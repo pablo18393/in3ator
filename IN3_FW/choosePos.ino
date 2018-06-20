@@ -10,14 +10,14 @@ void choosePos() {
   drawPos();
   end = 0;
   manualMode = 1;
-  Serial3.print("N");
-  Serial3.print("O");
-  Serial3.print(acceleration);
-  Serial3.print(",");
-  Serial3.print("E");
-  Serial3.print("Ix");
-  while (Serial3.available()) {
-    Serial3.read();
+  Serial.print("N");
+  Serial.print("O");
+  Serial.print(acceleration);
+  Serial.print(",");
+  Serial.print("E");
+  Serial.print("Ix");
+  while (Serial.available()) {
+    Serial.read();
   }
   while (end < 4) {
     manual_state = 0;
@@ -39,33 +39,33 @@ void choosePos() {
         manual_speed -= move;
         if (abs(manual_speed) == 0) {
           if (manualMode) {
-            Serial3.print("Px");
+            Serial.print("Px");
           }
           else {
-            Serial3.print("Pz");
+            Serial.print("Pz");
           }
           speed = min_speed_travel;
         }
         else {
           if (manualMode) {
-            Serial3.print("X");
+            Serial.print("X");
             if (manual_speed < 0) {
-              Serial3.print(-int(EEPROM.read(210 - manual_speed)));
+              Serial.print(-int(EEPROM.read(210 - manual_speed)));
             }
             else {
-              Serial3.print(EEPROM.read(210 + manual_speed));
+              Serial.print(EEPROM.read(210 + manual_speed));
             }
           }
           else {
-            Serial3.print("Z");
+            Serial.print("Z");
             if (manual_speed < 0) {
-              Serial3.print(-int(EEPROM.read(170 - manual_speed) ));
+              Serial.print(-int(EEPROM.read(170 - manual_speed) ));
             }
             else {
-              Serial3.print(EEPROM.read(170 + manual_speed) );
+              Serial.print(EEPROM.read(170 + manual_speed) );
             }
           }
-          Serial3.print(",");
+          Serial.print(",");
         }
         move = 0;
       }
@@ -76,28 +76,28 @@ void choosePos() {
       }
     }
     if (manualMode) {
-      Serial3.print("Px");
+      Serial.print("Px");
     }
     else {
-      Serial3.print("Pz");
+      Serial.print("Pz");
     }
     drawRespective(2);
     back_mode();
     if (end == 0) {
-      Serial3.print("Ix");
+      Serial.print("Ix");
     }
     end++;
     manualMode = !manualMode;
     switch (end) {
       case 2:
-        Serial3.print("Iz");
+        Serial.print("Iz");
         break;
       case 3:
-        Serial3.print("Fx");
+        Serial.print("Fx");
         delay(50);
         if (CheckComunication()) {
-          if (Serial3.peek() == '-') {
-            Serial3.read();
+          if (Serial.peek() == '-') {
+            Serial.read();
             travel_counter = read_string();
             travel_counter = -travel_counter;
           }
@@ -117,11 +117,11 @@ void choosePos() {
         printTravel();
         break;
       case 4:
-        Serial3.print("Fz");
+        Serial.print("Fz");
         delay(50);
         if (CheckComunication()) {
-          if (Serial3.peek() == '-') {
-            Serial3.read();
+          if (Serial.peek() == '-') {
+            Serial.read();
             pan_counter = read_string();
             pan_counter = -pan_counter;
           }
@@ -158,7 +158,7 @@ void choosePos() {
   else {
     tft.drawCentreString("GO", 123, 291, 4);
   }
-  Serial3.print("Y");
+  Serial.print("Y");
   black();
   if (page == 3) {
     calculateMin();

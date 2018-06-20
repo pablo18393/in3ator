@@ -218,7 +218,7 @@ int led_intensity;
 HardwareTimer timer(1);
 
 void setup() {
-  Serial3.begin(115200);
+  //Serial.begin(115200);
   pinMode(LED1, OUTPUT);
   pinMode(LED2, OUTPUT);
   pinMode(LED3, OUTPUT);
@@ -230,7 +230,6 @@ void setup() {
   pinMode(16, OUTPUT);
   pinMode(3, OUTPUT);
   pinMode(PB1, OUTPUT);
-  Serial.begin(115200);
   initEncoders();
   newPosition = myEncoderRead();
   auto_lock = EEPROM.read(13);
@@ -289,17 +288,17 @@ bool CheckComunication() {
 }
 
 byte read_char() {
-  return (Serial3.read());
+  return (Serial.read());
 }
 
 long read_string() {
   if (CheckComunication()) {
     data = 0;
     instant_read = 0;
-    if (Serial3.peek() == '-') {
-      Serial3.read();
+    if (Serial.peek() == '-') {
+      Serial.read();
     }
-    while (Serial3.available() && instant_read != ',') {
+    while (Serial.available() && instant_read != ',') {
       instant_read = read_char();
       if (instant_read != ',' && instant_read >= '0' && instant_read <= '9') {
         data = data * 10 + (instant_read - 48);

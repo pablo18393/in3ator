@@ -9,7 +9,7 @@ void selectMode() {
   }
   selected = 0;
   while (1) {
-    ypos = (320 - width_heading) / (2 * rectangles) + (bar_pos - 1) * (320 - width_heading) / (rectangles) + letter_height;
+    ypos = (tft.height() - width_heading) / (2 * rectangles) + (bar_pos - 1) * (tft.height() - width_heading) / (rectangles) + letter_height;
     updateData();
     if (move) {
       if (selected == 0) {
@@ -69,28 +69,28 @@ void selectMode() {
       selected = ! selected;
       if (!(page == 3 || page == 4 || page == 6) || bar_pos > 3) {
         if (selected) {
-          tft.fillRect(0, (320 - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (320 - width_heading) / rectangles, COLOR_CHOSEN);
+          tft.fillRect(0, (tft.height() - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (tft.height() - width_heading) / rectangles, COLOR_CHOSEN);
         }
         else {
-          tft.fillRect(0, (320 - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (320 - width_heading) / rectangles, WHITE);
+          tft.fillRect(0, (tft.height() - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (tft.height() - width_heading) / rectangles, WHITE);
         }
       }
       else {
         if (selected) {
-          tft.fillRect(0, width_heading, width_select, (320 - width_heading) * 3 / rectangles, COLOR_CHOSEN);
+          tft.fillRect(0, width_heading, width_select, (tft.height() - width_heading) * 3 / rectangles, COLOR_CHOSEN);
         }
         else {
-          tft.fillRect(0, width_heading, width_select, (320 - width_heading) * 3 / rectangles, WHITE);
+          tft.fillRect(0, width_heading, width_select, (tft.height() - width_heading) * 3 / rectangles, WHITE);
         }
       }
       if (!(page == 3 || page == 4 || page == 6)) {
         for (int i = 2; i <= rectangles; i++) {
-          tft.fillRect(0, (320 - width_heading) * (i - 1) / rectangles + width_heading - 1, 320, width_space, WHITE); //mejorable
+          tft.fillRect(0, (tft.height() - width_heading) * (i - 1) / rectangles + width_heading - 1, tft.height(), width_space, WHITE); //mejorable
         }
       }
       else {
         for (int i = 4; i <= rectangles; i++) {
-          tft.fillRect(0, (320 - width_heading) * (i - 1) / rectangles + width_heading - 1, 320, width_space, WHITE); //mejorable
+          tft.fillRect(0, (tft.height() - width_heading) * (i - 1) / rectangles + width_heading - 1, tft.height(), width_space, WHITE); //mejorable
         }
       }
       while (digitalRead(pulse) == 0) {
@@ -236,28 +236,28 @@ void selectMode() {
               }
               EEPROM.write(21, max_speed);
               EEPROM.write(0, page);
-              Serial3.print("E");
-              Serial3.print("t");
-              Serial3.print(travel_counter);
-              Serial3.print(",p");
-              Serial3.print(pan_counter);
-              Serial3.print(",O");
-              Serial3.print((ramp / ramp_factor));
-              Serial3.print(",M");
-              Serial3.print("R");
-              Serial3.print(repeat);
-              Serial3.print("D");
-              Serial3.print(delay_start);
-              Serial3.print(",");
+              Serial.print("E");
+              Serial.print("t");
+              Serial.print(travel_counter);
+              Serial.print(",p");
+              Serial.print(pan_counter);
+              Serial.print(",O");
+              Serial.print((ramp / ramp_factor));
+              Serial.print(",M");
+              Serial.print("R");
+              Serial.print(repeat);
+              Serial.print("D");
+              Serial.print(delay_start);
+              Serial.print(",");
               if (travel_counter) {
-                Serial3.print("X");
-                Serial3.print(EEPROM.read(210 + am_speed));
+                Serial.print("X");
+                Serial.print(EEPROM.read(210 + am_speed));
               }
               else {
-                Serial3.print("Z");
-                Serial3.print(EEPROM.read(170 + am_speed));
+                Serial.print("Z");
+                Serial.print(EEPROM.read(170 + am_speed));
               }
-              Serial3.print(",");
+              Serial.print(",");
               delayStart();
               delay(50);
               process_page();
@@ -265,7 +265,7 @@ void selectMode() {
           }
           selected = 0;
           if (bar_pos > 3) {
-            tft.fillRect(0, (320 - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (320 - width_heading) / rectangles, WHITE);
+            tft.fillRect(0, (tft.height() - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (tft.height() - width_heading) / rectangles, WHITE);
           }
           else {
             updateBigBar();
@@ -348,7 +348,7 @@ void selectMode() {
                 delay(100);
               }
               selected = 0;
-              tft.fillRect(0, (320 - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (320 - width_heading) / rectangles, WHITE);
+              tft.fillRect(0, (tft.height() - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (tft.height() - width_heading) / rectangles, WHITE);
               break;
             case 7:
               delay(50);
@@ -357,36 +357,36 @@ void selectMode() {
               }
               stops_done = 0;
               stops = (long(tl_data[0]) * 60 + tl_data[1]) * clip_fps; //primer fotograma y ultimo
-              Serial3.print("E");
-              Serial3.print("t");
-              Serial3.print(travel_counter);
-              Serial3.print(",p");
-              Serial3.print(pan_counter);
-              Serial3.print(",TL,");
-              Serial3.print(stops); //fotogramas
-              Serial3.print(",");
-              Serial3.print(tl_speed_travel); //velocidad de movimiento
-              Serial3.print(",");
-              Serial3.print(tl_speed_pan); //velocidad de movimiento
-              Serial3.print(",");
-              Serial3.print(long(tl_data[4]) * 60 + tl_data[5]); //tiempo de exposicion en segundos
-              Serial3.print(",");
-              Serial3.print(long(tl_data[2]) * 60 + tl_data[3]); //interval en segundos
-              Serial3.print(",");
-              Serial3.print(t_min[0]);
-              Serial3.print(",");
-              Serial3.print(t_min[1]);
-              Serial3.print(",");
-              Serial3.print(t_min[2]);
-              Serial3.print(",");
-              Serial3.print(tl_power);
-              Serial3.print(",");
-              Serial3.print(delay_start);
-              Serial3.print(",");
+              Serial.print("E");
+              Serial.print("t");
+              Serial.print(travel_counter);
+              Serial.print(",p");
+              Serial.print(pan_counter);
+              Serial.print(",TL,");
+              Serial.print(stops); //fotogramas
+              Serial.print(",");
+              Serial.print(tl_speed_travel); //velocidad de movimiento
+              Serial.print(",");
+              Serial.print(tl_speed_pan); //velocidad de movimiento
+              Serial.print(",");
+              Serial.print(long(tl_data[4]) * 60 + tl_data[5]); //tiempo de exposicion en segundos
+              Serial.print(",");
+              Serial.print(long(tl_data[2]) * 60 + tl_data[3]); //interval en segundos
+              Serial.print(",");
+              Serial.print(t_min[0]);
+              Serial.print(",");
+              Serial.print(t_min[1]);
+              Serial.print(",");
+              Serial.print(t_min[2]);
+              Serial.print(",");
+              Serial.print(tl_power);
+              Serial.print(",");
+              Serial.print(delay_start);
+              Serial.print(",");
               page = 10;
               EEPROM.write(0, page);
               delayStart();
-              while (Serial3.available()) {
+              while (Serial.available()) {
                 read_char();
               }
               process_page();
@@ -394,7 +394,7 @@ void selectMode() {
           }
           selected = 0;
           if (bar_pos > 3) {
-            tft.fillRect(0, (320 - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (320 - width_heading) / rectangles, WHITE);
+            tft.fillRect(0, (tft.height() - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (tft.height() - width_heading) / rectangles, WHITE);
           }
           else {
             updateBigBar();
@@ -519,7 +519,7 @@ void selectMode() {
               break;
           }
           selected = 0;
-          tft.fillRect(0, (320 - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (320 - width_heading) / rectangles, WHITE);
+          tft.fillRect(0, (tft.height() - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (tft.height() - width_heading) / rectangles, WHITE);
           while (digitalRead(pulse) == 0) {
             updateData();
             back_mode();
@@ -592,7 +592,7 @@ void selectMode() {
                 delay(100);
               }
               selected = 0;
-              tft.fillRect(0, (320 - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (320 - width_heading) / rectangles, WHITE);
+              tft.fillRect(0, (tft.height() - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (tft.height() - width_heading) / rectangles, WHITE);
               break;
             case 5:
               delay(50);
@@ -601,37 +601,37 @@ void selectMode() {
               }
               stops_done = 0;
               stops = (long(tl_data[0]) * 60 + tl_data[1]) * clip_fps; //primer fotograma y ultimo
-              Serial3.print("E");
-              Serial3.print("t");
-              Serial3.print(travel_counter);
-              Serial3.print(",p");
-              Serial3.print(pan_counter);
-              Serial3.print(",TM,");
-              Serial3.print(stops); //fotogramas
-              Serial3.print(",");
-              Serial3.print(tl_speed_travel); //velocidad de movimiento
-              Serial3.print(",");
-              Serial3.print(tl_speed_pan); //velocidad de movimiento
-              Serial3.print(",");
-              Serial3.print(0); //tiempo de exposicion en segundos
-              Serial3.print(",");
-              Serial3.print(0); //interval en segundos
-              Serial3.print(",");
-              Serial3.print(t_min[0]);
-              Serial3.print(",");
-              Serial3.print(t_min[1]);
-              Serial3.print(",");
-              Serial3.print(t_min[2]);
-              Serial3.print(",");
-              Serial3.print(tl_power);
-              Serial3.print(",");
-              Serial3.print(delay_start);
-              Serial3.print(",");
+              Serial.print("E");
+              Serial.print("t");
+              Serial.print(travel_counter);
+              Serial.print(",p");
+              Serial.print(pan_counter);
+              Serial.print(",TM,");
+              Serial.print(stops); //fotogramas
+              Serial.print(",");
+              Serial.print(tl_speed_travel); //velocidad de movimiento
+              Serial.print(",");
+              Serial.print(tl_speed_pan); //velocidad de movimiento
+              Serial.print(",");
+              Serial.print(0); //tiempo de exposicion en segundos
+              Serial.print(",");
+              Serial.print(0); //interval en segundos
+              Serial.print(",");
+              Serial.print(t_min[0]);
+              Serial.print(",");
+              Serial.print(t_min[1]);
+              Serial.print(",");
+              Serial.print(t_min[2]);
+              Serial.print(",");
+              Serial.print(tl_power);
+              Serial.print(",");
+              Serial.print(delay_start);
+              Serial.print(",");
 
               page = 11;
               EEPROM.write(0, page);
               delayStart();
-              while (Serial3.available()) {
+              while (Serial.available()) {
                 read_char();
               }
               process_page();
@@ -639,7 +639,7 @@ void selectMode() {
           }
           selected = 0;
           if (bar_pos > 3) {
-            tft.fillRect(0, (320 - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (320 - width_heading) / rectangles, WHITE);
+            tft.fillRect(0, (tft.height() - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (tft.height() - width_heading) / rectangles, WHITE);
           }
           else {
             updateBigBar();
@@ -652,32 +652,32 @@ void selectMode() {
 }
 
 void eraseBar() {
-  //tft.fillRect(0, (320 - width_heading - width_space * (rectangles - 1)) * (bar_pos - 1) / rectangles + width_heading + (bar_pos - 1) * (width_space), width_select, (320 - width_heading - width_space * (rectangles - 1)) / rectangles, COLOR_BAR);
-  tft.fillRect(0, (320 - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (320 - width_heading) / rectangles, COLOR_BAR);
+  //tft.fillRect(0, (tft.height() - width_heading - width_space * (rectangles - 1)) * (bar_pos - 1) / rectangles + width_heading + (bar_pos - 1) * (width_space), width_select, (tft.height() - width_heading - width_space * (rectangles - 1)) / rectangles, COLOR_BAR);
+  tft.fillRect(0, (tft.height() - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (tft.height() - width_heading) / rectangles, COLOR_BAR);
 }
 
 void updateBar() {
-  tft.fillRect(0, (320 - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (320 - width_heading) / rectangles, COLOR_SELECTED);
+  tft.fillRect(0, (tft.height() - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (tft.height() - width_heading) / rectangles, COLOR_SELECTED);
   if (page == 3 || page == 4 || page == 6) {
     for (int i = 4; i <= rectangles; i++) {
-      tft.fillRect(0, (320 - width_heading) * (i - 1) / rectangles + width_heading - 1, 320, width_space, WHITE); //mejorable
+      tft.fillRect(0, (tft.height() - width_heading) * (i - 1) / rectangles + width_heading - 1, tft.height(), width_space, WHITE); //mejorable
     }
   }
   else {
     for (int i = 2; i <= rectangles; i++) {
-      tft.fillRect(0, (320 - width_heading) * (i - 1) / rectangles + width_heading - 1, 320, width_space, WHITE); //mejorable
+      tft.fillRect(0, (tft.height() - width_heading) * (i - 1) / rectangles + width_heading - 1, tft.height(), width_space, WHITE); //mejorable
     }
   }
 }
 
 void eraseBigBar() {
-  tft.fillRect(0, width_heading, width_select, (320 - width_heading) * 3 / rectangles, COLOR_BAR);
+  tft.fillRect(0, width_heading, width_select, (tft.height() - width_heading) * 3 / rectangles, COLOR_BAR);
 }
 
 void updateBigBar() {
-  tft.fillRect(0, width_heading, width_select, (320 - width_heading) * 3 / rectangles, WHITE);
+  tft.fillRect(0, width_heading, width_select, (tft.height() - width_heading) * 3 / rectangles, WHITE);
   for (int i = 4; i <= rectangles; i++) {
-    tft.fillRect(0, (320 - width_heading) * (i - 1) / rectangles + width_heading - 1, 320, width_space, WHITE); //mejorable
+    tft.fillRect(0, (tft.height() - width_heading) * (i - 1) / rectangles + width_heading - 1, tft.height(), width_space, WHITE); //mejorable
   }
 }
 
@@ -693,17 +693,17 @@ void back_mode() {
     }
     if (back_bar == width_back) {
       if (page > 1 || page < 5) {
-        Serial3.print("N");
+        Serial.print("N");
         black();
       }
       if (page == 10) {
-        Serial3.print("P");
+        Serial.print("P");
         state_tl = 0;
         black();
         time_lapse();
       }
       if (page == 11) {
-        Serial3.print("P");
+        Serial.print("P");
         black();
         stop_motion();
       }
@@ -776,12 +776,12 @@ void delayStart() {
     tft.setTextColor(WHITE);
     if (language) {
       tft.drawCentreString("EMPEZANDO EN:", 120, 50, 4);
-      tft.drawCentreString("PULSA PARA", 120, 240, 4);
+      tft.drawCentreString("PULSA PARA", 120, tft.width(), 4);
       tft.drawCentreString("COMENZAR", 120, 280, 4);
     }
     else {
       tft.drawCentreString("STARTING IN:", 120, 50, 4);
-      tft.drawCentreString("PULSE BUTTON", 120, 240, 4);
+      tft.drawCentreString("PULSE BUTTON", 120, tft.width(), 4);
       tft.drawCentreString("TO SKIP DELAY", 120, 280, 4);
     }
     tft.setTextSize(2);
@@ -803,7 +803,7 @@ void delayStart() {
     }
     waiting = 0;
     if (digitalRead(pulse) == 0) {
-      Serial3.print("U");
+      Serial.print("U");
       while (digitalRead(pulse) == 0) {
         updateData();
       }

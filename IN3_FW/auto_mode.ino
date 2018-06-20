@@ -59,39 +59,39 @@ void errorPage() {
   tft.drawCentreString("ERROR", 120, ymess, 4);
   tft.setTextColor(ILI9341_WHITE);
   for (byte i = 0; i <= 2; i++) {
-    tft.fillCircle(cir_x, (320 - 50 - 40) * (i + 1) / 3 + 30, cir_rad, WHITE);
+    tft.fillCircle(cir_x, (tft.height() - 50 - 40) * (i + 1) / 3 + 30, cir_rad, WHITE);
     if (language) {
       switch (i) {
         case 0:
-          tft.drawString("aumenta distancia", cir_x + cir_rad + 5, (320 - 50 - 40) * (i + 1) / 3 + 20, 4);
-          tft.drawString("travelling", cir_x + cir_rad + 5, (320 - 50 - 40) * (i + 1) / 3 + 45, 4);
+          tft.drawString("aumenta distancia", cir_x + cir_rad + 5, (tft.height() - 50 - 40) * (i + 1) / 3 + 20, 4);
+          tft.drawString("travelling", cir_x + cir_rad + 5, (tft.height() - 50 - 40) * (i + 1) / 3 + 45, 4);
           break;
         case 1:
-          tft.drawString("reduce angulo", cir_x + cir_rad + 5, (320 - 50 - 40) * (i + 1) / 3 + 20, 4);
-          tft.drawString("de paneo", cir_x + cir_rad + 5, (320 - 50 - 40) * (i + 1) / 3 + 45, 4);
+          tft.drawString("reduce angulo", cir_x + cir_rad + 5, (tft.height() - 50 - 40) * (i + 1) / 3 + 20, 4);
+          tft.drawString("de paneo", cir_x + cir_rad + 5, (tft.height() - 50 - 40) * (i + 1) / 3 + 45, 4);
           break;
         case 2:
-          tft.drawString("reduce a velocidad", cir_x + cir_rad + 5, (320 - 50 - 40) * (i + 1) / 3 + 20, 4);
-          tft.drawString("numero:      o menor", cir_x + cir_rad + 5, (320 - 50 - 40) * (i + 1) / 3 + 45, 4);
+          tft.drawString("reduce a velocidad", cir_x + cir_rad + 5, (tft.height() - 50 - 40) * (i + 1) / 3 + 20, 4);
+          tft.drawString("numero:      o menor", cir_x + cir_rad + 5, (tft.height() - 50 - 40) * (i + 1) / 3 + 45, 4);
           tft.setTextColor(ILI9341_GREEN);
-          drawCentreNumber(d, 128, (320 - 50 - 40) * (i + 1) / 3 + 45);
+          drawCentreNumber(d, 128, (tft.height() - 50 - 40) * (i + 1) / 3 + 45);
           break;
       }
     }
     else {
       switch (i) {
         case 0:
-          tft.drawString("increase travelling", cir_x + cir_rad + 5, (320 - 50 - 40) * (i + 1) / 3 + 20, 4);
-          tft.drawString("distance", cir_x + cir_rad + 5, (320 - 50 - 40) * (i + 1) / 3 + 45, 4);
+          tft.drawString("increase travelling", cir_x + cir_rad + 5, (tft.height() - 50 - 40) * (i + 1) / 3 + 20, 4);
+          tft.drawString("distance", cir_x + cir_rad + 5, (tft.height() - 50 - 40) * (i + 1) / 3 + 45, 4);
           break;
         case 1:
-          tft.drawString("reduce pan angle", cir_x + cir_rad + 5, (320 - 50 - 40) * (i + 1) / 3 + 20, 4);
+          tft.drawString("reduce pan angle", cir_x + cir_rad + 5, (tft.height() - 50 - 40) * (i + 1) / 3 + 20, 4);
           break;
         case 2:
-          tft.drawString("reduce speed", cir_x + cir_rad + 5, (320 - 50 - 40) * (i + 1) / 3 + 20, 4);
-          tft.drawString("to:      or lower", cir_x + cir_rad + 5, (320 - 50 - 40) * (i + 1) / 3 + 45, 4);
+          tft.drawString("reduce speed", cir_x + cir_rad + 5, (tft.height() - 50 - 40) * (i + 1) / 3 + 20, 4);
+          tft.drawString("to:      or lower", cir_x + cir_rad + 5, (tft.height() - 50 - 40) * (i + 1) / 3 + 45, 4);
           tft.setTextColor(ILI9341_GREEN);
-          drawCentreNumber(d, 64, (320 - 50 - 40) * (i + 1) / 3 + 45);
+          drawCentreNumber(d, 64, (tft.height() - 50 - 40) * (i + 1) / 3 + 45);
           break;
       }
     }

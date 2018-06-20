@@ -8,14 +8,14 @@ void manual_mode() {
   tft.setTextSize(1);
   manualMode = EEPROM.read(1);
   if (manualMode) {
-    tft.drawCentreString("TRAVELLING", width_select + (240 - width_select) / 2, 265, 4);
+    tft.drawCentreString("TRAVELLING", width_select + (tft.width() - width_select) / 2, 265, 4);
   }
   else {
     if (language) {
-      tft.drawCentreString("PANEO/F-FOCUS", width_select + (240 - width_select) / 2, 265, 4);
+      tft.drawCentreString("PANEO/F-FOCUS", width_select + (tft.width() - width_select) / 2, 265, 4);
     }
     else {
-      tft.drawCentreString("PAN/F-FOCUS", width_select + (240 - width_select) / 2, 265, 4);
+      tft.drawCentreString("PAN/F-FOCUS", width_select + (tft.width() - width_select) / 2, 265, 4);
     }
   }
   tft.setTextSize(2);
@@ -35,8 +35,8 @@ void manual_mode() {
   keep_am = 0;
   travel_counter = 0;
   pan_counter = 0;
-  Serial3.print("W");
-  Serial3.print("E");
+  Serial.print("W");
+  Serial.print("E");
 
   while (1) {
     updateData();
@@ -84,13 +84,13 @@ void manual_mode() {
         if (manual_speed == 0) {
           if (stopped == 0) {
             if (manualMode) {
-              Serial3.print("EO");
-              Serial3.print(acceleration_stop);
-              Serial3.print(",");
-              Serial3.print("Px");
+              Serial.print("EO");
+              Serial.print(acceleration_stop);
+              Serial.print(",");
+              Serial.print("Px");
             }
             else {
-              Serial3.print("Pz");
+              Serial.print("Pz");
             }
             speed = min_speed_travel;
           }
@@ -99,28 +99,28 @@ void manual_mode() {
           if (manualMode) {
             stopped = 0;
             if (abs(manual_speed) == 1) {
-              Serial3.print("EO");
-              Serial3.print(acceleration);
-              Serial3.print(",");
+              Serial.print("EO");
+              Serial.print(acceleration);
+              Serial.print(",");
             }
-            Serial3.print("X");
+            Serial.print("X");
             if (manual_speed < 0) {
-              Serial3.print(-int(EEPROM.read(210 - manual_speed)));
+              Serial.print(-int(EEPROM.read(210 - manual_speed)));
             }
             else {
-              Serial3.print(EEPROM.read(210 + manual_speed));
+              Serial.print(EEPROM.read(210 + manual_speed));
             }
           }
           else {
-            Serial3.print("Z");
+            Serial.print("Z");
             if (manual_speed < 0) {
-              Serial3.print(-int(EEPROM.read(170 - manual_speed) ));
+              Serial.print(-int(EEPROM.read(170 - manual_speed) ));
             }
             else {
-              Serial3.print(EEPROM.read(170 + manual_speed) );
+              Serial.print(EEPROM.read(170 + manual_speed) );
             }
           }
-          Serial3.print(",");
+          Serial.print(",");
         }
         move = 0;
       }
@@ -148,16 +148,16 @@ void manual_mode() {
         drawCentreNumber(abs(manual_speed), 120, height_letter);
         if (stopped == 0) {
           if (manualMode) {
-            Serial3.print("EO");
-            Serial3.print(acceleration_stop);
-            Serial3.print(",");
+            Serial.print("EO");
+            Serial.print(acceleration_stop);
+            Serial.print(",");
             if (manual_speed != 0) {
-              Serial3.print("Px");
+              Serial.print("Px");
             }
           }
         }
         if (manualMode == 0) {
-          Serial3.print("Pz");
+          Serial.print("Pz");
         }
         manual_speed = 0;
         tft.setTextColor(ILI9341_WHITE);
