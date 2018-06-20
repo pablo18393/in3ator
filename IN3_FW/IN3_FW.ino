@@ -1,4 +1,4 @@
- const long tl_speed_travel = 200; //VELOCIDAD DE MOVIMIENTO DEL TIME LAPSE
+const long tl_speed_travel = 200; //VELOCIDAD DE MOVIMIENTO DEL TIME LAPSE
 const long tl_speed_pan = 4000; //VELOCIDAD DE MOVIMIENTO DEL TIME LAPSE
 const int min_speed_travel = 900; //VELOCIDAD MINIMA DE MODO MANUAL
 const byte max_speed_travel = 16; //VELOCIDAD MAXIMA MODO MANUAL
@@ -81,11 +81,11 @@ byte incResonancia[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //introducir empezando 
 #define FAN2_FB 21
 #define FAN3_FB 22
 #define HEATER 16
-#define HEATER_FB 17 
+#define HEATER_FB 17
 #define ICT 25
 #define ICT_FB 26
 #define STERILIZE 28
-#define STERILIZE_FB 29 
+#define STERILIZE_FB 29
 #define WATERPUMP 27
 #define WATERPUMP_FB 30
 #define THERMISTOR1 11
@@ -212,7 +212,7 @@ bool battery_warning, battery_warning_0;
 bool battery_blink;
 long last_battery_blink;
 bool waiting;
-
+int led_intensity;
 // timer
 #define ENCODER_RATE 1000    // in microseconds; 
 HardwareTimer timer(1);
@@ -223,29 +223,44 @@ void setup() {
   pinMode(LED2, OUTPUT);
   pinMode(LED3, OUTPUT);
   pinMode(pulse, INPUT_PULLUP);
+  pinMode(ICT, OUTPUT);
   pinMode(22, INPUT);
   pinMode(11, OUTPUT);
-  pinMode(8,OUTPUT);
-  pinMode(16,OUTPUT);
-  pinMode(3,OUTPUT);
-  pinMode(PB1,OUTPUT);
+  pinMode(8, OUTPUT);
+  pinMode(16, OUTPUT);
+  pinMode(3, OUTPUT);
+  pinMode(PB1, OUTPUT);
   Serial.begin(115200);
-while(0){
-  digitalWrite(8,HIGH);
-  digitalWrite(16,HIGH);
-  delay(2000);
-  digitalWrite(PB1,digitalRead(22));
-  digitalWrite(8,LOW);
-  digitalWrite(16,LOW);
-  delay(2000);
-  digitalWrite(PB1,digitalRead(22));
-}
+  initEncoders();
+  newPosition = myEncoderRead();
+  auto_lock = EEPROM.read(13);
+  oldPosition = newPosition;
+  while (0) {
+    /*
+      digitalWrite(8,HIGH);
+      digitalWrite(16,HIGH);
+      delay(2000);
+      digitalWrite(PB1,digitalRead(22));
+      digitalWrite(8,LOW);
+      digitalWrite(16,LOW);
+      delay(2000);
+      digitalWrite(PB1,digitalRead(22));
+    */
+    led_intensity += 10 * updateData();
+    if (led_intensity > 255) {
+      led_intensity = 255;
+    }
+    if (led_intensity < 0) {
+      led_intensity = 0;
+    }
+    analogWrite(ICT, led_intensity);
+  }
 
   tft.begin();
   tft.setRotation(1);
   initEEPROM();
   tft.fillScreen(WHITE);
-  //loadLogo();
+  loadLogo();
   black();
   digitalWrite(LED1, HIGH);
   digitalWrite(LED2, HIGH);
@@ -255,7 +270,7 @@ while(0){
   newPosition = myEncoderRead();
   auto_lock = EEPROM.read(13);
   oldPosition = newPosition;
-menu();
+  menu();
 }
 // the loop function runs over and over again forever
 void loop() {

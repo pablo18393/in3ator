@@ -100,7 +100,7 @@ void process_page() {
       print_text = 1; //cambiar en todos
       if (page == 10) {
         shots_height = 50;
-        text_height = 235;
+        text_height = 315;
       }
       else {
         shots_height = 80;

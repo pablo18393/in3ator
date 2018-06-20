@@ -113,10 +113,27 @@ void selectMode() {
               time_lapse();
               break;
             case 4:
-              stop_motion();
-              break;
-            case 5:
-              settings();
+              while (digitalRead(pulse)) {
+                updateData();
+                if (move) {
+                  if (language == 0) {
+                    tft.setTextColor(ILI9341_BLACK);
+                    tft.drawRightString("ENG", 315, ypos, 4);
+                    tft.setTextColor(ILI9341_WHITE);
+                    tft.drawRightString("SPA", 315, ypos, 4);
+                  }
+                  else if (language == 1) {
+                    tft.setTextColor(ILI9341_BLACK);
+                    tft.drawRightString("SPA", 315, ypos, 4);
+                    tft.setTextColor(ILI9341_WHITE);
+                    tft.drawRightString("ENG", 315, ypos, 4);
+                  }
+                  language = !language;
+                  move = 0;
+                  EEPROM.write(17, language);
+                }
+              }
+              menu();
               break;
           }
           break;
@@ -157,25 +174,25 @@ void selectMode() {
                 if (move) {
                   if (repeat == 0) {
                     tft.setTextColor(ILI9341_BLACK);
-                    tft.drawRightString("NO", 235, ypos, 4);
+                    tft.drawRightString("NO", 315, ypos, 4);
                     tft.setTextColor(ILI9341_WHITE);
                     if (language) {
-                      tft.drawRightString("SI", 235, ypos, 4);
+                      tft.drawRightString("SI", 315, ypos, 4);
                     }
                     else {
-                      tft.drawRightString("YES", 235, ypos, 4);
+                      tft.drawRightString("YES", 315, ypos, 4);
                     }
                   }
                   else {
                     tft.setTextColor(ILI9341_BLACK);
                     if (language) {
-                      tft.drawRightString("SI", 235, ypos, 4);
+                      tft.drawRightString("SI", 315, ypos, 4);
                     }
                     else {
-                      tft.drawRightString("YES", 235, ypos, 4);
+                      tft.drawRightString("YES", 315, ypos, 4);
                     }
                     tft.setTextColor(ILI9341_WHITE);
-                    tft.drawRightString("NO", 235, ypos, 4);
+                    tft.drawRightString("NO", 315, ypos, 4);
                   }
                   repeat = !repeat;
                   move = 0;
@@ -188,10 +205,10 @@ void selectMode() {
                 updateData();
                 if (move && -move + am_speed >= 1 && -move + am_speed <= 40) {
                   tft.setTextColor(ILI9341_BLACK);
-                  drawRightNumber(am_speed, 235, ypos);
+                  drawRightNumber(am_speed, 315, ypos);
                   am_speed -= move;
                   tft.setTextColor(ILI9341_WHITE);
-                  drawRightNumber(am_speed, 235, ypos);
+                  drawRightNumber(am_speed, 315, ypos);
                   EEPROM.write(6, am_speed);
                 }
                 calculateMin();
@@ -390,10 +407,10 @@ void selectMode() {
                 updateData();
                 if (move && -move + clip_fps >= 5 && -move + clip_fps <= 150) {
                   tft.setTextColor(ILI9341_BLACK);
-                  drawRightNumber(clip_fps, 235, ypos);
+                  drawRightNumber(clip_fps, 315, ypos);
                   clip_fps -= move;
                   tft.setTextColor(ILI9341_WHITE);
-                  drawRightNumber(clip_fps, 235, ypos);
+                  drawRightNumber(clip_fps, 315, ypos);
                   EEPROM.write(14, clip_fps);
                 }
                 move = 0;
@@ -405,25 +422,25 @@ void selectMode() {
                 if (move) {
                   if (auto_lock == 0) {
                     tft.setTextColor(ILI9341_BLACK);
-                    tft.drawRightString("NO", 235, ypos, 4);
+                    tft.drawRightString("NO", 315, ypos, 4);
                     tft.setTextColor(ILI9341_WHITE);
                     if (language) {
-                      tft.drawRightString("SI", 235, ypos, 4);
+                      tft.drawRightString("SI", 315, ypos, 4);
                     }
                     else {
-                      tft.drawRightString("YES", 235, ypos, 4);
+                      tft.drawRightString("YES", 315, ypos, 4);
                     }
                   }
                   else {
                     tft.setTextColor(ILI9341_BLACK);
                     if (language) {
-                      tft.drawRightString("SI", 235, ypos, 4);
+                      tft.drawRightString("SI", 315, ypos, 4);
                     }
                     else {
-                      tft.drawRightString("YES", 235, ypos, 4);
+                      tft.drawRightString("YES", 315, ypos, 4);
                     }
                     tft.setTextColor(ILI9341_WHITE);
-                    tft.drawRightString("NO", 235, ypos, 4);
+                    tft.drawRightString("NO", 315, ypos, 4);
                   }
                   auto_lock = !auto_lock;
                   move = 0;
@@ -437,25 +454,25 @@ void selectMode() {
                 if (move) {
                   if (tl_power == 0) {
                     tft.setTextColor(ILI9341_BLACK);
-                    tft.drawRightString("NO", 235, ypos, 4);
+                    tft.drawRightString("NO", 315, ypos, 4);
                     tft.setTextColor(ILI9341_WHITE);
                     if (language) {
-                      tft.drawRightString("SI", 235, ypos, 4);
+                      tft.drawRightString("SI", 315, ypos, 4);
                     }
                     else {
-                      tft.drawRightString("YES", 235, ypos, 4);
+                      tft.drawRightString("YES", 315, ypos, 4);
                     }
                   }
                   else {
                     tft.setTextColor(ILI9341_BLACK);
                     if (language) {
-                      tft.drawRightString("SI", 235, ypos, 4);
+                      tft.drawRightString("SI", 315, ypos, 4);
                     }
                     else {
-                      tft.drawRightString("YES", 235, ypos, 4);
+                      tft.drawRightString("YES", 315, ypos, 4);
                     }
                     tft.setTextColor(ILI9341_WHITE);
-                    tft.drawRightString("NO", 235, ypos, 4);
+                    tft.drawRightString("NO", 315, ypos, 4);
                   }
                   tl_power = !tl_power;
                   move = 0;
@@ -483,15 +500,15 @@ void selectMode() {
                 if (move) {
                   if (language == 0) {
                     tft.setTextColor(ILI9341_BLACK);
-                    tft.drawRightString("ENG", 235, ypos, 4);
+                    tft.drawRightString("ENG", 315, ypos, 4);
                     tft.setTextColor(ILI9341_WHITE);
-                    tft.drawRightString("SPA", 235, ypos, 4);
+                    tft.drawRightString("SPA", 315, ypos, 4);
                   }
                   else if (language == 1) {
                     tft.setTextColor(ILI9341_BLACK);
-                    tft.drawRightString("SPA", 235, ypos, 4);
+                    tft.drawRightString("SPA", 315, ypos, 4);
                     tft.setTextColor(ILI9341_WHITE);
-                    tft.drawRightString("ENG", 235, ypos, 4);
+                    tft.drawRightString("ENG", 315, ypos, 4);
                   }
                   language = !language;
                   move = 0;

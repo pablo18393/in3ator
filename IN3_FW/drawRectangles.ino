@@ -50,29 +50,30 @@ void drawRectangles() {
           switch (i) {
             case 0:
               drawPos();
+              tft.drawRightString("OFF", 315, ypos, 4);
               break;
             case 3:
               ramp = EEPROM.read(4);
               drawRightNumber(ramp, 200, ypos);
-              tft.drawRightString("%", 235, ypos, 4);
+              tft.drawRightString("%", 315, ypos, 4);
               break;
             case 4:
               repeat = EEPROM.read(5);
               if (repeat) {
                 if (language) {
-                  tft.drawRightString("SI", 235, ypos, 4);
+                  tft.drawRightString("SI", 315, ypos, 4);
                 }
                 else {
-                  tft.drawRightString("YES", 235, ypos, 4);
+                  tft.drawRightString("YES", 315, ypos, 4);
                 }
               }
               else {
-                tft.drawRightString("NO", 235, ypos, 4);
+                tft.drawRightString("NO", 315, ypos, 4);
               }
               break;
             case 5:
               am_speed = EEPROM.read(6);
-              drawRightNumber(am_speed, 235, ypos);
+              drawRightNumber(am_speed, 315, ypos);
               break;
           }
           break;
@@ -97,44 +98,44 @@ void drawRectangles() {
         case 5:
           switch (i) {
             case 0:
-              drawRightNumber(clip_fps, 235, ypos);
+              drawRightNumber(clip_fps, 315, ypos);
               break;
             case 1:
               if (auto_lock) {
                 if (language) {
-                  tft.drawRightString("SI", 235, ypos, 4);
+                  tft.drawRightString("SI", 315, ypos, 4);
                 }
                 else {
-                  tft.drawRightString("YES", 235, ypos, 4);
+                  tft.drawRightString("YES", 315, ypos, 4);
                 }
               }
               else {
-                tft.drawRightString("NO", 235, ypos, 4);
+                tft.drawRightString("NO", 315, ypos, 4);
               }
               break;
             case 2:
               if (tl_power) {
                 if (language) {
-                  tft.drawRightString("SI", 235, ypos, 4);
+                  tft.drawRightString("SI", 315, ypos, 4);
                 }
                 else {
-                  tft.drawRightString("YES", 235, ypos, 4);
+                  tft.drawRightString("YES", 315, ypos, 4);
                 }
               }
               else {
-                tft.drawRightString("NO", 235, ypos, 4);
+                tft.drawRightString("NO", 315, ypos, 4);
               }
               break;
             case 3:
               drawRightNumber(delay_start, 215, ypos);
-              tft.drawRightString("s", 235, ypos, 4);
+              tft.drawRightString("s", 315, ypos, 4);
               break;
             case 4:
               if (language == 0) {
-                tft.drawRightString("ENG", 235, ypos, 4);
+                tft.drawRightString("ENG", 315, ypos, 4);
               }
               else if (language == 1) {
-                tft.drawRightString("SPA", 235, ypos, 4);
+                tft.drawRightString("SPA", 315, ypos, 4);
               }
               break;
           }

@@ -1,4 +1,4 @@
-void updateData() {
+int updateData() {
   checkSleep();
   newPosition = myEncoderRead();
   move = oldPosition - newPosition;
@@ -12,26 +12,10 @@ void updateData() {
   }
   lastEncoderPos[counter] = encoderpos[counter];
   oldPosition = newPosition;
-  if (waiting == 0) {
-    checkBattery();
-    if (battery_warning) {
-      draw_battery_warning();
-    }
-  }
-  if (Serial3.peek() == 'm') {
-    Serial3.read();
-    Serial3.print('m');
-  }
-
+  return move;
 }
 
 void checkBattery() {
-  if (Serial3.peek() == 'B') {
-    delay(50);
-    Serial3.read();
-    voltage = read_string();
-    current = read_string();
-    drawBattery();
-  }
+
 }
 
