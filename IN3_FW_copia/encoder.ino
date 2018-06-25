@@ -13,7 +13,7 @@ void asleep() {
   }
   pulsed_before = pulsed;
 
-  if (millis() - last_something > time_lock && !auto_lock) {
+  if (millis() - last_something > time_lock && auto_lock) {
     digitalWrite(LED1, LOW);
     digitalWrite(LED2, LOW);
     digitalWrite(LED3, LOW);

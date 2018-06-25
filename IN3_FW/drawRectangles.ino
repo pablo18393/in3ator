@@ -19,21 +19,15 @@ int ypos;
 bool print_text = 1;
 
 void drawRectangles() {
-
   tft.fillRect(width_select, width_heading, tft.width() - width_select, tft.height() - width_heading, COLOR_MENU);
   if (print_text) {
     tft.fillRect(0, width_heading, width_select, (tft.height() - width_heading) / rectangles, COLOR_SELECTED);
   }
   for (int i = 2; i <= rectangles; i++) {
     tft.fillRect(0, (tft.height() - width_heading) * (i - 1) / rectangles + width_heading, width_select, (tft.height() - width_heading) / rectangles, COLOR_BAR);
-    if (!(page == 3 || page == 4 || page == 6) || i > 3) {
-      tft.fillRect(0, (tft.height() - width_heading) * (i - 1) / rectangles + width_heading - 1, tft.width(), width_space, WHITE);
-    }
-    else {
-      updateBigBar();
-    }
+    tft.fillRect(0, (tft.height() - width_heading) * (i - 1) / rectangles + width_heading - 1, tft.width(), width_space, WHITE);
   }
-  tft.drawRect(0, tft.height()-1, width_select, tft.height()-1, COLOR_MENU);
+  tft.drawRect(0, tft.height() - 1, width_select, tft.height() - 1, COLOR_MENU);
   if (print_text) {
     tft.setTextSize(1);
     text_size = 1;
@@ -46,52 +40,38 @@ void drawRectangles() {
         tft.drawCentreString(words[i], width_select + (tft.width() - width_select) / 2, ypos, 4);
       }
       switch (page) {
-        case 3:
+        case 0:
           switch (i) {
             case 0:
-              drawPos();
-              tft.drawRightString("OFF", 315, ypos, 4);
+              tft.drawRightString("/", 262, ypos, 4);
+              drawCentreNumber(temperature, 277, ypos);
+              tft.drawRightString("C", 315, ypos, 4);
               break;
-            case 3:
-              ramp = EEPROM.read(4);
-              drawRightNumber(ramp, 200, ypos);
+            case 1:
+              tft.drawRightString("/", 262, ypos, 4);
+              drawCentreNumber(humidity, 277, ypos);
               tft.drawRightString("%", 315, ypos, 4);
               break;
-            case 4:
-              repeat = EEPROM.read(5);
-              if (repeat) {
-                if (language) {
-                  tft.drawRightString("SI", 315, ypos, 4);
-                }
-                else {
-                  tft.drawRightString("YES", 315, ypos, 4);
-                }
+            case 2:
+              if (led_intensity) {
+                drawRightNumber(led_intensity, 280, ypos);
+                tft.drawRightString("%", 315, ypos, 4);
               }
               else {
-                tft.drawRightString("NO", 315, ypos, 4);
+                tft.drawRightString("OFF", 315, ypos, 4);
+              }
+              break;
+            case 3:
+              if (language) {
+                tft.drawRightString("SPA", 315, ypos, 4);
+              }
+              else {
+                tft.drawRightString("ENG", 315, ypos, 4);
               }
               break;
             case 5:
               am_speed = EEPROM.read(6);
               drawRightNumber(am_speed, 315, ypos);
-              break;
-          }
-          break;
-        case 4:
-        case 6:
-          switch (i) {
-            case 0:
-              drawPos();
-              break;
-            case 3:
-            case 4:
-            case 5:
-              if (!(page == 6 && i == 4)) {
-                tft.drawString("m       s", 165 , ypos, 4);
-                for (byte j = 0 ; j <= 1; j++) {
-                  drawRightNumber(tl_data[j + 2 * (i - 3)], pos_clip[j], ypos);
-                }
-              }
               break;
           }
           break;
@@ -152,7 +132,6 @@ void drawHeading() {
       drawBack();
     }
   }
-  drawBattery();
 }
 
 void clearMenu() {
@@ -167,7 +146,7 @@ void drawBack() {
   tft.fillRect(width_back / 2, width_heading / 2, width_back / 2 - arrow_height, arrow_tail, COLOR_ARROW);
 }
 
-void drawRightNumber(int n, byte x, int i) {
+void drawRightNumber(int n, int x, int i) {
   length = 1;
   for (long k = 10; k <= n; k *= 10) {
     length++;
@@ -308,12 +287,16 @@ void loadLogo() {
   tft.drawCentreString("I N 3", 120, 100, 4);
 }
 
-void drawBattery() {
-
-  page0 = page;
-}
-
-void draw_battery_warning() {
-
+void drawCentreNumber(int n, int x, int i) {
+  length = 1;
+  for (long k = 10; k <= n; k *= 10) {
+    length++;
+  }
+  if (text_size == 2) {
+    tft.drawNumber(n, x - length * 27, i, 6);
+  }
+  else {
+    tft.drawNumber(n, x - length * text_size * 7, i, 4);
+  }
 }
 

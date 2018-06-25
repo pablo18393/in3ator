@@ -1,4 +1,5 @@
 int updateData() {
+  checkSleep();
   newPosition = myEncoderRead();
   move = oldPosition - newPosition;
   if (abs(move) > 1) {

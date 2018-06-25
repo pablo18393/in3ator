@@ -23,10 +23,10 @@ void process_page() {
       drawStopAm();
       state_blink = 1;
       keep_am = 1;
-      while (Serial.peek() != 'F') {
+      while (Serial3.peek() != 'F') {
         updateData();
         if (CheckComunication()) {
-          instant_read = Serial.read();
+          instant_read = Serial3.read();
           if (instant_read == 'F') {
             auto_mode();
           }
@@ -45,19 +45,19 @@ void process_page() {
           tft.setTextColor(ILI9341_WHITE);
           drawCentreNumber(am_speed, 120, 90);
           if (travel_counter) {
-            Serial.print("X");
-            Serial.print(EEPROM.read(210 + am_speed));
+            Serial3.print("X");
+            Serial3.print(EEPROM.read(210 + am_speed));
           }
           else {
-            Serial.print("Z");
-            Serial.print(EEPROM.read(170 + am_speed));
+            Serial3.print("Z");
+            Serial3.print(EEPROM.read(170 + am_speed));
           }
           }
         */
         move = 0;
 
         if (digitalRead(pulse) == 0 ) {
-          Serial.print("K");
+          Serial3.print("K");
           delay(10);
           auto_mode();
         }
@@ -75,7 +75,7 @@ void process_page() {
           //drawSpin();
         }
       }
-      Serial.read();
+      Serial3.read();
       auto_mode();
       break;
     case 10:
@@ -134,9 +134,9 @@ void process_page() {
       allow_shot = 1;
       while (1) {
         updateData();
-        if (Serial.available()) {
-          if (Serial.peek() == 'S') {
-            Serial.read();
+        if (Serial3.available()) {
+          if (Serial3.peek() == 'S') {
+            Serial3.read();
             allow_shot = 1;
             if (page == 11) {
               blue();
@@ -153,29 +153,29 @@ void process_page() {
               drawRemaining();
             }
           }
-          else if (Serial.peek() == 'F') {
-            Serial.read();
+          else if (Serial3.peek() == 'F') {
+            Serial3.read();
             keep_am = 1;
             time_lapse();
           }
-          else if (Serial.peek() == 'H') {
+          else if (Serial3.peek() == 'H') {
             //CODIGO PARA SOBRECALENTAMIENTO
           }
-          else if (Serial.peek() == 'B') {
+          else if (Serial3.peek() == 'B') {
             delay(50);
-            Serial.read();
+            Serial3.read();
             voltage = read_string();
             current = read_string();
             drawBattery();
           }
-          else if (Serial.peek() == 'x') {
-            Serial.read();
+          else if (Serial3.peek() == 'x') {
+            Serial3.read();
             black();
             EEPROM.write(0, 1);
             nvic_sys_reset();
           }
           else {
-            Serial.read();
+            Serial3.read();
           }
         }
         if (digitalRead(pulse) ) {
@@ -201,7 +201,7 @@ void process_page() {
             }
           }
           if (allow_shot || page == 10) {
-            Serial.print('J');
+            Serial3.print('J');
             allow_shot = 0;
             if (page == 11) {
               green();

@@ -24,7 +24,6 @@ void menu() {
     updateData();
   }
   delay(100);
-  page=0;
   selectMode();
 }
 

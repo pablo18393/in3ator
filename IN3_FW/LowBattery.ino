@@ -1,8 +1,0 @@
-void LowBattery() {
-
-}
-
-void checkSleep() {
-
-}
-

@@ -128,10 +128,11 @@ volatile int  encodertimer = millis(); // acceleration measurement
 int encoderpinA[MAXENCODERS] = {12}; // pin array of all encoder A inputs
 int encoderpinB[MAXENCODERS] = {13}; // pin array of all encoder B inputs
 unsigned int lastEncoderPos[MAXENCODERS];
-bool selected;
+
 int data, instant_read;
 byte page, page0;
 byte text_size;
+bool selected;
 bool pos_text[8];
 volatile int move;
 long last_pulsed;
@@ -211,27 +212,25 @@ bool battery_warning, battery_warning_0;
 bool battery_blink;
 long last_battery_blink;
 bool waiting;
-int temperature = 25;
-int humidity = 40;
 int led_intensity;
 // timer
 #define ENCODER_RATE 1000    // in microseconds; 
 HardwareTimer timer(1);
 
 void setup() {
-  //Serial.begin(115200);
+  Serial3.begin(115200);
   pinMode(LED1, OUTPUT);
   pinMode(LED2, OUTPUT);
   pinMode(LED3, OUTPUT);
   pinMode(pulse, INPUT_PULLUP);
   pinMode(ICT, OUTPUT);
-  pinMode(HEATER,OUTPUT);
   pinMode(22, INPUT);
   pinMode(11, OUTPUT);
   pinMode(8, OUTPUT);
   pinMode(16, OUTPUT);
   pinMode(3, OUTPUT);
   pinMode(PB1, OUTPUT);
+  Serial.begin(115200);
   initEncoders();
   newPosition = myEncoderRead();
   auto_lock = EEPROM.read(13);
@@ -290,17 +289,17 @@ bool CheckComunication() {
 }
 
 byte read_char() {
-  return (Serial.read());
+  return (Serial3.read());
 }
 
 long read_string() {
   if (CheckComunication()) {
     data = 0;
     instant_read = 0;
-    if (Serial.peek() == '-') {
-      Serial.read();
+    if (Serial3.peek() == '-') {
+      Serial3.read();
     }
-    while (Serial.available() && instant_read != ',') {
+    while (Serial3.available() && instant_read != ',') {
       instant_read = read_char();
       if (instant_read != ',' && instant_read >= '0' && instant_read <= '9') {
         data = data * 10 + (instant_read - 48);
