@@ -1,3 +1,0 @@
-void follow_focus(){
-}
-
