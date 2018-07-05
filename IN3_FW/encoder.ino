@@ -14,9 +14,9 @@ void asleep() {
   pulsed_before = pulsed;
 
   if (millis() - last_something > time_lock && !auto_lock) {
-    digitalWrite(LED1, LOW);
-    digitalWrite(LED2, LOW);
-    digitalWrite(LED3, LOW);
+    //digitalWrite(LED1, LOW);
+    //digitalWrite(LED2, LOW);
+    //digitalWrite(LED3, LOW);
     noInterrupts();
     for (int i = 0; i < 8; i++) {
       write0();
@@ -31,9 +31,9 @@ void asleep() {
     state_asleep = 0;
   }
   else {
-    digitalWrite(LED1, HIGH);
-    digitalWrite(LED2, HIGH);
-    digitalWrite(LED3, HIGH);
+    //digitalWrite(LED1, HIGH);
+    //digitalWrite(LED2, HIGH);
+    //digitalWrite(LED3, HIGH);
     if (state_asleep == 0) {
       switch (color_led) {
         case 0:

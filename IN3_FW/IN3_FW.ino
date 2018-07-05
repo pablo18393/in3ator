@@ -1,23 +1,3 @@
-const long tl_speed_travel = 200; //VELOCIDAD DE MOVIMIENTO DEL TIME LAPSE
-const long tl_speed_pan = 4000; //VELOCIDAD DE MOVIMIENTO DEL TIME LAPSE
-const int min_speed_travel = 900; //VELOCIDAD MINIMA DE MODO MANUAL
-const byte max_speed_travel = 16; //VELOCIDAD MAXIMA MODO MANUAL
-const long min_speed_pan = 40000; //VELOCIDAD MINIMA DE MODO MANUAL
-const long max_speed_pan = 2000; //VELOCIDAD MAXIMA MODO MANUAL
-byte acceleration = 3; //1%acceleration
-byte acceleration_stop = 12;
-int ramp_factor = 10;
-int current_0 = 482;
-int battery_max = 835;
-int battery_min = 715;
-const int t_min[3] = {250, 250, 250};
-const float interval_margin = 1.4;
-int battery_freq = 2000;
-bool NuevoPrograma = 0; //solamente poner a 1 cuando se vaya a reprogramar un mando
-byte numResonancia = 0; //introducir números de resonancia
-byte velResonancia[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //introducir empezando desde la izquierda el número de la velocidad en la que hay resonancia
-byte incResonancia[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //introducir empezando desde la izquierda el número de la incremento de velocidad (entre 5 y 20 suele ser notable)
-
 /*
    EEPROM VARIABLES
    0: PAGE
@@ -128,6 +108,14 @@ volatile int  encodertimer = millis(); // acceleration measurement
 int encoderpinA[MAXENCODERS] = {12}; // pin array of all encoder A inputs
 int encoderpinB[MAXENCODERS] = {13}; // pin array of all encoder B inputs
 unsigned int lastEncoderPos[MAXENCODERS];
+
+int firmwareVersion=0;
+
+//Text position
+int humidityPos;
+int temperatureX;
+int temperatureY;
+
 bool selected;
 int data, instant_read;
 byte page, page0;
@@ -178,7 +166,7 @@ float factor;
 bool pulsed, pulsed_before;
 int time_lock = 60000;
 bool state_asleep = 1;
-bool auto_lock;
+bool auto_lock = 1; //cambiar a 0 si se quiere apagar
 int manual_speed;
 byte end;
 byte counter;
@@ -211,23 +199,27 @@ bool battery_warning, battery_warning_0;
 bool battery_blink;
 long last_battery_blink;
 bool waiting;
-int temperature = 25;
+float temperature;
 int humidity = 40;
+float desiredTemp=35;
 int led_intensity;
+long last_temp_update;
+long temp_update_rate = 2000;
+int backlight_intensity = 100;
+bool enableSet;
 // timer
 #define ENCODER_RATE 1000    // in microseconds; 
 HardwareTimer timer(1);
 
 void setup() {
-  //Serial.begin(115200);
+  Serial.begin(115200);
   pinMode(LED1, OUTPUT);
   pinMode(LED2, OUTPUT);
   pinMode(LED3, OUTPUT);
   pinMode(pulse, INPUT_PULLUP);
   pinMode(ICT, OUTPUT);
-  pinMode(HEATER,OUTPUT);
+  pinMode(HEATER, OUTPUT);
   pinMode(22, INPUT);
-  pinMode(11, OUTPUT);
   pinMode(8, OUTPUT);
   pinMode(16, OUTPUT);
   pinMode(3, OUTPUT);
@@ -236,37 +228,14 @@ void setup() {
   newPosition = myEncoderRead();
   auto_lock = EEPROM.read(13);
   oldPosition = newPosition;
-  while (0) {
-    /*
-      digitalWrite(8,HIGH);
-      digitalWrite(16,HIGH);
-      delay(2000);
-      digitalWrite(PB1,digitalRead(22));
-      digitalWrite(8,LOW);
-      digitalWrite(16,LOW);
-      delay(2000);
-      digitalWrite(PB1,digitalRead(22));
-    */
-    led_intensity += 10 * updateData();
-    if (led_intensity > 255) {
-      led_intensity = 255;
-    }
-    if (led_intensity < 0) {
-      led_intensity = 0;
-    }
-    analogWrite(ICT, led_intensity);
-  }
-
   tft.begin();
   tft.setRotation(1);
+  setVariablesRotation();
   initEEPROM();
   tft.fillScreen(WHITE);
-  loadLogo();
-  black();
-  digitalWrite(LED1, HIGH);
-  digitalWrite(LED2, HIGH);
-  digitalWrite(LED3, HIGH);
-  //delay(2000);
+  //loadLogo();
+  analogWrite(LED1, backlight_intensity);
+
   initEncoders();
   newPosition = myEncoderRead();
   auto_lock = EEPROM.read(13);
@@ -279,6 +248,13 @@ void loop() {
 }
 
 void initEEPROM() {
+
+}
+
+void setVariablesRotation() {
+  humidityPos = tft.width() - 43;
+  temperatureX = tft.width() - 79;
+  temperatureY = 51;
 
 }
 

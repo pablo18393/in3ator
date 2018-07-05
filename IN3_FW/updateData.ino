@@ -11,6 +11,13 @@ int updateData() {
   }
   lastEncoderPos[counter] = encoderpos[counter];
   oldPosition = newPosition;
+  if(millis()-last_temp_update>temp_update_rate){
+    last_temp_update=millis();
+    updateTemperature();
+  }
+  else{
+    
+  }
   return move;
 }
 

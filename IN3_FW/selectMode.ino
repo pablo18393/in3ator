@@ -10,57 +10,23 @@ void selectMode() {
       if (selected == 0) {
         if (move < 0) {
           move++;
-          if (!(page == 3 || page == 4 || page == 6)) {
-            if (bar_pos < rectangles) {
-              eraseBar();
-              bar_pos++;
-              updateBar();
-            }
-          }
-          else if (bar_pos == 3) {
-            eraseBigBar();
+          if (bar_pos < rectangles - !enableSet) {
+            eraseBar();
             bar_pos++;
             updateBar();
-          }
-          else if (bar_pos < rectangles) {
-            if (page == 3 || page == 4) {
-              bar_limit = 6;
-            }
-            else {
-              bar_limit = 4;
-            }
-            if (bar_pos != bar_limit || (am_move[0] || am_move[1])) {
-              eraseBar();
-              bar_pos++;
-              updateBar();
-            }
           }
         }
         else {
           move --;
-          if (!(page == 3 || page == 4 || page == 6)) {
-            if (bar_pos > 1) {
-              eraseBar();
-              bar_pos--;
-              updateBar();
-            }
-          }
-          else {
-            if (bar_pos > 4) {
-              eraseBar();
-              bar_pos--;
-              updateBar();
-            }
-            else if (bar_pos == 4) {
-              eraseBar();
-              bar_pos = 3;
-              updateBigBar();
-            }
+          if (bar_pos > 1) {
+            eraseBar();
+            bar_pos--;
+            updateBar();
           }
         }
       }
     }
-    if (digitalRead(pulse) == 0) {
+    if (!digitalRead(pulse)) {
       selected = ! selected;
       if (selected) {
         tft.fillRect(0, (tft.height() - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (tft.height() - width_heading) / rectangles, COLOR_CHOSEN);
@@ -84,52 +50,23 @@ void selectMode() {
         case 0:
           switch (bar_pos) {
             case 1:
-              while (digitalRead(pulse) ) {
+              while (digitalRead(pulse)) {
                 updateData();
-                if (move && -move + clip_fps >= 5 && -move + clip_fps <= 150) {
+                if (move && -move + desiredTemp >= 15 && -move + desiredTemp <= 45) {
                   tft.setTextColor(ILI9341_BLACK);
-                  drawRightNumber(clip_fps, 315, ypos);
-                  clip_fps -= move;
+                  tft.drawFloat(desiredTemp, 1, temperatureX - 65, temperatureY, 4);
+                  desiredTemp -= float(move) / 10;
                   tft.setTextColor(ILI9341_WHITE);
-                  drawRightNumber(clip_fps, 315, ypos);
-                  EEPROM.write(14, clip_fps);
+                  tft.drawFloat(desiredTemp, 1, temperatureX - 65, temperatureY, 4);
+                  enableSet = 1;
                 }
                 move = 0;
               }
-              break;
-            case 2:
-              while (digitalRead(pulse) ) {
-                updateData();
-                if (move) {
-                  if (auto_lock == 0) {
-                    tft.setTextColor(ILI9341_BLACK);
-                    tft.drawRightString("NO", 315, ypos, 4);
-                    tft.setTextColor(ILI9341_WHITE);
-                    if (language) {
-                      tft.drawRightString("SI", 315, ypos, 4);
-                    }
-                    else {
-                      tft.drawRightString("YES", 315, ypos, 4);
-                    }
-                  }
-                  else {
-                    tft.setTextColor(ILI9341_BLACK);
-                    if (language) {
-                      tft.drawRightString("SI", 315, ypos, 4);
-                    }
-                    else {
-                      tft.drawRightString("YES", 315, ypos, 4);
-                    }
-                    tft.setTextColor(ILI9341_WHITE);
-                    tft.drawRightString("NO", 315, ypos, 4);
-                  }
-                  auto_lock = !auto_lock;
-                  move = 0;
-                  EEPROM.write(13, auto_lock);
-                }
+              if (enableSet) {
+                menu();
               }
               break;
-            case 3:
+            case 2:
               while (digitalRead(pulse) ) {
                 updateData();
                 if (move && -move + led_intensity >= 0 && -move + led_intensity <= 100) {
@@ -141,7 +78,7 @@ void selectMode() {
                     tft.drawRightString("%", 315, ypos, 4);
                   }
                   led_intensity -= 10 * move;
-                  analogWrite(HEATER,led_intensity);
+                  analogWrite(HEATER, led_intensity);
                   tft.setTextColor(ILI9341_WHITE);
                   if (!led_intensity && move) {
                     tft.setTextColor(ILI9341_BLACK);
@@ -156,7 +93,7 @@ void selectMode() {
                 move = 0;
               }
               break;
-            case 4:
+            case 3:
               while (digitalRead(pulse)) {
                 updateData();
                 if (move) {
@@ -177,6 +114,10 @@ void selectMode() {
               }
               menu();
               break;
+            case 4:
+              page = 1;
+              process_page();
+              break;
           }
           selected = 0;
           tft.fillRect(0, (tft.height() - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (tft.height() - width_heading) / rectangles, WHITE);
@@ -191,7 +132,6 @@ void selectMode() {
 }
 
 void eraseBar() {
-  //tft.fillRect(0, (tft.height() - width_heading - width_space * (rectangles - 1)) * (bar_pos - 1) / rectangles + width_heading + (bar_pos - 1) * (width_space), width_select, (tft.height() - width_heading - width_space * (rectangles - 1)) / rectangles, COLOR_BAR);
   tft.fillRect(0, (tft.height() - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (tft.height() - width_heading) / rectangles, COLOR_BAR);
 }
 
@@ -221,23 +161,6 @@ void back_mode() {
       tft.drawLine(width_back - back_bar, 0, width_back - back_bar, width_heading, BLACK);
     }
     if (back_bar == width_back) {
-      if (page > 1 || page < 5) {
-        Serial.print("N");
-        black();
-      }
-      if (page == 10) {
-        Serial.print("P");
-        state_tl = 0;
-        black();
-        //time_lapse();
-      }
-      if (page == 11) {
-        Serial.print("P");
-        black();
-        //stop_motion();
-      }
-      page = 1;
-      EEPROM.write(0, page);
       menu();
     }
     delay((time_back_draw + time_back_wait) / width_back);
@@ -247,3 +170,30 @@ void back_mode() {
   }
   delay(50);
 }
+
+void updateTemperature() {
+  tft.setTextColor(ILI9341_BLACK);
+  tft.drawFloat(temperature, 1, temperatureX, temperatureY, 4);
+  updateTemp();
+  tft.setTextColor(ILI9341_WHITE);
+  tft.drawFloat(temperature, 1, temperatureX, temperatureY, 4);
+}
+
+void updateTemp() {
+  //Valores fijos del circuito
+  float rAux = 10000.0;
+  float vcc = 3.3;
+  float beta = 3950.0;
+  float temp0 = 298.0;
+  float r0 = 10000.0;
+
+  //Variables usadas en el cálculo
+  float vm = 0.0;
+  float rntc = 0.0;
+
+  //Bloque de cálculo
+  vm = (vcc / 4098) * ( analogRead(THERMISTOR1) );            //Calcular tensión en la entrada
+  rntc = rAux / ((vcc / vm) - 1);                   //Calcular la resistencia de la NTC
+  temperature = beta / (log(rntc / r0) + (beta / temp0)) - 273; //Calcular la temperatura en Celsius
+}
+

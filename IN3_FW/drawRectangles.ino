@@ -36,23 +36,24 @@ void drawRectangles() {
       if (pos_text[i] == 0) {
         tft.drawString(words[i], width_select + side_gap, ypos, 4);
       }
-      else if (pos_text[i] == 1) {
+      else if (pos_text[i]) {
         tft.drawCentreString(words[i], width_select + (tft.width() - width_select) / 2, ypos, 4);
       }
       switch (page) {
         case 0:
           switch (i) {
             case 0:
-              tft.drawRightString("/", 262, ypos, 4);
-              drawCentreNumber(temperature, 277, ypos);
-              tft.drawRightString("C", 315, ypos, 4);
+              drawTemperature();
+              if (enableSet) {
+                tft.drawFloat(desiredTemp, 1, temperatureX - 65, temperatureY, 4);
+              }
               break;
-            case 1:
+            case 4: //implement with humidity
               tft.drawRightString("/", 262, ypos, 4);
-              drawCentreNumber(humidity, 277, ypos);
+              drawCentreNumber(humidity, humidityPos, ypos);
               tft.drawRightString("%", 315, ypos, 4);
               break;
-            case 2:
+            case 1:
               if (led_intensity) {
                 drawRightNumber(led_intensity, 280, ypos);
                 tft.drawRightString("%", 315, ypos, 4);
@@ -61,17 +62,13 @@ void drawRectangles() {
                 tft.drawRightString("OFF", 315, ypos, 4);
               }
               break;
-            case 3:
+            case 2:
               if (language) {
                 tft.drawRightString("SPA", 315, ypos, 4);
               }
               else {
                 tft.drawRightString("ENG", 315, ypos, 4);
               }
-              break;
-            case 5:
-              am_speed = EEPROM.read(6);
-              drawRightNumber(am_speed, 315, ypos);
               break;
           }
           break;
@@ -128,10 +125,14 @@ void drawRectangles() {
 void drawHeading() {
   for (int i = 0; i <= 1; i++) {
     tft.fillRect(0, 0, tft.height(), width_heading, COLOR_HEADING);
-    if (page > 1) {
+    if (page) {
       drawBack();
     }
   }
+  tft.setTextColor(ILI9341_BLACK);
+  tft.drawCentreString("In3ator, saving lives", 20, width_heading / 5, 4);
+  tft.drawCentreString("V", tft.width() - 32, width_heading / 5, 4);
+  drawRightNumber(firmwareVersion, tft.width() - 10, width_heading / 5);
 }
 
 void clearMenu() {
@@ -285,6 +286,16 @@ void loadLogo() {
   tft.setTextSize(2);
   tft.setTextColor(ILI9341_BLACK);
   tft.drawCentreString("I N 3", 120, 100, 4);
+  for (int i = 0; i < backlight_intensity; i++) {
+    analogWrite(LED1, i);
+    delay(20);
+  }
+}
+
+void drawTemperature() {
+  tft.drawRightString("/", 240, ypos, 4);
+  tft.drawRightString("C", 315, ypos, 4);
+  updateTemperature();
 }
 
 void drawCentreNumber(int n, int x, int i) {
