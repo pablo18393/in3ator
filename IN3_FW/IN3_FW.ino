@@ -50,6 +50,10 @@
 #define TFT_DC         31
 #define TFT_RST        2
 
+//configuration variables
+
+const byte temperature_fraction = 20;
+
 #define POWER_EN 18
 #define POWER_EN_FB 19
 #define BACKLIGHT1 3
@@ -109,7 +113,7 @@ int encoderpinA[MAXENCODERS] = {12}; // pin array of all encoder A inputs
 int encoderpinB[MAXENCODERS] = {13}; // pin array of all encoder B inputs
 unsigned int lastEncoderPos[MAXENCODERS];
 
-int firmwareVersion=0;
+int firmwareVersion = 0;
 
 //Text position
 int humidityPos;
@@ -201,12 +205,16 @@ long last_battery_blink;
 bool waiting;
 float temperature;
 int humidity = 40;
-float desiredTemp=35;
+float desiredTemp = 35;
 int led_intensity;
 long last_temp_update;
 long temp_update_rate = 2000;
 int backlight_intensity = 100;
 bool enableSet;
+bool firstTemperatureMeasure = 1;
+int temperatureArray [temperature_fraction];
+byte temperaturePos, temperature_measured;
+
 // timer
 #define ENCODER_RATE 1000    // in microseconds; 
 HardwareTimer timer(1);

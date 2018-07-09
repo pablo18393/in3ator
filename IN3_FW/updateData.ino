@@ -11,12 +11,18 @@ int updateData() {
   }
   lastEncoderPos[counter] = encoderpos[counter];
   oldPosition = newPosition;
-  if(millis()-last_temp_update>temp_update_rate){
-    last_temp_update=millis();
+  if (millis() - last_temp_update > temp_update_rate) {
+    last_temp_update = millis();
     updateTemperature();
+    temperature_measured = 0;
   }
-  else{
-    
+  else {
+
+  }
+  //PROBLEM WITH THIS FUNCTION: temperature measure time is not constant
+  if (millis() - last_temp_update > (temp_update_rate * temperature_measured / temperature_fraction)) {
+    temperatureArray[temperature_measured]=analogRead(THERMISTOR1);
+    temperature_measured++;
   }
   return move;
 }

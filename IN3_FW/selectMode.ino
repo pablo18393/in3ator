@@ -186,13 +186,25 @@ void updateTemp() {
   float beta = 3950.0;
   float temp0 = 298.0;
   float r0 = 10000.0;
+  float temperatureMean;
 
   //Variables usadas en el cálculo
   float vm = 0.0;
   float rntc = 0.0;
 
   //Bloque de cálculo
-  vm = (vcc / 4098) * ( analogRead(THERMISTOR1) );            //Calcular tensión en la entrada
+  if (firstTemperatureMeasure) {
+    firstTemperatureMeasure = 0;
+    temperatureMean = analogRead(THERMISTOR1);
+  }
+  else {
+    temperatureMean = 0;
+    for (int i = 0; i < temperature_measured; i++) {
+      temperatureMean += temperatureArray[i];
+    }
+    temperatureMean /= temperature_measured;
+  }
+  vm = (vcc) * ( temperatureMean / 4098 );          //Calcular tensión en la entrada
   rntc = rAux / ((vcc / vm) - 1);                   //Calcular la resistencia de la NTC
   temperature = beta / (log(rntc / r0) + (beta / temp0)) - 273; //Calcular la temperatura en Celsius
 }
