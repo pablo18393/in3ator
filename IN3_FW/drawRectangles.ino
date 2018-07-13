@@ -130,9 +130,9 @@ void drawHeading() {
     }
   }
   tft.setTextColor(ILI9341_BLACK);
-  tft.drawCentreString("In3ator, saving lives", 20, width_heading / 5, 4);
-  tft.drawCentreString("V", tft.width() - 32, width_heading / 5, 4);
-  drawRightNumber(firmwareVersion, tft.width() - 10, width_heading / 5);
+  tft.drawCentreString("In3ator, saving lives", tft.width() - 150, width_heading / 5, 4);
+  //tft.drawCentreString("V", tft.width() - 32, width_heading / 5, 4);
+  //drawRightNumber(firmwareVersion, tft.width() - 10, width_heading / 5);
 }
 
 void clearMenu() {
@@ -155,137 +155,10 @@ void drawRightNumber(int n, int x, int i) {
   tft.drawNumber(n, x - length * 14, i, 4);
 }
 
-void drawPos() {
-  long pos_color;
-  if (keep_am) {
-    if (travel_counter) {
-      am_move[0] = 1;
-      pos_color = GREEN;
-    }
-    else {
-      pos_color = RED;
-    }
-    tft.fillCircle((tft.width() - width_select) / 5 + 60, width_heading + 10 + tft.height() / (rectangles), circle, WHITE);
-    tft.fillCircle((tft.width() - width_select) / 5 + 60, width_heading + 15 + tft.height() * 9 / (rectangles * 5), circle, WHITE);
-  }
-  else {
-    pos_color = WHITE;
-    tft.fillCircle((tft.width() - width_select) / 5 + 60, width_heading + 10 + tft.height() / (rectangles), circle, BLACK);
-    tft.fillCircle((tft.width() - width_select) / 5 + 60, width_heading + 15 + tft.height() * 9 / (rectangles * 5), circle, BLACK);
-  }
-  tft.drawFastHLine((tft.width() - width_select) / 5 - 20, width_heading + 10 + tft.height() / (rectangles), 40, pos_color);
-  tft.fillTriangle((tft.width() - width_select) / 5 - 20 , width_heading + 10 + tft.height() / (rectangles), (tft.width() - width_select) / 5 - 20 + triang, width_heading + 10 + tft.height() / (rectangles) - triang, (tft.width() - width_select) / 5 - 20 + triang, width_heading + 10 + tft.height() / (rectangles) + triang, pos_color);
-  tft.fillTriangle((tft.width() - width_select) / 5 + 20 , width_heading + 10 + tft.height() / (rectangles), (tft.width() - width_select) / 5 + 20 - triang, width_heading + 10 + tft.height() / (rectangles) - triang, (tft.width() - width_select) / 5 + 20 - triang, width_heading + 10 + tft.height() / (rectangles) + triang, pos_color);
-  if (keep_am) {
-    if (pan_counter) {
-      pos_color = GREEN;
-      am_move[1] = 1;
-    }
-    else {
-      pos_color = RED;
-    }
-    tft.fillCircle((tft.width() - width_select) / 5 + 160, width_heading + 10 + tft.height() / (rectangles), circle, WHITE);
-    tft.fillCircle((tft.width() - width_select) / 5 + 160, width_heading + 15 + tft.height() * 9 / (rectangles * 5), circle, WHITE);
-  }
-  else {
-    pos_color = WHITE;
-    tft.fillCircle((tft.width() - width_select) / 5 + 160, width_heading + 10 + tft.height() / (rectangles), circle, BLACK);
-    tft.fillCircle((tft.width() - width_select) / 5 + 160, width_heading + 15 + tft.height() * 9 / (rectangles * 5), circle, BLACK);
-  }
-  tft.drawCircle((tft.width() - width_select) / 5, width_heading + 15 + tft.height() * 9 / (rectangles * 5), radius, pos_color);
-  tft.fillTriangle((tft.width() - width_select) / 5 - triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) + radius, (tft.width() - width_select) / 5 + triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) + radius + triang, (tft.width() - width_select) / 5 + triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) + radius - triang, pos_color);
-  tft.fillTriangle((tft.width() - width_select) / 5 + triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) - radius, (tft.width() - width_select) / 5 - triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) - radius - triang, (tft.width() - width_select) / 5 - triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) - radius + triang, pos_color);
-
-  tft.drawFastHLine((tft.width() - width_select) / 5 + 60, width_heading + tft.height() * 3 / (rectangles * 6), 100, WHITE);
-  tft.fillCircle((tft.width() - width_select) / 5 + 60, width_heading + tft.height() * 3 / (rectangles * 6), triang - 2, WHITE);
-  tft.fillCircle((tft.width() - width_select) / 5 + 160, width_heading + tft.height() * 3 / (rectangles * 6), triang - 2, WHITE);
-  tft.fillTriangle((tft.width() - width_select) / 5 + 93, width_heading + tft.height() * 3 / (rectangles * 6) - triang, (tft.width() - width_select) / 5 + 93, width_heading + tft.height() * 3 / (rectangles * 6) + triang, (tft.width() - width_select) / 5 + 93 + triang, width_heading + tft.height() * 3 / (rectangles * 6), WHITE);
-  tft.fillTriangle((tft.width() - width_select) / 5 + 126, width_heading + tft.height() * 3 / (rectangles * 6) - triang, (tft.width() - width_select) / 5 + 126, width_heading + tft.height() * 3 / (rectangles * 6) + triang, (tft.width() - width_select) / 5 + 126 + triang, width_heading + tft.height() * 3 / (rectangles * 6), WHITE);
-
-  tft.drawCircle((tft.width() - width_select) / 5 + 60, width_heading + 10 + tft.height() / (rectangles), circle, WHITE);
-  tft.drawCircle((tft.width() - width_select) / 5 + 60, width_heading + 15 + tft.height() * 9 / (rectangles * 5), circle, WHITE);
-  tft.drawCircle((tft.width() - width_select) / 5 + 160, width_heading + 10 + tft.height() / (rectangles), circle, WHITE);
-  tft.drawCircle((tft.width() - width_select) / 5 + 160, width_heading + 15 + tft.height() * 9 / (rectangles * 5), circle, WHITE);
-}
-
-void printTravel() {
-  if (am_move[0]) {
-    tft.drawFastHLine((tft.width() - width_select) / 5 - 20, width_heading + 10 + tft.height() / (rectangles), 40, GREEN);
-    tft.fillTriangle((tft.width() - width_select) / 5 - 20 , width_heading + 10 + tft.height() / (rectangles), (tft.width() - width_select) / 5 - 20 + triang, width_heading + 10 + tft.height() / (rectangles) - triang, (tft.width() - width_select) / 5 - 20 + triang, width_heading + 10 + tft.height() / (rectangles) + triang, GREEN);
-    tft.fillTriangle((tft.width() - width_select) / 5 + 20 , width_heading + 10 + tft.height() / (rectangles), (tft.width() - width_select) / 5 + 20 - triang, width_heading + 10 + tft.height() / (rectangles) - triang, (tft.width() - width_select) / 5 + 20 - triang, width_heading + 10 + tft.height() / (rectangles) + triang, GREEN);
-  }
-  else {
-    tft.drawFastHLine((tft.width() - width_select) / 5 - 20, width_heading + 10 + tft.height() / (rectangles), 40, RED);
-    tft.fillTriangle((tft.width() - width_select) / 5 - 20 , width_heading + 10 + tft.height() / (rectangles), (tft.width() - width_select) / 5 - 20 + triang, width_heading + 10 + tft.height() / (rectangles) - triang, (tft.width() - width_select) / 5 - 20 + triang, width_heading + 10 + tft.height() / (rectangles) + triang, RED);
-    tft.fillTriangle((tft.width() - width_select) / 5 + 20 , width_heading + 10 + tft.height() / (rectangles), (tft.width() - width_select) / 5 + 20 - triang, width_heading + 10 + tft.height() / (rectangles) - triang, (tft.width() - width_select) / 5 + 20 - triang, width_heading + 10 + tft.height() / (rectangles) + triang, RED);
-  }
-}
-
-void printPan() {
-  if (am_move[1]) {
-    tft.drawCircle((tft.width() - width_select) / 5, width_heading + 15 + tft.height() * 9 / (rectangles * 5), radius, GREEN);
-    tft.fillTriangle((tft.width() - width_select) / 5 - triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) + radius, (tft.width() - width_select) / 5 + triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) + radius + triang, (tft.width() - width_select) / 5 + triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) + radius - triang, GREEN);
-    tft.fillTriangle((tft.width() - width_select) / 5 + triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) - radius, (tft.width() - width_select) / 5 - triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) - radius - triang, (tft.width() - width_select) / 5 - triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) - radius + triang, GREEN);
-  }
-  else {
-    tft.drawCircle((tft.width() - width_select) / 5, width_heading + 15 + tft.height() * 9 / (rectangles * 5), radius, RED);
-    tft.fillTriangle((tft.width() - width_select) / 5 - triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) + radius, (tft.width() - width_select) / 5 + triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) + radius + triang, (tft.width() - width_select) / 5 + triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) + radius - triang, RED);
-    tft.fillTriangle((tft.width() - width_select) / 5 + triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) - radius, (tft.width() - width_select) / 5 - triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) - radius - triang, (tft.width() - width_select) / 5 - triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) - radius + triang, RED);
-  }
-}
-
-void drawRespective(byte c) {
-  unsigned int respectiveColor;
-  if (c == 1) {
-    respectiveColor = BLACK;
-  }
-  else {
-    respectiveColor = WHITE;
-  }
-  switch (end) {
-    case 0:
-      if (c == 2) {
-        tft.fillCircle((tft.width() - width_select) / 5 + 60, width_heading + 10 + tft.height() / (rectangles), circle, respectiveColor);
-      }
-      tft.drawCircle((tft.width() - width_select) / 5 + 60, width_heading + 10 + tft.height() / (rectangles), circle, respectiveColor);
-      tft.drawFastHLine((tft.width() - width_select) / 5 - 20, width_heading + 10 + tft.height() / (rectangles), 40, respectiveColor);
-      tft.fillTriangle((tft.width() - width_select) / 5 - 20 , width_heading + 10 + tft.height() / (rectangles), (tft.width() - width_select) / 5 - 20 + triang, width_heading + 10 + tft.height() / (rectangles) - triang, (tft.width() - width_select) / 5 - 20 + triang, width_heading + 10 + tft.height() / (rectangles) + triang, respectiveColor);
-      tft.fillTriangle((tft.width() - width_select) / 5 + 20 , width_heading + 10 + tft.height() / (rectangles), (tft.width() - width_select) / 5 + 20 - triang, width_heading + 10 + tft.height() / (rectangles) - triang, (tft.width() - width_select) / 5 + 20 - triang, width_heading + 10 + tft.height() / (rectangles) + triang, respectiveColor);
-      break;
-    case 1:
-      if (c == 2) {
-        tft.fillCircle((tft.width() - width_select) / 5 + 60, width_heading + 15 + tft.height() * 9 / (rectangles * 5), circle, respectiveColor);
-      }
-      tft.drawCircle((tft.width() - width_select) / 5 + 60, width_heading + 15 + tft.height() * 9 / (rectangles * 5), circle, respectiveColor);
-      tft.drawCircle((tft.width() - width_select) / 5, width_heading + 15 + tft.height() * 9 / (rectangles * 5), radius, respectiveColor);
-      tft.fillTriangle((tft.width() - width_select) / 5 - triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) + radius, (tft.width() - width_select) / 5 + triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) + radius + triang, (tft.width() - width_select) / 5 + triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) + radius - triang, respectiveColor);
-      tft.fillTriangle((tft.width() - width_select) / 5 + triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) - radius, (tft.width() - width_select) / 5 - triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) - radius - triang, (tft.width() - width_select) / 5 - triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) - radius + triang, respectiveColor);
-      break;
-    case 2:
-      if (c == 2) {
-        tft.fillCircle((tft.width() - width_select) / 5 + 160, width_heading + 10 + tft.height() / (rectangles), circle, respectiveColor);
-      }
-      tft.drawCircle((tft.width() - width_select) / 5 + 160, width_heading + 10 + tft.height() / (rectangles), circle, respectiveColor);
-      tft.drawFastHLine((tft.width() - width_select) / 5 - 20, width_heading + 10 + tft.height() / (rectangles), 40, respectiveColor);
-      tft.fillTriangle((tft.width() - width_select) / 5 - 20 , width_heading + 10 + tft.height() / (rectangles), (tft.width() - width_select) / 5 - 20 + triang, width_heading + 10 + tft.height() / (rectangles) - triang, (tft.width() - width_select) / 5 - 20 + triang, width_heading + 10 + tft.height() / (rectangles) + triang, respectiveColor);
-      tft.fillTriangle((tft.width() - width_select) / 5 + 20 , width_heading + 10 + tft.height() / (rectangles), (tft.width() - width_select) / 5 + 20 - triang, width_heading + 10 + tft.height() / (rectangles) - triang, (tft.width() - width_select) / 5 + 20 - triang, width_heading + 10 + tft.height() / (rectangles) + triang, respectiveColor);
-      break;
-    case 3:
-      if (c == 2) {
-        tft.fillCircle((tft.width() - width_select) / 5 + 160, width_heading + 15 + tft.height() * 9 / (rectangles * 5), circle, respectiveColor);
-      }
-      tft.drawCircle((tft.width() - width_select) / 5 + 160, width_heading + 15 + tft.height() * 9 / (rectangles * 5), circle, respectiveColor);
-      tft.drawCircle((tft.width() - width_select) / 5, width_heading + 15 + tft.height() * 9 / (rectangles * 5), radius, respectiveColor);
-      tft.fillTriangle((tft.width() - width_select) / 5 - triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) + radius, (tft.width() - width_select) / 5 + triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) + radius + triang, (tft.width() - width_select) / 5 + triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) + radius - triang, respectiveColor);
-      tft.fillTriangle((tft.width() - width_select) / 5 + triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) - radius, (tft.width() - width_select) / 5 - triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) - radius - triang, (tft.width() - width_select) / 5 - triang / 2, width_heading + 15 + tft.height() * 9 / (rectangles * 5) - radius + triang, respectiveColor);
-      break;
-  }
-}
-
 void loadLogo() {
   tft.setTextSize(2);
   tft.setTextColor(ILI9341_BLACK);
-  tft.drawCentreString("I N 3", 120, 100, 4);
+  tft.drawCentreString("I N 3", tft.width()/2, 100, 4);
   for (int i = 0; i < backlight_intensity; i++) {
     analogWrite(LED1, i);
     delay(20);

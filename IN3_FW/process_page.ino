@@ -1,53 +1,18 @@
 void process_page() {
   switch (page) {
     case 1:
-      tft.fillScreen(BLACK);
       tft.setTextSize(1);
-      tft.setTextColor(ILI9341_WHITE);
-      for (byte j = 0; j < 6; j++) {
-        tl_data[j] = EEPROM.read(7 + j);
-      }
-      clip_fps = EEPROM.read(14);
-      stops = (long(EEPROM.read(7)) * 60 + EEPROM.read(8)) * clip_fps; //primer fotograma y ultimo
-      if (page == 10) {
-        rectangles = 3;
-      }
-      else {
-        rectangles = 2;
-      }
+      rectangles = 2;
       print_text = 0;
       drawRectangles();
       drawHeading();
       print_text = 1; //cambiar en todos
-      if (page == 10) {
-        shots_height = 50;
-        text_height = 235;
-      }
-      else {
-        shots_height = 80;
-        text_height = 205;
-        blue();
-      }
+      tft.setTextColor(ILI9341_WHITE);
       if (language) {
-        tft.drawCentreString("DISPAROS", 120, shots_height , 4);
+        tft.drawCentreString("Temperatura", tft.width() / 2, tft.height() / 5 , 4);
       }
       else {
-        tft.drawCentreString("SHOTS", 120, shots_height, 4);
-      }
-      tft.drawCentreString("/", 120, shots_height + 40, 4);
-      tft.drawNumber(stops, 130, shots_height + 40, 4);
-      drawShots();
-      if (page == 10) {
-        tft.drawString("H", 80, 185, 4);
-        tft.drawString("MIN", 140, 185, 4);
-        drawRemaining();
-        updateTlState();
-        if (state_tl) {
-          blue();
-        }
-        else {
-          black();
-        }
+        tft.drawCentreString("Temperature", tft.width() / 2, tft.height() / 5, 4);
       }
       tft.setTextColor(ILI9341_ORANGE);
       drawStop();
@@ -149,46 +114,46 @@ void process_page() {
 
 void drawSpin() {
   if (language) {
-    tft.drawCentreString("GIRA PARA CAMBIAR", 120, 145, 4);
-    tft.drawCentreString("VELOCIDAD", 120, 185, 4);
+    tft.drawCentreString("GIRA PARA CAMBIAR", tft.width() / 2, 145, 4);
+    tft.drawCentreString("VELOCIDAD", tft.width() / 2, 185, 4);
   }
   else {
-    tft.drawCentreString("SPIN BUTTON TO", 120, 145, 4);
-    tft.drawCentreString("CHANGE SPEED", 120, 185, 4);
+    tft.drawCentreString("SPIN BUTTON TO", tft.width() / 2, 145, 4);
+    tft.drawCentreString("CHANGE SPEED", tft.width() / 2, 185, 4);
   }
 }
 
 void drawStopAm() {
   if (language) {
-    tft.drawCentreString("PULSA PARA", 120, 220, 4);
-    tft.drawCentreString("DETENER", 120, 250, 4);
+    tft.drawCentreString("PULSA PARA", tft.width() / 2, 220, 4);
+    tft.drawCentreString("DETENER", tft.width() / 2, 250, 4);
   }
   else {
-    tft.drawCentreString("PRESS BUTTON", 120, 220, 4);
-    tft.drawCentreString("TO STOP", 120, 250, 4);
+    tft.drawCentreString("PRESS BUTTON", tft.width() / 2, 220, 4);
+    tft.drawCentreString("TO STOP", tft.width() / 2, 250, 4);
   }
 }
 
 void drawStop() {
   if (language) {
-    tft.drawCentreString("PULSA BOTON", 120, text_height, 4);
+    tft.drawCentreString("PULSA BOTON", tft.width() / 2, text_height, 4);
     if (page == 10) {
-      tft.drawCentreString("PARA PARADA,", 120, text_height + 30, 4);
+      tft.drawCentreString("PARA PARADA,", tft.width() / 2, text_height + 30, 4);
     }
     else {
-      tft.drawCentreString("PARA FOTO,", 120, text_height + 30, 4);
+      tft.drawCentreString("PARA FOTO,", tft.width() / 2, text_height + 30, 4);
     }
-    tft.drawCentreString("3 SEC SALIR", 120, text_height + 60, 4);
+    tft.drawCentreString("3 SEC SALIR", tft.width() / 2, text_height + 60, 4);
   }
   else {
-    tft.drawCentreString("PRESS BUTTON", 120, text_height, 4);
+    tft.drawCentreString("PRESS BUTTON", tft.width() / 2, text_height, 4);
     if (page == 10) {
-      tft.drawCentreString("TO PAUSE, HOLD", 120, text_height + 30, 4);
+      tft.drawCentreString("TO PAUSE, HOLD", tft.width() / 2, text_height + 30, 4);
     }
     else {
-      tft.drawCentreString("TO SHOOT, HOLD", 120, text_height + 30, 4);
+      tft.drawCentreString("TO SHOOT, HOLD", tft.width() / 2, text_height + 30, 4);
     }
-    tft.drawCentreString("3 SEC TO STOP", 120, text_height + 60, 4);
+    tft.drawCentreString("3 SEC TO STOP", tft.width() / 2, text_height + 60, 4);
   }
 }
 
@@ -207,51 +172,51 @@ void updateTlState() {
   tft.setTextColor(ILI9341_BLACK);
   if (language) {
     if (state_tl) {
-      tft.drawCentreString("TIEMPO RESTANTE", 120, 145, 4);
+      tft.drawCentreString("TIEMPO RESTANTE", tft.width() / 2, 145, 4);
       tft.drawString("H", 80, 185, 4);
       tft.drawString("MIN", 140, 185, 4);
       drawShots();
       drawRemaining();
     }
     else {
-      tft.drawCentreString("PAUSADO", 120, 165, 4);
+      tft.drawCentreString("PAUSADO", tft.width() / 2, 165, 4);
     }
   }
   else {
     if (state_tl) {
-      tft.drawCentreString("TIME REMAINING", 120, 145, 4);
+      tft.drawCentreString("TIME REMAINING", tft.width() / 2, 145, 4);
       tft.drawString("H", 80, 185, 4);
       tft.drawString("MIN", 140, 185, 4);
       drawShots();
       drawRemaining();
     }
     else {
-      tft.drawCentreString("PAUSED", 120, 165, 4);
+      tft.drawCentreString("PAUSED", tft.width() / 2, 165, 4);
     }
   }
   tft.setTextColor(ILI9341_WHITE);
   if (language) {
     if (!state_tl) {
-      tft.drawCentreString("TIEMPO RESTANTE", 120, 145, 4);
+      tft.drawCentreString("TIEMPO RESTANTE", tft.width() / 2, 145, 4);
       tft.drawString("H", 80, 185, 4);
       tft.drawString("MIN", 140, 185, 4);
       drawShots();
       drawRemaining();
     }
     else {
-      tft.drawCentreString("PAUSADO", 120, 165, 4);
+      tft.drawCentreString("PAUSADO", tft.width() / 2, 165, 4);
     }
   }
   else {
     if (!state_tl) {
-      tft.drawCentreString("TIME REMAINING", 120, 145, 4);
+      tft.drawCentreString("TIME REMAINING", tft.width() / 2, 145, 4);
       tft.drawString("H", 80, 185, 4);
       tft.drawString("MIN", 140, 185, 4);
       drawShots();
       drawRemaining();
     }
     else {
-      tft.drawCentreString("PAUSED", 120, 165, 4);
+      tft.drawCentreString("PAUSED", tft.width() / 2, 165, 4);
     }
   }
   drawRightNumber(stops_done, 110, 90);

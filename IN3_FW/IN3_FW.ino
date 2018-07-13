@@ -50,10 +50,6 @@
 #define TFT_DC         31
 #define TFT_RST        2
 
-//configuration variables
-
-const byte temperature_fraction = 20;
-
 #define POWER_EN 18
 #define POWER_EN_FB 19
 #define BACKLIGHT1 3
@@ -197,7 +193,7 @@ bool first_draw_battery = 1;
 bool state_tl;
 byte bar_limit;
 byte shots_height;
-byte text_height;
+int text_height=tft.height()/2;
 bool allow_shot;
 bool battery_warning, battery_warning_0;
 bool battery_blink;
@@ -211,10 +207,6 @@ long last_temp_update;
 long temp_update_rate = 2000;
 int backlight_intensity = 100;
 bool enableSet;
-bool firstTemperatureMeasure = 1;
-int temperatureArray [temperature_fraction];
-byte temperaturePos, temperature_measured;
-
 // timer
 #define ENCODER_RATE 1000    // in microseconds; 
 HardwareTimer timer(1);
