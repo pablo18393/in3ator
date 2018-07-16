@@ -1,6 +1,5 @@
 
 void selectMode() {
-  end = 0;
   bar_pos = 1;
   selected = 0;
   while (1) {
@@ -128,31 +127,12 @@ void selectMode() {
   }
 }
 
-void eraseBar() {
-  tft.fillRect(0, (tft.height() - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (tft.height() - width_heading) / rectangles, COLOR_BAR);
-}
-
-void updateBar() {
-  tft.fillRect(0, (tft.height() - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (tft.height() - width_heading) / rectangles, COLOR_SELECTED);
-  for (int i = 2; i <= rectangles; i++) {
-    tft.fillRect(0, (tft.height() - width_heading) * (i - 1) / rectangles + width_heading - 1, tft.height(), width_space, WHITE); //mejorable
-  }
-}
-
-void eraseBigBar() {
-  tft.fillRect(0, width_heading, width_select, (tft.height() - width_heading) * 3 / rectangles, COLOR_BAR);
-}
-
-void updateBigBar() {
-
-}
-
 void back_mode() {
-  delay(50);
+  delay(100);
   last_pulsed = millis();
   byte back_bar = 0;
-  while (digitalRead(pulse) == 0) {
-    //updateData();
+  while (!digitalRead(pulse)) {
+    updateData();
     if (millis() - last_pulsed > time_back_wait) {
       back_bar++;
       tft.drawLine(width_back - back_bar, 0, width_back - back_bar, width_heading, BLACK);

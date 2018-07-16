@@ -24,10 +24,10 @@ void menu() {
     }
   }
   rectangles = 4;
-  manual_speed = 0;
   drawRectangles();
   drawHeading();
-  while (digitalRead(pulse) == 0) {
+  updateSensors();
+  while (!digitalRead(pulse)) {
     updateData();
   }
   delay(100);

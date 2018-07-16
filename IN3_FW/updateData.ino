@@ -11,43 +11,42 @@ int updateData() {
   }
   lastEncoderPos[counter] = encoderpos[counter];
   oldPosition = newPosition;
-  if (millis() - last_temp_update > temp_update_rate) {
-    last_temp_update = millis();
-    updateTemperature();
-    temperature_measured = 0;
-  }
   //PROBLEM WITH THIS FUNCTION: temperature measure time is not constant
   if (millis() - last_temp_update > (temp_update_rate * temperature_measured / temperature_fraction)) {
-    temperatureArray[temperature_measured] = analogRead(THERMISTOR1);
+    temperatureArray[temperature_measured] = analogRead(THERMISTOR_CORNER);
     temperature_measured++;
+  }
+  if (millis() - last_temp_update > temp_update_rate) {
+    updateSensors();
   }
   return move;
 }
 
-void updateTemperature() {
+void updateSensors() {
+  tft.setTextColor(COLOR_HEADING);
+  drawCentreNumber(humidity, humidityX, humidityY);
   tft.setTextColor(ILI9341_BLACK);
   tft.drawFloat(temperature, 1, temperatureX, temperatureY, 4);
+  humidity = dht.getHumidity();
+  drawCentreNumber(humidity, humidityX, humidityY);
   updateTemp();
-  if (page && !lockPercentage) {
-    drawRightNumber(processPercentage, tft.width() / 2, temperatureY);
-  }
   tft.setTextColor(ILI9341_WHITE);
   tft.drawFloat(temperature, 1, temperatureX, temperatureY, 4);
   if (page && !lockPercentage) {
-    Serial.println(desiredTemp);
-    Serial.println(temperature);
-    Serial.println(temperatureAtStart);
+    drawRightNumber(processPercentage, tft.width() / 2, temperatureY);
+    float previousPercentage = processPercentage;
     processPercentage = 100 - ((desiredTemp - temperature) * 100 / (desiredTemp - temperatureAtStart));
-    Serial.println(processPercentage);
     if (processPercentage > 99) {
-      lockPercentage = 1;
       processPercentage = 100;
     }
     if (processPercentage < 0) {
       processPercentage = 0;
     }
+    updateLoadingBar(int(previousPercentage), int(processPercentage));
     drawRightNumber(processPercentage, tft.width() / 2, temperatureY);
   }
+  temperature_measured = 0;
+  last_temp_update = millis();
 }
 
 void updateTemp() {
@@ -66,7 +65,7 @@ void updateTemp() {
   //Bloque de cálculo
   if (firstTemperatureMeasure) {
     firstTemperatureMeasure = 0;
-    temperatureMean = analogRead(THERMISTOR1);
+    temperatureMean = analogRead(THERMISTOR_CORNER);
   }
   else {
     temperatureMean = 0;
@@ -78,6 +77,27 @@ void updateTemp() {
   vm = (vcc) * ( temperatureMean / 4098 );          //Calcular tensión en la entrada
   rntc = rAux / ((vcc / vm) - 1);                   //Calcular la resistencia de la NTC
   temperature = beta / (log(rntc / r0) + (beta / temp0)) - 273; //Calcular la temperatura en Celsius
+  if (temperatureAtStart > temperature) {
+    temperatureAtStart = temperature;
+  }
 }
 
-
+void updateLoadingBar(float prev, float actual) {
+  if (prev != actual) {
+    float diff = (actual - prev) / 100;
+    int color;
+    float barX;
+    int barY, barDiffWidth;
+    barX = barPosX - (barWidth / 2) * (1 - prev / 50);
+    barY = barPosY - barHeight / 2;
+    barDiffWidth = barWidth * abs(diff) + 1;
+    if (diff > 0) {
+      color = COLOR_LOADING_BAR;
+    }
+    else {
+      color = COLOR_MENU;
+      barX -= barDiffWidth - 1;
+    }
+    tft.fillRect(barX, barY, barDiffWidth, barHeight, color);
+  }
+}
