@@ -19,7 +19,12 @@ int ypos;
 bool print_text = 1;
 
 void drawRectangles() {
-  tft.fillRect(width_select, width_heading, tft.width() - width_select, tft.height() - width_heading, COLOR_MENU);
+  if (!page) {
+    tft.fillRect(width_select, width_heading, tft.width() - width_select, tft.height() - width_heading, COLOR_MENU);
+  }
+  else {
+    tft.fillRect(0, width_heading, tft.width(), tft.height() - width_heading, COLOR_MENU);
+  }
   if (print_text) {
     tft.fillRect(0, width_heading, width_select, (tft.height() - width_heading) / rectangles, COLOR_SELECTED);
   }
@@ -130,7 +135,7 @@ void drawHeading() {
     }
   }
   tft.setTextColor(ILI9341_BLACK);
-  tft.drawCentreString("In3ator, saving lives", tft.width() - 150, width_heading / 5, 4);
+  tft.drawCentreString("In3ator   hum:34%", tft.width() - 110, width_heading / 5, 4);
   //tft.drawCentreString("V", tft.width() - 32, width_heading / 5, 4);
   //drawRightNumber(firmwareVersion, tft.width() - 10, width_heading / 5);
 }
@@ -158,7 +163,7 @@ void drawRightNumber(int n, int x, int i) {
 void loadLogo() {
   tft.setTextSize(2);
   tft.setTextColor(ILI9341_BLACK);
-  tft.drawCentreString("I N 3", tft.width()/2, 100, 4);
+  tft.drawCentreString("I N 3", tft.width() / 2, 100, 4);
   for (int i = 0; i < backlight_intensity; i++) {
     analogWrite(LED1, i);
     delay(20);

@@ -1,5 +1,6 @@
 void menu() {
   page = 0;
+  setVariablesPosition();
   tft.setTextSize(1);
   tft.setTextColor(ILI9341_WHITE);
   for (int i = 0; i <= 3; i++) {

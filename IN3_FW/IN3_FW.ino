@@ -50,6 +50,11 @@
 #define TFT_DC         31
 #define TFT_RST        2
 
+//configuration variables
+
+#define temperature_fraction 20
+
+
 #define POWER_EN 18
 #define POWER_EN_FB 19
 #define BACKLIGHT1 3
@@ -97,6 +102,8 @@ Adafruit_ILI9341_STM tft = Adafruit_ILI9341_STM(TFT_CS, TFT_DC, TFT_RST); // Use
 #define COLOR_ARROW 0x0000
 #define COLOR_BATTERY BLACK
 #define COLOR_BATTERY_LEFT BLACK
+#define COLOR_LOADING_BAR WHITE
+
 
 #define MAXENCODERS 1
 volatile int encstate[MAXENCODERS];
@@ -193,13 +200,13 @@ bool first_draw_battery = 1;
 bool state_tl;
 byte bar_limit;
 byte shots_height;
-int text_height=tft.height()/2;
+int text_height = tft.height() / 2;
 bool allow_shot;
 bool battery_warning, battery_warning_0;
 bool battery_blink;
 long last_battery_blink;
 bool waiting;
-float temperature;
+float temperature = 25;
 int humidity = 40;
 float desiredTemp = 35;
 int led_intensity;
@@ -207,6 +214,12 @@ long last_temp_update;
 long temp_update_rate = 2000;
 int backlight_intensity = 100;
 bool enableSet;
+bool firstTemperatureMeasure = 1;
+float processPercentage = 0, temperatureAtStart;
+int temperatureArray [temperature_fraction];
+byte temperaturePos, temperature_measured;
+bool lockPercentage;
+
 // timer
 #define ENCODER_RATE 1000    // in microseconds; 
 HardwareTimer timer(1);
@@ -230,13 +243,10 @@ void setup() {
   oldPosition = newPosition;
   tft.begin();
   tft.setRotation(1);
-  setVariablesRotation();
   initEEPROM();
   tft.fillScreen(WHITE);
   //loadLogo();
   analogWrite(LED1, backlight_intensity);
-
-  initEncoders();
   newPosition = myEncoderRead();
   auto_lock = EEPROM.read(13);
   oldPosition = newPosition;
@@ -251,11 +261,10 @@ void initEEPROM() {
 
 }
 
-void setVariablesRotation() {
+void setVariablesPosition() {
   humidityPos = tft.width() - 43;
   temperatureX = tft.width() - 79;
   temperatureY = 51;
-
 }
 
 void recap() {

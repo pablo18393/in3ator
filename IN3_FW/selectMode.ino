@@ -34,10 +34,8 @@ void selectMode() {
       else {
         tft.fillRect(0, (tft.height() - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (tft.height() - width_heading) / rectangles, WHITE);
       }
-      if (!(page == 3 || page == 4 || page == 6)) {
-        for (int i = 2; i <= rectangles; i++) {
-          tft.fillRect(0, (tft.height() - width_heading) * (i - 1) / rectangles + width_heading - 1, tft.height(), width_space, WHITE); //mejorable
-        }
+      for (int i = 2; i <= rectangles; i++) {
+        tft.fillRect(0, (tft.height() - width_heading) * (i - 1) / rectangles + width_heading - 1, tft.height(), width_space, WHITE); //mejorable
       }
       while (!digitalRead(pulse)) {
         updateData();
@@ -115,7 +113,6 @@ void selectMode() {
               menu();
               break;
             case 4:
-              page = 1;
               process_page();
               break;
           }
@@ -155,12 +152,13 @@ void back_mode() {
   last_pulsed = millis();
   byte back_bar = 0;
   while (digitalRead(pulse) == 0) {
-    updateData();
+    //updateData();
     if (millis() - last_pulsed > time_back_wait) {
       back_bar++;
       tft.drawLine(width_back - back_bar, 0, width_back - back_bar, width_heading, BLACK);
     }
     if (back_bar == width_back) {
+      lockPercentage = 0;
       menu();
     }
     delay((time_back_draw + time_back_wait) / width_back);
@@ -169,31 +167,5 @@ void back_mode() {
     drawBack();
   }
   delay(50);
-}
-
-void updateTemperature() {
-  tft.setTextColor(ILI9341_BLACK);
-  tft.drawFloat(temperature, 1, temperatureX, temperatureY, 4);
-  updateTemp();
-  tft.setTextColor(ILI9341_WHITE);
-  tft.drawFloat(temperature, 1, temperatureX, temperatureY, 4);
-}
-
-void updateTemp() {
-  //Valores fijos del circuito
-  float rAux = 10000.0;
-  float vcc = 3.3;
-  float beta = 3950.0;
-  float temp0 = 298.0;
-  float r0 = 10000.0;
-
-  //Variables usadas en el cálculo
-  float vm = 0.0;
-  float rntc = 0.0;
-
-  //Bloque de cálculo
-  vm = (vcc / 4098) * ( analogRead(THERMISTOR1) );            //Calcular tensión en la entrada
-  rntc = rAux / ((vcc / vm) - 1);                   //Calcular la resistencia de la NTC
-  temperature = beta / (log(rntc / r0) + (beta / temp0)) - 273; //Calcular la temperatura en Celsius
 }
 
