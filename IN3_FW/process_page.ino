@@ -9,7 +9,7 @@ void process_page() {
   drawHeading();
   printLoadingBar();
   print_text = 1; //cambiar en todos
-  tft.setTextColor(ILI9341_WHITE);
+  tft.setTextColor(COLOR_MENU_TEXT);
   if (language) {
     tft.drawCentreString("Temperatura", tft.width() / 2, tft.height() / 5 - 4, 4);
   }
@@ -47,7 +47,7 @@ void process_page() {
         tft.setTextColor(ILI9341_ORANGE);
       }
       else {
-        tft.setTextColor(ILI9341_BLACK);
+        tft.setTextColor(COLOR_MENU);
         blinking += 400;
       }
       drawStop();

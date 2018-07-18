@@ -1,8 +1,7 @@
 void settings() {
   page = 2;
-  EEPROM.write(0, page);
   tft.setTextSize(1);
-  tft.setTextColor(ILI9341_WHITE);
+  tft.setTextColor(COLOR_MENU_TEXT);
   for (int i = 0; i <= 0; i++) {
     pos_text[i] = 0;
   }

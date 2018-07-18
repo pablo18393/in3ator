@@ -23,16 +23,17 @@ int updateData() {
 }
 
 void updateSensors() {
+  Serial.println(page);
   tft.setTextColor(COLOR_HEADING);
   drawCentreNumber(humidity, humidityX, humidityY);
-  tft.setTextColor(ILI9341_BLACK);
+  tft.setTextColor(COLOR_MENU);
   tft.drawFloat(temperature, 1, temperatureX, temperatureY, 4);
-  humidity = dht.getHumidity();
+  updateHumidity();
   drawCentreNumber(humidity, humidityX, humidityY);
   updateTemp();
-  tft.setTextColor(ILI9341_WHITE);
+  tft.setTextColor(COLOR_MENU_TEXT);
   tft.drawFloat(temperature, 1, temperatureX, temperatureY, 4);
-  if (page && !lockPercentage) {
+  if (page) {
     drawRightNumber(processPercentage, tft.width() / 2, temperatureY);
     float previousPercentage = processPercentage;
     processPercentage = 100 - ((desiredTemp - temperature) * 100 / (desiredTemp - temperatureAtStart));
@@ -43,10 +44,17 @@ void updateSensors() {
       processPercentage = 0;
     }
     updateLoadingBar(int(previousPercentage), int(processPercentage));
-    drawRightNumber(processPercentage, tft.width() / 2, temperatureY);
   }
+  
   temperature_measured = 0;
   last_temp_update = millis();
+}
+
+void updateHumidity() {
+  timer.pause();
+  humidity = dht.getHumidity();
+  timer.refresh();
+  timer.resume();
 }
 
 void updateTemp() {
@@ -63,8 +71,7 @@ void updateTemp() {
   float rntc = 0.0;
 
   //Bloque de cálculo
-  if (firstTemperatureMeasure) {
-    firstTemperatureMeasure = 0;
+  if (!temperature_measured) {
     temperatureMean = analogRead(THERMISTOR_CORNER);
   }
   else {
@@ -99,5 +106,9 @@ void updateLoadingBar(float prev, float actual) {
       barX -= barDiffWidth - 1;
     }
     tft.fillRect(barX, barY, barDiffWidth, barHeight, color);
+    tft.setTextColor(COLOR_MENU);
+    drawRightNumber(prev, tft.width() / 2, temperatureY);
+    tft.setTextColor(COLOR_MENU_TEXT);
+    drawRightNumber(actual, tft.width() / 2, temperatureY);
   }
 }

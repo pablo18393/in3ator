@@ -128,7 +128,7 @@ void drawHeading() {
       drawBack();
     }
   }
-  tft.setTextColor(ILI9341_BLACK);
+  tft.setTextColor(COLOR_MENU);
   tft.drawCentreString("In3ator   hum:      %", tft.width() - 110, width_heading / 5, 4);
 }
 
@@ -165,7 +165,7 @@ void drawRightNumber(int n, int x, int i) {
 
 void loadLogo() {
   tft.setTextSize(2);
-  tft.setTextColor(ILI9341_BLACK);
+  tft.setTextColor(COLOR_MENU);
   tft.drawCentreString("I N 3", tft.width() / 2, 100, 4);
   for (int i = 0; i < backlight_intensity; i++) {
     analogWrite(SCREENBACKLIGHT, i);

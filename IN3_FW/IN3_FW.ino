@@ -49,7 +49,7 @@
 //configuration variables
 
 #define temperature_fraction 20
-
+#define mosfet_switch_time 50 //in millis, oversized
 //pin definition
 #define DHTPIN 0
 #define SCREENBACKLIGHT 3
@@ -87,6 +87,7 @@ Adafruit_ILI9341_STM tft = Adafruit_ILI9341_STM(TFT_CS, TFT_DC, TFT_RST); // Use
 #define WHITE 0xFFFF
 #define COLOR_MENU BLACK
 #define COLOR_BAR  BLACK
+#define COLOR_MENU_TEXT WHITE
 #define COLOR_SELECTED WHITE
 #define COLOR_CHOSEN GREEN
 #define COLOR_HEADING WHITE
@@ -118,9 +119,9 @@ int humidityY;
 int temperatureX;
 int temperatureY;
 
+int page, page0;
 bool selected;
 int data, instant_read;
-byte page, page0;
 byte text_size;
 bool pos_text[8];
 volatile int move;
@@ -169,11 +170,9 @@ long last_temp_update;
 long temp_update_rate = 2000;
 int backlight_intensity = 100;
 bool enableSet;
-bool firstTemperatureMeasure = 1;
 float processPercentage = 0, temperatureAtStart;
 int temperatureArray [temperature_fraction];
 byte temperaturePos, temperature_measured;
-bool lockPercentage;
 int barWidth, barHeight, barPosX, barPosY;
 byte barThickness;
 
@@ -185,20 +184,16 @@ HardwareTimer timer(1);
 void setup() {
   Serial.begin(115200);
   dht.setup(DHTPIN);
-  pinsDirection();
-  initEncoders();
-  newPosition = myEncoderRead();
-  auto_lock = EEPROM.read(13);
-  oldPosition = newPosition;
   tft.begin();
   tft.setRotation(1);
   //initEEPROM();
+  //loadLogo();
   tft.fillScreen(WHITE);
   if (hardwareVerification()) {
     while (digitalRead(pulse));
   }
-  //loadLogo();
   analogWrite(SCREENBACKLIGHT, backlight_intensity);
+  initEncoders();
   newPosition = myEncoderRead();
   auto_lock = EEPROM.read(13);
   oldPosition = newPosition;
@@ -210,16 +205,101 @@ void pinsDirection() {
   pinMode(pulse, INPUT_PULLUP);
   pinMode(ICT, OUTPUT);
   pinMode(HEATER, OUTPUT);
-  pinMode(22, INPUT);
-  pinMode(8, OUTPUT);
-  pinMode(16, OUTPUT);
-  pinMode(3, OUTPUT);
-  pinMode(PB1, OUTPUT);
-  pinMode(DHTPIN,INPUT);
+  pinMode(POWER_EN, OUTPUT);
+  pinMode(FAN1, OUTPUT);
+  pinMode(FAN2, OUTPUT);
+  pinMode(FAN3, OUTPUT);
+  pinMode(STERILIZE, OUTPUT);
+  pinMode(WATERPUMP, OUTPUT);
 }
 
 byte hardwareVerification() {
+  pinDirection();
+  delay(mosfet_switch_time);
+  byte errorHardwareCode = 0;
+  if (!digitalRead(POWER_EN_FB)) {
+    errorHardwareCode = 1;
+  }
+  if (!digitalRead(HEATER_FB)) {
+    errorHardwareCode = 2;
+  }
+  if (!digitalRead(FAN1_FB)) {
+    errorHardwareCode = 3;
+  }
+  if (!digitalRead(FAN2_FB)) {
+    errorHardwareCode = 4;
+  }
+  if (!digitalRead(FAN3_FB)) {
+    errorHardwareCode = 5;
+  }
+  if (!digitalRead(ICT_FB)) {
+    errorHardwareCode = 6;
+  }
+  if (!digitalRead(STERILIZE_FB)) {
+    errorHardwareCode = 7;
+  }
+  if (!digitalRead(WATERPUMP_FB)) {
+    errorHardwareCode = 8;
+  }
+  //power verification
+  if (analogRead(THERMISTOR_HEATER) > 800 || analogRead(THERMISTOR_HEATER) < 300) {
+    errorHardwareCode = 9;
+  }
+  if (analogRead(THERMISTOR_CORNER) > 800 || analogRead(THERMISTOR_CORNER) < 300) {
+    errorHardwareCode = 10;
+  }
+  digitalWrite(POWER_EN, HIGH);
+  delay(mosfet_switch_time);
+  if (!digitalRead(POWER_EN_FB)) {
+    errorHardwareCode = 11;
+  }
+  digitalWrite(POWER_EN, LOW);
+  digitalWrite(HEATER, HIGH);
+  delay(mosfet_switch_time);
+  if (!digitalRead(HEATER_FB)) {
+    errorHardwareCode = 12;
+  }
+  digitalWrite(HEATER, LOW);
+  digitalWrite(FAN1, HIGH);
+  delay(mosfet_switch_time);
+  if (!digitalRead(FAN1_FB)) {
+    errorHardwareCode = 13;
+  }
+  digitalWrite(FAN1, LOW);
+  digitalWrite(FAN2, HIGH);
+  delay(mosfet_switch_time);
+  if (!digitalRead(FAN2_FB)) {
+    errorHardwareCode = 14;
+  }
+  digitalWrite(FAN2, LOW);
+  digitalWrite(FAN3, HIGH);
+  delay(mosfet_switch_time);
+  if (!digitalRead(FAN3_FB)) {
+    errorHardwareCode = 15;
+  }
+  digitalWrite(FAN3, LOW);
+  digitalWrite(ICT, HIGH);
+  delay(mosfet_switch_time);
+  if (!digitalRead(ICT_FB)) {
+    errorHardwareCode = 16;
+  }
+  digitalWrite(ICT, LOW);
+  digitalWrite(STERILIZE, HIGH);
+  delay(mosfet_switch_time);
+  if (!digitalRead(STERILIZE_FB)) {
+    errorHardwareCode = 17;
+  }
+  digitalWrite(STERILIZE, LOW);
+  digitalWrite(WATERPUMP, HIGH);
+  delay(mosfet_switch_time);
+  if (!digitalRead(WATERPUMP_FB)) {
+    errorHardwareCode = 18;
+  }
+  digitalWrite(WATERPUMP, LOW);
+  if (errorHardwareCode) {
 
+  }
+  return (errorHardwareCode);
 }
 
 long EEPROMReadLong(int p_address)
