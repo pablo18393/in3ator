@@ -1,8 +1,7 @@
 void menu() {
   page = 0;
-  setVariablesPosition();
   tft.setTextSize(1);
-  tft.setTextColor(COLOR_MENU_TEXT);
+  tft.setTextColor(ILI9341_WHITE);
   for (int i = 0; i <= 3; i++) {
     pos_text[i] = 0;
   }
@@ -14,26 +13,20 @@ void menu() {
     if (enableSet) {
       words[3] = "Empezar";
     }
-    else {
-      words[3] = "Introduce temperatura";
-    }
   }
   else {
     words[0]  = "Temperature";
     words[1] = "LEDS";
     words[2] = "Language";
     if (enableSet) {
-      words[3] = "Start";
-    }
-    else {
-      words[3] = "Set new Temperature";
+      words[3] = "Set";
     }
   }
   rectangles = 4;
+  manual_speed = 0;
   drawRectangles();
   drawHeading();
-  updateSensors();
-  while (!digitalRead(pulse)) {
+  while (digitalRead(pulse) == 0) {
     updateData();
   }
   delay(100);

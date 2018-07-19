@@ -32,14 +32,18 @@
 */
 
 /*page:
-   0 menu
-   1 process_page
+   2 manual
+   3 auto mode
+   4 time lapse
+   5 settings
+   6 stop mtion
+   9-10 process page
+   30 travelling/pan mode
 */
 #include <Adafruit_GFX_AS.h>
 #include <EEPROM.h>
 #include <Adafruit_ILI9341_STM.h> // STM32 DMA Hardware-specific library
 #include <SPI.h>
-#include "DHT.h"
 
 // Use hardware SPI lines+
 #define TFT_CS         7
@@ -48,32 +52,36 @@
 
 //configuration variables
 
-#define temperature_fraction 20
-#define mosfet_switch_time 50 //in millis, oversized
-//pin definition
-#define DHTPIN 0
-#define SCREENBACKLIGHT 3
-#define THERMISTOR_HEATER 10
-#define THERMISTOR_CORNER 11
-#define ENCODER_A 12
-#define ENCODER_B 13
+const byte temperature_fraction = 20;
+
 #define POWER_EN 18
+#define POWER_EN_FB 19
+#define BACKLIGHT1 3
+#define BACKLIGHT2 23
 #define FAN1 9
 #define FAN2 8
 #define FAN3 15
-#define HEATER 16
-#define ICT 25
-#define STERILIZE 28
-#define WATERPUMP 27
-#define HEATER_FB 17
-#define POWER_EN_FB 19
 #define FAN1_FB 20
 #define FAN2_FB 21
 #define FAN3_FB 22
+#define HEATER 16
+#define HEATER_FB 17
+#define ICT 25
 #define ICT_FB 26
+#define STERILIZE 28
 #define STERILIZE_FB 29
+#define WATERPUMP 27
 #define WATERPUMP_FB 30
+#define THERMISTOR1 11
+#define THERMISTOR2 10
+#define DHT22_1 24
+
 #define pulse 14
+#define LED1 3
+#define LED2 3
+#define LED3 3
+
+
 
 Adafruit_ILI9341_STM tft = Adafruit_ILI9341_STM(TFT_CS, TFT_DC, TFT_RST); // Use hardware SPI
 
@@ -87,41 +95,34 @@ Adafruit_ILI9341_STM tft = Adafruit_ILI9341_STM(TFT_CS, TFT_DC, TFT_RST); // Use
 #define WHITE 0xFFFF
 #define COLOR_MENU BLACK
 #define COLOR_BAR  BLACK
-#define COLOR_MENU_TEXT WHITE
 #define COLOR_SELECTED WHITE
 #define COLOR_CHOSEN GREEN
 #define COLOR_HEADING WHITE
 #define COLOR_ARROW 0x0000
 #define COLOR_BATTERY BLACK
 #define COLOR_BATTERY_LEFT BLACK
-#define COLOR_FRAME_BAR WHITE
-#define COLOR_LOADING_BAR RED
-#define COLOR_COMPLETED_BAR GREEN
+
 #define MAXENCODERS 1
-
-DHT dht;
-
 volatile int encstate[MAXENCODERS];
 volatile int encflag[MAXENCODERS];
 boolean A_set[MAXENCODERS];
 boolean B_set[MAXENCODERS];
 volatile int16_t encoderpos[MAXENCODERS];
 volatile int  encodertimer = millis(); // acceleration measurement
-int encoderpinA[MAXENCODERS] = {ENCODER_A}; // pin array of all encoder A inputs
-int encoderpinB[MAXENCODERS] = {ENCODER_B}; // pin array of all encoder B inputs
+int encoderpinA[MAXENCODERS] = {12}; // pin array of all encoder A inputs
+int encoderpinB[MAXENCODERS] = {13}; // pin array of all encoder B inputs
 unsigned int lastEncoderPos[MAXENCODERS];
 
 int firmwareVersion = 0;
 
 //Text position
-int humidityX;
-int humidityY;
+int humidityPos;
 int temperatureX;
 int temperatureY;
 
-int page, page0;
 bool selected;
 int data, instant_read;
+byte page, page0;
 byte text_size;
 bool pos_text[8];
 volatile int move;
@@ -132,11 +133,23 @@ int oldPosition;
 int newPosition;
 byte rectangles;
 bool manualMode;
-const byte time_back_draw = 255;
+const byte time_back_draw = 100;
 const byte time_back_wait = 255;
+const byte pos_clip[2] = {163, 220};
+long min_interval;
+const byte pos_dist = 130;
+const byte pos_dolly = 175;
+unsigned char letter;
 bool mode;
+long travel_counter, pan_counter;
+byte tl_data[6], data_min, data_max;
+int tl_distance;
+byte distance_number[4];
+bool tl_direction;
+byte clip_fps = 28;
 byte xpos;
 byte length;
+long stops, stops_done;
 const byte height = 40;
 const byte separation = 10;
 const byte height_bar = 200;
@@ -158,24 +171,49 @@ bool pulsed, pulsed_before;
 int time_lock = 60000;
 bool state_asleep = 1;
 bool auto_lock = 1; //cambiar a 0 si se quiere apagar
+int manual_speed;
+byte end;
 byte counter;
+bool repeat;
+byte ramp;
+byte am_speed;
+bool am_move[2];
+long check_EEPROM;
+bool tl_power;
 byte language;
-int text_height = tft.height() / 2;
-
+byte delay_start;
+bool keep_am;
+byte color_led;
+int voltage, current;
+int battery_lines, battery_lines0;
+byte battery_div = 4;
+float battery_percentage = 0.96;
+float battery_sure;
+byte min_ramp, max_speed;
+bool errorPan;
+byte d;
+bool stopped;
+bool first_draw_battery = 1;
+bool state_tl;
+byte bar_limit;
+byte shots_height;
+byte text_height;
+bool allow_shot;
+bool battery_warning, battery_warning_0;
+bool battery_blink;
+long last_battery_blink;
+bool waiting;
 float temperature;
-int humidity;
+int humidity = 40;
 float desiredTemp = 35;
 int led_intensity;
 long last_temp_update;
 long temp_update_rate = 2000;
 int backlight_intensity = 100;
 bool enableSet;
-float processPercentage = 0, temperatureAtStart;
+bool firstTemperatureMeasure = 1;
 int temperatureArray [temperature_fraction];
 byte temperaturePos, temperature_measured;
-int barWidth, barHeight, barPosX, barPosY;
-byte barThickness;
-
 
 // timer
 #define ENCODER_RATE 1000    // in microseconds; 
@@ -183,123 +221,80 @@ HardwareTimer timer(1);
 
 void setup() {
   Serial.begin(115200);
-  dht.setup(DHTPIN);
+  pinMode(LED1, OUTPUT);
+  pinMode(LED2, OUTPUT);
+  pinMode(LED3, OUTPUT);
+  pinMode(pulse, INPUT_PULLUP);
+  pinMode(ICT, OUTPUT);
+  pinMode(HEATER, OUTPUT);
+  pinMode(22, INPUT);
+  pinMode(8, OUTPUT);
+  pinMode(16, OUTPUT);
+  pinMode(3, OUTPUT);
+  pinMode(PB1, OUTPUT);
+  initEncoders();
+  newPosition = myEncoderRead();
+  auto_lock = EEPROM.read(13);
+  oldPosition = newPosition;
   tft.begin();
   tft.setRotation(1);
-  //initEEPROM();
-  //loadLogo();
+  setVariablesRotation();
+  initEEPROM();
   tft.fillScreen(WHITE);
-  if (hardwareVerification()) {
-    while (digitalRead(pulse));
-  }
-  analogWrite(SCREENBACKLIGHT, backlight_intensity);
+  //loadLogo();
+  analogWrite(LED1, backlight_intensity);
+
   initEncoders();
   newPosition = myEncoderRead();
   auto_lock = EEPROM.read(13);
   oldPosition = newPosition;
   menu();
 }
+// the loop function runs over and over again forever
+void loop() {
 
-void pinsDirection() {
-  pinMode(SCREENBACKLIGHT, OUTPUT);
-  pinMode(pulse, INPUT_PULLUP);
-  pinMode(ICT, OUTPUT);
-  pinMode(HEATER, OUTPUT);
-  pinMode(POWER_EN, OUTPUT);
-  pinMode(FAN1, OUTPUT);
-  pinMode(FAN2, OUTPUT);
-  pinMode(FAN3, OUTPUT);
-  pinMode(STERILIZE, OUTPUT);
-  pinMode(WATERPUMP, OUTPUT);
 }
 
-byte hardwareVerification() {
-  pinDirection();
-  delay(mosfet_switch_time);
-  byte errorHardwareCode = 0;
-  if (!digitalRead(POWER_EN_FB)) {
-    errorHardwareCode = 1;
-  }
-  if (!digitalRead(HEATER_FB)) {
-    errorHardwareCode = 2;
-  }
-  if (!digitalRead(FAN1_FB)) {
-    errorHardwareCode = 3;
-  }
-  if (!digitalRead(FAN2_FB)) {
-    errorHardwareCode = 4;
-  }
-  if (!digitalRead(FAN3_FB)) {
-    errorHardwareCode = 5;
-  }
-  if (!digitalRead(ICT_FB)) {
-    errorHardwareCode = 6;
-  }
-  if (!digitalRead(STERILIZE_FB)) {
-    errorHardwareCode = 7;
-  }
-  if (!digitalRead(WATERPUMP_FB)) {
-    errorHardwareCode = 8;
-  }
-  //power verification
-  if (analogRead(THERMISTOR_HEATER) > 800 || analogRead(THERMISTOR_HEATER) < 300) {
-    errorHardwareCode = 9;
-  }
-  if (analogRead(THERMISTOR_CORNER) > 800 || analogRead(THERMISTOR_CORNER) < 300) {
-    errorHardwareCode = 10;
-  }
-  digitalWrite(POWER_EN, HIGH);
-  delay(mosfet_switch_time);
-  if (!digitalRead(POWER_EN_FB)) {
-    errorHardwareCode = 11;
-  }
-  digitalWrite(POWER_EN, LOW);
-  digitalWrite(HEATER, HIGH);
-  delay(mosfet_switch_time);
-  if (!digitalRead(HEATER_FB)) {
-    errorHardwareCode = 12;
-  }
-  digitalWrite(HEATER, LOW);
-  digitalWrite(FAN1, HIGH);
-  delay(mosfet_switch_time);
-  if (!digitalRead(FAN1_FB)) {
-    errorHardwareCode = 13;
-  }
-  digitalWrite(FAN1, LOW);
-  digitalWrite(FAN2, HIGH);
-  delay(mosfet_switch_time);
-  if (!digitalRead(FAN2_FB)) {
-    errorHardwareCode = 14;
-  }
-  digitalWrite(FAN2, LOW);
-  digitalWrite(FAN3, HIGH);
-  delay(mosfet_switch_time);
-  if (!digitalRead(FAN3_FB)) {
-    errorHardwareCode = 15;
-  }
-  digitalWrite(FAN3, LOW);
-  digitalWrite(ICT, HIGH);
-  delay(mosfet_switch_time);
-  if (!digitalRead(ICT_FB)) {
-    errorHardwareCode = 16;
-  }
-  digitalWrite(ICT, LOW);
-  digitalWrite(STERILIZE, HIGH);
-  delay(mosfet_switch_time);
-  if (!digitalRead(STERILIZE_FB)) {
-    errorHardwareCode = 17;
-  }
-  digitalWrite(STERILIZE, LOW);
-  digitalWrite(WATERPUMP, HIGH);
-  delay(mosfet_switch_time);
-  if (!digitalRead(WATERPUMP_FB)) {
-    errorHardwareCode = 18;
-  }
-  digitalWrite(WATERPUMP, LOW);
-  if (errorHardwareCode) {
+void initEEPROM() {
 
+}
+
+void setVariablesRotation() {
+  humidityPos = tft.width() - 43;
+  temperatureX = tft.width() - 79;
+  temperatureY = 51;
+
+}
+
+void recap() {
+}
+
+bool CheckComunication() {
+
+}
+
+byte read_char() {
+  return (Serial.read());
+}
+
+long read_string() {
+  if (CheckComunication()) {
+    data = 0;
+    instant_read = 0;
+    if (Serial.peek() == '-') {
+      Serial.read();
+    }
+    while (Serial.available() && instant_read != ',') {
+      instant_read = read_char();
+      if (instant_read != ',' && instant_read >= '0' && instant_read <= '9') {
+        data = data * 10 + (instant_read - 48);
+      }
+    }
+    return (data);
   }
-  return (errorHardwareCode);
+  else {
+    return (0);
+  }
 }
 
 long EEPROMReadLong(int p_address)
