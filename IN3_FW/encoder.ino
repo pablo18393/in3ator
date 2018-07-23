@@ -17,41 +17,13 @@ void asleep() {
     //digitalWrite(LED1, LOW);
     //digitalWrite(LED2, LOW);
     //digitalWrite(LED3, LOW);
-    noInterrupts();
-    for (int i = 0; i < 8; i++) {
-      write0();
-    }
-    for (int i = 0; i < 8; i++) {
-      write0();
-    }
-    for (int i = 0; i < 8; i++) {
-      write0();
-    }
-    interrupts();
     state_asleep = 0;
   }
   else {
     //digitalWrite(LED1, HIGH);
     //digitalWrite(LED2, HIGH);
     //digitalWrite(LED3, HIGH);
-    if (state_asleep == 0) {
-      switch (color_led) {
-        case 0:
-          black();
-          break;
-        case 1:
-          red();
-          break;
-        case 2:
-          green();
-          break;
-        case 3:
-          blue();
-          break;
-      }
-      while (digitalRead(pulse) == 0);
-      delayMicroseconds(1000);
-    }
+    delayMicroseconds(1000);
     state_asleep = 1;
   }
 }
