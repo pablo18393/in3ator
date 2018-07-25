@@ -22,8 +22,8 @@ void processPage() {
   state_blink = 1;
   while (!digitalRead(pulse));
   digitalWrite(FAN1, HIGH);
-  digitalWrite(FAN1, HIGH);
-  digitalWrite(FAN1, HIGH);
+  digitalWrite(FAN2, HIGH);
+  digitalWrite(FAN3, HIGH);
   while (1) {
     updateData();
     if (digitalRead(pulse)) {

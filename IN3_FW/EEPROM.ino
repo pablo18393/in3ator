@@ -4,16 +4,16 @@ void initEEPROM() {
   EEPROM.PageSize  = 0x400;
   EEPROM.init();
   if (EEPROM.read(170)) {
-    EEPROM.write(252, 0);
+    EEPROM.write(170, 0);
     delay(30);
-    if (EEPROM.read(252) != 0) {
+    if (EEPROM.read(170) != 0) {
       EEPROM.format();
     }
   }
   else {
-    EEPROM.write(252, 1);
+    EEPROM.write(170, 1);
     delay(30);
-    if (EEPROM.read(252) != 1) {
+    if (EEPROM.read(170) != 1) {
       EEPROM.format();
     }
   }
@@ -31,7 +31,15 @@ void initEEPROM() {
 void recapVariables() {
   auto_lock = EEPROM.read(1);
   language = EEPROM.read(2);
-
+  diffTemperature = EEPROM.read(3);
+  if (diffTemperature > 1000) {
+    diffTemperature -= 65535;
+  }
+  diffTemperature /= 10;
+  diffHumidity = EEPROM.read(4);
+  if (diffHumidity > 1000) {
+    diffHumidity -= 65535;
+  }
 }
 
 long EEPROMReadLong(int p_address)

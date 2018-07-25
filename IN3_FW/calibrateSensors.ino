@@ -1,6 +1,6 @@
-void settings() {
-  byte numWords=3;
-  page = 2;
+void calibrateSensors() {
+  byte numWords = 3;
+  page = 3;
   tft.setTextSize(1);
   tft.setTextColor(COLOR_MENU_TEXT);
   for (int i = 0; i < numWords; i++) {
@@ -8,14 +8,14 @@ void settings() {
   }
   pos_text[2] = 1;
   if (!language) {
-    words[0]  = "AUTO LOCK";
-    words[1] = "LANGUAGE";
-    words[2] = "CALIBRATE";
+    words[0]  = "Temperature";
+    words[1] = "Humidity";
+    words[2] = "Reset values";
   }
   else {
-    words[0]  = "AUTO BLOQUEO";
-    words[1] = "IDIOMA";
-    words[2] = "CALIBRAR";
+    words[0]  = "Temperatura";
+    words[1] = "Humedad";
+    words[2] = "Reiniciar valores";
   }
   rectangles = 3;
   drawRectangles();
@@ -27,5 +27,3 @@ void settings() {
   delay(100);
   selectMode();
 }
-
-

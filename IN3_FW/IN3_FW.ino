@@ -156,8 +156,7 @@ byte next;
 float factor;
 bool pulsed, pulsed_before;
 int time_lock = 60000;
-bool state_asleep = 1;
-bool auto_lock = 1; //cambiar a 0 si se quiere apagar
+bool auto_lock;
 byte counter;
 byte language;
 int text_height = tft.height() / 2;
@@ -175,7 +174,8 @@ int temperatureArray [temperature_fraction];
 byte temperaturePos, temperature_measured;
 int barWidth, barHeight, barPosX, barPosY;
 byte barThickness;
-
+float diffTemperature;
+int diffHumidity;
 
 // timer
 #define ENCODER_RATE 1000    // in microseconds; 
@@ -190,14 +190,13 @@ void setup() {
   initEEPROM();
   tft.fillScreen(WHITE);
   /*
-  if (hardwareVerification()) {
+    if (hardwareVerification()) {
     while (digitalRead(pulse));
-  }
+    }
   */
   analogWrite(SCREENBACKLIGHT, backlight_intensity);
   initEncoders();
   newPosition = myEncoderRead();
-  auto_lock = EEPROM.read(13);
   oldPosition = newPosition;
   menu();
 }

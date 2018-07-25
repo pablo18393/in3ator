@@ -1,9 +1,10 @@
 void menu() {
   page = 0;
+  byte numWords = 4;
   setVariablesPosition();
   tft.setTextSize(1);
   tft.setTextColor(COLOR_MENU_TEXT);
-  for (int i = 0; i <= 3; i++) {
+  for (int i = 0; i < numWords; i++) {
     pos_text[i] = 0;
   }
   pos_text[2] = 1;
@@ -22,7 +23,7 @@ void menu() {
   else {
     words[0]  = "Temperature";
     words[1] = "LEDS";
-    words[2] = "Configuration";
+    words[2] = "Settings";
     if (enableSet) {
       words[3] = "Start";
     }

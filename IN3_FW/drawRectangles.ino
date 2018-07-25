@@ -94,6 +94,16 @@ void drawRectangles() {
               break;
           }
           break;
+        case 3:
+          switch (i) {
+            case 0:
+              tft.drawFloat(temperature, 1, 245, ypos, 4);
+              break;
+            case 1:
+              tft.drawFloat(humidity, 0, 245, ypos, 4);
+              break;
+          }
+          break;
       }
     }
   }
@@ -107,12 +117,10 @@ void setVariablesPosition() {
 }
 
 void drawHeading() {
-  for (int i = 0; i <= 1; i++) {
-    tft.fillRect(0, 0, tft.height(), width_heading, COLOR_HEADING);
+    tft.fillRect(0, 0, tft.width(), width_heading, COLOR_HEADING);
     if (page) {
       drawBack();
     }
-  }
   tft.setTextColor(COLOR_MENU);
   tft.drawCentreString("In3ator   hum:      %", tft.width() - 110, width_heading / 5, 4);
 }

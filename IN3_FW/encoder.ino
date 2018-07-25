@@ -12,19 +12,13 @@ void asleep() {
     last_something = millis();
   }
   pulsed_before = pulsed;
-
-  if (millis() - last_something > time_lock && !auto_lock) {
-    //digitalWrite(LED1, LOW);
-    //digitalWrite(LED2, LOW);
-    //digitalWrite(LED3, LOW);
-    state_asleep = 0;
-  }
-  else {
-    //digitalWrite(LED1, HIGH);
-    //digitalWrite(LED2, HIGH);
-    //digitalWrite(LED3, HIGH);
-    delayMicroseconds(1000);
-    state_asleep = 1;
+  if (auto_lock) {
+    if (millis() - last_something > time_lock) {
+      analogWrite(SCREENBACKLIGHT, 0);
+    }
+    else {
+      analogWrite(SCREENBACKLIGHT, backlight_intensity);
+    }
   }
 }
 void readEncoders() {

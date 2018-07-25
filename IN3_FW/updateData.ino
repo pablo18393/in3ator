@@ -12,7 +12,7 @@ int updateData() {
   lastEncoderPos[counter] = encoderpos[counter];
   oldPosition = newPosition;
   //PROBLEM WITH THIS FUNCTION: temperature measure time is not constant
-  if (page != 2) {
+  if (page == 0 || page == 1) {
     if (millis() - last_temp_update > (temp_update_rate * temperature_measured / temperature_fraction)) {
       temperatureArray[temperature_measured] = analogRead(THERMISTOR_CORNER);
       temperature_measured++;
@@ -28,13 +28,17 @@ void updateSensors() {
   tft.setTextColor(COLOR_HEADING);
   drawCentreNumber(humidity, humidityX, humidityY);
   tft.setTextColor(COLOR_MENU);
-  tft.drawFloat(temperature, 1, temperatureX, temperatureY, 4);
+  if (page == 0 || page == 1) {
+    tft.drawFloat(temperature, 1, temperatureX, temperatureY, 4);
+  }
   updateHumidity();
   drawCentreNumber(humidity, humidityX, humidityY);
   updateTemp();
   tft.setTextColor(COLOR_MENU_TEXT);
-  tft.drawFloat(temperature, 1, temperatureX, temperatureY, 4);
-  if (page) {
+  if (page == 0 || page == 1) {
+    tft.drawFloat(temperature, 1, temperatureX, temperatureY, 4);
+  }
+  if (page == 1) {
     drawRightNumber(processPercentage, tft.width() / 2, temperatureY);
     float previousPercentage = processPercentage;
     processPercentage = 100 - ((desiredTemp - temperature) * 100 / (desiredTemp - temperatureAtStart));
@@ -52,7 +56,11 @@ void updateSensors() {
 
 void updateHumidity() {
   timer.pause();
-  humidity = dht.getHumidity();
+  int newHumidity = dht.getHumidity();
+  if (newHumidity) {
+    humidity = newHumidity;
+    humidity += diffHumidity;
+  }
   timer.refresh();
   timer.resume();
 }
@@ -72,7 +80,7 @@ void updateTemp() {
 
   //Bloque de cálculo
   if (!temperature_measured) {
-    temperatureMean = analogRead(THERMISTOR_CORNER);
+    temperatureMean = analogRead(THERMISTOR_CORNER) + diffTemperature;
   }
   else {
     temperatureMean = 0;
@@ -84,6 +92,7 @@ void updateTemp() {
   vm = (vcc) * ( temperatureMean / 4098 );          //Calcular tensión en la entrada
   rntc = rAux / ((vcc / vm) - 1);                   //Calcular la resistencia de la NTC
   temperature = beta / (log(rntc / r0) + (beta / temp0)) - 273; //Calcular la temperatura en Celsius
+  temperature += diffTemperature;
   if (temperatureAtStart > temperature) {
     temperatureAtStart = temperature;
   }

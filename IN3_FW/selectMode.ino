@@ -1,4 +1,3 @@
-
 void selectMode() {
   bool enableSetProcess;
   bar_pos = 1;
@@ -98,7 +97,7 @@ void selectMode() {
               }
               break;
             case 3:
-              configuration();
+              settings();
               break;
             case 4:
               processPage();
@@ -160,7 +159,53 @@ void selectMode() {
                   move = 0;
                 }
               }
-              configuration();
+              settings();
+              break;
+            case 3:
+              calibrateSensors();
+              break;
+          }
+          break;
+        case 3:
+          switch (bar_pos) {
+            case 1:
+              while (digitalRead(pulse)) {
+                updateData();
+                if (move) {
+                  tft.setTextColor(COLOR_MENU);
+                  tft.drawFloat(temperature, 1, 245, ypos, 4);
+                  tft.setTextColor(COLOR_MENU_TEXT);
+                  diffTemperature += move * (0.1);
+                  temperature += move * (0.1);
+                  tft.drawFloat(temperature, 1, 245, ypos, 4);
+                  move = 0;
+                  EEPROM.write(3, int(diffTemperature * 10));
+                }
+              }
+              break;
+            case 2:
+              while (digitalRead(pulse)) {
+                updateData();
+                if (move) {
+                  tft.setTextColor(COLOR_MENU);
+                  tft.drawFloat(humidity, 0, 245, ypos, 4);
+                  tft.setTextColor(COLOR_MENU_TEXT);
+                  diffHumidity += move;
+                  humidity += move;
+                  tft.drawFloat(humidity, 0, 245, ypos, 4);
+                  move = 0;
+                  EEPROM.write(4, diffHumidity );
+                }
+              }
+              break;
+            case 3:
+              diffTemperature = 0;
+              diffHumidity = 0;
+              EEPROM.write(3, diffTemperature);
+              EEPROM.write(4, diffHumidity);
+              updateHumidity();
+              updateTemp();
+              calibrateSensors();
               break;
           }
           break;
