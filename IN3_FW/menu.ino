@@ -1,4 +1,9 @@
 void menu() {
+  if (page == 1) {
+    digitalWrite(FAN1, LOW);
+    digitalWrite(FAN2, LOW);
+    digitalWrite(FAN3, LOW);
+  }
   page = 0;
   byte numWords = 4;
   setVariablesPosition();
@@ -31,8 +36,8 @@ void menu() {
       words[3] = "Set new Temperature";
     }
   }
-  rectangles = 4;
-  drawRectangles();
+  rectangles = numWords;
+  drawGraphicInterface();
   drawHeading();
   updateSensors();
   while (!digitalRead(pulse)) {

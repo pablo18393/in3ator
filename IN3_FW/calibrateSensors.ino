@@ -17,8 +17,8 @@ void calibrateSensors() {
     words[1] = "Humedad";
     words[2] = "Reiniciar valores";
   }
-  rectangles = 3;
-  drawRectangles();
+  rectangles = numWords;
+  drawGraphicInterface();
   drawHeading();
   updateSensors();
   while (!digitalRead(pulse)) {

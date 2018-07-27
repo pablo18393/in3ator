@@ -1,11 +1,12 @@
 void processPage() {
+  byte  numWords = 2;
   temperatureAtStart = temperature;
   processPercentage = 0;
   page = 1;
   tft.setTextSize(1);
-  rectangles = 2;
   print_text = 0;
-  drawRectangles();
+  rectangles = numWords;
+  drawGraphicInterface();
   drawHeading();
   printLoadingBar();
   print_text = 1; //cambiar en todos
@@ -21,9 +22,9 @@ void processPage() {
   drawStop();
   state_blink = 1;
   while (!digitalRead(pulse));
-  digitalWrite(FAN1, HIGH);
-  digitalWrite(FAN2, HIGH);
-  digitalWrite(FAN3, HIGH);
+  analogWrite(FAN1, HIGH);
+  analogWrite(FAN2, HIGH);
+  analogWrite(FAN3, HIGH);
   while (1) {
     updateData();
     if (digitalRead(pulse)) {

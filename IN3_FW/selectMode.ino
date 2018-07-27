@@ -72,25 +72,25 @@ void selectMode() {
             case 2:
               while (digitalRead(pulse) ) {
                 updateData();
-                if (move && -move + led_intensity >= 0 && -move + led_intensity <= 100) {
+                if (move && -move + LEDIntensity >= 0 && -move + LEDIntensity <= LEDMaxIntensity) {
                   tft.setTextColor(COLOR_MENU);
-                  drawRightNumber(led_intensity, 280, ypos);
-                  if (!led_intensity && move) {
+                  drawRightNumber(LEDIntensity, 280, ypos);
+                  if (!LEDIntensity && move) {
                     tft.drawRightString("OFF", 315, ypos, 4);
                     tft.setTextColor(COLOR_MENU_TEXT);
                     tft.drawRightString("%", 315, ypos, 4);
                   }
-                  led_intensity -= 10 * move;
-                  analogWrite(HEATER, led_intensity);
+                  LEDIntensity -= 10 * move;
+                  analogWrite(ICT, LEDIntensity);
                   tft.setTextColor(COLOR_MENU_TEXT);
-                  if (!led_intensity && move) {
+                  if (!LEDIntensity && move) {
                     tft.setTextColor(COLOR_MENU);
                     tft.drawRightString("%", 315, ypos, 4);
                     tft.setTextColor(COLOR_MENU_TEXT);
                     tft.drawRightString("OFF", 315, ypos, 4);
                   }
                   else {
-                    drawRightNumber(led_intensity, 280, ypos);
+                    drawRightNumber(LEDIntensity, 280, ypos);
                   }
                 }
                 move = 0;
@@ -162,6 +162,60 @@ void selectMode() {
               settings();
               break;
             case 3:
+              while (digitalRead(pulse) ) {
+                updateData();
+                if (move && -move + heaterTemp >= 0 && -move + heaterTemp <= heaterMaxTemp) {
+                  tft.setTextColor(COLOR_MENU);
+                  drawRightNumber(heaterTemp, 280, ypos);
+                  if (!heaterTemp && move) {
+                    tft.drawRightString("OFF", 315, ypos, 4);
+                    tft.setTextColor(COLOR_MENU_TEXT);
+                    tft.drawRightString("C", 315, ypos, 4);
+                  }
+                  heaterTemp -= 5 * move;
+                  EEPROM.write(5, heaterTemp);
+                  tft.setTextColor(COLOR_MENU_TEXT);
+                  if (!heaterTemp && move) {
+                    tft.setTextColor(COLOR_MENU);
+                    tft.drawRightString("C", 315, ypos, 4);
+                    tft.setTextColor(COLOR_MENU_TEXT);
+                    tft.drawRightString("OFF", 315, ypos, 4);
+                  }
+                  else {
+                    drawRightNumber(heaterTemp, 280, ypos);
+                  }
+                }
+                move = 0;
+              }
+              break;
+            case 4:
+              while (digitalRead(pulse) ) {
+                updateData();
+                if (move && -move + fanSpeed >= 0 && -move + fanSpeed <= fanMaxSpeed) {
+                  tft.setTextColor(COLOR_MENU);
+                  drawRightNumber(fanSpeed, 280, ypos);
+                  if (!fanSpeed && move) {
+                    tft.drawRightString("OFF", 315, ypos, 4);
+                    tft.setTextColor(COLOR_MENU_TEXT);
+                    tft.drawRightString("%", 315, ypos, 4);
+                  }
+                  fanSpeed -= 10 * move;
+                  EEPROM.write(6, fanSpeed);
+                  tft.setTextColor(COLOR_MENU_TEXT);
+                  if (!fanSpeed && move) {
+                    tft.setTextColor(COLOR_MENU);
+                    tft.drawRightString("%", 315, ypos, 4);
+                    tft.setTextColor(COLOR_MENU_TEXT);
+                    tft.drawRightString("OFF", 315, ypos, 4);
+                  }
+                  else {
+                    drawRightNumber(fanSpeed, 280, ypos);
+                  }
+                }
+                move = 0;
+              }
+              break;
+            case 5:
               calibrateSensors();
               break;
           }

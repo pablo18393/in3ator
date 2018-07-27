@@ -18,7 +18,7 @@ const byte arrow_tail = 5;
 int ypos;
 bool print_text = 1;
 
-void drawRectangles() {
+void drawGraphicInterface() {
   if (!page) {
     tft.fillRect(width_select, width_heading, tft.width() - width_select, tft.height() - width_heading, COLOR_MENU);
   }
@@ -59,8 +59,8 @@ void drawRectangles() {
               tft.drawRightString("%", 315, ypos, 4);
               break;
             case 1:
-              if (led_intensity) {
-                drawRightNumber(led_intensity, 280, ypos);
+              if (LEDIntensity) {
+                drawRightNumber(LEDIntensity, 280, ypos);
                 tft.drawRightString("%", 315, ypos, 4);
               }
               else {
@@ -92,6 +92,19 @@ void drawRectangles() {
                 tft.drawRightString("ENG", 315, ypos, 4);
               }
               break;
+            case 2:
+              drawRightNumber(heaterTemp, 280, ypos);
+              tft.drawRightString("C", 315, ypos, 4);
+              break;
+            case 3:
+              if (fanSpeed) {
+                drawRightNumber(fanSpeed, 280, ypos);
+                tft.drawRightString("%", 315, ypos, 4);
+              }
+              else {
+                tft.drawRightString("OFF", 315, ypos, 4);
+              }
+              break;
           }
           break;
         case 3:
@@ -117,10 +130,10 @@ void setVariablesPosition() {
 }
 
 void drawHeading() {
-    tft.fillRect(0, 0, tft.width(), width_heading, COLOR_HEADING);
-    if (page) {
-      drawBack();
-    }
+  tft.fillRect(0, 0, tft.width(), width_heading, COLOR_HEADING);
+  if (page) {
+    drawBack();
+  }
   tft.setTextColor(COLOR_MENU);
   tft.drawCentreString("In3ator   hum:      %", tft.width() - 110, width_heading / 5, 4);
 }

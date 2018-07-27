@@ -1,34 +1,12 @@
 /*
    EEPROM VARIABLES
-   0: PAGE
-   1: MANUAL MODE
-   2: AUTO DATA
-   3: AUTO DATA
-   4: RAMP
-   5: REPEAT
-   6: SPEED
-   7: TL DATA CLIP MIN
-   8: TL DATA CLIP SEC
-   9: TL DATA INTERVAL MIN
-   10: TL DATA INTERVAL SEC
-   11: TL DATA EXP MIN
-   12: TL DATA EXP SEC
-   13: AUTO LOCK
-   14: CLIP FPS
-   15: TL POWER
-   16: DELAY_START
-   17: LANGUAGE
-   18:
-   19:
-   20:
-   21: MAX SPEED
-   22:TRAVEL COUNTER
-   23:TRAVEL COUNTER
-   24: PAN COUNTER
-   25: PAN COUNTER
-   170: EEPROM CHECK
-   171-211: PAN SPEED
-   212-252: TRAVEL SPEED
+   0: First turn on / eeprom format
+   1: auto lock
+   2: language
+   3: diffTemperature
+   4: diffHumidity
+   5: heaterTemp
+   6: fanSpeed
 */
 
 /*page:
@@ -142,6 +120,9 @@ const byte separation = 10;
 const byte height_bar = 200;
 const byte height_letter = 70;
 const byte rect_length = 80;
+const byte heaterMaxTemp = 70;
+const byte fanMaxSpeed = 100;
+const byte LEDMaxIntensity = 100;
 bool manual_state = 0;
 long blinking;
 long last_something;
@@ -164,7 +145,9 @@ int text_height = tft.height() / 2;
 float temperature;
 int humidity;
 float desiredTemp = 35;
-int led_intensity;
+int heaterTemp;
+int fanSpeed;
+int LEDIntensity;
 long last_temp_update;
 long temp_update_rate = 2000;
 int backlight_intensity = 100;
@@ -187,6 +170,7 @@ void setup() {
   tft.begin();
   tft.setRotation(1);
   //loadLogo();
+  pinDirection();
   initEEPROM();
   tft.fillScreen(WHITE);
   /*

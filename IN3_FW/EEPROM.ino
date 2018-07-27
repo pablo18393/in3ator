@@ -17,15 +17,32 @@ void initEEPROM() {
       EEPROM.format();
     }
   }
-  /*
-    if (EEPROM.read(0) > 0) { //firstTimePowerOn
+  if (EEPROM.read(0) > 0) { //firstTimePowerOn
+    EEPROM.format();
     for (int i = 0; i <= 253; i++) {
       EEPROM.write(i, 0);
     }
-    firstTurnOn();
-    }
-  */
-  recapVariables();
+    loadStandardValues();
+    //firstTurnOn();
+  }
+  else {
+    recapVariables();
+  }
+}
+
+void loadStandardValues() {
+  auto_lock = 0;
+  EEPROM.write(1, auto_lock);
+  language = 0;
+  EEPROM.write(2, language);
+  diffTemperature = 0;
+  EEPROM.write(3, diffTemperature);
+  diffHumidity = 0;
+  EEPROM.write(4, diffHumidity);
+  heaterTemp = 50;
+  EEPROM.write(5, heaterTemp);
+  fanSpeed = 100;
+  EEPROM.write(6, fanSpeed);
 }
 
 void recapVariables() {
@@ -40,6 +57,8 @@ void recapVariables() {
   if (diffHumidity > 1000) {
     diffHumidity -= 65535;
   }
+  heaterTemp = EEPROM.read(5);
+  fanSpeed = EEPROM.read(6);
 }
 
 long EEPROMReadLong(int p_address)
