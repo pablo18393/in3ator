@@ -63,13 +63,14 @@ Adafruit_ILI9341_STM tft = Adafruit_ILI9341_STM(TFT_CS, TFT_DC, TFT_RST); // Use
 #define MAGENTA 0xF81F
 #define YELLOW 0xFFE0
 #define WHITE 0xFFFF
+#define COLOR_WARNING_TEXT ILI9341_ORANGE
 #define COLOR_MENU BLACK
 #define COLOR_BAR  BLACK
 #define COLOR_MENU_TEXT WHITE
 #define COLOR_SELECTED WHITE
 #define COLOR_CHOSEN GREEN
 #define COLOR_HEADING WHITE
-#define COLOR_ARROW 0x0000
+#define COLOR_ARROW BLACK
 #define COLOR_BATTERY BLACK
 #define COLOR_BATTERY_LEFT BLACK
 #define COLOR_FRAME_BAR WHITE
@@ -97,24 +98,7 @@ int humidityY;
 int temperatureX;
 int temperatureY;
 
-int page, page0;
-bool selected;
-int data, instant_read;
-byte text_size;
-bool pos_text[8];
-volatile int move;
-long last_pulsed;
-char* words[8];
-byte bar_pos;
-int oldPosition;
-int newPosition;
-byte rectangles;
-bool manualMode;
-const byte time_back_draw = 255;
-const byte time_back_wait = 255;
-bool mode;
-byte xpos;
-byte length;
+//constants
 const byte height = 40;
 const byte separation = 10;
 const byte height_bar = 200;
@@ -123,6 +107,28 @@ const byte rect_length = 80;
 const byte heaterMaxTemp = 70;
 const byte fanMaxSpeed = 100;
 const byte LEDMaxIntensity = 100;
+const byte time_back_draw = 255;
+const byte time_back_wait = 255;
+const byte minTemp = 15;
+const byte maxTemp = 45;
+
+int page, page0;
+bool selected;
+int data, instant_read;
+byte text_size;
+bool pos_text[8];
+volatile int move;
+long last_pulsed;
+char* words[8];
+char* helpMessage;
+byte bar_pos;
+int oldPosition;
+int newPosition;
+byte rectangles;
+bool manualMode;
+bool mode;
+byte xpos;
+byte length;
 bool manual_state = 0;
 long blinking;
 long last_something;
@@ -159,6 +165,12 @@ int barWidth, barHeight, barPosX, barPosY;
 byte barThickness;
 float diffTemperature;
 int diffHumidity;
+bool enableSetProcess;
+bool blinkSetMessageState;
+int blinkTimeON = 1000;
+int blinkTimeOFF = 100;
+long lastBlinkSetMessage;
+byte goToProcessRow;
 
 // timer
 #define ENCODER_RATE 1000    // in microseconds; 

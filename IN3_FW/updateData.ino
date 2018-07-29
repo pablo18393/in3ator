@@ -21,18 +21,23 @@ int updateData() {
       updateSensors();
     }
   }
+  if (!page && !enableSet) {
+    checkSetMessage();
+  }
   return move;
 }
 
 void updateSensors() {
-  tft.setTextColor(COLOR_HEADING);
-  drawCentreNumber(humidity, humidityX, humidityY);
   tft.setTextColor(COLOR_MENU);
   if (page == 0 || page == 1) {
     tft.drawFloat(temperature, 1, temperatureX, temperatureY, 4);
   }
-  updateHumidity();
-  drawCentreNumber(humidity, humidityX, humidityY);
+  if (updateHumidity()) {
+    tft.setTextColor(COLOR_HEADING);
+    drawCentreNumber(humidity, humidityX, humidityY);
+    tft.setTextColor(COLOR_MENU);
+    drawCentreNumber(humidity, humidityX, humidityY);
+  }
   updateTemp();
   tft.setTextColor(COLOR_MENU_TEXT);
   if (page == 0 || page == 1) {
@@ -54,7 +59,7 @@ void updateSensors() {
   last_temp_update = millis();
 }
 
-void updateHumidity() {
+bool updateHumidity() {
   timer.pause();
   int newHumidity = dht.getHumidity();
   if (newHumidity) {
@@ -63,6 +68,7 @@ void updateHumidity() {
   }
   timer.refresh();
   timer.resume();
+  return (newHumidity);
 }
 
 void updateTemp() {

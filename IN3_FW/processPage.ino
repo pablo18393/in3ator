@@ -18,7 +18,7 @@ void processPage() {
     tft.drawCentreString("Temperature", tft.width() / 2, tft.height() / 5 - 4, 4);
   }
   tft.drawCentreString("%", tft.width() / 2 + 14, temperatureY, 4);
-  tft.setTextColor(ILI9341_ORANGE);
+  tft.setTextColor(COLOR_WARNING_TEXT);
   drawStop();
   state_blink = 1;
   while (!digitalRead(pulse));

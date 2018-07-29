@@ -22,7 +22,7 @@ void menu() {
       words[3] = "Empezar";
     }
     else {
-      words[3] = "Introduce temperatura";
+      words[3] = "";
     }
   }
   else {
@@ -33,10 +33,11 @@ void menu() {
       words[3] = "Start";
     }
     else {
-      words[3] = "Set new Temperature";
+      words[3] = "";
     }
   }
   rectangles = numWords;
+  goToProcessRow = numWords;
   drawGraphicInterface();
   drawHeading();
   updateSensors();

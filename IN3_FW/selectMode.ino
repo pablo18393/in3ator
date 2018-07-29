@@ -1,12 +1,10 @@
 void selectMode() {
-  bool enableSetProcess;
   bar_pos = 1;
   selected = 0;
   while (1) {
-    ypos = (tft.height() - width_heading) / (2 * rectangles) + (bar_pos - 1) * (tft.height() - width_heading) / (rectangles) + letter_height;
     updateData();
     if (move) {
-      if (selected == 0) {
+      if (!selected) {
         if (move < 0) {
           move++;
           if (!page) {
@@ -29,6 +27,7 @@ void selectMode() {
             updateBar();
           }
         }
+        ypos = (tft.height() - width_heading) / (2 * rectangles) + (bar_pos - 1) * (tft.height() - width_heading) / (rectangles) + letter_height;
       }
     }
     if (!digitalRead(pulse)) {
@@ -55,7 +54,7 @@ void selectMode() {
             case 1:
               while (digitalRead(pulse)) {
                 updateData();
-                if (move && -move + desiredTemp >= 15 && -move + desiredTemp <= 45) {
+                if (move && -move + desiredTemp >= minTemp && -move + desiredTemp <= maxTemp) {
                   tft.setTextColor(COLOR_MENU);
                   tft.drawFloat(desiredTemp, 1, temperatureX - 65, temperatureY, 4);
                   desiredTemp -= float(move) / 10;
@@ -274,6 +273,37 @@ void selectMode() {
   }
 }
 
+int getYpos(byte row) {
+  return ((tft.height() - width_heading) / (2 * rectangles) + (row - 1) * (tft.height() - width_heading) / (rectangles) + letter_height);
+}
+
+void checkSetMessage() {
+  int compareTime;
+  if (blinkSetMessageState) {
+    compareTime = blinkTimeON;
+  }
+  else {
+    compareTime = blinkTimeOFF;
+  }
+  if (millis() - lastBlinkSetMessage > compareTime) {
+    lastBlinkSetMessage = millis();
+    blinkSetMessageState = !blinkSetMessageState;
+    if (blinkSetMessageState) {
+      tft.setTextColor(COLOR_WARNING_TEXT);
+    }
+    else {
+      tft.setTextColor(COLOR_MENU);
+    }
+    if (!language) {
+      helpMessage = "Set desired temperature";
+    }
+    else {
+      helpMessage = "Introduce temperatura";
+    }
+    tft.drawCentreString(helpMessage, width_select + (tft.width() - width_select) / 2, getYpos(goToProcessRow), 4);
+  }
+}
+
 void back_mode() {
   delay(100);
   last_pulsed = millis();
@@ -282,7 +312,7 @@ void back_mode() {
     updateData();
     if (millis() - last_pulsed > time_back_wait) {
       back_bar++;
-      tft.drawLine(width_back - back_bar, 0, width_back - back_bar, width_heading, BLACK);
+      tft.drawLine(width_back - back_bar, 0, width_back - back_bar, width_heading, COLOR_MENU);
     }
     if (back_bar == width_back) {
       menu();
