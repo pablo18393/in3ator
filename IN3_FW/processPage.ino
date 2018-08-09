@@ -1,6 +1,6 @@
 void processPage() {
   byte  numWords = 2;
-  temperatureAtStart = temperature;
+  temperatureAtStart = temperature[cornerNTC];
   processPercentage = 0;
   page = 1;
   tft.setTextSize(1);
@@ -25,8 +25,17 @@ void processPage() {
   analogWrite(FAN1, HIGH);
   analogWrite(FAN2, HIGH);
   analogWrite(FAN3, HIGH);
+  if (temperatureAtStart > temperature[cornerNTC]) {
+    temperatureAtStart = temperature[cornerNTC];
+  }
   while (1) {
     updateData();
+    if (temperature[cornerNTC] < desiredTemp) {
+      heatUp();
+    }
+    else {
+      digitalWrite(HEATER, LOW);
+    }
     if (digitalRead(pulse)) {
       last_pulsed = millis();
       delay(100);
@@ -55,3 +64,13 @@ void processPage() {
     }
   }
 }
+
+void heatUp() {
+  if (temperature[heaterNTC] < temperature[heaterNTC]) {
+    analogWrite(HEATER, 200);
+  }
+  else {
+    digitalWrite(HEATER, LOW);
+  }
+}
+

@@ -93,7 +93,7 @@ void drawGraphicInterface() {
               }
               break;
             case 2:
-              drawRightNumber(heaterTemp, 280, ypos);
+              drawRightNumber(heaterLimitTemp, 280, ypos);
               tft.drawRightString("C", 315, ypos, 4);
               break;
             case 3:
@@ -110,7 +110,7 @@ void drawGraphicInterface() {
         case 3:
           switch (i) {
             case 0:
-              tft.drawFloat(temperature, 1, 245, ypos, 4);
+              tft.drawFloat(temperature[cornerNTC], 1, 245, ypos, 4);
               break;
             case 1:
               tft.drawFloat(humidity, 0, 245, ypos, 4);

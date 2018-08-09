@@ -35,12 +35,14 @@ void loadStandardValues() {
   EEPROM.write(1, auto_lock);
   language = 0;
   EEPROM.write(2, language);
-  diffTemperature = 0;
-  EEPROM.write(3, diffTemperature);
+  for (int i = 0; i < numTempSensors; i++) {
+    diffTemperature[numTempSensors] = 0;
+    EEPROM.write(100+i, diffTemperature[i]);
+  }
   diffHumidity = 0;
   EEPROM.write(4, diffHumidity);
-  heaterTemp = 50;
-  EEPROM.write(5, heaterTemp);
+  heaterLimitTemp = 50;
+  EEPROM.write(5, heaterLimitTemp);
   fanSpeed = 100;
   EEPROM.write(6, fanSpeed);
 }
@@ -48,16 +50,16 @@ void loadStandardValues() {
 void recapVariables() {
   auto_lock = EEPROM.read(1);
   language = EEPROM.read(2);
-  diffTemperature = EEPROM.read(3);
-  if (diffTemperature > 1000) {
-    diffTemperature -= 65535;
+  diffTemperature[cornerNTC] = EEPROM.read(3);
+  if (diffTemperature[cornerNTC] > 1000) {
+    diffTemperature[cornerNTC] -= 65535;
   }
-  diffTemperature /= 10;
+  diffTemperature[cornerNTC] /= 10;
   diffHumidity = EEPROM.read(4);
   if (diffHumidity > 1000) {
     diffHumidity -= 65535;
   }
-  heaterTemp = EEPROM.read(5);
+  heaterLimitTemp = EEPROM.read(5);
   fanSpeed = EEPROM.read(6);
 }
 

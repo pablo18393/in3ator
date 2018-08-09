@@ -3,10 +3,12 @@
    0: First turn on / eeprom format
    1: auto lock
    2: language
-   3: diffTemperature
    4: diffHumidity
-   5: heaterTemp
+   5: heaterLimitTemp
    6: fanSpeed
+
+   100: diffTemperature
+
 */
 
 /*page:
@@ -24,10 +26,17 @@
 #define TFT_DC         31
 #define TFT_RST        2
 
-//configuration variables
+//EEPROM VARIABLES
 
+//configuration variables
 #define temperature_fraction 20
 #define mosfet_switch_time 50 //in millis, oversized
+#define cornerNTC 0
+#define heaterNTC 1
+#define dhtSensor 2
+#define numNTC 2
+#define numTempSensors 3
+
 //pin definition
 #define DHTPIN 0
 #define SCREENBACKLIGHT 3
@@ -80,6 +89,7 @@ Adafruit_ILI9341_STM tft = Adafruit_ILI9341_STM(TFT_CS, TFT_DC, TFT_RST); // Use
 
 DHT dht;
 
+const byte NTCpin[numNTC] = {THERMISTOR_HEATER, THERMISTOR_CORNER};
 volatile int encstate[MAXENCODERS];
 volatile int encflag[MAXENCODERS];
 boolean A_set[MAXENCODERS];
@@ -148,10 +158,10 @@ byte counter;
 byte language;
 int text_height = tft.height() / 2;
 
-float temperature;
+float temperature[numTempSensors];
 int humidity;
 float desiredTemp = 35;
-int heaterTemp;
+int heaterLimitTemp;
 int fanSpeed;
 int LEDIntensity;
 long last_temp_update;
@@ -159,11 +169,11 @@ long temp_update_rate = 2000;
 int backlight_intensity = 100;
 bool enableSet;
 float processPercentage = 0, temperatureAtStart;
-int temperatureArray [temperature_fraction];
+int temperatureArray [numNTC][temperature_fraction];
 byte temperaturePos, temperature_measured;
 int barWidth, barHeight, barPosX, barPosY;
 byte barThickness;
-float diffTemperature;
+float diffTemperature[numTempSensors];
 int diffHumidity;
 bool enableSetProcess;
 bool blinkSetMessageState;

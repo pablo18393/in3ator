@@ -14,11 +14,16 @@ int updateData() {
   //PROBLEM WITH THIS FUNCTION: temperature measure time is not constant
   if (page == 0 || page == 1) {
     if (millis() - last_temp_update > (temp_update_rate * temperature_measured / temperature_fraction)) {
-      temperatureArray[temperature_measured] = analogRead(THERMISTOR_CORNER);
+      for (int ntc = 0; ntc < numNTC; ntc++) {
+        temperatureArray[ntc][temperature_measured] = analogRead(NTCpin[ntc]);
+      }
       temperature_measured++;
     }
     if (millis() - last_temp_update > temp_update_rate) {
       updateSensors();
+      if (page == 1) {
+        printStatus();
+      }
     }
   }
   if (!page && !enableSet) {
@@ -30,7 +35,7 @@ int updateData() {
 void updateSensors() {
   tft.setTextColor(COLOR_MENU);
   if (page == 0 || page == 1) {
-    tft.drawFloat(temperature, 1, temperatureX, temperatureY, 4);
+    tft.drawFloat(temperature[cornerNTC], 1, temperatureX, temperatureY, 4);
   }
   if (updateHumidity()) {
     tft.setTextColor(COLOR_HEADING);
@@ -41,12 +46,12 @@ void updateSensors() {
   updateTemp();
   tft.setTextColor(COLOR_MENU_TEXT);
   if (page == 0 || page == 1) {
-    tft.drawFloat(temperature, 1, temperatureX, temperatureY, 4);
+    tft.drawFloat(temperature[cornerNTC], 1, temperatureX, temperatureY, 4);
   }
   if (page == 1) {
     drawRightNumber(processPercentage, tft.width() / 2, temperatureY);
     float previousPercentage = processPercentage;
-    processPercentage = 100 - ((desiredTemp - temperature) * 100 / (desiredTemp - temperatureAtStart));
+    processPercentage = 100 - ((desiredTemp - temperature[cornerNTC]) * 100 / (desiredTemp - temperatureAtStart));
     if (processPercentage > 99) {
       processPercentage = 100;
     }
@@ -61,8 +66,10 @@ void updateSensors() {
 
 bool updateHumidity() {
   timer.pause();
+  int newTemp = dht.getTemperature();
   int newHumidity = dht.getHumidity();
-  if (newHumidity) {
+  if (newHumidity && newTemp) {
+    temperature[dhtSensor] = newTemp;
     humidity = newHumidity;
     humidity += diffHumidity;
   }
@@ -85,22 +92,21 @@ void updateTemp() {
   float rntc = 0.0;
 
   //Bloque de cálculo
-  if (!temperature_measured) {
-    temperatureMean = analogRead(THERMISTOR_CORNER) + diffTemperature;
-  }
-  else {
-    temperatureMean = 0;
-    for (int i = 0; i < temperature_measured; i++) {
-      temperatureMean += temperatureArray[i];
+  for (int ntc = 0; ntc < numNTC; ntc++) {
+    if (!temperature_measured) {
+      temperatureMean = analogRead(NTCpin[ntc]) + diffTemperature[cornerNTC];
     }
-    temperatureMean /= temperature_measured;
-  }
-  vm = (vcc) * ( temperatureMean / 4098 );          //Calcular tensión en la entrada
-  rntc = rAux / ((vcc / vm) - 1);                   //Calcular la resistencia de la NTC
-  temperature = beta / (log(rntc / r0) + (beta / temp0)) - 273; //Calcular la temperatura en Celsius
-  temperature += diffTemperature;
-  if (temperatureAtStart > temperature) {
-    temperatureAtStart = temperature;
+    else {
+      temperatureMean = 0;
+      for (int i = 0; i < temperature_measured; i++) {
+        temperatureMean += temperatureArray[ntc][i];
+      }
+      temperatureMean /= temperature_measured;
+    }
+    vm = (vcc) * ( temperatureMean / 4098 );          //Calcular tensión en la entrada
+    rntc = rAux / ((vcc / vm) - 1);                   //Calcular la resistencia de la NTC
+    temperature[ntc] = beta / (log(rntc / r0) + (beta / temp0)) - 273; //Calcular la temperatura en Celsius
+    temperature[ntc] += diffTemperature[ntc];
   }
 }
 
@@ -127,3 +133,18 @@ void updateLoadingBar(float prev, float actual) {
     drawRightNumber(actual, tft.width() / 2, temperatureY);
   }
 }
+
+void printStatus() {
+  Serial.print(millis());
+  Serial.print(";");
+  Serial.print(desiredTemp);
+  Serial.print(";");
+  Serial.print(heaterLimitTemp);
+  Serial.print(";");
+  for (int i = 0; i < numTempSensors; i++) {
+    Serial.print(temperature[i]);
+    Serial.print(";");
+  }
+  Serial.println(humidity);
+}
+

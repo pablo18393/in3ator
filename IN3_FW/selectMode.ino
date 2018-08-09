@@ -163,25 +163,25 @@ void selectMode() {
             case 3:
               while (digitalRead(pulse) ) {
                 updateData();
-                if (move && -move + heaterTemp >= 0 && -move + heaterTemp <= heaterMaxTemp) {
+                if (move && -move + heaterLimitTemp >= 0 && -move + heaterLimitTemp <= heaterMaxTemp) {
                   tft.setTextColor(COLOR_MENU);
-                  drawRightNumber(heaterTemp, 280, ypos);
-                  if (!heaterTemp && move) {
+                  drawRightNumber(heaterLimitTemp, 280, ypos);
+                  if (!heaterLimitTemp && move) {
                     tft.drawRightString("OFF", 315, ypos, 4);
                     tft.setTextColor(COLOR_MENU_TEXT);
                     tft.drawRightString("C", 315, ypos, 4);
                   }
-                  heaterTemp -= 5 * move;
-                  EEPROM.write(5, heaterTemp);
+                  heaterLimitTemp -= 5 * move;
+                  EEPROM.write(5, heaterLimitTemp);
                   tft.setTextColor(COLOR_MENU_TEXT);
-                  if (!heaterTemp && move) {
+                  if (!heaterLimitTemp && move) {
                     tft.setTextColor(COLOR_MENU);
                     tft.drawRightString("C", 315, ypos, 4);
                     tft.setTextColor(COLOR_MENU_TEXT);
                     tft.drawRightString("OFF", 315, ypos, 4);
                   }
                   else {
-                    drawRightNumber(heaterTemp, 280, ypos);
+                    drawRightNumber(heaterLimitTemp, 280, ypos);
                   }
                 }
                 move = 0;
@@ -226,13 +226,13 @@ void selectMode() {
                 updateData();
                 if (move) {
                   tft.setTextColor(COLOR_MENU);
-                  tft.drawFloat(temperature, 1, 245, ypos, 4);
+                  tft.drawFloat(temperature[cornerNTC], 1, 245, ypos, 4);
                   tft.setTextColor(COLOR_MENU_TEXT);
-                  diffTemperature += move * (0.1);
-                  temperature += move * (0.1);
-                  tft.drawFloat(temperature, 1, 245, ypos, 4);
+                  diffTemperature[cornerNTC] += move * (0.1);
+                  temperature[cornerNTC] += move * (0.1);
+                  tft.drawFloat(temperature[cornerNTC], 1, 245, ypos, 4);
                   move = 0;
-                  EEPROM.write(3, int(diffTemperature * 10));
+                  EEPROM.write(3, int(diffTemperature[cornerNTC] * 10));
                 }
               }
               break;
@@ -252,9 +252,9 @@ void selectMode() {
               }
               break;
             case 3:
-              diffTemperature = 0;
+              diffTemperature[cornerNTC] = 0;
               diffHumidity = 0;
-              EEPROM.write(3, diffTemperature);
+              EEPROM.write(3, diffTemperature[cornerNTC]);
               EEPROM.write(4, diffHumidity);
               updateHumidity();
               updateTemp();
