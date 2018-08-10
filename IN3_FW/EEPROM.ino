@@ -3,27 +3,27 @@ void initEEPROM() {
   EEPROM.PageBase1 = 0x801F800;
   EEPROM.PageSize  = 0x400;
   EEPROM.init();
-  if (EEPROM.read(170)) {
-    EEPROM.write(170, 0);
+  if (EEPROM.read(EEPROM_checkStatus)) {
+    EEPROM.write(EEPROM_checkStatus, 0);
     delay(30);
-    if (EEPROM.read(170) != 0) {
+    if (EEPROM.read(EEPROM_checkStatus) != 0) {
       EEPROM.format();
     }
   }
   else {
-    EEPROM.write(170, 1);
+    EEPROM.write(EEPROM_checkStatus, 1);
     delay(30);
-    if (EEPROM.read(170) != 1) {
+    if (EEPROM.read(EEPROM_checkStatus) != 1) {
       EEPROM.format();
     }
   }
-  if (EEPROM.read(0) > 0) { //firstTimePowerOn
+  if (EEPROM.read(EEPROM_firstTurnOn) > 0) { //firstTimePowerOn
     EEPROM.format();
     for (int i = 0; i <= 253; i++) {
       EEPROM.write(i, 0);
     }
     loadStandardValues();
-    //firstTurnOn();
+    firstTurnOn();
   }
   else {
     recapVariables();
@@ -32,35 +32,35 @@ void initEEPROM() {
 
 void loadStandardValues() {
   auto_lock = 0;
-  EEPROM.write(1, auto_lock);
+  EEPROM.write(EEPROM_autoLock, auto_lock);
   language = 0;
-  EEPROM.write(2, language);
+  EEPROM.write(EEPROM_language, language);
   for (int i = 0; i < numTempSensors; i++) {
     diffTemperature[numTempSensors] = 0;
     EEPROM.write(100+i, diffTemperature[i]);
   }
   diffHumidity = 0;
-  EEPROM.write(4, diffHumidity);
+  EEPROM.write(EEPROM_diffHumidity, diffHumidity);
   heaterLimitTemp = 50;
-  EEPROM.write(5, heaterLimitTemp);
+  EEPROM.write(EEPROM_heaterLimitTemp, heaterLimitTemp);
   fanSpeed = 100;
-  EEPROM.write(6, fanSpeed);
+  EEPROM.write(EEPROM_fanSpeed, fanSpeed);
 }
 
 void recapVariables() {
-  auto_lock = EEPROM.read(1);
-  language = EEPROM.read(2);
-  diffTemperature[cornerNTC] = EEPROM.read(3);
+  auto_lock = EEPROM.read(EEPROM_autoLock);
+  language = EEPROM.read(EEPROM_language);
+  diffTemperature[cornerNTC] = EEPROM.read(EEPROM_diffTemperature);
   if (diffTemperature[cornerNTC] > 1000) {
     diffTemperature[cornerNTC] -= 65535;
   }
   diffTemperature[cornerNTC] /= 10;
-  diffHumidity = EEPROM.read(4);
+  diffHumidity = EEPROM.read(EEPROM_diffHumidity);
   if (diffHumidity > 1000) {
     diffHumidity -= 65535;
   }
-  heaterLimitTemp = EEPROM.read(5);
-  fanSpeed = EEPROM.read(6);
+  heaterLimitTemp = EEPROM.read(EEPROM_heaterLimitTemp);
+  fanSpeed = EEPROM.read(EEPROM_fanSpeed);
 }
 
 long EEPROMReadLong(int p_address)

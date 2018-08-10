@@ -1,19 +1,9 @@
-/*
-   EEPROM VARIABLES
-   0: First turn on / eeprom format
-   1: auto lock
-   2: language
-   4: diffHumidity
-   5: heaterLimitTemp
-   6: fanSpeed
-
-   100: diffTemperature
-
-*/
 
 /*page:
    0 menu
    1 processPage
+   2 settings
+   3 calibrate sensors
 */
 #include <Adafruit_GFX_AS.h>
 #include <EEPROM.h>
@@ -27,6 +17,14 @@
 #define TFT_RST        2
 
 //EEPROM VARIABLES
+#define EEPROM_firstTurnOn 0
+#define EEPROM_autoLock 1
+#define EEPROM_language 2
+#define EEPROM_heaterLimitTemp 3
+#define EEPROM_fanSpeed 4
+#define EEPROM_diffHumidity 10
+#define EEPROM_diffTemperature 20
+#define EEPROM_checkStatus 100
 
 //configuration variables
 #define temperature_fraction 20

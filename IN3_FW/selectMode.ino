@@ -132,7 +132,7 @@ void selectMode() {
                     }
                   }
                   auto_lock = !auto_lock;
-                  EEPROM.write(1, auto_lock);
+                  EEPROM.write(EEPROM_autoLock, auto_lock);
                   move = 0;
                 }
               }
@@ -154,7 +154,7 @@ void selectMode() {
                     tft.drawRightString("ENG", 315, ypos, 4);
                   }
                   language = !language;
-                  EEPROM.write(2, language);
+                  EEPROM.write(EEPROM_language, language);
                   move = 0;
                 }
               }
@@ -172,7 +172,7 @@ void selectMode() {
                     tft.drawRightString("C", 315, ypos, 4);
                   }
                   heaterLimitTemp -= 5 * move;
-                  EEPROM.write(5, heaterLimitTemp);
+                  EEPROM.write(EEPROM_heaterLimitTemp, heaterLimitTemp);
                   tft.setTextColor(COLOR_MENU_TEXT);
                   if (!heaterLimitTemp && move) {
                     tft.setTextColor(COLOR_MENU);
@@ -199,7 +199,7 @@ void selectMode() {
                     tft.drawRightString("%", 315, ypos, 4);
                   }
                   fanSpeed -= 10 * move;
-                  EEPROM.write(6, fanSpeed);
+                  EEPROM.write(EEPROM_fanSpeed, fanSpeed);
                   tft.setTextColor(COLOR_MENU_TEXT);
                   if (!fanSpeed && move) {
                     tft.setTextColor(COLOR_MENU);
@@ -232,7 +232,7 @@ void selectMode() {
                   temperature[cornerNTC] += move * (0.1);
                   tft.drawFloat(temperature[cornerNTC], 1, 245, ypos, 4);
                   move = 0;
-                  EEPROM.write(3, int(diffTemperature[cornerNTC] * 10));
+                  EEPROM.write(EEPROM_diffTemperature, int(diffTemperature[cornerNTC] * 10));
                 }
               }
               break;
@@ -247,15 +247,15 @@ void selectMode() {
                   humidity += move;
                   tft.drawFloat(humidity, 0, 245, ypos, 4);
                   move = 0;
-                  EEPROM.write(4, diffHumidity );
+                  EEPROM.write(EEPROM_diffHumidity, diffHumidity );
                 }
               }
               break;
             case 3:
               diffTemperature[cornerNTC] = 0;
               diffHumidity = 0;
-              EEPROM.write(3, diffTemperature[cornerNTC]);
-              EEPROM.write(4, diffHumidity);
+              EEPROM.write(EEPROM_diffTemperature, diffTemperature[cornerNTC]);
+              EEPROM.write(EEPROM_diffHumidity, diffHumidity);
               updateHumidity();
               updateTemp();
               calibrateSensors();

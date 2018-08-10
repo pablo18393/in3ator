@@ -137,6 +137,10 @@ void updateLoadingBar(float prev, float actual) {
 void printStatus() {
   Serial.print(millis());
   Serial.print(";");
+  Serial.print(fanSpeed);
+  Serial.print(";");
+  Serial.print(heaterLimitTemp);
+  Serial.print(";");
   Serial.print(desiredTemp);
   Serial.print(";");
   Serial.print(heaterLimitTemp);

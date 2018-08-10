@@ -22,9 +22,9 @@ void processPage() {
   drawStop();
   state_blink = 1;
   while (!digitalRead(pulse));
-  analogWrite(FAN1, HIGH);
-  analogWrite(FAN2, HIGH);
-  analogWrite(FAN3, HIGH);
+  analogWrite(FAN1, fanSpeed * 2.55);
+  analogWrite(FAN2, fanSpeed * 2.55);
+  analogWrite(FAN3, fanSpeed * 2.55);
   if (temperatureAtStart > temperature[cornerNTC]) {
     temperatureAtStart = temperature[cornerNTC];
   }
