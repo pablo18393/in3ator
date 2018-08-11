@@ -182,7 +182,9 @@ byte goToProcessRow;
 
 // timer
 #define ENCODER_RATE 1000    // in microseconds; 
+#define PID_RATE 1000    // in microseconds; 
 HardwareTimer timer(1);
+HardwareTimer PID(2);
 
 void setup() {
   Serial.begin(115200);

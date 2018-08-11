@@ -1,8 +1,8 @@
 void menu() {
   if (page == 1) {
-    digitalWrite(FAN1, LOW);
-    digitalWrite(FAN2, LOW);
-    digitalWrite(FAN3, LOW);
+    analogWrite(FAN1, 0);
+    analogWrite(FAN2, 0);
+    analogWrite(FAN3, 0);
   }
   page = 0;
   byte numWords = 4;

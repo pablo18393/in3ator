@@ -66,11 +66,11 @@ void processPage() {
 }
 
 void heatUp() {
-  if (temperature[heaterNTC] < temperature[heaterNTC]) {
+  if (temperature[heaterNTC] < heaterLimitTemp) {
     analogWrite(HEATER, 200);
   }
   else {
-    digitalWrite(HEATER, LOW);
+    analogWrite(HEATER, 0);
   }
 }
 
