@@ -34,7 +34,7 @@ void processPage() {
       heatUp();
     }
     else {
-      digitalWrite(HEATER, LOW);
+      analogWrite(HEATER, 0);
     }
     if (digitalRead(pulse)) {
       last_pulsed = millis();
