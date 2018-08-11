@@ -1,10 +1,10 @@
 // ********PID function
 void heaterPIDInterrupt() {
-
+  heaterPID.Compute();
 }
 
 void in3PIDInterrupt() {
-
+  in3PID.Compute();
 }
 
 void initPID()
@@ -18,7 +18,7 @@ void initPID()
   heaterPIDTimer.refresh();
   heaterPIDTimer.resume();
 
-    // PID setup for encoder
+  // PID setup for encoder
   in3PIDTimer.pause();
   in3PIDTimer.setPeriod(in3PIDRate); // in microseconds
   in3PIDTimer.setChannel2Mode(TIMER_OUTPUT_COMPARE);
@@ -26,4 +26,6 @@ void initPID()
   in3PIDTimer.attachCompare1Interrupt(in3PIDInterrupt);
   in3PIDTimer.refresh();
   in3PIDTimer.resume();
+
+
 }

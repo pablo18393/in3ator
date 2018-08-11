@@ -28,6 +28,7 @@ void processPage() {
   if (temperatureAtStart > temperature[cornerNTC]) {
     temperatureAtStart = temperature[cornerNTC];
   }
+  myPID.SetMode(AUTOMATIC);
   while (1) {
     updateData();
     if (temperature[cornerNTC] < desiredTemp) {
