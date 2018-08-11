@@ -10,6 +10,7 @@
 #include <Adafruit_ILI9341_STM.h> // STM32 DMA Hardware-specific library
 #include <SPI.h>
 #include "DHT.h"
+#include <PID_v1.h>
 
 // Use hardware SPI lines+
 #define TFT_CS         7
@@ -156,10 +157,10 @@ byte counter;
 byte language;
 int text_height = tft.height() / 2;
 
-float temperature[numTempSensors];
+double temperature[numTempSensors];
 int humidity;
-float desiredTemp = 35;
-int heaterLimitTemp;
+double desiredTemp = 35;
+double heaterLimitTemp;
 int fanSpeed;
 int LEDIntensity;
 long last_temp_update;
@@ -180,11 +181,19 @@ int blinkTimeOFF = 100;
 long lastBlinkSetMessage;
 byte goToProcessRow;
 
+//PID VARIABLES
+double Kp_heater = 1, Ki_heater = 3, Kd_heater = 1;
+double Kp_in3 = 2, Ki_in3 = 5, Kd_in3 = 1;
+double PIDOutput[2];
+PID heaterPID(&temperature[1], &PIDOutput[1], &heaterLimitTemp, Kp_heater, Ki_heater, Kd_heater, P_ON_M, DIRECT);
+PID in3PID(&temperature[0], &PIDOutput[0], &desiredTemp, Kp_in3, Ki_in3, Kd_in3, P_ON_M, DIRECT);
 // timer
 #define ENCODER_RATE 1000    // in microseconds; 
-#define PID_RATE 1000    // in microseconds; 
+#define heaterPIDRate 5000000    // in microseconds; 
+#define in3PIDRate 1000000    // in microseconds; 
 HardwareTimer timer(1);
-HardwareTimer PID(2);
+HardwareTimer heaterPIDTimer(2);
+HardwareTimer in3PIDTimer(3);
 
 void setup() {
   Serial.begin(115200);

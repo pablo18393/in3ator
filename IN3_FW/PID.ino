@@ -1,16 +1,29 @@
 // ********PID function
-void PIDInterrupt() {
+void heaterPIDInterrupt() {
+
+}
+
+void in3PIDInterrupt() {
 
 }
 
 void initPID()
 {
   // PID setup for encoder
-  PID.pause();
-  PID.setPeriod(PID_RATE); // in microseconds
-  PID.setChannel2Mode(TIMER_OUTPUT_COMPARE);
-  PID.setCompare(TIMER_CH2, 1);  // Interrupt 1 count after each update
-  PID.attachCompare1Interrupt(PIDInterrupt);
-  PID.refresh();
-  PID.resume();
+  heaterPIDTimer.pause();
+  heaterPIDTimer.setPeriod(heaterPIDRate); // in microseconds
+  heaterPIDTimer.setChannel2Mode(TIMER_OUTPUT_COMPARE);
+  heaterPIDTimer.setCompare(TIMER_CH2, 1);  // Interrupt 1 count after each update
+  heaterPIDTimer.attachCompare1Interrupt(heaterPIDInterrupt);
+  heaterPIDTimer.refresh();
+  heaterPIDTimer.resume();
+
+    // PID setup for encoder
+  in3PIDTimer.pause();
+  in3PIDTimer.setPeriod(in3PIDRate); // in microseconds
+  in3PIDTimer.setChannel2Mode(TIMER_OUTPUT_COMPARE);
+  in3PIDTimer.setCompare(TIMER_CH2, 1);  // Interrupt 1 count after each update
+  in3PIDTimer.attachCompare1Interrupt(in3PIDInterrupt);
+  in3PIDTimer.refresh();
+  in3PIDTimer.resume();
 }
