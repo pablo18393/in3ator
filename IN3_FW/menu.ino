@@ -1,5 +1,6 @@
 void menu() {
   if (page == 1) {
+    stopPID();
     analogWrite(FAN1, 0);
     analogWrite(FAN2, 0);
     analogWrite(FAN3, 0);

@@ -50,7 +50,7 @@ void drawGraphicInterface() {
             case 0:
               drawTemperature();
               if (enableSet) {
-                tft.drawFloat(desiredTemp, 1, temperatureX - 65, temperatureY, 4);
+                tft.drawFloat(desiredIn3Temp, 1, temperatureX - 65, temperatureY, 4);
               }
               break;
             case 4: //implement in the future with humidity
@@ -218,7 +218,7 @@ void printLoadingBar() {
   temperatureX = barPosX - barWidth / 2 - 30;
   temperatureY = barPosY + barHeight / 2 + 10;
   updateSensors();
-  tft.drawFloat(desiredTemp, 1, barPosX + barWidth / 2 - 30, temperatureY, 4);
+  tft.drawFloat(desiredIn3Temp, 1, barPosX + barWidth / 2 - 30, temperatureY, 4);
   for (int i = 1; i <= barThickness; i++) {
     tft.drawRect(barPosX - barWidth / 2 - i, barPosY - barHeight / 2 - i, barWidth + i * 2, barHeight + i * 2, COLOR_FRAME_BAR);
   }

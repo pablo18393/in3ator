@@ -28,10 +28,10 @@ void processPage() {
   if (temperatureAtStart > temperature[cornerNTC]) {
     temperatureAtStart = temperature[cornerNTC];
   }
-  myPID.SetMode(AUTOMATIC);
+  startPID();
   while (1) {
     updateData();
-    if (temperature[cornerNTC] < desiredTemp) {
+    if (temperature[cornerNTC] < desiredIn3Temp) {
       heatUp();
     }
     else {

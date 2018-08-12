@@ -54,12 +54,12 @@ void selectMode() {
             case 1:
               while (digitalRead(pulse)) {
                 updateData();
-                if (move && -move + desiredTemp >= minTemp && -move + desiredTemp <= maxTemp) {
+                if (move && -move + desiredIn3Temp >= minTemp && -move + desiredIn3Temp <= maxTemp) {
                   tft.setTextColor(COLOR_MENU);
-                  tft.drawFloat(desiredTemp, 1, temperatureX - 65, temperatureY, 4);
-                  desiredTemp -= float(move) / 10;
+                  tft.drawFloat(desiredIn3Temp, 1, temperatureX - 65, temperatureY, 4);
+                  desiredIn3Temp -= float(move) / 10;
                   tft.setTextColor(COLOR_MENU_TEXT);
-                  tft.drawFloat(desiredTemp, 1, temperatureX - 65, temperatureY, 4);
+                  tft.drawFloat(desiredIn3Temp, 1, temperatureX - 65, temperatureY, 4);
                   enableSet = 1;
                 }
                 move = 0;
@@ -257,7 +257,7 @@ void selectMode() {
               EEPROM.write(EEPROM_diffTemperature, diffTemperature[cornerNTC]);
               EEPROM.write(EEPROM_diffHumidity, diffHumidity);
               updateHumidity();
-              updateTemp();
+              updateTemp(bothNTC);
               calibrateSensors();
               break;
           }

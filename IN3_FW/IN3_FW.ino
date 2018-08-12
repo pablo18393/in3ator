@@ -32,6 +32,7 @@
 #define mosfet_switch_time 50 //in millis, oversized
 #define cornerNTC 0
 #define heaterNTC 1
+#define bothNTC 2
 #define dhtSensor 2
 #define numNTC 2
 #define numTempSensors 3
@@ -158,8 +159,9 @@ byte language;
 int text_height = tft.height() / 2;
 
 double temperature[numTempSensors];
+double desiredHeaterTemp;
 int humidity;
-double desiredTemp = 35;
+double desiredIn3Temp = 35;
 double heaterLimitTemp;
 int fanSpeed;
 int LEDIntensity;
@@ -180,20 +182,20 @@ int blinkTimeON = 1000;
 int blinkTimeOFF = 100;
 long lastBlinkSetMessage;
 byte goToProcessRow;
+volatile long interruptcounter;
 
 //PID VARIABLES
 double Kp_heater = 1, Ki_heater = 3, Kd_heater = 1;
 double Kp_in3 = 2, Ki_in3 = 5, Kd_in3 = 1;
 double PIDOutput[2];
-PID heaterPID(&temperature[1], &PIDOutput[1], &heaterLimitTemp, Kp_heater, Ki_heater, Kd_heater, P_ON_M, DIRECT);
-PID in3PID(&temperature[0], &PIDOutput[0], &desiredTemp, Kp_in3, Ki_in3, Kd_in3, P_ON_M, DIRECT);
+PID heaterPID(&temperature[1], &PIDOutput[1], &desiredHeaterTemp, Kp_heater, Ki_heater, Kd_heater, P_ON_M, DIRECT);
+PID in3PID(&temperature[0], &PIDOutput[0], &desiredIn3Temp, Kp_in3, Ki_in3, Kd_in3, P_ON_M, DIRECT);
 // timer
 #define ENCODER_RATE 1000    // in microseconds; 
-#define heaterPIDRate 5000000    // in microseconds; 
-#define in3PIDRate 1000000    // in microseconds; 
+#define in3PIDRate 200000    // in microseconds; 
+#define heaterPIDRate 5   // times of in3PIDRate;
 HardwareTimer timer(1);
-HardwareTimer heaterPIDTimer(2);
-HardwareTimer in3PIDTimer(3);
+HardwareTimer in3PIDTimer(2);
 
 void setup() {
   Serial.begin(115200);
@@ -203,6 +205,7 @@ void setup() {
   //loadLogo();
   pinDirection();
   initEEPROM();
+  initPIDTimers();
   tft.fillScreen(WHITE);
   /*
     if (hardwareVerification()) {

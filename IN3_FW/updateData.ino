@@ -43,7 +43,7 @@ void updateSensors() {
     tft.setTextColor(COLOR_MENU);
     drawCentreNumber(humidity, humidityX, humidityY);
   }
-  updateTemp();
+  updateTemp(bothNTC);
   tft.setTextColor(COLOR_MENU_TEXT);
   if (page == 0 || page == 1) {
     tft.drawFloat(temperature[cornerNTC], 1, temperatureX, temperatureY, 4);
@@ -51,7 +51,7 @@ void updateSensors() {
   if (page == 1) {
     drawRightNumber(processPercentage, tft.width() / 2, temperatureY);
     float previousPercentage = processPercentage;
-    processPercentage = 100 - ((desiredTemp - temperature[cornerNTC]) * 100 / (desiredTemp - temperatureAtStart));
+    processPercentage = 100 - ((desiredIn3Temp - temperature[cornerNTC]) * 100 / (desiredIn3Temp - temperatureAtStart));
     if (processPercentage > 99) {
       processPercentage = 100;
     }
@@ -78,7 +78,7 @@ bool updateHumidity() {
   return (newHumidity);
 }
 
-void updateTemp() {
+void updateTemp(byte sensor) {
   //Valores fijos del circuito
   float rAux = 10000.0;
   float vcc = 3.3;
@@ -86,13 +86,29 @@ void updateTemp() {
   float temp0 = 298.0;
   float r0 = 10000.0;
   float temperatureMean;
+  byte startSensor;
+  byte endSensor;
 
-  //Variables usadas en el cálculo
-  float vm = 0.0;
-  float rntc = 0.0;
+  switch (sensor) {
+    case cornerNTC:
+      startSensor = cornerNTC;
+      endSensor = cornerNTC;
+      break;
+    case heaterNTC:
+      startSensor = heaterNTC;
+      endSensor = heaterNTC;
+      break;
+    case bothNTC:
+      startSensor = cornerNTC;
+      endSensor = heaterNTC;
+      break;
+  }
 
   //Bloque de cálculo
-  for (int ntc = 0; ntc < numNTC; ntc++) {
+  for (int ntc = startSensor; ntc < endSensor; ntc++) {
+    //Variables usadas en el cálculo
+    float vm = 0.0;
+    float rntc = 0.0;
     if (!temperature_measured) {
       temperatureMean = analogRead(NTCpin[ntc]) + diffTemperature[cornerNTC];
     }
@@ -141,7 +157,7 @@ void printStatus() {
   Serial.print(";");
   Serial.print(heaterLimitTemp);
   Serial.print(";");
-  Serial.print(desiredTemp);
+  Serial.print(desiredIn3Temp);
   Serial.print(";");
   Serial.print(heaterLimitTemp);
   Serial.print(";");
@@ -149,6 +165,8 @@ void printStatus() {
     Serial.print(temperature[i]);
     Serial.print(";");
   }
-  Serial.println(humidity);
+  Serial.print(humidity);
+  Serial.print(";");
+  Serial.println(interruptcounter);
 }
 
