@@ -12,11 +12,6 @@
 #include "DHT.h"
 #include <PID_v1.h>
 
-// Use hardware SPI lines+
-#define TFT_CS         7
-#define TFT_DC         31
-#define TFT_RST        2
-
 //EEPROM VARIABLES
 #define EEPROM_firstTurnOn 0
 #define EEPROM_autoLock 1
@@ -28,8 +23,10 @@
 #define EEPROM_checkStatus 100
 
 //configuration variables
-#define temperature_fraction 20
-#define mosfet_switch_time 50 //in millis, oversized
+#define maxPWMvalue 255         //for maple mini
+#define maxHeaterPWM 150        //max power for heater, full power (255) is 50W
+#define temperature_fraction 20 //times to measure in a 
+#define mosfet_switch_time 50   //in millis, oversized
 #define cornerNTC 0
 #define heaterNTC 1
 #define bothNTC 2
@@ -38,6 +35,14 @@
 #define numTempSensors 3
 
 //pin definition
+//boardPWMPins: 3, 4, 5, 8, 9, 10, 11, 15, 16, 25, 26, 27
+
+// Use hardware SPI lines+
+//Pins from 4-6 are SPI
+#define TFT_CS         7
+#define TFT_DC         31
+#define TFT_RST        2
+
 #define DHTPIN 0
 #define SCREENBACKLIGHT 3
 #define THERMISTOR_HEATER 10
@@ -152,7 +157,7 @@ bool int_length, int_length_0;
 byte next;
 float factor;
 bool pulsed, pulsed_before;
-int time_lock = 60000;
+int time_lock = 16000;
 bool auto_lock;
 byte counter;
 byte language;
@@ -166,7 +171,7 @@ double heaterLimitTemp;
 int fanSpeed;
 int LEDIntensity;
 long last_temp_update;
-long temp_update_rate = 2000;
+long temp_update_rate = 1000;
 int backlight_intensity = 100;
 bool enableSet;
 float processPercentage = 0, temperatureAtStart;
@@ -185,21 +190,26 @@ byte goToProcessRow;
 volatile long interruptcounter;
 
 //PID VARIABLES
-double Kp_heater = 1, Ki_heater = 3, Kd_heater = 1;
-double Kp_in3 = 2, Ki_in3 = 5, Kd_in3 = 1;
+double Kp_heater = 0.1, Ki_heater = 0.3, Kd_heater = 0.1;
+double Kp_in3 = 0.1, Ki_in3 = 0.3, Kd_in3 = 0.1;
 double PIDOutput[2];
-PID heaterPID(&temperature[1], &PIDOutput[1], &desiredHeaterTemp, Kp_heater, Ki_heater, Kd_heater, P_ON_M, DIRECT);
-PID in3PID(&temperature[0], &PIDOutput[0], &desiredIn3Temp, Kp_in3, Ki_in3, Kd_in3, P_ON_M, DIRECT);
+bool PIDcontrolEnabled;
+PID heaterPID(&temperature[heaterNTC], &PIDOutput[heaterNTC], &desiredHeaterTemp, Kp_heater, Ki_heater, Kd_heater, P_ON_M, DIRECT);
+PID in3PID(&temperature[cornerNTC], &PIDOutput[cornerNTC], &desiredIn3Temp, Kp_in3, Ki_in3, Kd_in3, P_ON_M, DIRECT);
 // timer
 #define ENCODER_RATE 1000    // in microseconds; 
-#define in3PIDRate 200000    // in microseconds; 
-#define heaterPIDRate 5   // times of in3PIDRate;
+#define NTCInterruptRate 20000    // in microseconds; 
+#define in3PIDRate 1000000    // in microseconds; 
+#define heaterPIDRate 200000   // times of in3PIDRate;
+int in3PIDfactor = in3PIDRate / NTCInterruptRate;
+int heaterPIDfactor = heaterPIDRate / NTCInterruptRate;
 HardwareTimer timer(1);
 HardwareTimer in3PIDTimer(2);
 
 void setup() {
   Serial.begin(115200);
   dht.setup(DHTPIN);
+  heaterPID.SetOutputLimits(0,maxHeaterPWM);
   tft.begin();
   tft.setRotation(1);
   //loadLogo();
