@@ -17,7 +17,7 @@ void initEEPROM() {
       EEPROM.format();
     }
   }
-  if (EEPROM.read(EEPROM_firstTurnOn) > 0) { //firstTimePowerOn
+  if (EEPROM.read(EEPROM_firstTurnOn)) { //firstTimePowerOn
     EEPROM.format();
     for (int i = 0; i <= 253; i++) {
       EEPROM.write(i, 0);
@@ -37,14 +37,12 @@ void loadStandardValues() {
   EEPROM.write(EEPROM_language, language);
   for (int i = 0; i < numTempSensors; i++) {
     diffTemperature[numTempSensors] = 0;
-    EEPROM.write(100+i, diffTemperature[i]);
+    EEPROM.write(100 + i, diffTemperature[i]);
   }
   diffHumidity = 0;
   EEPROM.write(EEPROM_diffHumidity, diffHumidity);
   heaterLimitTemp = 50;
   EEPROM.write(EEPROM_heaterLimitTemp, heaterLimitTemp);
-  fanSpeed = 100;
-  EEPROM.write(EEPROM_fanSpeed, fanSpeed);
 }
 
 void recapVariables() {
@@ -60,7 +58,6 @@ void recapVariables() {
     diffHumidity -= 65535;
   }
   heaterLimitTemp = EEPROM.read(EEPROM_heaterLimitTemp);
-  fanSpeed = EEPROM.read(EEPROM_fanSpeed);
 }
 
 long EEPROMReadLong(int p_address)

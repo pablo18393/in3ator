@@ -17,10 +17,17 @@
 #define EEPROM_autoLock 1
 #define EEPROM_language 2
 #define EEPROM_heaterLimitTemp 3
-#define EEPROM_fanSpeed 4
 #define EEPROM_diffHumidity 10
 #define EEPROM_diffTemperature 20
 #define EEPROM_checkStatus 100
+
+//display variables
+#define introDelay    2000      //initial delay between intro and menu
+#define brightenRate  30        //intro brighten speed (Higher value, slower)
+#define valuePosition 245
+#define separatorPosition 240
+#define unitPosition 315
+#define textFontSize 4          //text standard size
 
 //configuration variables
 #define maxPWMvalue 255         //for maple mini
@@ -90,10 +97,13 @@ Adafruit_ILI9341_STM tft = Adafruit_ILI9341_STM(TFT_CS, TFT_DC, TFT_RST); // Use
 #define COLOR_FRAME_BAR WHITE
 #define COLOR_LOADING_BAR RED
 #define COLOR_COMPLETED_BAR GREEN
-#define MAXENCODERS 1
+#define introBackColor WHITE
+#define introTextColor BLACK
+#define transitionEffect BLACK
 
 DHT dht;
 
+#define MAXENCODERS 1
 const byte NTCpin[numNTC] = {THERMISTOR_HEATER, THERMISTOR_CORNER};
 volatile int encstate[MAXENCODERS];
 volatile int encflag[MAXENCODERS];
@@ -164,6 +174,7 @@ byte language;
 int text_height = tft.height() / 2;
 
 double temperature[numTempSensors];
+double previousTemperature[numTempSensors];
 double desiredHeaterTemp;
 int humidity;
 double desiredIn3Temp = 35;
@@ -209,14 +220,13 @@ HardwareTimer in3PIDTimer(2);
 void setup() {
   Serial.begin(115200);
   dht.setup(DHTPIN);
-  heaterPID.SetOutputLimits(0,maxHeaterPWM);
+  heaterPID.SetOutputLimits(0, maxHeaterPWM);
   tft.begin();
   tft.setRotation(1);
-  //loadLogo();
+  loadLogo();
   pinDirection();
   initEEPROM();
   initPIDTimers();
-  tft.fillScreen(WHITE);
   /*
     if (hardwareVerification()) {
     while (digitalRead(pulse));

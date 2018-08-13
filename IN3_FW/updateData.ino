@@ -11,7 +11,6 @@ int updateData() {
   }
   lastEncoderPos[counter] = encoderpos[counter];
   oldPosition = newPosition;
-  //PROBLEM WITH THIS FUNCTION: temperature measure time is not constant
   if (page == 0 || page == 1) {
     if (millis() - last_temp_update > temp_update_rate) {
       updateSensors();
@@ -29,7 +28,7 @@ int updateData() {
 void updateSensors() {
   tft.setTextColor(COLOR_MENU);
   if (page == 0 || page == 1) {
-    tft.drawFloat(temperature[cornerNTC], 1, temperatureX, temperatureY, 4);
+    tft.drawFloat(previousTemperature[cornerNTC], 1, temperatureX, temperatureY, textFontSize);
   }
   if (updateHumidity()) {
     tft.setTextColor(COLOR_HEADING);
@@ -40,7 +39,8 @@ void updateSensors() {
   updateTemp(bothNTC);
   tft.setTextColor(COLOR_MENU_TEXT);
   if (page == 0 || page == 1) {
-    tft.drawFloat(temperature[cornerNTC], 1, temperatureX, temperatureY, 4);
+    tft.drawFloat(temperature[cornerNTC], 1, temperatureX, temperatureY, textFontSize);
+    previousTemperature[cornerNTC]=temperature[cornerNTC];
   }
   if (page == 1) {
     drawRightNumber(processPercentage, tft.width() / 2, temperatureY);
@@ -150,8 +150,6 @@ void measureAllNTC() {
 
 void printStatus() {
   Serial.print(millis());
-  Serial.print(";");
-  Serial.print(fanSpeed);
   Serial.print(";");
   Serial.print(desiredIn3Temp);
   Serial.print(";");

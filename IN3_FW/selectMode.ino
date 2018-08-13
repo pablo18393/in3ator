@@ -1,6 +1,7 @@
 void selectMode() {
   bar_pos = 1;
   selected = 0;
+  ypos = (tft.height() - width_heading) / (2 * rectangles) + letter_height;
   while (1) {
     updateData();
     if (move) {
@@ -56,10 +57,10 @@ void selectMode() {
                 updateData();
                 if (move && -move + desiredIn3Temp >= minTemp && -move + desiredIn3Temp <= maxTemp) {
                   tft.setTextColor(COLOR_MENU);
-                  tft.drawFloat(desiredIn3Temp, 1, temperatureX - 65, temperatureY, 4);
+                  tft.drawFloat(desiredIn3Temp, 1, temperatureX - 65, temperatureY, textFontSize);
                   desiredIn3Temp -= float(move) / 10;
                   tft.setTextColor(COLOR_MENU_TEXT);
-                  tft.drawFloat(desiredIn3Temp, 1, temperatureX - 65, temperatureY, 4);
+                  tft.drawFloat(desiredIn3Temp, 1, temperatureX - 65, temperatureY, textFontSize);
                   enableSet = 1;
                 }
                 move = 0;
@@ -75,18 +76,18 @@ void selectMode() {
                   tft.setTextColor(COLOR_MENU);
                   drawRightNumber(LEDIntensity, 280, ypos);
                   if (!LEDIntensity && move) {
-                    tft.drawRightString("OFF", 315, ypos, 4);
+                    tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
-                    tft.drawRightString("%", 315, ypos, 4);
+                    tft.drawRightString("%", unitPosition, ypos, textFontSize);
                   }
                   LEDIntensity -= 10 * move;
                   analogWrite(ICT, LEDIntensity);
                   tft.setTextColor(COLOR_MENU_TEXT);
                   if (!LEDIntensity && move) {
                     tft.setTextColor(COLOR_MENU);
-                    tft.drawRightString("%", 315, ypos, 4);
+                    tft.drawRightString("%", unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
-                    tft.drawRightString("OFF", 315, ypos, 4);
+                    tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
                   }
                   else {
                     drawRightNumber(LEDIntensity, 280, ypos);
@@ -112,23 +113,23 @@ void selectMode() {
                   tft.setTextColor(COLOR_MENU);
                   if (auto_lock) {
                     if (!language) {
-                      tft.drawRightString("YES", 315, ypos, 4);
+                      tft.drawRightString("YES", unitPosition, ypos, textFontSize);
                     }
                     else {
-                      tft.drawRightString("SI", 315, ypos, 4);
+                      tft.drawRightString("SI", unitPosition, ypos, textFontSize);
                     }
                     tft.setTextColor(COLOR_MENU_TEXT);
-                    tft.drawRightString("NO", 315, ypos, 4);
+                    tft.drawRightString("NO", unitPosition, ypos, textFontSize);
                   }
                   else {
                     tft.setTextColor(COLOR_MENU);
-                    tft.drawRightString("NO", 315, ypos, 4);
+                    tft.drawRightString("NO", unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
                     if (!language) {
-                      tft.drawRightString("YES", 315, ypos, 4);
+                      tft.drawRightString("YES", unitPosition, ypos, textFontSize);
                     }
                     else {
-                      tft.drawRightString("SI", 315, ypos, 4);
+                      tft.drawRightString("SI", unitPosition, ypos, textFontSize);
                     }
                   }
                   auto_lock = !auto_lock;
@@ -143,15 +144,15 @@ void selectMode() {
                 if (move) {
                   if (!language) {
                     tft.setTextColor(COLOR_MENU);
-                    tft.drawRightString("ENG", 315, ypos, 4);
+                    tft.drawRightString("ENG", unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
-                    tft.drawRightString("SPA", 315, ypos, 4);
+                    tft.drawRightString("SPA", unitPosition, ypos, textFontSize);
                   }
                   else {
                     tft.setTextColor(COLOR_MENU);
-                    tft.drawRightString("SPA", 315, ypos, 4);
+                    tft.drawRightString("SPA", unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
-                    tft.drawRightString("ENG", 315, ypos, 4);
+                    tft.drawRightString("ENG", unitPosition, ypos, textFontSize);
                   }
                   language = !language;
                   EEPROM.write(EEPROM_language, language);
@@ -167,18 +168,18 @@ void selectMode() {
                   tft.setTextColor(COLOR_MENU);
                   drawRightNumber(heaterLimitTemp, 280, ypos);
                   if (!heaterLimitTemp && move) {
-                    tft.drawRightString("OFF", 315, ypos, 4);
+                    tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
-                    tft.drawRightString("C", 315, ypos, 4);
+                    tft.drawRightString("C", unitPosition, ypos, textFontSize);
                   }
                   heaterLimitTemp -= 5 * move;
                   EEPROM.write(EEPROM_heaterLimitTemp, heaterLimitTemp);
                   tft.setTextColor(COLOR_MENU_TEXT);
                   if (!heaterLimitTemp && move) {
                     tft.setTextColor(COLOR_MENU);
-                    tft.drawRightString("C", 315, ypos, 4);
+                    tft.drawRightString("C", unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
-                    tft.drawRightString("OFF", 315, ypos, 4);
+                    tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
                   }
                   else {
                     drawRightNumber(heaterLimitTemp, 280, ypos);
@@ -188,31 +189,8 @@ void selectMode() {
               }
               break;
             case 4:
-              while (digitalRead(pulse) ) {
-                updateData();
-                if (move && -move + fanSpeed >= 0 && -move + fanSpeed <= fanMaxSpeed) {
-                  tft.setTextColor(COLOR_MENU);
-                  drawRightNumber(fanSpeed, 280, ypos);
-                  if (!fanSpeed && move) {
-                    tft.drawRightString("OFF", 315, ypos, 4);
-                    tft.setTextColor(COLOR_MENU_TEXT);
-                    tft.drawRightString("%", 315, ypos, 4);
-                  }
-                  fanSpeed -= 10 * move;
-                  EEPROM.write(EEPROM_fanSpeed, fanSpeed);
-                  tft.setTextColor(COLOR_MENU_TEXT);
-                  if (!fanSpeed && move) {
-                    tft.setTextColor(COLOR_MENU);
-                    tft.drawRightString("%", 315, ypos, 4);
-                    tft.setTextColor(COLOR_MENU_TEXT);
-                    tft.drawRightString("OFF", 315, ypos, 4);
-                  }
-                  else {
-                    drawRightNumber(fanSpeed, 280, ypos);
-                  }
-                }
-                move = 0;
-              }
+              loadStandardValues();
+              settings();
               break;
             case 5:
               calibrateSensors();
@@ -226,11 +204,12 @@ void selectMode() {
                 updateData();
                 if (move) {
                   tft.setTextColor(COLOR_MENU);
-                  tft.drawFloat(temperature[cornerNTC], 1, 245, ypos, 4);
+                  tft.drawFloat(previousTemperature[cornerNTC], 1, valuePosition, ypos, textFontSize);
                   tft.setTextColor(COLOR_MENU_TEXT);
                   diffTemperature[cornerNTC] += move * (0.1);
                   temperature[cornerNTC] += move * (0.1);
-                  tft.drawFloat(temperature[cornerNTC], 1, 245, ypos, 4);
+                  tft.drawFloat(temperature[cornerNTC], 1, valuePosition, ypos, textFontSize);
+                  previousTemperature[cornerNTC]=temperature[cornerNTC];
                   move = 0;
                   EEPROM.write(EEPROM_diffTemperature, int(diffTemperature[cornerNTC] * 10));
                 }
@@ -241,11 +220,11 @@ void selectMode() {
                 updateData();
                 if (move) {
                   tft.setTextColor(COLOR_MENU);
-                  tft.drawFloat(humidity, 0, 245, ypos, 4);
+                  tft.drawFloat(humidity, 0, valuePosition, ypos, textFontSize);
                   tft.setTextColor(COLOR_MENU_TEXT);
                   diffHumidity += move;
                   humidity += move;
-                  tft.drawFloat(humidity, 0, 245, ypos, 4);
+                  tft.drawFloat(humidity, 0, valuePosition, ypos, textFontSize);
                   move = 0;
                   EEPROM.write(EEPROM_diffHumidity, diffHumidity );
                 }
@@ -300,7 +279,7 @@ void checkSetMessage() {
     else {
       helpMessage = "Introduce temperatura";
     }
-    tft.drawCentreString(helpMessage, width_select + (tft.width() - width_select) / 2, getYpos(goToProcessRow), 4);
+    tft.drawCentreString(helpMessage, width_select + (tft.width() - width_select) / 2, getYpos(goToProcessRow), textFontSize);
   }
 }
 
