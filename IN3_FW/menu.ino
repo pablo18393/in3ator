@@ -3,9 +3,7 @@ void menu() {
     if (PIDcontrol) {
       stopPID();
     }
-    analogWrite(FAN1, 0);
-    analogWrite(FAN2, 0);
-    analogWrite(FAN3, 0);
+    turnFansOff();
   }
   page = 0;
   byte numWords = 4;

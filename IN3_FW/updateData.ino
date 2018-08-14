@@ -40,7 +40,7 @@ void updateSensors() {
   tft.setTextColor(COLOR_MENU_TEXT);
   if (page == 0 || page == 1) {
     tft.drawFloat(temperature[cornerNTC], 1, temperatureX, temperatureY, textFontSize);
-    previousTemperature[cornerNTC]=temperature[cornerNTC];
+    previousTemperature[cornerNTC] = temperature[cornerNTC];
   }
   if (page == 1) {
     drawRightNumber(processPercentage, tft.width() / 2, temperatureY);
@@ -146,6 +146,18 @@ void measureAllNTC() {
   if (temperature_measured == temperature_fraction) {
     temperature_measured = 0;
   }
+}
+
+void turnFansOn() {
+  digitalWrite(FAN1, HIGH);
+  digitalWrite(FAN2, HIGH);
+  digitalWrite(FAN3, HIGH);
+}
+
+void turnFansOff() {
+  digitalWrite(FAN1, LOW);
+  digitalWrite(FAN2, LOW);
+  digitalWrite(FAN3, LOW);
 }
 
 void printStatus() {
