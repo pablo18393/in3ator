@@ -12,29 +12,34 @@ void processPage() {
   print_text = 1; //cambiar en todos
   tft.setTextColor(COLOR_MENU_TEXT);
   if (language) {
-    tft.drawCentreString("Temperatura", tft.width() / 2, tft.height() / 5 - 4, 4);
+    tft.drawCentreString("Temperatura", tft.width() / 2, tft.height() / 5 - 4, textFontSize);
   }
   else {
-    tft.drawCentreString("Temperature", tft.width() / 2, tft.height() / 5 - 4, 4);
+    tft.drawCentreString("Temperature", tft.width() / 2, tft.height() / 5 - 4, textFontSize);
   }
-  tft.drawCentreString("%", tft.width() / 2 + 14, temperatureY, 4);
+  tft.drawCentreString("%", tft.width() / 2 + 14, temperatureY, textFontSize);
   tft.setTextColor(COLOR_WARNING_TEXT);
   drawStop();
   state_blink = 1;
   while (!digitalRead(pulse));
-  analogWrite(FAN1, fanSpeed * 2.55);
-  analogWrite(FAN2, fanSpeed * 2.55);
-  analogWrite(FAN3, fanSpeed * 2.55);
+  analogWrite(FAN1, maxPWMvalue);
+  analogWrite(FAN2, maxPWMvalue);
+  analogWrite(FAN3, maxPWMvalue);
   if (temperatureAtStart > temperature[cornerNTC]) {
     temperatureAtStart = temperature[cornerNTC];
   }
+  if (PIDcontrol) {
+    startPID();
+  }
   while (1) {
     updateData();
-    if (temperature[cornerNTC] < desiredTemp) {
-      heatUp();
-    }
-    else {
-      analogWrite(HEATER, 0);
+    if (!PIDcontrol) {
+      if (temperature[cornerNTC] < desiredIn3Temp) {
+        heatUp();
+      }
+      else {
+        analogWrite(HEATER, 0);
+      }
     }
     if (digitalRead(pulse)) {
       last_pulsed = millis();
