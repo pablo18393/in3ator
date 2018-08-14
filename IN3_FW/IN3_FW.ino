@@ -204,10 +204,11 @@ volatile long interruptcounter;
 double Kp_heater = 0.1, Ki_heater = 0.3, Kd_heater = 0.1;
 double Kp_in3 = 0.1, Ki_in3 = 0.3, Kd_in3 = 0.1;
 double PIDOutput[2];
-bool PIDcontrolEnabled;
+bool PIDControlStart;
 PID heaterPID(&temperature[heaterNTC], &PIDOutput[heaterNTC], &desiredHeaterTemp, Kp_heater, Ki_heater, Kd_heater, P_ON_M, DIRECT);
 PID in3PID(&temperature[cornerNTC], &PIDOutput[cornerNTC], &desiredIn3Temp, Kp_in3, Ki_in3, Kd_in3, P_ON_M, DIRECT);
 // timer
+#define PIDcontrol 0         //0 to disable, 1 to enable
 #define ENCODER_RATE 1000    // in microseconds; 
 #define NTCInterruptRate 20000    // in microseconds; 
 #define in3PIDRate 1000000    // in microseconds; 

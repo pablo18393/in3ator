@@ -28,14 +28,18 @@ void processPage() {
   if (temperatureAtStart > temperature[cornerNTC]) {
     temperatureAtStart = temperature[cornerNTC];
   }
-  startPID();
+  if (PIDcontrol) {
+    startPID();
+  }
   while (1) {
     updateData();
-    if (temperature[cornerNTC] < desiredIn3Temp) {
-      heatUp();
-    }
-    else {
-      analogWrite(HEATER, 0);
+    if (!PIDcontrol) {
+      if (temperature[cornerNTC] < desiredIn3Temp) {
+        heatUp();
+      }
+      else {
+        analogWrite(HEATER, 0);
+      }
     }
     if (digitalRead(pulse)) {
       last_pulsed = millis();

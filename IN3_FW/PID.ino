@@ -2,7 +2,7 @@
 
 void in3PIDInterrupt() {
   measureAllNTC();
-  if (PIDcontrolEnabled) {
+  if (PIDControlStart) {
     if (interruptcounter == in3PIDfactor) {
       interruptcounter = 0;
       updateTemp(cornerNTC);
@@ -36,14 +36,14 @@ void initPIDTimers() {
 void startPID() {
   in3PID.SetMode(AUTOMATIC);
   heaterPID.SetMode(AUTOMATIC);
-  PIDcontrolEnabled = 1;
+  PIDControlStart = 1;
   interruptcounter = 0;
 }
 
 void stopPID() {
   in3PID.SetMode(MANUAL);
   heaterPID.SetMode(MANUAL);
-  PIDcontrolEnabled = 0;
+  PIDControlStart = 0;
   analogWrite(HEATER, 0);
 }
 
