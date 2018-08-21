@@ -1,26 +1,29 @@
 void settings() {
   byte numWords = 5;
-  page = 2;
+  page = settingsPage;
+  print_text = 1;
   tft.setTextSize(1);
   tft.setTextColor(COLOR_MENU_TEXT);
   for (int i = 0; i < numWords; i++) {
     pos_text[i] = 0;
   }
-  pos_text[3] = 1;
-  pos_text[4] = 1;
-  if (!language) {
-    words[0]  = "Auto lock";
-    words[1] = "Language";
-    words[2] = "Heater temp";
-    words[3] = "Set standard values";
-    words[4] = "Calibrate";
-  }
-  else {
-    words[0]  = "Auto bloqueo";
-    words[1] = "Idioma";
-    words[2] = "Temp calefactor";
-    words[3] = "Fijar valores iniciales";
-    words[4] = "Calibrar";
+  pos_text[setStandardValuesGraphicPosition] = 1;
+  pos_text[calibrateGraphicPosition] = 1;
+  switch (language) {
+    case english:
+      words[autoLockGraphicPosition]  = "Auto lock";
+      words[languageGraphicPosition] = "Language";
+      words[heaterTempGraphicPosition] = "Heater temp";
+      words[setStandardValuesGraphicPosition] = "Set standard values";
+      words[calibrateGraphicPosition] = "Calibrate";
+      break;
+    case spanish:
+      words[autoLockGraphicPosition]  = "Auto bloqueo";
+      words[languageGraphicPosition] = "Idioma";
+      words[heaterTempGraphicPosition] = "Temp calefactor";
+      words[setStandardValuesGraphicPosition] = "Fijar valores iniciales";
+      words[calibrateGraphicPosition] = "Calibrar";
+      break;
   }
   rectangles = numWords;
   drawGraphicInterface();
@@ -29,8 +32,9 @@ void settings() {
   while (!digitalRead(pulse)) {
     updateData();
   }
-  delay(100);
-  selectMode();
+  delay(debounceTime);
+  barSelection();
 }
+
 
 

@@ -1,21 +1,22 @@
-void processPage() {
+void actuatorsProgress() {
   byte  numWords = 2;
   temperatureAtStart = temperature[cornerNTC];
   processPercentage = 0;
-  page = 1;
+  page = actuatorsProgressPage;
   tft.setTextSize(1);
   print_text = 0;
   rectangles = numWords;
   drawGraphicInterface();
   drawHeading();
   printLoadingBar();
-  print_text = 1; //cambiar en todos
   tft.setTextColor(COLOR_MENU_TEXT);
-  if (language) {
-    tft.drawCentreString("Temperatura", tft.width() / 2, tft.height() / 5 - 4, textFontSize);
-  }
-  else {
-    tft.drawCentreString("Temperature", tft.width() / 2, tft.height() / 5 - 4, textFontSize);
+  switch (language) {
+    case spanish:
+      tft.drawCentreString("Temperatura", tft.width() / 2, tft.height() / 5 - 4, textFontSize);
+      break;
+    case english:
+      tft.drawCentreString("Temperature", tft.width() / 2, tft.height() / 5 - 4, textFontSize);
+      break;
   }
   tft.drawCentreString("%", tft.width() / 2 + 14, temperatureY, textFontSize);
   tft.setTextColor(COLOR_WARNING_TEXT);
@@ -41,7 +42,7 @@ void processPage() {
     }
     if (digitalRead(pulse)) {
       last_pulsed = millis();
-      delay(100);
+      delay(debounceTime);
     }
     else {
       delay(50);

@@ -1,43 +1,48 @@
 void menu() {
-  if (page == 1) {
+  if (page == actuatorsProgressPage) {
     if (PIDcontrol) {
       stopPID();
     }
     turnFansOff();
   }
-  page = 0;
-  byte numWords = 4;
-  setVariablesPosition();
+  page = menuPage;
+  byte numWords = 5;
+  print_text = 1;
   tft.setTextSize(1);
   tft.setTextColor(COLOR_MENU_TEXT);
   for (int i = 0; i < numWords; i++) {
     pos_text[i] = 0;
   }
-  pos_text[2] = 1;
-  pos_text[3] = 1;
-  if (language) {
-    words[0]  = "Temperatura";
-    words[1] = "LEDS";
-    words[2] = "Configuracion";
-    if (enableSet) {
-      words[3] = "Empezar";
-    }
-    else {
-      words[3] = "";
-    }
-  }
-  else {
-    words[0]  = "Temperature";
-    words[1] = "LEDS";
-    words[2] = "Settings";
-    if (enableSet) {
-      words[3] = "Start";
-    }
-    else {
-      words[3] = "";
-    }
+  pos_text[settingsGraphicPosition] = 1;
+  pos_text[startGraphicPosition] = 1;
+  switch (language) {
+    case spanish:
+      words[temperatureGraphicPosition]  = "Temperatura";
+      words[humidityGraphicPosition] = "Humedad";
+      words[LEDGraphicPosition] = "LED";
+      words[settingsGraphicPosition] = "Configuracion";
+      if (enableSet) {
+        words[startGraphicPosition] = "Empezar";
+      }
+      else {
+        words[startGraphicPosition] = "";
+      }
+      break;
+    case english:
+      words[temperatureGraphicPosition]  = "Temperature";
+      words[humidityGraphicPosition] = "Humedad";
+      words[LEDGraphicPosition] = "LED";
+      words[settingsGraphicPosition] = "Settings";
+      if (enableSet) {
+        words[startGraphicPosition] = "Start";
+      }
+      else {
+        words[startGraphicPosition] = "";
+      }
+      break;
   }
   rectangles = numWords;
+  setVariablesPosition();
   goToProcessRow = numWords;
   drawGraphicInterface();
   drawHeading();
@@ -45,7 +50,7 @@ void menu() {
   while (!digitalRead(pulse)) {
     updateData();
   }
-  delay(100);
-  selectMode();
+  delay(debounceTime);
+  barSelection();
 }
 

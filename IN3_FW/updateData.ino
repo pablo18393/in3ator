@@ -11,10 +11,10 @@ int updateData() {
   }
   lastEncoderPos[counter] = encoderpos[counter];
   oldPosition = newPosition;
-  if (page == 0 || page == 1) {
+  if (page == menuPage || page == actuatorsProgressPage) {
     if (millis() - last_temp_update > temp_update_rate) {
       updateSensors();
-      if (page == 1) {
+      if (page == actuatorsProgressPage) {
         printStatus();
       }
     }
@@ -27,22 +27,17 @@ int updateData() {
 
 void updateSensors() {
   tft.setTextColor(COLOR_MENU);
-  if (page == 0 || page == 1) {
+  if (page == menuPage || page == actuatorsProgressPage) {
     tft.drawFloat(previousTemperature[cornerNTC], 1, temperatureX, temperatureY, textFontSize);
   }
-  if (updateHumidity()) {
-    tft.setTextColor(COLOR_HEADING);
-    drawCentreNumber(humidity, humidityX, humidityY);
-    tft.setTextColor(COLOR_MENU);
-    drawCentreNumber(humidity, humidityX, humidityY);
-  }
+  drawHumidity();
   updateTemp(bothNTC);
   tft.setTextColor(COLOR_MENU_TEXT);
-  if (page == 0 || page == 1) {
+  if (page == menuPage || page == actuatorsProgressPage) {
     tft.drawFloat(temperature[cornerNTC], 1, temperatureX, temperatureY, textFontSize);
     previousTemperature[cornerNTC] = temperature[cornerNTC];
   }
-  if (page == 1) {
+  if (page == actuatorsProgressPage) {
     drawRightNumber(processPercentage, tft.width() / 2, temperatureY);
     float previousPercentage = processPercentage;
     processPercentage = 100 - ((desiredIn3Temp - temperature[cornerNTC]) * 100 / (desiredIn3Temp - temperatureAtStart));
@@ -55,6 +50,18 @@ void updateSensors() {
     updateLoadingBar(int(previousPercentage), int(processPercentage));
   }
   last_temp_update = millis();
+    Serial.println(temperatureY);
+}
+
+void drawHumidity() {
+  int previousHumidity;
+  if (updateHumidity()) {
+    tft.setTextColor(COLOR_HEADING);
+    drawCentreNumber(previousHumidity, humidityX, temperatureY);
+    tft.setTextColor(COLOR_MENU);
+    drawCentreNumber(humidity, humidityX, temperatureY);
+    humidity = previousHumidity;
+  }
 }
 
 bool updateHumidity() {

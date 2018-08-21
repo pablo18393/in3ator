@@ -1,43 +1,23 @@
-const byte width_select = 7;
-const byte width_heading = 34;
-const byte width_space = 4;
-const byte width_back = 50;
-const byte side_gap = 4;
-const byte letter_height = 26;
-const byte triang = 6;
-const byte radius = 12;
-const byte circle = 8;
-const byte logo = 40;
-const byte battery_lenght = 50;
-const byte battery_height = 6;
-const byte battery_gap = 2;
-const byte battery_margin = 20;
-const byte battery_round = 4;
-const byte arrow_height = 6;
-const byte arrow_tail = 5;
-int ypos;
-bool print_text = 1;
-
 void drawGraphicInterface() {
   if (!page) {
-    tft.fillRect(width_select, width_heading, tft.width() - width_select, tft.height() - width_heading, COLOR_MENU);
+    tft.fillRect(width_select, height_heading, tft.width() - width_select, tft.height() - height_heading, COLOR_MENU);
   }
   else {
-    tft.fillRect(0, width_heading, tft.width(), tft.height() - width_heading, COLOR_MENU);
+    tft.fillRect(0, height_heading, tft.width(), tft.height() - height_heading, COLOR_MENU);
   }
   if (print_text) {
-    tft.fillRect(0, width_heading, width_select, (tft.height() - width_heading) / rectangles, COLOR_SELECTED);
+    tft.fillRect(0, height_heading, width_select, (tft.height() - height_heading) / rectangles, COLOR_SELECTED);
   }
   for (int i = 2; i <= rectangles; i++) {
-    tft.fillRect(0, (tft.height() - width_heading) * (i - 1) / rectangles + width_heading, width_select, (tft.height() - width_heading) / rectangles, COLOR_BAR);
-    tft.fillRect(0, (tft.height() - width_heading) * (i - 1) / rectangles + width_heading - 1, tft.width(), width_space, WHITE);
+    tft.fillRect(0, (tft.height() - height_heading) * (i - 1) / rectangles + height_heading, width_select, (tft.height() - height_heading) / rectangles, COLOR_BAR);
+    tft.fillRect(0, (tft.height() - height_heading) * (i - 1) / rectangles + height_heading - 1, tft.width(), width_indentation, WHITE);
   }
   tft.drawRect(0, tft.height() - 1, width_select, tft.height() - 1, COLOR_MENU);
   if (print_text) {
     tft.setTextSize(1);
     text_size = 1;
     for (int i = 0; i < rectangles; i++) {
-      ypos = (tft.height() - width_heading) / (2 * rectangles) + i * (tft.height() - width_heading) / (rectangles) + letter_height;
+      ypos = graphicHeight(i);
       if (pos_text[i] == 0) {
         tft.drawString(words[i], width_select + side_gap, ypos, textFontSize);
       }
@@ -45,20 +25,19 @@ void drawGraphicInterface() {
         tft.drawCentreString(words[i], width_select + (tft.width() - width_select) / 2, ypos, textFontSize);
       }
       switch (page) {
-        case 0:
+        case menuPage:
           switch (i) {
-            case 0:
-              drawTemperature();
-              if (enableSet) {
+            case temperatureGraphicPosition:
+              drawTemperatureUnits();
+              updateSensors();
+              if (firstTempWrite) {
                 tft.drawFloat(desiredIn3Temp, 1, temperatureX - 65, temperatureY, textFontSize);
               }
+              else {
+                tft.drawRightString(initialSensorsValue, initialSensorPosition, temperatureY, textFontSize);
+              }
               break;
-            case 4: //implement in the future with humidity
-              tft.drawRightString("/", 262, ypos, textFontSize);
-              drawCentreNumber(humidity, humidityX, ypos);
-              tft.drawRightString("%", unitPosition, ypos, textFontSize);
-              break;
-            case 1:
+            case LEDGraphicPosition:
               if (LEDIntensity) {
                 drawRightNumber(LEDIntensity, 280, ypos);
                 tft.drawRightString("%", unitPosition, ypos, textFontSize);
@@ -67,43 +46,75 @@ void drawGraphicInterface() {
                 tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
               }
               break;
+            case humidityGraphicPosition:
+              drawHumidityUnits();
+              if (firstHumWrite) {
+                tft.drawFloat(desiredIn3Hum, 1, temperatureX - 65, temperatureY, textFontSize);
+              }
+              else {
+                tft.drawRightString(initialSensorsValue, initialSensorPosition, humidityY, textFontSize);
+              }
+              updateSensors();
+              break;
           }
           break;
-        case 2:
+        case settingsPage:
           switch (i) {
-            case 0:
+            case autoLockGraphicPosition:
               if (auto_lock) {
-                if (language) {
-                  tft.drawRightString("SI", unitPosition, ypos, textFontSize);
-                }
-                else {
-                  tft.drawRightString("YES", unitPosition, ypos, textFontSize);
+                switch (language) {
+                  case spanish:
+                    textToWrite = "SI";
+                    break;
+                  case english:
+                    textToWrite = "YES";
+                    break;
+                  case french:
+                    textToWrite = "OUI";
+                    break;
                 }
               }
               else {
-                tft.drawRightString("NO", unitPosition, ypos, textFontSize);
+                switch (language) {
+                  case spanish:
+                    textToWrite = "NO";
+                    break;
+                  case english:
+                    textToWrite = "NO";
+                    break;
+                  case french:
+                    textToWrite = "PAS";
+                    break;
+                }
               }
+              tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
               break;
-            case 1:
-              if (language) {
-                tft.drawRightString("SPA", unitPosition, ypos, textFontSize);
+            case languageGraphicPosition:
+              switch (language) {
+                case spanish:
+                  textToWrite = "SPA";
+                  break;
+                case english:
+                  textToWrite = "ENG";
+                  break;
+                case french:
+                  textToWrite = "FRA";
+                  break;
               }
-              else {
-                tft.drawRightString("ENG", unitPosition, ypos, textFontSize);
-              }
+              tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
               break;
-            case 2:
+            case heaterTempGraphicPosition:
               drawRightNumber(heaterLimitTemp, 280, ypos);
               tft.drawRightString("C", unitPosition, ypos, textFontSize);
               break;
           }
           break;
-        case 3:
+        case calibrateSensorsPage:
           switch (i) {
-            case 0:
+            case temperatureCalibrationGraphicPosition:
               tft.drawFloat(previousTemperature[cornerNTC], 1, valuePosition, ypos, textFontSize);
               break;
-            case 1:
+            case humidityCalibrationGraphicPosition:
               tft.drawFloat(humidity, 0, valuePosition, ypos, textFontSize);
               break;
           }
@@ -115,41 +126,41 @@ void drawGraphicInterface() {
 
 void setVariablesPosition() {
   humidityX = tft.width() - 43;
-  humidityY = width_heading / 5;
+  humidityY = graphicHeight(humidityGraphicPosition);
   temperatureX = tft.width() - 79;
-  temperatureY = 51;
+  temperatureY = graphicHeight(temperatureGraphicPosition);
 }
 
 void drawHeading() {
-  tft.fillRect(0, 0, tft.width(), width_heading, COLOR_HEADING);
+  tft.fillRect(0, 0, tft.width(), height_heading, COLOR_HEADING);
   if (page) {
     drawBack();
   }
   tft.setTextColor(COLOR_MENU);
-  tft.drawCentreString("In3ator   hum:      %", tft.width() - 110, width_heading / 5, textFontSize);
+  tft.drawCentreString("In3ator", tft.width() / 2, height_heading / 5, textFontSize);
 }
 
 void eraseBar() {
-  tft.fillRect(0, (tft.height() - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (tft.height() - width_heading) / rectangles, COLOR_BAR);
+  tft.fillRect(0, (tft.height() - height_heading) * (bar_pos - 1) / rectangles + height_heading, width_select, (tft.height() - height_heading) / rectangles, COLOR_BAR);
 }
 
 void updateBar() {
-  tft.fillRect(0, (tft.height() - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (tft.height() - width_heading) / rectangles, COLOR_SELECTED);
+  tft.fillRect(0, (tft.height() - height_heading) * (bar_pos - 1) / rectangles + height_heading, width_select, (tft.height() - height_heading) / rectangles, COLOR_SELECTED);
   for (int i = 2; i <= rectangles; i++) {
-    tft.fillRect(0, (tft.height() - width_heading) * (i - 1) / rectangles + width_heading - 1, tft.height(), width_space, WHITE); //mejorable
+    tft.fillRect(0, (tft.height() - height_heading) * (i - 1) / rectangles + height_heading - 1, tft.height(), width_indentation, WHITE); //mejorable
   }
 }
 
 void clearMenu() {
-  tft.fillRect(0, width_heading, tft.width(), tft.height() - width_heading, BLACK);
+  tft.fillRect(0, height_heading, tft.width(), tft.height() - height_heading, BLACK);
 }
 
 void drawBack() {
-  tft.fillRect(0, 0, width_back, width_heading, COLOR_HEADING);
-  tft.drawRect(0, 0, width_back, width_heading, BLACK);
-  tft.fillTriangle(arrow_height, width_heading / 2, width_back / 2 , arrow_height, width_back / 2, width_heading - arrow_height, COLOR_ARROW);
-  tft.fillRect(width_back / 2, width_heading / 2 - arrow_tail, width_back / 2 - arrow_height, arrow_tail, COLOR_ARROW);
-  tft.fillRect(width_back / 2, width_heading / 2, width_back / 2 - arrow_height, arrow_tail, COLOR_ARROW);
+  tft.fillRect(0, 0, width_back, height_heading, COLOR_HEADING);
+  tft.drawRect(0, 0, width_back, height_heading, BLACK);
+  tft.fillTriangle(arrow_height, height_heading / 2, width_back / 2 , arrow_height, width_back / 2, height_heading - arrow_height, COLOR_ARROW);
+  tft.fillRect(width_back / 2, height_heading / 2 - arrow_tail, width_back / 2 - arrow_height, arrow_tail, COLOR_ARROW);
+  tft.fillRect(width_back / 2, height_heading / 2, width_back / 2 - arrow_height, arrow_tail, COLOR_ARROW);
 }
 
 void drawRightNumber(int n, int x, int i) {
@@ -161,22 +172,10 @@ void drawRightNumber(int n, int x, int i) {
 }
 
 void loadLogo() {
-  byte numWords = 1;
   tft.setTextSize(1);
   tft.fillScreen(introBackColor);
   tft.setTextColor(introTextColor);
-  for (int i = 0; i < numWords; i++) {
-    pos_text[i] = 0;
-  }
-  if (!language) {
-    words[0]  = "Welcome to in3";
-  }
-  else {
-    words[0]  = "Bienvenido a in3";
-  }
-  for (int i = 0; i < numWords; i++) {
-    tft.drawCentreString(words[i], tft.width() / 2, tft.height() / (2 + i) , textFontSize);
-  }
+  drawIntroMessage();
   for (int i = 0; i < backlight_intensity; i++) {
     analogWrite(SCREENBACKLIGHT, i);
     delay(brightenRate);
@@ -184,10 +183,29 @@ void loadLogo() {
   delay(introDelay);
 }
 
-void drawTemperature() {
+void drawIntroMessage() {
+  byte numWords = 1;
+  switch (language) {
+    case english:
+      words[0]  = "Welcome to in3";
+      break;
+    case spanish:
+      words[0]  = "Bienvenido a in3";
+      break;
+  }
+  for (int i = 0; i < numWords; i++) {
+    tft.drawCentreString(words[i], tft.width() / 2, tft.height() / (2 + i) , textFontSize);
+  }
+}
+
+void drawHumidityUnits() {
+  tft.drawRightString("/", separatorPosition, ypos, textFontSize);
+  tft.drawRightString("%", unitPosition, ypos, textFontSize);
+}
+
+void drawTemperatureUnits() {
   tft.drawRightString("/", separatorPosition, ypos, textFontSize);
   tft.drawRightString("C", unitPosition, ypos, textFontSize);
-  updateSensors();
 }
 
 void drawCentreNumber(int n, int x, int i) {
@@ -212,6 +230,10 @@ void drawStop() {
     tft.drawCentreString("PRESS BUTTON", tft.width() / 2, text_height, textFontSize);
     tft.drawCentreString("3 SEC TO STOP", tft.width() / 2, text_height + 30, textFontSize);
   }
+}
+
+int graphicHeight(int position) {
+  return ((tft.height() - height_heading) / (2 * rectangles) + position * (tft.height() - height_heading) / (rectangles) + letter_height);
 }
 
 void printLoadingBar() {

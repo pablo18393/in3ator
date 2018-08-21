@@ -1,7 +1,7 @@
-void selectMode() {
+void barSelection() {
   bar_pos = 1;
   selected = 0;
-  ypos = (tft.height() - width_heading) / (2 * rectangles) + letter_height;
+  ypos = (tft.height() - height_heading) / (2 * rectangles) + letter_height;
   while (1) {
     updateData();
     if (move) {
@@ -28,19 +28,19 @@ void selectMode() {
             updateBar();
           }
         }
-        ypos = (tft.height() - width_heading) / (2 * rectangles) + (bar_pos - 1) * (tft.height() - width_heading) / (rectangles) + letter_height;
+        ypos = graphicHeight(bar_pos - 1);
       }
     }
     if (!digitalRead(pulse)) {
       selected = ! selected;
       if (selected) {
-        tft.fillRect(0, (tft.height() - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (tft.height() - width_heading) / rectangles, COLOR_CHOSEN);
+        tft.fillRect(0, (tft.height() - height_heading) * (bar_pos - 1) / rectangles + height_heading, width_select, (tft.height() - height_heading) / rectangles, COLOR_CHOSEN);
       }
       else {
-        tft.fillRect(0, (tft.height() - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (tft.height() - width_heading) / rectangles, WHITE);
+        tft.fillRect(0, (tft.height() - height_heading) * (bar_pos - 1) / rectangles + height_heading, width_select, (tft.height() - height_heading) / rectangles, WHITE);
       }
       for (int i = 2; i <= rectangles; i++) {
-        tft.fillRect(0, (tft.height() - width_heading) * (i - 1) / rectangles + width_heading - 1, tft.height(), width_space, WHITE); //mejorable
+        tft.fillRect(0, (tft.height() - height_heading) * (i - 1) / rectangles + height_heading - 1, tft.height(), width_indentation, WHITE); //mejorable
       }
       while (!digitalRead(pulse)) {
         updateData();
@@ -48,11 +48,11 @@ void selectMode() {
           back_mode();
         }
       }
-      delay(100);
+      delay(debounceTime);
       switch (page) {
-        case 0:
-          switch (bar_pos) {
-            case 1:
+        case menuPage:
+          switch (bar_pos - graphicTextOffset) {
+            case temperatureGraphicPosition:
               while (digitalRead(pulse)) {
                 updateData();
                 if (move && -move + desiredIn3Temp >= minTemp && -move + desiredIn3Temp <= maxTemp) {
@@ -69,7 +69,10 @@ void selectMode() {
                 menu();
               }
               break;
-            case 2:
+            case humidityGraphicPosition:
+
+              break;
+            case LEDGraphicPosition:
               while (digitalRead(pulse) ) {
                 updateData();
                 if (move && -move + LEDIntensity >= 0 && -move + LEDIntensity <= LEDMaxIntensity) {
@@ -96,41 +99,75 @@ void selectMode() {
                 move = 0;
               }
               break;
-            case 3:
+            case settingsGraphicPosition:
               settings();
               break;
-            case 4:
-              processPage();
+            case startGraphicPosition:
+              actuatorsProgress();
               break;
           }
           break;
-        case 2:
-          switch (bar_pos) {
-            case 1:
+        case settingsPage:
+          switch (bar_pos - graphicTextOffset) {
+            case autoLockGraphicPosition:
               while (digitalRead(pulse)) {
                 updateData();
                 if (move) {
                   tft.setTextColor(COLOR_MENU);
                   if (auto_lock) {
-                    if (!language) {
-                      tft.drawRightString("YES", unitPosition, ypos, textFontSize);
+                    switch (language) {
+                      case spanish:
+                        textToWrite = "SI";
+                        break;
+                      case english:
+                        textToWrite = "YES";
+                        break;
+                      case french:
+                        textToWrite = "OUI";
+                        break;
                     }
-                    else {
-                      tft.drawRightString("SI", unitPosition, ypos, textFontSize);
-                    }
+                    tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
-                    tft.drawRightString("NO", unitPosition, ypos, textFontSize);
+                    switch (language) {
+                      case spanish:
+                        textToWrite = "NO";
+                        break;
+                      case english:
+                        textToWrite = "NO";
+                        break;
+                      case french:
+                        textToWrite = "PAS";
+                        break;
+                    }
+                    tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
                   }
                   else {
                     tft.setTextColor(COLOR_MENU);
-                    tft.drawRightString("NO", unitPosition, ypos, textFontSize);
+                    switch (language) {
+                      case spanish:
+                        textToWrite = "NO";
+                        break;
+                      case english:
+                        textToWrite = "NO";
+                        break;
+                      case french:
+                        textToWrite = "PAS";
+                        break;
+                    }
+                    tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
-                    if (!language) {
-                      tft.drawRightString("YES", unitPosition, ypos, textFontSize);
+                    switch (language) {
+                      case spanish:
+                        textToWrite = "SI";
+                        break;
+                      case english:
+                        textToWrite = "YES";
+                        break;
+                      case french:
+                        textToWrite = "OUI";
+                        break;
                     }
-                    else {
-                      tft.drawRightString("SI", unitPosition, ypos, textFontSize);
-                    }
+                    tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
                   }
                   auto_lock = !auto_lock;
                   EEPROM.write(EEPROM_autoLock, auto_lock);
@@ -138,30 +175,50 @@ void selectMode() {
                 }
               }
               break;
-            case 2:
+            case languageGraphicPosition:
               while (digitalRead(pulse)) {
                 updateData();
                 if (move) {
-                  if (!language) {
-                    tft.setTextColor(COLOR_MENU);
-                    tft.drawRightString("ENG", unitPosition, ypos, textFontSize);
-                    tft.setTextColor(COLOR_MENU_TEXT);
-                    tft.drawRightString("SPA", unitPosition, ypos, textFontSize);
+                  tft.setTextColor(COLOR_MENU);
+                  switch (language) {
+                    case spanish:
+                      textToWrite = "SPA";
+                      break;
+                    case english:
+                      textToWrite = "ENG";
+                      break;
+                    case french:
+                      textToWrite = "FRA";
+                      break;
                   }
-                  else {
-                    tft.setTextColor(COLOR_MENU);
-                    tft.drawRightString("SPA", unitPosition, ypos, textFontSize);
-                    tft.setTextColor(COLOR_MENU_TEXT);
-                    tft.drawRightString("ENG", unitPosition, ypos, textFontSize);
+                  tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
+                  language -= move;
+                  if (language < firstLanguage) {
+                    language = numLanguages;
                   }
-                  language = !language;
+                  if (language > numLanguages) {
+                    language = firstLanguage;
+                  }
+                  tft.setTextColor(COLOR_MENU_TEXT);
+                  switch (language) {
+                    case spanish:
+                      textToWrite = "SPA";
+                      break;
+                    case english:
+                      textToWrite = "ENG";
+                      break;
+                    case french:
+                      textToWrite = "FRA";
+                      break;
+                  }
+                  tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
                   EEPROM.write(EEPROM_language, language);
                   move = 0;
                 }
               }
               settings();
               break;
-            case 3:
+            case heaterTempGraphicPosition:
               while (digitalRead(pulse) ) {
                 updateData();
                 if (move && -move + heaterLimitTemp >= 0 && -move + heaterLimitTemp <= heaterMaxTemp) {
@@ -188,18 +245,18 @@ void selectMode() {
                 move = 0;
               }
               break;
-            case 4:
+            case setStandardValuesGraphicPosition:
               loadStandardValues();
               settings();
               break;
-            case 5:
+            case calibrateGraphicPosition:
               calibrateSensors();
               break;
           }
           break;
-        case 3:
-          switch (bar_pos) {
-            case 1:
+        case calibrateSensorsPage:
+          switch (bar_pos - graphicTextOffset) {
+            case temperatureCalibrationGraphicPosition:
               while (digitalRead(pulse)) {
                 updateData();
                 if (move) {
@@ -209,13 +266,13 @@ void selectMode() {
                   diffTemperature[cornerNTC] += move * (0.1);
                   temperature[cornerNTC] += move * (0.1);
                   tft.drawFloat(temperature[cornerNTC], 1, valuePosition, ypos, textFontSize);
-                  previousTemperature[cornerNTC]=temperature[cornerNTC];
+                  previousTemperature[cornerNTC] = temperature[cornerNTC];
                   move = 0;
                   EEPROM.write(EEPROM_diffTemperature, int(diffTemperature[cornerNTC] * 10));
                 }
               }
               break;
-            case 2:
+            case humidityCalibrationGraphicPosition:
               while (digitalRead(pulse)) {
                 updateData();
                 if (move) {
@@ -230,7 +287,7 @@ void selectMode() {
                 }
               }
               break;
-            case 3:
+            case restartCalibrationValuesTempGraphicPosition:
               diffTemperature[cornerNTC] = 0;
               diffHumidity = 0;
               EEPROM.write(EEPROM_diffTemperature, diffTemperature[cornerNTC]);
@@ -243,7 +300,7 @@ void selectMode() {
           break;
       }
       selected = 0;
-      tft.fillRect(0, (tft.height() - width_heading) * (bar_pos - 1) / rectangles + width_heading, width_select, (tft.height() - width_heading) / rectangles, WHITE);
+      tft.fillRect(0, (tft.height() - height_heading) * (bar_pos - 1) / rectangles + height_heading, width_select, (tft.height() - height_heading) / rectangles, WHITE);
       while (digitalRead(pulse) == 0) {
         updateData();
         back_mode();
@@ -253,7 +310,7 @@ void selectMode() {
 }
 
 int getYpos(byte row) {
-  return ((tft.height() - width_heading) / (2 * rectangles) + (row - 1) * (tft.height() - width_heading) / (rectangles) + letter_height);
+  return ((tft.height() - height_heading) / (2 * rectangles) + (row - 1) * (tft.height() - height_heading) / (rectangles) + letter_height);
 }
 
 void checkSetMessage() {
@@ -273,25 +330,27 @@ void checkSetMessage() {
     else {
       tft.setTextColor(COLOR_MENU);
     }
-    if (!language) {
-      helpMessage = "Set desired temperature";
-    }
-    else {
-      helpMessage = "Introduce temperatura";
+    switch (language) {
+      case english:
+        helpMessage = "Set desired temperature";
+        break;
+      case spanish:
+        helpMessage = "Introduce temperatura";
+        break;
     }
     tft.drawCentreString(helpMessage, width_select + (tft.width() - width_select) / 2, getYpos(goToProcessRow), textFontSize);
   }
 }
 
 void back_mode() {
-  delay(100);
+  delay(debounceTime);
   last_pulsed = millis();
   byte back_bar = 0;
   while (!digitalRead(pulse)) {
     updateData();
     if (millis() - last_pulsed > time_back_wait) {
       back_bar++;
-      tft.drawLine(width_back - back_bar, 0, width_back - back_bar, width_heading, COLOR_MENU);
+      tft.drawLine(width_back - back_bar, 0, width_back - back_bar, height_heading, COLOR_MENU);
     }
     if (back_bar == width_back) {
       menu();

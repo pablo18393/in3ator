@@ -28,8 +28,34 @@
 #define separatorPosition 240
 #define unitPosition 315
 #define textFontSize 4          //text standard size
+#define helpTextMenuCentreX tft.width()/2;
+#define width_select  7
+#define height_heading  34
+#define width_indentation  4
+#define width_back  50
+#define side_gap  4
+#define letter_height  26
+#define letter_width  14
+#define triang  6
+#define radius  12
+#define circle  8
+#define logo  40
+#define battery_lenght  50
+#define battery_height  6
+#define battery_gap  2
+#define battery_margin  20
+#define battery_round  4
+#define arrow_height  6
+#define arrow_tail  5
+int initialSensorPosition = separatorPosition-letter_width;
+char* initialSensorsValue = "XX";
+bool firstTempWrite;
+bool firstHumWrite;
+int ypos;
+bool print_text;
 
 //configuration variables
+#define debounceTime 100        //encoder debouncing time
 #define maxPWMvalue 255         //for maple mini
 #define maxHeaterPWM 150        //max power for heater, full power (255) is 50W
 #define temperature_fraction 20 //times to measure in a 
@@ -40,6 +66,38 @@
 #define dhtSensor 2
 #define numNTC 2
 #define numTempSensors 3
+
+//pages
+#define menuPage 0
+#define actuatorsProgressPage 1
+#define settingsPage 2
+#define calibrateSensorsPage 3
+
+//languages
+#define firstLanguage 1
+#define spanish 1
+#define english 2
+#define french 3
+#define numLanguages 3
+
+//graphic positions
+#define graphicTextOffset 1                //bar pos is counted from 1, but text from 0
+//menu
+#define temperatureGraphicPosition 0
+#define humidityGraphicPosition 1
+#define LEDGraphicPosition 2
+#define settingsGraphicPosition 3
+#define startGraphicPosition 4
+//settings
+#define autoLockGraphicPosition 0
+#define languageGraphicPosition 1
+#define heaterTempGraphicPosition 2
+#define setStandardValuesGraphicPosition 3
+#define calibrateGraphicPosition 4
+//settings
+#define temperatureCalibrationGraphicPosition 0
+#define humidityCalibrationGraphicPosition 1
+#define restartCalibrationValuesTempGraphicPosition 2
 
 //pin definition
 //boardPWMPins: 3, 4, 5, 8, 9, 10, 11, 15, 16, 25, 26, 27
@@ -124,11 +182,6 @@ int temperatureX;
 int temperatureY;
 
 //constants
-const byte height = 40;
-const byte separation = 10;
-const byte height_bar = 200;
-const byte height_letter = 70;
-const byte rect_length = 80;
 const byte heaterMaxTemp = 70;
 const byte fanMaxSpeed = 100;
 const byte LEDMaxIntensity = 100;
@@ -144,6 +197,7 @@ byte text_size;
 bool pos_text[8];
 volatile int move;
 long last_pulsed;
+char* textToWrite;
 char* words[8];
 char* helpMessage;
 byte bar_pos;
@@ -170,7 +224,7 @@ bool pulsed, pulsed_before;
 int time_lock = 16000;
 bool auto_lock;
 byte counter;
-byte language;
+int language;
 int text_height = tft.height() / 2;
 
 double temperature[numTempSensors];
@@ -178,6 +232,7 @@ double previousTemperature[numTempSensors];
 double desiredHeaterTemp;
 int humidity;
 double desiredIn3Temp = 35;
+double desiredIn3Hum = 80;
 double heaterLimitTemp;
 int fanSpeed;
 int LEDIntensity;
@@ -222,11 +277,11 @@ void setup() {
   Serial.begin(115200);
   dht.setup(DHTPIN);
   heaterPID.SetOutputLimits(0, maxHeaterPWM);
+  initEEPROM();
   tft.begin();
   tft.setRotation(1);
   loadLogo();
   pinDirection();
-  initEEPROM();
   initPIDTimers();
   /*
     if (hardwareVerification()) {

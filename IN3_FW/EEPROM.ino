@@ -33,7 +33,7 @@ void initEEPROM() {
 void loadStandardValues() {
   auto_lock = 0;
   EEPROM.write(EEPROM_autoLock, auto_lock);
-  language = 0;
+  language = english;
   EEPROM.write(EEPROM_language, language);
   for (int i = 0; i < numTempSensors; i++) {
     diffTemperature[numTempSensors] = 0;
