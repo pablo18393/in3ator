@@ -47,7 +47,7 @@
 #define battery_round  4
 #define arrow_height  6
 #define arrow_tail  5
-int initialSensorPosition = separatorPosition-letter_width;
+int initialSensorPosition = separatorPosition - letter_width;
 char* initialSensorsValue = "XX";
 bool firstTempWrite;
 bool firstHumWrite;
@@ -189,6 +189,8 @@ const byte time_back_draw = 255;
 const byte time_back_wait = 255;
 const byte minTemp = 15;
 const byte maxTemp = 45;
+const byte maxHum = 100;
+const byte minHum = 20;
 
 int page, page0;
 bool selected;
@@ -229,10 +231,11 @@ int text_height = tft.height() / 2;
 
 double temperature[numTempSensors];
 double previousTemperature[numTempSensors];
+int previousHumidity;
 double desiredHeaterTemp;
 int humidity;
-double desiredIn3Temp = 35;
-double desiredIn3Hum = 80;
+double desiredIn3Temp = 36.5;
+int desiredIn3Hum = 80;
 double heaterLimitTemp;
 int fanSpeed;
 int LEDIntensity;

@@ -19,34 +19,30 @@ void menu() {
     case spanish:
       words[temperatureGraphicPosition]  = "Temperatura";
       words[humidityGraphicPosition] = "Humedad";
-      words[LEDGraphicPosition] = "LED";
       words[settingsGraphicPosition] = "Configuracion";
-      if (enableSet) {
-        words[startGraphicPosition] = "Empezar";
-      }
-      else {
-        words[startGraphicPosition] = "";
-      }
       break;
     case english:
       words[temperatureGraphicPosition]  = "Temperature";
       words[humidityGraphicPosition] = "Humedad";
-      words[LEDGraphicPosition] = "LED";
       words[settingsGraphicPosition] = "Settings";
-      if (enableSet) {
-        words[startGraphicPosition] = "Start";
-      }
-      else {
-        words[startGraphicPosition] = "";
-      }
+      break;
+    case french:
+      words[temperatureGraphicPosition]  = "Temperature";
+      words[humidityGraphicPosition] = "Humidite";
+      words[settingsGraphicPosition] = "parametres";
       break;
   }
+  words[LEDGraphicPosition] = "LED";
+  words[startGraphicPosition] = "";
   rectangles = numWords;
   setVariablesPosition();
   goToProcessRow = numWords;
   drawGraphicInterface();
   drawHeading();
   updateSensors();
+  firstTempWrite = 1;
+  firstHumWrite = 1;
+  enableSet = 0;
   while (!digitalRead(pulse)) {
     updateData();
   }

@@ -15,6 +15,7 @@ void actuatorsProgress() {
       tft.drawCentreString("Temperatura", tft.width() / 2, tft.height() / 5 - 4, textFontSize);
       break;
     case english:
+    case french:
       tft.drawCentreString("Temperature", tft.width() / 2, tft.height() / 5 - 4, textFontSize);
       break;
   }

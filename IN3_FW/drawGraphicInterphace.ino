@@ -30,12 +30,7 @@ void drawGraphicInterface() {
             case temperatureGraphicPosition:
               drawTemperatureUnits();
               updateSensors();
-              if (firstTempWrite) {
-                tft.drawFloat(desiredIn3Temp, 1, temperatureX - 65, temperatureY, textFontSize);
-              }
-              else {
-                tft.drawRightString(initialSensorsValue, initialSensorPosition, temperatureY, textFontSize);
-              }
+              tft.drawRightString(initialSensorsValue, initialSensorPosition, temperatureY, textFontSize);
               break;
             case LEDGraphicPosition:
               if (LEDIntensity) {
@@ -48,12 +43,7 @@ void drawGraphicInterface() {
               break;
             case humidityGraphicPosition:
               drawHumidityUnits();
-              if (firstHumWrite) {
-                tft.drawFloat(desiredIn3Hum, 1, temperatureX - 65, temperatureY, textFontSize);
-              }
-              else {
-                tft.drawRightString(initialSensorsValue, initialSensorPosition, humidityY, textFontSize);
-              }
+              tft.drawRightString(initialSensorsValue, initialSensorPosition, humidityY, textFontSize);
               updateSensors();
               break;
           }
@@ -125,7 +115,7 @@ void drawGraphicInterface() {
 }
 
 void setVariablesPosition() {
-  humidityX = tft.width() - 43;
+  humidityX = tft.width() - 50;
   humidityY = graphicHeight(humidityGraphicPosition);
   temperatureX = tft.width() - 79;
   temperatureY = graphicHeight(temperatureGraphicPosition);
@@ -192,6 +182,9 @@ void drawIntroMessage() {
     case spanish:
       words[0]  = "Bienvenido a in3";
       break;
+    case french:
+      words[0]  = "Bienvenue a in3";
+      break;
   }
   for (int i = 0; i < numWords; i++) {
     tft.drawCentreString(words[i], tft.width() / 2, tft.height() / (2 + i) , textFontSize);
@@ -234,6 +227,36 @@ void drawStop() {
 
 int graphicHeight(int position) {
   return ((tft.height() - height_heading) / (2 * rectangles) + position * (tft.height() - height_heading) / (rectangles) + letter_height);
+}
+
+void drawHumidity() {
+  if (updateHumidity()) {
+    tft.setTextColor(COLOR_MENU);
+    drawCentreNumber(previousHumidity, humidityX, humidityY);
+    tft.setTextColor(COLOR_MENU_TEXT);
+    drawCentreNumber(humidity, humidityX, humidityY);
+    previousHumidity = humidity;
+  }
+}
+
+void drawStartMessage() {
+  if (enableSet) {
+    tft.setTextColor(COLOR_MENU);
+    tft.drawCentreString(helpMessage, width_select + (tft.width() - width_select) / 2, getYpos(goToProcessRow), textFontSize);
+    tft.setTextColor(COLOR_MENU_TEXT);
+    switch (language) {
+      case spanish:
+        words[startGraphicPosition] = "Empezar";
+        break;
+      case english:
+        words[startGraphicPosition] = "Start";
+        break;
+      case french:
+        words[startGraphicPosition] = "Debut";
+        break;
+    }
+    tft.drawCentreString(words[startGraphicPosition], width_select + (tft.width() - width_select) / 2, getYpos(goToProcessRow), textFontSize);
+  }
 }
 
 void printLoadingBar() {

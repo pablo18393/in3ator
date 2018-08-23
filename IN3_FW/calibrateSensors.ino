@@ -19,11 +19,15 @@ void calibrateSensors() {
       words[humidityCalibrationGraphicPosition] = "Humedad";
       words[restartCalibrationValuesTempGraphicPosition] = "Reiniciar valores";
       break;
+    case french:
+      words[temperatureCalibrationGraphicPosition]  = "Temperature";
+      words[humidityCalibrationGraphicPosition] = "Humidite";
+      words[restartCalibrationValuesTempGraphicPosition] = "Reinitialiser valeurs";
+      break;
   }
   rectangles = numWords;
   drawGraphicInterface();
   drawHeading();
-  updateSensors();
   while (!digitalRead(pulse)) {
     updateData();
   }

@@ -50,32 +50,22 @@ void updateSensors() {
     updateLoadingBar(int(previousPercentage), int(processPercentage));
   }
   last_temp_update = millis();
-    Serial.println(temperatureY);
-}
-
-void drawHumidity() {
-  int previousHumidity;
-  if (updateHumidity()) {
-    tft.setTextColor(COLOR_HEADING);
-    drawCentreNumber(previousHumidity, humidityX, temperatureY);
-    tft.setTextColor(COLOR_MENU);
-    drawCentreNumber(humidity, humidityX, temperatureY);
-    humidity = previousHumidity;
-  }
+  Serial.println(temperatureY);
 }
 
 bool updateHumidity() {
   timer.pause();
   int newTemp = dht.getTemperature();
   int newHumidity = dht.getHumidity();
+  timer.refresh();
+  timer.resume();
   if (newHumidity && newTemp) {
     temperature[dhtSensor] = newTemp;
     humidity = newHumidity;
     humidity += diffHumidity;
+    return ('TRUE');
   }
-  timer.refresh();
-  timer.resume();
-  return (newHumidity);
+  return ('FALSE');
 }
 
 void updateTemp(byte sensor) {

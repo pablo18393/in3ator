@@ -28,6 +28,9 @@ void initEEPROM() {
   else {
     recapVariables();
   }
+  if (!language) {
+    loadStandardValues();
+  }
 }
 
 void loadStandardValues() {

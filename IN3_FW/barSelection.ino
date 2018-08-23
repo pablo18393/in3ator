@@ -57,6 +57,10 @@ void barSelection() {
                 updateData();
                 if (move && -move + desiredIn3Temp >= minTemp && -move + desiredIn3Temp <= maxTemp) {
                   tft.setTextColor(COLOR_MENU);
+                  if (firstTempWrite) {
+                    firstHumWrite = 0;
+                    tft.drawRightString(initialSensorsValue, initialSensorPosition, temperatureY, textFontSize);
+                  }
                   tft.drawFloat(desiredIn3Temp, 1, temperatureX - 65, temperatureY, textFontSize);
                   desiredIn3Temp -= float(move) / 10;
                   tft.setTextColor(COLOR_MENU_TEXT);
@@ -65,12 +69,26 @@ void barSelection() {
                 }
                 move = 0;
               }
-              if (enableSet) {
-                menu();
-              }
+              drawStartMessage();
               break;
             case humidityGraphicPosition:
-
+              while (digitalRead(pulse)) {
+                updateData();
+                if (move && -move + desiredIn3Hum >= minHum && -move + desiredIn3Hum <= maxHum) {
+                  tft.setTextColor(COLOR_MENU);
+                  if (firstHumWrite) {
+                    firstHumWrite = 0;
+                    tft.drawRightString(initialSensorsValue, initialSensorPosition, humidityY, textFontSize);
+                  }
+                  drawCentreNumber(desiredIn3Hum, humidityX - 65, humidityY);
+                  desiredIn3Hum -= (move);
+                  tft.setTextColor(COLOR_MENU_TEXT);
+                  drawCentreNumber(desiredIn3Hum, humidityX - 65, humidityY);
+                  enableSet = 1;
+                }
+                move = 0;
+              }
+              drawStartMessage();
               break;
             case LEDGraphicPosition:
               while (digitalRead(pulse) ) {
@@ -336,6 +354,9 @@ void checkSetMessage() {
         break;
       case spanish:
         helpMessage = "Introduce temperatura";
+        break;
+      case french:
+        helpMessage = "Regler temperature desiree";
         break;
     }
     tft.drawCentreString(helpMessage, width_select + (tft.width() - width_select) / 2, getYpos(goToProcessRow), textFontSize);

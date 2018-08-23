@@ -21,14 +21,20 @@ void settings() {
       words[autoLockGraphicPosition]  = "Auto bloqueo";
       words[languageGraphicPosition] = "Idioma";
       words[heaterTempGraphicPosition] = "Temp calefactor";
-      words[setStandardValuesGraphicPosition] = "Fijar valores iniciales";
+      words[setStandardValuesGraphicPosition] = "Fijar valores estandar";
       words[calibrateGraphicPosition] = "Calibrar";
+      break;
+    case french:
+      words[autoLockGraphicPosition]  = "verrouillage auto";
+      words[languageGraphicPosition] = "Langue";
+      words[heaterTempGraphicPosition] = "Temp chauffage";
+      words[setStandardValuesGraphicPosition] = "definir valeurs standard";
+      words[calibrateGraphicPosition] = "etalonner";
       break;
   }
   rectangles = numWords;
   drawGraphicInterface();
   drawHeading();
-  updateSensors();
   while (!digitalRead(pulse)) {
     updateData();
   }
