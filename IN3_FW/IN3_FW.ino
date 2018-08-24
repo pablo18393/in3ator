@@ -49,8 +49,8 @@
 #define arrow_tail  5
 int initialSensorPosition = separatorPosition - letter_width;
 char* initialSensorsValue = "XX";
-bool firstTempWrite;
-bool firstHumWrite;
+bool controlTemperature;
+bool controlHumidity;
 int ypos;
 bool print_text;
 
@@ -121,7 +121,7 @@ bool print_text;
 #define HEATER 16
 #define ICT 25
 #define STERILIZE 28
-#define WATERPUMP 27
+#define HUMIDIFIER 27
 #define HEATER_FB 17
 #define POWER_EN_FB 19
 #define FAN1_FB 20
@@ -129,7 +129,7 @@ bool print_text;
 #define FAN3_FB 22
 #define ICT_FB 26
 #define STERILIZE_FB 29
-#define WATERPUMP_FB 30
+#define HUMIDIFIER_FB 30
 #define pulse 14
 
 Adafruit_ILI9341_STM tft = Adafruit_ILI9341_STM(TFT_CS, TFT_DC, TFT_RST); // Use hardware SPI
@@ -227,7 +227,7 @@ int time_lock = 16000;
 bool auto_lock;
 byte counter;
 int language;
-int text_height = tft.height() / 2;
+int goBackTextY = tft.height() / 2;
 
 double temperature[numTempSensors];
 double previousTemperature[numTempSensors];
@@ -262,11 +262,11 @@ volatile long interruptcounter;
 double Kp_heater = 0.1, Ki_heater = 0.3, Kd_heater = 0.1;
 double Kp_in3 = 0.1, Ki_in3 = 0.3, Kd_in3 = 0.1;
 double PIDOutput[2];
-bool PIDControlStart;
+bool temperaturePIDcontrolStart;
 PID heaterPID(&temperature[heaterNTC], &PIDOutput[heaterNTC], &desiredHeaterTemp, Kp_heater, Ki_heater, Kd_heater, P_ON_M, DIRECT);
 PID in3PID(&temperature[cornerNTC], &PIDOutput[cornerNTC], &desiredIn3Temp, Kp_in3, Ki_in3, Kd_in3, P_ON_M, DIRECT);
 // timer
-#define PIDcontrol 0         //0 to disable, 1 to enable
+#define temperaturePIDcontrol 0         //0 to disable, 1 to enable
 #define ENCODER_RATE 1000    // in microseconds; 
 #define NTCInterruptRate 20000    // in microseconds; 
 #define in3PIDRate 1000000    // in microseconds; 
@@ -309,5 +309,5 @@ void pinDirection() {
   pinMode(FAN2, OUTPUT);
   pinMode(FAN3, OUTPUT);
   pinMode(STERILIZE, OUTPUT);
-  pinMode(WATERPUMP, OUTPUT);
+  pinMode(HUMIDIFIER, OUTPUT);
 }

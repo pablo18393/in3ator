@@ -34,7 +34,7 @@ void helpingMenu() {
   tft.fillScreen(COLOR_MENU);
   page = menuPage;
   byte  numWords = 4;
-  setVariablesPosition();
+  setSensorsGraphicPosition();
   tft.setTextSize(1);
   tft.setTextColor(COLOR_MENU_TEXT);
   for (int i = 0; i < numWords; i++) {

@@ -23,7 +23,7 @@ void initEEPROM() {
       EEPROM.write(i, 0);
     }
     loadStandardValues();
-    firstTurnOn();
+    //firstTurnOn();
   }
   else {
     recapVariables();

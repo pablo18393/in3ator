@@ -1,6 +1,6 @@
 void menu() {
   if (page == actuatorsProgressPage) {
-    if (PIDcontrol) {
+    if (temperaturePIDcontrol) {
       stopPID();
     }
     turnFansOff();
@@ -35,13 +35,13 @@ void menu() {
   words[LEDGraphicPosition] = "LED";
   words[startGraphicPosition] = "";
   rectangles = numWords;
-  setVariablesPosition();
+  setSensorsGraphicPosition();
   goToProcessRow = numWords;
   drawGraphicInterface();
   drawHeading();
   updateSensors();
-  firstTempWrite = 1;
-  firstHumWrite = 1;
+  controlTemperature = 1;
+  controlHumidity = 1;
   enableSet = 0;
   while (!digitalRead(pulse)) {
     updateData();

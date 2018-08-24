@@ -1,5 +1,5 @@
 void actuatorsProgress() {
-  byte  numWords = 2;
+  byte  numWords = 0;
   temperatureAtStart = temperature[cornerNTC];
   processPercentage = 0;
   page = actuatorsProgressPage;
@@ -8,18 +8,38 @@ void actuatorsProgress() {
   rectangles = numWords;
   drawGraphicInterface();
   drawHeading();
-  printLoadingBar();
   tft.setTextColor(COLOR_MENU_TEXT);
+  setSensorsGraphicPosition();
+  printLoadingTemperatureBar();
   switch (language) {
     case spanish:
-      tft.drawCentreString("Temperatura", tft.width() / 2, tft.height() / 5 - 4, textFontSize);
+      textToWrite = "Temperatura";
       break;
     case english:
     case french:
-      tft.drawCentreString("Temperature", tft.width() / 2, tft.height() / 5 - 4, textFontSize);
+      textToWrite = "Temperature";
       break;
   }
-  tft.drawCentreString("%", tft.width() / 2 + 14, temperatureY, textFontSize);
+  tft.drawCentreString(textToWrite, tft.width() / 2, tft.height() / 5 - 12, textFontSize);
+  tft.drawCentreString("%", tft.width() / 2 + 14, temperatureY , textFontSize);
+  drawActuatorsSeparators();
+  /*
+    printLoadingHumidityBar();
+    switch (language) {
+      case spanish:
+        textToWrite = "Humedad";
+        break;
+      case english:
+        tft.textToWrite = "Humidity";
+        break;
+      case french:
+        tft.textToWrite = "Humidite";
+        break;
+    }
+    tft.drawCentreString(textToWrite, tft.width() / 2, tft.height() / 5 - 4, textFontSize);
+    tft.drawCentreString("%", tft.width() / 2 + 14, temperatureY, textFontSize);
+  */
+
   tft.setTextColor(COLOR_WARNING_TEXT);
   drawStop();
   state_blink = 1;
@@ -28,45 +48,61 @@ void actuatorsProgress() {
   if (temperatureAtStart > temperature[cornerNTC]) {
     temperatureAtStart = temperature[cornerNTC];
   }
-  if (PIDcontrol) {
-    startPID();
+  if (controlTemperature) {
+    if (temperaturePIDcontrol) {
+      startPID();
+    }
   }
   while (1) {
     updateData();
-    if (!PIDcontrol) {
-      if (temperature[cornerNTC] < desiredIn3Temp) {
-        heatUp();
-      }
-      else {
-        analogWrite(HEATER, 0);
+    if (controlTemperature) {
+      if (!temperaturePIDcontrol) {
+        basicTemperatureControl();
       }
     }
-    if (digitalRead(pulse)) {
-      last_pulsed = millis();
-      delay(debounceTime);
+    if (controlHumidity) {
+      basicHumidityControl();
+    }
+    while (!digitalRead(pulse)) {
+      updateData();
+      if (digitalRead(pulse) == 0) {
+        back_mode();
+      }
+    }
+    blinkGoBackMessage();
+  }
+}
+
+void blinkGoBackMessage() {
+  if (millis() - blinking > 1000) {
+    blinking = millis();
+    state_blink = !state_blink;
+    if (state_blink) {
+      tft.setTextColor(ILI9341_ORANGE);
     }
     else {
-      delay(50);
-      while (!digitalRead(pulse)) {
-        updateData();
-        if (digitalRead(pulse) == 0) {
-          back_mode();
-        }
-      }
-      delay(50);
+      tft.setTextColor(COLOR_MENU);
+      blinking += 400;
     }
-    if (millis() - blinking > 1000) {
-      blinking = millis();
-      state_blink = !state_blink;
-      if (state_blink) {
-        tft.setTextColor(ILI9341_ORANGE);
-      }
-      else {
-        tft.setTextColor(COLOR_MENU);
-        blinking += 400;
-      }
-      drawStop();
-    }
+    drawStop();
+  }
+}
+
+void basicTemperatureControl() {
+  if (temperature[cornerNTC] < desiredIn3Temp) {
+    heatUp();
+  }
+  else {
+    analogWrite(HEATER, 0);
+  }
+}
+
+void basicHumidityControl() {
+  if (humidity < desiredIn3Hum) {
+    digitalWrite(HUMIDIFIER, HIGH);
+  }
+  else {
+    digitalWrite(HUMIDIFIER, LOW);
   }
 }
 

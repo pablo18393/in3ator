@@ -114,11 +114,23 @@ void drawGraphicInterface() {
   }
 }
 
-void setVariablesPosition() {
-  humidityX = tft.width() - 50;
-  humidityY = graphicHeight(humidityGraphicPosition);
-  temperatureX = tft.width() - 79;
-  temperatureY = graphicHeight(temperatureGraphicPosition);
+void setSensorsGraphicPosition() {
+  switch (page) {
+    case menuPage:
+      humidityX = tft.width() - 50;
+      humidityY = graphicHeight(humidityGraphicPosition);
+      temperatureX = tft.width() - 79;
+      temperatureY = graphicHeight(temperatureGraphicPosition);
+      break;
+    case actuatorsProgressPage:
+      barWidth = tft.width() / 4 * 3;
+      barHeight = 15;
+      barPosX = tft.width() / 2;
+      barPosY = tft.height() / 3 - 8;
+      temperatureX = barPosX - barWidth / 2 - 38;
+      temperatureY = barPosY + barHeight / 2 + 2;
+      break;
+  }
 }
 
 void drawHeading() {
@@ -215,14 +227,18 @@ void drawCentreNumber(int n, int x, int i) {
 }
 
 void drawStop() {
-  if (language) {
-    tft.drawCentreString("PULSA BOTON", tft.width() / 2, text_height, textFontSize);
-    tft.drawCentreString("3 SEC SALIR", tft.width() / 2, text_height + 30, textFontSize);
+  switch (language) {
+    case spanish:
+      textToWrite = "Pulsa 2 seg para salir";
+      break;
+    case english:
+      textToWrite = "Press 2 sec to go back";
+      break;
+    case french:
+      textToWrite = "Press 2 sec to go back";
+      break;
   }
-  else {
-    tft.drawCentreString("PRESS BUTTON", tft.width() / 2, text_height, textFontSize);
-    tft.drawCentreString("3 SEC TO STOP", tft.width() / 2, text_height + 30, textFontSize);
-  }
+  tft.drawCentreString(textToWrite, tft.width() / 2, goBackTextY, textFontSize);
 }
 
 int graphicHeight(int position) {
@@ -259,14 +275,12 @@ void drawStartMessage() {
   }
 }
 
-void printLoadingBar() {
-  barWidth = tft.width() / 4 * 3;
-  barHeight = 15;
-  barPosX = tft.width() / 2;
-  barPosY = tft.height() / 3;
+void drawActuatorsSeparators(){
+  
+}
+
+void printLoadingTemperatureBar() {
   barThickness = 3;
-  temperatureX = barPosX - barWidth / 2 - 30;
-  temperatureY = barPosY + barHeight / 2 + 10;
   updateSensors();
   tft.drawFloat(desiredIn3Temp, 1, barPosX + barWidth / 2 - 30, temperatureY, textFontSize);
   for (int i = 1; i <= barThickness; i++) {

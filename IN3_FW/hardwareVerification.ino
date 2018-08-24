@@ -23,7 +23,7 @@ byte hardwareVerification() {
   if (!digitalRead(STERILIZE_FB)) {
     errorHardwareCode = 7;
   }
-  if (!digitalRead(WATERPUMP_FB)) {
+  if (!digitalRead(HUMIDIFIER_FB)) {
     errorHardwareCode = 8;
   }
   //power verification
@@ -75,12 +75,12 @@ byte hardwareVerification() {
     errorHardwareCode = 17;
   }
   digitalWrite(STERILIZE, LOW);
-  digitalWrite(WATERPUMP, HIGH);
+  digitalWrite(HUMIDIFIER, HIGH);
   delay(mosfet_switch_time);
-  if (!digitalRead(WATERPUMP_FB)) {
+  if (!digitalRead(HUMIDIFIER_FB)) {
     errorHardwareCode = 18;
   }
-  digitalWrite(WATERPUMP, LOW);
+  digitalWrite(HUMIDIFIER, LOW);
   if (errorHardwareCode) {
 
   }

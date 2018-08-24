@@ -44,7 +44,7 @@ void barSelection() {
       }
       while (!digitalRead(pulse)) {
         updateData();
-        if (page > 1) {
+        if (page != menuPage) {
           back_mode();
         }
       }
@@ -57,8 +57,8 @@ void barSelection() {
                 updateData();
                 if (move && -move + desiredIn3Temp >= minTemp && -move + desiredIn3Temp <= maxTemp) {
                   tft.setTextColor(COLOR_MENU);
-                  if (firstTempWrite) {
-                    firstHumWrite = 0;
+                  if (controlTemperature) {
+                    controlHumidity = 0;
                     tft.drawRightString(initialSensorsValue, initialSensorPosition, temperatureY, textFontSize);
                   }
                   tft.drawFloat(desiredIn3Temp, 1, temperatureX - 65, temperatureY, textFontSize);
@@ -76,8 +76,8 @@ void barSelection() {
                 updateData();
                 if (move && -move + desiredIn3Hum >= minHum && -move + desiredIn3Hum <= maxHum) {
                   tft.setTextColor(COLOR_MENU);
-                  if (firstHumWrite) {
-                    firstHumWrite = 0;
+                  if (controlHumidity) {
+                    controlHumidity = 0;
                     tft.drawRightString(initialSensorsValue, initialSensorPosition, humidityY, textFontSize);
                   }
                   drawCentreNumber(desiredIn3Hum, humidityX - 65, humidityY);
@@ -319,9 +319,11 @@ void barSelection() {
       }
       selected = 0;
       tft.fillRect(0, (tft.height() - height_heading) * (bar_pos - 1) / rectangles + height_heading, width_select, (tft.height() - height_heading) / rectangles, WHITE);
-      while (digitalRead(pulse) == 0) {
+      while (!digitalRead(pulse)) {
         updateData();
-        back_mode();
+        if (page != menuPage) {
+          back_mode();
+        }
       }
     }
   }
