@@ -81,8 +81,7 @@ bool readDHT22() {
     humidity += diffHumidity;
     return ('TRUE');
   }
-  //return ('FALSE');
-  return ('TRUE');
+  return ('FALSE');
 }
 
 void updateTemp(byte sensor) {
