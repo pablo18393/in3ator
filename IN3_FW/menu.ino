@@ -40,8 +40,8 @@ void menu() {
   drawGraphicInterface();
   drawHeading();
   updateSensors();
-  controlTemperature = 1;
-  controlHumidity = 1;
+  controlTemperature = 0;
+  controlHumidity = 0;
   enableSet = 0;
   while (!digitalRead(pulse)) {
     updateData();

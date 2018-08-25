@@ -57,8 +57,8 @@ void barSelection() {
                 updateData();
                 if (move && -move + desiredIn3Temp >= minTemp && -move + desiredIn3Temp <= maxTemp) {
                   tft.setTextColor(COLOR_MENU);
-                  if (controlTemperature) {
-                    controlHumidity = 0;
+                  if (!controlTemperature) {
+                    controlTemperature = 1;
                     tft.drawRightString(initialSensorsValue, initialSensorPosition, temperatureY, textFontSize);
                   }
                   tft.drawFloat(desiredIn3Temp, 1, temperatureX - 65, temperatureY, textFontSize);
@@ -76,8 +76,8 @@ void barSelection() {
                 updateData();
                 if (move && -move + desiredIn3Hum >= minHum && -move + desiredIn3Hum <= maxHum) {
                   tft.setTextColor(COLOR_MENU);
-                  if (controlHumidity) {
-                    controlHumidity = 0;
+                  if (!controlHumidity) {
+                    controlHumidity = 1;
                     tft.drawRightString(initialSensorsValue, initialSensorPosition, humidityY, textFontSize);
                   }
                   drawCentreNumber(desiredIn3Hum, humidityX - 65, humidityY);
@@ -310,7 +310,7 @@ void barSelection() {
               diffHumidity = 0;
               EEPROM.write(EEPROM_diffTemperature, diffTemperature[cornerNTC]);
               EEPROM.write(EEPROM_diffHumidity, diffHumidity);
-              updateHumidity();
+              readDHT22();
               updateTemp(bothNTC);
               calibrateSensors();
               break;
@@ -325,6 +325,7 @@ void barSelection() {
           back_mode();
         }
       }
+      delay(debounceTime);
     }
   }
 }

@@ -22,38 +22,54 @@ int updateData() {
   if (!page && !enableSet) {
     checkSetMessage();
   }
+  checkSerialPort();
   return move;
 }
 
 void updateSensors() {
   tft.setTextColor(COLOR_MENU);
-  if (page == menuPage || page == actuatorsProgressPage) {
+  if (page == menuPage || (page == actuatorsProgressPage && controlTemperature)) {
     tft.drawFloat(previousTemperature[cornerNTC], 1, temperatureX, temperatureY, textFontSize);
   }
-  drawHumidity();
+  if (page != actuatorsProgressPage || controlHumidity) {
+    drawHumidity();
+  }
   updateTemp(bothNTC);
   tft.setTextColor(COLOR_MENU_TEXT);
-  if (page == menuPage || page == actuatorsProgressPage) {
+  if (page == menuPage || (page == actuatorsProgressPage && controlTemperature)) {
     tft.drawFloat(temperature[cornerNTC], 1, temperatureX, temperatureY, textFontSize);
     previousTemperature[cornerNTC] = temperature[cornerNTC];
   }
   if (page == actuatorsProgressPage) {
-    drawRightNumber(processPercentage, tft.width() / 2, temperatureY);
-    float previousPercentage = processPercentage;
-    processPercentage = 100 - ((desiredIn3Temp - temperature[cornerNTC]) * 100 / (desiredIn3Temp - temperatureAtStart));
-    if (processPercentage > 99) {
-      processPercentage = 100;
+    if (controlTemperature) {
+      drawRightNumber(temperaturePercentage, tft.width() / 2, temperatureY);
+      float previousTemperaturePercentage = temperaturePercentage;
+      temperaturePercentage = 100 - ((desiredIn3Temp - temperature[cornerNTC]) * 100 / (desiredIn3Temp - temperatureAtStart));
+      if (temperaturePercentage > 99) {
+        temperaturePercentage = 100;
+      }
+      if (temperaturePercentage < 0) {
+        temperaturePercentage = 0;
+      }
+      updateLoadingTemperatureBar(int(previousTemperaturePercentage), int(temperaturePercentage));
     }
-    if (processPercentage < 0) {
-      processPercentage = 0;
+    if (controlHumidity) {
+      drawRightNumber(humidityPercentage, tft.width() / 2, humidityY);
+      float previousHumidityPercentage = humidityPercentage;
+      humidityPercentage = 100 - ((desiredIn3Hum - humidity) * 100 / (desiredIn3Hum - humidityAtStart));
+      if (humidityPercentage > 99) {
+        humidityPercentage = 100;
+      }
+      if (humidityPercentage < 0) {
+        humidityPercentage = 0;
+      }
+      updateLoadingHumidityBar(int(previousHumidityPercentage), int(humidityPercentage));
     }
-    updateLoadingBar(int(previousPercentage), int(processPercentage));
   }
   last_temp_update = millis();
-  Serial.println(temperatureY);
 }
 
-bool updateHumidity() {
+bool readDHT22() {
   timer.pause();
   int newTemp = dht.getTemperature();
   int newHumidity = dht.getHumidity();
@@ -65,7 +81,8 @@ bool updateHumidity() {
     humidity += diffHumidity;
     return ('TRUE');
   }
-  return ('FALSE');
+  //return ('FALSE');
+  return ('TRUE');
 }
 
 void updateTemp(byte sensor) {
@@ -111,14 +128,14 @@ void updateTemp(byte sensor) {
   }
 }
 
-void updateLoadingBar(float prev, float actual) {
+void updateLoadingTemperatureBar(float prev, float actual) {
   if (prev != actual) {
     float diff = (actual - prev) / 100;
     int color;
     float barX;
     int barY, barDiffWidth;
-    barX = barPosX - (barWidth / 2) * (1 - prev / 50);
-    barY = barPosY - barHeight / 2;
+    barX = tempBarPosX - (barWidth / 2) * (1 - prev / 50);
+    barY = tempBarPosY - barHeight / 2;
     barDiffWidth = barWidth * abs(diff) + 1;
     if (diff > 0) {
       color = COLOR_LOADING_BAR;
@@ -132,6 +149,30 @@ void updateLoadingBar(float prev, float actual) {
     drawRightNumber(prev, tft.width() / 2, temperatureY);
     tft.setTextColor(COLOR_MENU_TEXT);
     drawRightNumber(actual, tft.width() / 2, temperatureY);
+  }
+}
+
+void updateLoadingHumidityBar(float prev, float actual) {
+  if (prev != actual) {
+    float diff = (actual - prev) / 100;
+    int color;
+    float barX;
+    int barY, barDiffWidth;
+    barX = humBarPosX - (barWidth / 2) * (1 - prev / 50);
+    barY = humBarPosY - barHeight / 2;
+    barDiffWidth = barWidth * abs(diff) + 1;
+    if (diff > 0) {
+      color = COLOR_LOADING_BAR;
+    }
+    else {
+      color = COLOR_MENU;
+      barX -= barDiffWidth - 1;
+    }
+    tft.fillRect(barX, barY, barDiffWidth, barHeight, color);
+    tft.setTextColor(COLOR_MENU);
+    drawRightNumber(prev, tft.width() / 2, humidityY);
+    tft.setTextColor(COLOR_MENU_TEXT);
+    drawRightNumber(actual, tft.width() / 2, humidityY);
   }
 }
 
@@ -155,6 +196,38 @@ void turnFansOff() {
   digitalWrite(FAN1, LOW);
   digitalWrite(FAN2, LOW);
   digitalWrite(FAN3, LOW);
+}
+void checkSerialPort() {
+  if (Serial.available()) {
+    switch (Serial.read()) {
+      case 'T':
+        switch (Serial.read()) {
+          case 'C':
+            diffTemperature[cornerNTC] = temperature[cornerNTC] - readSerialData();
+            temperature[cornerNTC] -= diffTemperature[cornerNTC];
+            break;
+          case 'H':
+            diffTemperature[heaterNTC] = temperature[heaterNTC] - readSerialData();
+            temperature[heaterNTC] -= diffTemperature[heaterNTC];
+            break;
+        }
+        break;
+      case 'H':
+        diffHumidity = humidity - readSerialData();
+        humidity -= diffHumidity;
+        break;
+    }
+  }
+}
+
+int readSerialData() {
+  int serialData = 0;
+  delay(15);
+  while (Serial.available()) {
+    serialData *= 10;
+    serialData += Serial.read() - 48;
+  }
+  return (serialData);
 }
 
 void printStatus() {

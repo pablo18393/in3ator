@@ -12,6 +12,9 @@
 #include "DHT.h"
 #include <PID_v1.h>
 
+#define FWversion "v1.6"
+#define headingTitle "in3ator"
+
 //EEPROM VARIABLES
 #define EEPROM_firstTurnOn 0
 #define EEPROM_autoLock 1
@@ -147,8 +150,8 @@ Adafruit_ILI9341_STM tft = Adafruit_ILI9341_STM(TFT_CS, TFT_DC, TFT_RST); // Use
 #define COLOR_BAR  BLACK
 #define COLOR_MENU_TEXT WHITE
 #define COLOR_SELECTED WHITE
-#define COLOR_CHOSEN GREEN
-#define COLOR_HEADING WHITE
+#define COLOR_CHOSEN BLUE
+#define COLOR_HEADING BLUE
 #define COLOR_ARROW BLACK
 #define COLOR_BATTERY BLACK
 #define COLOR_BATTERY_LEFT BLACK
@@ -243,10 +246,11 @@ long last_temp_update;
 long temp_update_rate = 1000;
 int backlight_intensity = 100;
 bool enableSet;
-float processPercentage = 0, temperatureAtStart;
+float temperaturePercentage, temperatureAtStart;
+float humidityPercentage, humidityAtStart;
 int temperatureArray [numNTC][temperature_fraction];
 byte temperaturePos, temperature_measured;
-int barWidth, barHeight, barPosX, barPosY;
+int barWidth, barHeight, tempBarPosX, tempBarPosY, humBarPosX, humBarPosY;
 byte barThickness;
 float diffTemperature[numTempSensors];
 int diffHumidity;

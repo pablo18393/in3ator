@@ -1,7 +1,6 @@
 void actuatorsProgress() {
   byte  numWords = 0;
-  temperatureAtStart = temperature[cornerNTC];
-  processPercentage = 0;
+  temperaturePercentage = 0;
   page = actuatorsProgressPage;
   tft.setTextSize(1);
   print_text = 0;
@@ -10,36 +9,39 @@ void actuatorsProgress() {
   drawHeading();
   tft.setTextColor(COLOR_MENU_TEXT);
   setSensorsGraphicPosition();
-  printLoadingTemperatureBar();
-  switch (language) {
-    case spanish:
-      textToWrite = "Temperatura";
-      break;
-    case english:
-    case french:
-      textToWrite = "Temperature";
-      break;
-  }
-  tft.drawCentreString(textToWrite, tft.width() / 2, tft.height() / 5 - 12, textFontSize);
-  tft.drawCentreString("%", tft.width() / 2 + 14, temperatureY , textFontSize);
   drawActuatorsSeparators();
-  /*
+  if (controlTemperature) {
+    temperatureAtStart = temperature[cornerNTC];
+    printLoadingTemperatureBar();
+    switch (language) {
+      case spanish:
+        textToWrite = "Temperatura";
+        break;
+      case english:
+      case french:
+        textToWrite = "Temperature";
+        break;
+    }
+    tft.drawCentreString(textToWrite, tft.width() / 2, tempBarPosY - 4 * letter_height / 3, textFontSize);
+    tft.drawCentreString("%", tft.width() / 2 + 14, temperatureY , textFontSize);
+  }
+  if (controlHumidity) {
+    humidityAtStart = humidity;
     printLoadingHumidityBar();
     switch (language) {
       case spanish:
         textToWrite = "Humedad";
         break;
       case english:
-        tft.textToWrite = "Humidity";
+        textToWrite = "Humidity";
         break;
       case french:
-        tft.textToWrite = "Humidite";
+        textToWrite = "Humidite";
         break;
     }
-    tft.drawCentreString(textToWrite, tft.width() / 2, tft.height() / 5 - 4, textFontSize);
-    tft.drawCentreString("%", tft.width() / 2 + 14, temperatureY, textFontSize);
-  */
-
+    tft.drawCentreString(textToWrite, tft.width() / 2, humBarPosY - 4 * letter_height / 3, textFontSize);
+    tft.drawCentreString("%", tft.width() / 2 + 14, humidityY, textFontSize);
+  }
   tft.setTextColor(COLOR_WARNING_TEXT);
   drawStop();
   state_blink = 1;
