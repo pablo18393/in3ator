@@ -12,7 +12,7 @@
 #include "DHT.h"
 #include <PID_v1.h>
 
-#define FWversion "v1.6"
+#define FWversion "v1.7"
 #define headingTitle "in3ator"
 
 //EEPROM VARIABLES

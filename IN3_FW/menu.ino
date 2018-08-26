@@ -3,6 +3,7 @@ void menu() {
     if (temperaturePIDcontrol) {
       stopPID();
     }
+    turnActuatorsOff();
     turnFansOff();
   }
   page = menuPage;

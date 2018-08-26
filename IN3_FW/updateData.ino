@@ -185,6 +185,12 @@ void measureAllNTC() {
   }
 }
 
+void turnActuatorsOff() {
+  digitalWrite(HEATER, LOW);
+  analogWrite(HEATER, 0);
+  digitalWrite(HUMIDIFIER, LOW);
+}
+
 void turnFansOn() {
   digitalWrite(FAN1, HIGH);
   digitalWrite(FAN2, HIGH);
