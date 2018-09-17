@@ -12,8 +12,22 @@
 #include "DHT.h"
 #include <PID_v1.h>
 
-#define FWversion "v1.7"
+#define FWversion "v1.8"
 #define headingTitle "in3ator"
+
+//hardware verification. 1 is a mounted hardware, 0 a not mounted.
+#define HWPowerEn 1
+#define HWHeater 1
+#define HWGeneric 1
+#define HWFan1 1
+#define HWFan2 1
+#define HWFan3 1
+#define HWICT 1
+#define HWSterilize 1
+#define HWNTCHeater 1
+#define HWHumidifier 1
+#define HWNTCIn3 1
+
 
 //EEPROM VARIABLES
 #define EEPROM_firstTurnOn 0
@@ -62,7 +76,7 @@ bool print_text;
 #define maxPWMvalue 255         //for maple mini
 #define maxHeaterPWM 150        //max power for heater, full power (255) is 50W
 #define temperature_fraction 20 //times to measure in a 
-#define mosfet_switch_time 50   //in millis, oversized
+#define mosfet_switch_time 100   //in millis, oversized
 #define cornerNTC 0
 #define heaterNTC 1
 #define bothNTC 2
@@ -185,7 +199,7 @@ int temperatureX;
 int temperatureY;
 
 //constants
-const byte heaterMaxTemp = 70;
+const byte heaterMaxTemp = 80;
 const byte fanMaxSpeed = 100;
 const byte LEDMaxIntensity = 100;
 const byte time_back_draw = 255;
@@ -290,11 +304,12 @@ void setup() {
   loadLogo();
   pinDirection();
   initPIDTimers();
-  /*
-    if (hardwareVerification()) {
+
+  if (!hardwareVerification()) {
+    Serial.println("pulse to continue");
     while (digitalRead(pulse));
-    }
-  */
+  }
+
   analogWrite(SCREENBACKLIGHT, backlight_intensity);
   initEncoders();
   newPosition = myEncoderRead();

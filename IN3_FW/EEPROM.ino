@@ -44,7 +44,7 @@ void loadStandardValues() {
   }
   diffHumidity = 0;
   EEPROM.write(EEPROM_diffHumidity, diffHumidity);
-  heaterLimitTemp = 50;
+  heaterLimitTemp = 70;
   EEPROM.write(EEPROM_heaterLimitTemp, heaterLimitTemp);
 }
 

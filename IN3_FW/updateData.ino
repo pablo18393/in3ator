@@ -215,6 +215,9 @@ void checkSerialPort() {
             diffTemperature[heaterNTC] = temperature[heaterNTC] - readSerialData();
             temperature[heaterNTC] -= diffTemperature[heaterNTC];
             break;
+          case 'R':
+            nvic_sys_reset();
+            break;
         }
         break;
       case 'H':
