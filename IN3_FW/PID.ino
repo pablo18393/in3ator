@@ -8,7 +8,6 @@ void in3PIDInterrupt() {
       updateTemp(cornerNTC);
       in3PID.Compute();
       desiredHeaterTemp = PIDOutput[cornerNTC] * (heaterLimitTemp - desiredIn3Temp) / (maxPWMvalue) + desiredIn3Temp;  //map function: min value is 
-
     }
     if (interruptcounter % heaterPIDfactor == 0) {
       updateTemp(heaterNTC);

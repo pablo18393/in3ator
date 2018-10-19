@@ -61,6 +61,7 @@ void recapVariables() {
     diffHumidity -= 65535;
   }
   heaterLimitTemp = EEPROM.read(EEPROM_heaterLimitTemp);
+  swapTempSensors = EEPROM.read(EEPROM_swapTempSensors);
 }
 
 long EEPROMReadLong(int p_address)

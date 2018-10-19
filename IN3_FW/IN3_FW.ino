@@ -1,10 +1,3 @@
-
-/*page:
-   0 menu
-   1 processPage
-   2 settings
-   3 calibrate sensors
-*/
 #include <Adafruit_GFX_AS.h>
 #include <EEPROM.h>
 #include <Adafruit_ILI9341_STM.h> // STM32 DMA Hardware-specific library
@@ -12,7 +5,7 @@
 #include "DHT.h"
 #include <PID_v1.h>
 
-#define FWversion "v1.8"
+#define FWversion "v1.9"
 #define headingTitle "in3ator"
 
 //hardware verification. 1 is a mounted hardware, 0 a not mounted.
@@ -36,9 +29,10 @@
 #define EEPROM_heaterLimitTemp 3
 #define EEPROM_diffHumidity 10
 #define EEPROM_diffTemperature 20
+#define EEPROM_swapTempSensors 30
 #define EEPROM_checkStatus 100
 
-//display variables
+//display graphic geometric variables
 #define introDelay    2000      //initial delay between intro and menu
 #define brightenRate  30        //intro brighten speed (Higher value, slower)
 #define valuePosition 245
@@ -116,7 +110,7 @@ bool print_text;
 #define humidityCalibrationGraphicPosition 1
 #define restartCalibrationValuesTempGraphicPosition 2
 
-//pin definition
+//pin declaration
 //boardPWMPins: 3, 4, 5, 8, 9, 10, 11, 15, 16, 25, 26, 27
 
 // Use hardware SPI lines+
@@ -127,8 +121,8 @@ bool print_text;
 
 #define DHTPIN 0
 #define SCREENBACKLIGHT 3
-#define THERMISTOR_HEATER 10
-#define THERMISTOR_CORNER 11
+byte THERMISTOR_HEATER=10;
+byte THERMISTOR_CORNER=11;
 #define ENCODER_A 12
 #define ENCODER_B 13
 #define POWER_EN 18
@@ -209,6 +203,7 @@ const byte maxTemp = 45;
 const byte maxHum = 100;
 const byte minHum = 20;
 
+bool criticalError;
 int page, page0;
 bool selected;
 int data, instant_read;
@@ -241,9 +236,11 @@ byte next;
 float factor;
 bool pulsed, pulsed_before;
 int time_lock = 16000;
+long CheckTempSensorPinTimeout=45000; //timeout for checking the thermistor pinout
 bool auto_lock;
 byte counter;
 int language;
+bool swapTempSensors;
 int goBackTextY = tft.height() / 2;
 
 double temperature[numTempSensors];
@@ -305,10 +302,15 @@ void setup() {
   pinDirection();
   initPIDTimers();
 
+/*
   if (!hardwareVerification()) {
+    if (criticalError) {
+      while (1);
+    }
     Serial.println("pulse to continue");
     while (digitalRead(pulse));
   }
+*/
 
   analogWrite(SCREENBACKLIGHT, backlight_intensity);
   initEncoders();
