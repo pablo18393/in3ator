@@ -7,7 +7,7 @@ void menu() {
     turnFansOff();
   }
   page = menuPage;
-  byte numWords = 5;
+  byte numWords = 4;
   print_text = 1;
   tft.setTextSize(1);
   tft.setTextColor(COLOR_MENU_TEXT);

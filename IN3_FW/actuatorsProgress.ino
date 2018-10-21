@@ -11,7 +11,7 @@ void actuatorsProgress() {
   setSensorsGraphicPosition();
   drawActuatorsSeparators();
   if (controlTemperature) {
-    temperatureAtStart = temperature[cornerNTC];
+    temperatureAtStart = temperature[roomNTC];
     printLoadingTemperatureBar();
     switch (language) {
       case spanish:
@@ -51,8 +51,8 @@ void actuatorsProgress() {
   }
   while (!digitalRead(pulse));
   turnFansOn();
-  if (temperatureAtStart > temperature[cornerNTC]) {
-    temperatureAtStart = temperature[cornerNTC];
+  if (temperatureAtStart > temperature[roomNTC]) {
+    temperatureAtStart = temperature[roomNTC];
   }
   if (controlTemperature) {
     if (temperaturePIDcontrol) {
@@ -71,9 +71,7 @@ void actuatorsProgress() {
     }
     while (!digitalRead(pulse)) {
       updateData();
-      if (digitalRead(pulse) == 0) {
-        back_mode();
-      }
+      back_mode();
     }
     blinkGoBackMessage();
   }
@@ -82,44 +80,45 @@ void actuatorsProgress() {
 void checkTempSensorPin() {
   //pending: program timeout too
   Serial.println("checking NTC pinout");
-  float prevCornerTemp = temperature[cornerNTC];
+  float prevroomTemp = temperature[roomNTC];
   float prevHeaterTemp = temperature[heaterNTC];
-  Serial.println(prevCornerTemp);
+  Serial.println(prevroomTemp);
   Serial.println(prevHeaterTemp);
-  bool exitCheck;
+  bool exitCheck = 0;
   long timeElapsedChecking = millis();
   turnFansOn();
   heatUp();
   while (!exitCheck) {
     updateData();
+    while (!digitalRead(pulse)) {
+      updateData();
+      back_mode();
+    }
     if (millis() - timeElapsedChecking > CheckTempSensorPinTimeout) {
       //error
     }
-    if ((temperature[heaterNTC] - prevHeaterTemp) > 5) {
+    if ((temperature[heaterNTC] - prevHeaterTemp) > CheckSensorRaiseTemp) {
       swapTempSensors = 0;
-      Serial.println("true");
-      //exitCheck = 1;
+      exitCheck = 1;
     }
-    if ((temperature[cornerNTC] - prevCornerTemp) > 5) {
-      Serial.println("false");
+    if ((temperature[roomNTC] - prevroomTemp) > CheckSensorRaiseTemp) {
       swapTempSensors = 1;
-      //exitCheck = 1;
+      EEPROM.write(EEPROM_swapTempSensors, swapTempSensors);
+      exitCheck = 1;
     }
     delay(500);
     printStatus();
-    Serial.println((temperature[cornerNTC] - prevCornerTemp));
-  }
-  EEPROM.write(EEPROM_swapTempSensors, swapTempSensors);
-  if (swapTempSensors) {
-    Serial.println("pins Swapped");
   }
 }
 
 
 void asignCorrectTempSensorsPin() {
   int valueRetainer = THERMISTOR_HEATER;
-  THERMISTOR_HEATER = THERMISTOR_CORNER;
-  THERMISTOR_CORNER = valueRetainer;
+  THERMISTOR_HEATER = THERMISTOR_ROOM;
+  THERMISTOR_ROOM = valueRetainer;
+  NTCpin[roomNTC] = {THERMISTOR_ROOM};
+  NTCpin[heaterNTC] = {THERMISTOR_HEATER};
+  Serial.println("NTC pins swapped");
 }
 
 void blinkGoBackMessage() {
@@ -138,7 +137,7 @@ void blinkGoBackMessage() {
 }
 
 void basicTemperatureControl() {
-  if (temperature[cornerNTC] < desiredIn3Temp) {
+  if (temperature[roomNTC] < desiredRoomTemp) {
     heatUp();
   }
   else {
@@ -147,7 +146,7 @@ void basicTemperatureControl() {
 }
 
 void basicHumidityControl() {
-  if (humidity < desiredIn3Hum) {
+  if (humidity < desiredRoomHum) {
     digitalWrite(HUMIDIFIER, HIGH);
   }
   else {
@@ -157,7 +156,7 @@ void basicHumidityControl() {
 
 void heatUp() {
   if (temperature[heaterNTC] < heaterLimitTemp) {
-    analogWrite(HEATER, 200);
+    analogWrite(HEATER, maxHeaterPWM);
   }
   else {
     analogWrite(HEATER, 0);

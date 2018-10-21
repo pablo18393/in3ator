@@ -18,7 +18,7 @@ void drawGraphicInterface() {
     text_size = 1;
     for (int i = 0; i < rectangles; i++) {
       ypos = graphicHeight(i);
-      if (pos_text[i] == 0) {
+      if (!pos_text[i]) {
         tft.drawString(words[i], width_select + side_gap, ypos, textFontSize);
       }
       else if (pos_text[i]) {
@@ -102,7 +102,7 @@ void drawGraphicInterface() {
         case calibrateSensorsPage:
           switch (i) {
             case temperatureCalibrationGraphicPosition:
-              tft.drawFloat(previousTemperature[cornerNTC], 1, valuePosition, ypos, textFontSize);
+              tft.drawFloat(previousTemperature[roomNTC], 1, valuePosition, ypos, textFontSize);
               break;
             case humidityCalibrationGraphicPosition:
               tft.drawFloat(humidity, 0, valuePosition, ypos, textFontSize);
@@ -144,7 +144,7 @@ void drawHeading() {
   }
   tft.setTextColor(COLOR_MENU);
   tft.drawCentreString(headingTitle, tft.width() / 2, height_heading / 5, textFontSize);
-  tft.drawCentreString(FWversion, tft.width() - 2 * letter_width, height_heading / 5, textFontSize);
+  tft.drawCentreString(FWversion, tft.width() - 3 * letter_width, height_heading / 5, textFontSize);
 }
 
 void eraseBar() {
@@ -183,7 +183,7 @@ void loadLogo() {
   tft.fillScreen(introBackColor);
   tft.setTextColor(introTextColor);
   drawIntroMessage();
-  for (int i = 0; i < backlight_intensity; i++) {
+  for (int i = 0; i <= backlight_intensity; i++) {
     analogWrite(SCREENBACKLIGHT, i);
     delay(brightenRate);
   }
@@ -195,6 +195,32 @@ void drawIntroMessage() {
   switch (language) {
     case english:
       words[0]  = "Welcome to in3";
+      break;
+    case spanish:
+      words[0]  = "Bienvenido a in3";
+      break;
+    case french:
+      words[0]  = "Bienvenue a in3";
+      break;
+  }
+  for (int i = 0; i < numWords; i++) {
+    tft.drawCentreString(words[i], tft.width() / 2, tft.height() / (2 + i) , textFontSize);
+  }
+}
+
+void drawHardwareErrorMessage() {
+  byte numErrors = 0;
+  for (int i = 0; i < hardwareComponents; i++) {
+    if (errorHardwareCode[i]) {
+      numErrors++;
+    }
+  }
+  byte numWords = 3 + numErrors;
+  switch (language) {
+    case english:
+      words[0]  = "Hardware error: critical";
+      words[1]  = "Hardware error";
+      words[2]  = "Hardware error";
       break;
     case spanish:
       words[0]  = "Bienvenido a in3";
@@ -288,7 +314,7 @@ void drawActuatorsSeparators() {
 
 void printLoadingHumidityBar() {
   barThickness = 3;
-  tft.drawFloat(desiredIn3Hum, 1, humBarPosX + barWidth / 2 - 30, humidityY, textFontSize);
+  tft.drawFloat(desiredRoomHum, 1, humBarPosX + barWidth / 2 - 30, humidityY, textFontSize);
   for (int i = 1; i <= barThickness; i++) {
     tft.drawRect(humBarPosX - barWidth / 2 - i, humBarPosY - barHeight / 2 - i, barWidth + i * 2, barHeight + i * 2, COLOR_FRAME_BAR);
   }
@@ -296,7 +322,7 @@ void printLoadingHumidityBar() {
 
 void printLoadingTemperatureBar() {
   barThickness = 3;
-  tft.drawFloat(desiredIn3Temp, 1, tempBarPosX + barWidth / 2 - 30, temperatureY, textFontSize);
+  tft.drawFloat(desiredRoomTemp, 1, tempBarPosX + barWidth / 2 - 30, temperatureY, textFontSize);
   for (int i = 1; i <= barThickness; i++) {
     tft.drawRect(tempBarPosX - barWidth / 2 - i, tempBarPosY - barHeight / 2 - i, barWidth + i * 2, barHeight + i * 2, COLOR_FRAME_BAR);
   }

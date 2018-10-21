@@ -5,22 +5,23 @@
 #include "DHT.h"
 #include <PID_v1.h>
 
-#define FWversion "v1.9"
+#define FWversion "v1.10"
 #define headingTitle "in3ator"
 
-//hardware verification. 1 is a mounted hardware, 0 a not mounted.
-#define HWPowerEn 1
-#define HWHeater 1
-#define HWGeneric 1
-#define HWFan1 1
-#define HWFan2 1
-#define HWFan3 1
-#define HWICT 1
-#define HWSterilize 1
-#define HWNTCHeater 1
-#define HWHumidifier 1
-#define HWNTCIn3 1
-
+//configuration variables
+#define debounceTime 100        //encoder debouncing time
+#define maxPWMvalue 255         //for maple mini
+#define maxHeaterPWM 255        //max power for heater, full power (255) is 50W
+#define temperature_fraction 20 //times to measure in a 
+#define mosfet_switch_time 100   //in millis, oversized
+#define timePressToSettings 5000 //in millis, time to press to go to settings window
+#define CheckSensorRaiseTemp 3   //in celsius degrees, the amount of degrees to differentiate heater or room NTC
+#define roomNTC 0
+#define heaterNTC 1
+#define bothNTC 2
+#define dhtSensor 2
+#define numNTC 2
+#define numTempSensors 3
 
 //EEPROM VARIABLES
 #define EEPROM_firstTurnOn 0
@@ -30,10 +31,11 @@
 #define EEPROM_diffHumidity 10
 #define EEPROM_diffTemperature 20
 #define EEPROM_swapTempSensors 30
+#define EEPROM_usedGenericMosfet 40
 #define EEPROM_checkStatus 100
 
 //display graphic geometric variables
-#define introDelay    2000      //initial delay between intro and menu
+#define introDelay    1000      //initial delay between intro and menu
 #define brightenRate  30        //intro brighten speed (Higher value, slower)
 #define valuePosition 245
 #define separatorPosition 240
@@ -65,19 +67,6 @@ bool controlHumidity;
 int ypos;
 bool print_text;
 
-//configuration variables
-#define debounceTime 100        //encoder debouncing time
-#define maxPWMvalue 255         //for maple mini
-#define maxHeaterPWM 150        //max power for heater, full power (255) is 50W
-#define temperature_fraction 20 //times to measure in a 
-#define mosfet_switch_time 100   //in millis, oversized
-#define cornerNTC 0
-#define heaterNTC 1
-#define bothNTC 2
-#define dhtSensor 2
-#define numNTC 2
-#define numTempSensors 3
-
 //pages
 #define menuPage 0
 #define actuatorsProgressPage 1
@@ -97,8 +86,8 @@ bool print_text;
 #define temperatureGraphicPosition 0
 #define humidityGraphicPosition 1
 #define LEDGraphicPosition 2
-#define settingsGraphicPosition 3
-#define startGraphicPosition 4
+#define settingsGraphicPosition 4
+#define startGraphicPosition 3
 //settings
 #define autoLockGraphicPosition 0
 #define languageGraphicPosition 1
@@ -121,8 +110,8 @@ bool print_text;
 
 #define DHTPIN 0
 #define SCREENBACKLIGHT 3
-byte THERMISTOR_HEATER=10;
-byte THERMISTOR_CORNER=11;
+byte THERMISTOR_HEATER = 10;
+byte THERMISTOR_ROOM = 11;
 #define ENCODER_A 12
 #define ENCODER_B 13
 #define POWER_EN 18
@@ -130,6 +119,7 @@ byte THERMISTOR_CORNER=11;
 #define FAN2 8
 #define FAN3 15
 #define HEATER 16
+#define GENERIC 16
 #define ICT 25
 #define STERILIZE 28
 #define HUMIDIFIER 27
@@ -142,6 +132,61 @@ byte THERMISTOR_CORNER=11;
 #define STERILIZE_FB 29
 #define HUMIDIFIER_FB 30
 #define pulse 14
+
+//hardware verification. 1 is a mounted hardware, 0 a not mounted.
+#define hardwareComponents 12
+byte errorHardwareCode[hardwareComponents];
+#define HWPowerEn 0
+#define HWHeater 1
+#define HWGeneric 1
+#define HWFan1 1
+#define HWFan2 1
+#define HWFan3 0
+#define HWICT 1
+#define HWSterilize 0
+#define HWHumidifier 1
+#define HWNTCHeater 1
+#define HWNTCRoom 1
+#define HWHUMSENSOR 1
+
+//number assigned to hardware
+#define HW_NUM_PowerEn 1         //hardware 1
+#define HW_NUM_Heater 2          //hardware 2
+#define HW_NUM_Generic 3         //hardware 3
+#define HW_NUM_Fan1 4            //hardware 4
+#define HW_NUM_Fan2 5            //hardware 5
+#define HW_NUM_Fan3 6            //hardware 6
+#define HW_NUM_ICT 7             //hardware 7
+#define HW_NUM_Sterilize 8       //hardware 8
+#define HW_NUM_Humidifier 9      //hardware 9
+#define HW_NUM_NTCHeater 10       //hardware 10
+#define HW_NUM_NTCRoom 11         //hardware 11
+#define HW_NUM_HUMSENSOR 12       //hardware 12
+
+
+//hardware critical check. 2 is a critical non interchangable hardware, 1 is a critical interchangable hardware, 0 a not critical and interchangable hardware.
+#define HW_CRIT_PowerEn 2
+#define HW_CRIT_Heater 1
+#define HW_CRIT_Generic 0
+#define HW_CRIT_Fan1 0
+#define HW_CRIT_Fan2 0
+#define HW_CRIT_Fan3 0
+#define HW_CRIT_ICT 1
+#define HW_CRIT_Sterilize 1
+#define HW_CRIT_Humidifier 1
+#define HW_CRIT_NTCHeater 2
+#define HW_CRIT_NTCRoom 2
+#define HW_CRIT_HUMSENSOR 2
+
+bool hardwareMounted[] = {HWPowerEn, HWHeater, HWGeneric, HWFan1, HWFan2, HWFan3, HWICT, HWSterilize, HWHumidifier, HWNTCHeater, HWNTCRoom};
+bool hardwareCritical[] = {HW_CRIT_PowerEn, HW_CRIT_Heater, HW_CRIT_Generic, HW_CRIT_Fan1, HW_CRIT_Fan2, HW_CRIT_Fan3, HW_CRIT_ICT, HW_CRIT_Sterilize, HW_CRIT_Humidifier, HW_CRIT_NTCHeater, HW_CRIT_NTCRoom};
+byte hardwareVerificationPin[] = {POWER_EN, HEATER, GENERIC, FAN1, FAN2, FAN3, ICT, STERILIZE, HUMIDIFIER, THERMISTOR_HEATER, THERMISTOR_ROOM};
+#define errorComponent[]={"Power enable MOSFET","Heater","Generic","Fan1","Fan2","Fan3","Jaundice LED","Sterilizer","Humidifier","Temperature sensor","Temperature sensor"}
+#define shortcircuit 2
+#define opencircuit 1
+bool testOK;
+bool testCritical;
+
 
 Adafruit_ILI9341_STM tft = Adafruit_ILI9341_STM(TFT_CS, TFT_DC, TFT_RST); // Use hardware SPI
 
@@ -173,7 +218,7 @@ Adafruit_ILI9341_STM tft = Adafruit_ILI9341_STM(TFT_CS, TFT_DC, TFT_RST); // Use
 DHT dht;
 
 #define MAXENCODERS 1
-const byte NTCpin[numNTC] = {THERMISTOR_HEATER, THERMISTOR_CORNER};
+byte NTCpin[numNTC] = {THERMISTOR_HEATER, THERMISTOR_ROOM};
 volatile int encstate[MAXENCODERS];
 volatile int encflag[MAXENCODERS];
 boolean A_set[MAXENCODERS];
@@ -184,8 +229,6 @@ int encoderpinA[MAXENCODERS] = {ENCODER_A}; // pin array of all encoder A inputs
 int encoderpinB[MAXENCODERS] = {ENCODER_B}; // pin array of all encoder B inputs
 unsigned int lastEncoderPos[MAXENCODERS];
 
-int firmwareVersion = 0;
-
 //Text position
 int humidityX;
 int humidityY;
@@ -193,7 +236,7 @@ int temperatureX;
 int temperatureY;
 
 //constants
-const byte heaterMaxTemp = 80;
+const byte heaterMaxTemp = 100;
 const byte fanMaxSpeed = 100;
 const byte LEDMaxIntensity = 100;
 const byte time_back_draw = 255;
@@ -236,7 +279,7 @@ byte next;
 float factor;
 bool pulsed, pulsed_before;
 int time_lock = 16000;
-long CheckTempSensorPinTimeout=45000; //timeout for checking the thermistor pinout
+long CheckTempSensorPinTimeout = 45000; //timeout for checking the thermistor pinout
 bool auto_lock;
 byte counter;
 int language;
@@ -248,8 +291,8 @@ double previousTemperature[numTempSensors];
 int previousHumidity;
 double desiredHeaterTemp;
 int humidity;
-double desiredIn3Temp = 36.5;
-int desiredIn3Hum = 80;
+double desiredRoomTemp = 36.5;
+int desiredRoomHum = 80;
 double heaterLimitTemp;
 int fanSpeed;
 int LEDIntensity;
@@ -275,44 +318,32 @@ volatile long interruptcounter;
 
 //PID VARIABLES
 double Kp_heater = 0.1, Ki_heater = 0.3, Kd_heater = 0.1;
-double Kp_in3 = 0.1, Ki_in3 = 0.3, Kd_in3 = 0.1;
+double Kp_room = 0.1, Ki_room = 0.3, Kd_room = 0.1;
 double PIDOutput[2];
 bool temperaturePIDcontrolStart;
 PID heaterPID(&temperature[heaterNTC], &PIDOutput[heaterNTC], &desiredHeaterTemp, Kp_heater, Ki_heater, Kd_heater, P_ON_M, DIRECT);
-PID in3PID(&temperature[cornerNTC], &PIDOutput[cornerNTC], &desiredIn3Temp, Kp_in3, Ki_in3, Kd_in3, P_ON_M, DIRECT);
+PID roomPID(&temperature[roomNTC], &PIDOutput[roomNTC], &desiredRoomTemp, Kp_room, Ki_room, Kd_room, P_ON_M, DIRECT);
 // timer
 #define temperaturePIDcontrol 0         //0 to disable, 1 to enable
 #define ENCODER_RATE 1000    // in microseconds; 
 #define NTCInterruptRate 20000    // in microseconds; 
-#define in3PIDRate 1000000    // in microseconds; 
-#define heaterPIDRate 200000   // times of in3PIDRate;
-int in3PIDfactor = in3PIDRate / NTCInterruptRate;
+#define roomPIDRate 1000000    // in microseconds; 
+#define heaterPIDRate 200000   // times of roomPIDRate;
+int roomPIDfactor = roomPIDRate / NTCInterruptRate;
 int heaterPIDfactor = heaterPIDRate / NTCInterruptRate;
 HardwareTimer timer(1);
-HardwareTimer in3PIDTimer(2);
+HardwareTimer roomPIDTimer(2);
 
 void setup() {
   Serial.begin(115200);
-  dht.setup(DHTPIN);
-  heaterPID.SetOutputLimits(0, maxHeaterPWM);
   initEEPROM();
+  pinDirection();
+  initPIDTimers();
   tft.begin();
   tft.setRotation(1);
   loadLogo();
-  pinDirection();
-  initPIDTimers();
-
-/*
-  if (!hardwareVerification()) {
-    if (criticalError) {
-      while (1);
-    }
-    Serial.println("pulse to continue");
-    while (digitalRead(pulse));
-  }
-*/
-
-  analogWrite(SCREENBACKLIGHT, backlight_intensity);
+  dht.setup(DHTPIN);
+  //hardwareVerification();
   initEncoders();
   newPosition = myEncoderRead();
   oldPosition = newPosition;

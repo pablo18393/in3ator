@@ -29,7 +29,7 @@ int updateData() {
 void updateSensors() {
   tft.setTextColor(COLOR_MENU);
   if (page == menuPage || (page == actuatorsProgressPage && controlTemperature)) {
-    tft.drawFloat(previousTemperature[cornerNTC], 1, temperatureX, temperatureY, textFontSize);
+    tft.drawFloat(previousTemperature[roomNTC], 1, temperatureX, temperatureY, textFontSize);
   }
   if (page != actuatorsProgressPage || controlHumidity) {
     drawHumidity();
@@ -37,14 +37,14 @@ void updateSensors() {
   updateTemp(bothNTC);
   tft.setTextColor(COLOR_MENU_TEXT);
   if (page == menuPage || (page == actuatorsProgressPage && controlTemperature)) {
-    tft.drawFloat(temperature[cornerNTC], 1, temperatureX, temperatureY, textFontSize);
-    previousTemperature[cornerNTC] = temperature[cornerNTC];
+    tft.drawFloat(temperature[roomNTC], 1, temperatureX, temperatureY, textFontSize);
+    previousTemperature[roomNTC] = temperature[roomNTC];
   }
   if (page == actuatorsProgressPage) {
     if (controlTemperature) {
       drawRightNumber(temperaturePercentage, tft.width() / 2, temperatureY);
       float previousTemperaturePercentage = temperaturePercentage;
-      temperaturePercentage = 100 - ((desiredIn3Temp - temperature[cornerNTC]) * 100 / (desiredIn3Temp - temperatureAtStart));
+      temperaturePercentage = 100 - ((desiredRoomTemp - temperature[roomNTC]) * 100 / (desiredRoomTemp - temperatureAtStart));
       if (temperaturePercentage > 99) {
         temperaturePercentage = 100;
       }
@@ -56,7 +56,7 @@ void updateSensors() {
     if (controlHumidity) {
       drawRightNumber(humidityPercentage, tft.width() / 2, humidityY);
       float previousHumidityPercentage = humidityPercentage;
-      humidityPercentage = 100 - ((desiredIn3Hum - humidity) * 100 / (desiredIn3Hum - humidityAtStart));
+      humidityPercentage = 100 - ((desiredRoomHum - humidity) * 100 / (desiredRoomHum - humidityAtStart));
       if (humidityPercentage > 99) {
         humidityPercentage = 100;
       }
@@ -96,16 +96,16 @@ void updateTemp(byte sensor) {
   byte endSensor;
 
   switch (sensor) {
-    case cornerNTC:
-      startSensor = cornerNTC;
-      endSensor = cornerNTC;
+    case roomNTC:
+      startSensor = roomNTC;
+      endSensor = roomNTC;
       break;
     case heaterNTC:
       startSensor = heaterNTC;
       endSensor = heaterNTC;
       break;
     case bothNTC:
-      startSensor = cornerNTC;
+      startSensor = roomNTC;
       endSensor = heaterNTC;
       break;
   }
@@ -208,8 +208,8 @@ void checkSerialPort() {
       case 'T':
         switch (Serial.read()) {
           case 'C':
-            diffTemperature[cornerNTC] = temperature[cornerNTC] - readSerialData();
-            temperature[cornerNTC] -= diffTemperature[cornerNTC];
+            diffTemperature[roomNTC] = temperature[roomNTC] - readSerialData();
+            temperature[roomNTC] -= diffTemperature[roomNTC];
             break;
           case 'H':
             diffTemperature[heaterNTC] = temperature[heaterNTC] - readSerialData();
@@ -239,9 +239,9 @@ int readSerialData() {
 }
 
 void printStatus() {
-  Serial.print(millis());
+  Serial.print(millis() / 1000);
   Serial.print(";");
-  Serial.print(desiredIn3Temp);
+  Serial.print(desiredRoomTemp);
   Serial.print(";");
   Serial.print(heaterLimitTemp);
   Serial.print(";");
@@ -249,9 +249,11 @@ void printStatus() {
     Serial.print(temperature[i]);
     Serial.print(";");
   }
+  Serial.print(desiredHeaterTemp);
+  Serial.print(";");
   Serial.print(humidity);
   Serial.print(";");
-  Serial.print(desiredHeaterTemp);
+  Serial.print(desiredRoomHum);
   Serial.print(";");
   Serial.println(PIDOutput[heaterNTC]);
 }
