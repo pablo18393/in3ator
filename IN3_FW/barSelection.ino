@@ -310,7 +310,7 @@ void barSelection() {
               diffHumidity = 0;
               EEPROM.write(EEPROM_diffTemperature, diffTemperature[roomNTC]);
               EEPROM.write(EEPROM_diffHumidity, diffHumidity);
-              readDHT22();
+              readHumSensor();
               updateTemp(bothNTC);
               calibrateSensors();
               break;

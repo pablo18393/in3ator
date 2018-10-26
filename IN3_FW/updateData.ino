@@ -69,19 +69,19 @@ void updateSensors() {
   last_temp_update = millis();
 }
 
-bool readDHT22() {
+bool readHumSensor() {
   timer.pause();
   int newTemp = dht.getTemperature();
   int newHumidity = dht.getHumidity();
   timer.refresh();
   timer.resume();
   if (newHumidity && newTemp) {
-    temperature[dhtSensor] = newTemp;
+    temperature[numNTC + dhtSensor] = newTemp;
     humidity = newHumidity;
     humidity += diffHumidity;
-    return ('TRUE');
+    return (1);
   }
-  return ('FALSE');
+  return (0);
 }
 
 void updateTemp(byte sensor) {
@@ -214,6 +214,9 @@ void checkSerialPort() {
           case 'H':
             diffTemperature[heaterNTC] = temperature[heaterNTC] - readSerialData();
             temperature[heaterNTC] -= diffTemperature[heaterNTC];
+            break;
+          case 'P':
+            Serial.println("ping");
             break;
           case 'R':
             nvic_sys_reset();

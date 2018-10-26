@@ -210,27 +210,36 @@ void drawIntroMessage() {
 
 void drawHardwareErrorMessage() {
   byte numErrors = 0;
+  byte j;
+  int yErrorPos = letter_height;
+  tft.drawCentreString("Hardware errors:", tft.width() / 2, yErrorPos , textFontSize);
+  yErrorPos += letter_height;
   for (int i = 0; i < hardwareComponents; i++) {
     if (errorHardwareCode[i]) {
       numErrors++;
+      if (yErrorPos > (tft.height() - 4 * letter_height)) {
+        i = hardwareComponents;
+      }
+      else {
+        tft.drawCentreString(errorComponent[i], tft.width() / 2, yErrorPos , textFontSize);
+        yErrorPos += letter_height;
+      }
     }
   }
-  byte numWords = 3 + numErrors;
-  switch (language) {
-    case english:
-      words[0]  = "Hardware error: critical";
-      words[1]  = "Hardware error";
-      words[2]  = "Hardware error";
-      break;
-    case spanish:
-      words[0]  = "Bienvenido a in3";
-      break;
-    case french:
-      words[0]  = "Bienvenue a in3";
-      break;
+  if (testCritical) {
+    tft.setTextColor(ILI9341_RED);
+    yErrorPos += letter_height;
+    tft.drawCentreString("CRITICAL ERROR, FIX", tft.width() / 2, yErrorPos , textFontSize);
+    yErrorPos += letter_height;
+    tft.drawCentreString("PROBLEM TO CONTINUE", tft.width() / 2, yErrorPos , textFontSize);
   }
-  for (int i = 0; i < numWords; i++) {
-    tft.drawCentreString(words[i], tft.width() / 2, tft.height() / (2 + i) , textFontSize);
+  else {
+    tft.setTextColor(ILI9341_ORANGE);
+    tft.drawCentreString("lost functions:", tft.width() / 2, yErrorPos , textFontSize);
+    yErrorPos += letter_height;
+    tft.drawCentreString("temperature, jaundice LED", tft.width() / 2, yErrorPos , textFontSize);
+    yErrorPos += letter_height;
+    tft.drawCentreString("pulse to continue", tft.width() / 2, yErrorPos , textFontSize);
   }
 }
 
@@ -277,7 +286,7 @@ int graphicHeight(int position) {
 }
 
 void drawHumidity() {
-  if (readDHT22()) {
+  if (readHumSensor()) {
     tft.setTextColor(COLOR_MENU);
     drawCentreNumber(previousHumidity, humidityX, humidityY);
     tft.setTextColor(COLOR_MENU_TEXT);

@@ -5,7 +5,7 @@
 #include "DHT.h"
 #include <PID_v1.h>
 
-#define FWversion "v1.10"
+#define FWversion "v1.11"
 #define headingTitle "in3ator"
 
 //configuration variables
@@ -19,9 +19,10 @@
 #define roomNTC 0
 #define heaterNTC 1
 #define bothNTC 2
-#define dhtSensor 2
+#define dhtSensor 1
 #define numNTC 2
 #define numTempSensors 3
+byte numSensors;
 
 //EEPROM VARIABLES
 #define EEPROM_firstTurnOn 0
@@ -128,6 +129,7 @@ byte THERMISTOR_ROOM = 11;
 #define FAN1_FB 20
 #define FAN2_FB 21
 #define FAN3_FB 22
+#define GENERIC_FB 22
 #define ICT_FB 26
 #define STERILIZE_FB 29
 #define HUMIDIFIER_FB 30
@@ -136,32 +138,32 @@ byte THERMISTOR_ROOM = 11;
 //hardware verification. 1 is a mounted hardware, 0 a not mounted.
 #define hardwareComponents 12
 byte errorHardwareCode[hardwareComponents];
-#define HWPowerEn 0
+#define HWPowerEn 1
 #define HWHeater 1
 #define HWGeneric 1
 #define HWFan1 1
 #define HWFan2 1
-#define HWFan3 0
+#define HWFan3 1
 #define HWICT 1
-#define HWSterilize 0
+#define HWSterilize 1
 #define HWHumidifier 1
 #define HWNTCHeater 1
 #define HWNTCRoom 1
-#define HWHUMSENSOR 1
+#define HWHUMSensor 1
 
 //number assigned to hardware
-#define HW_NUM_PowerEn 1         //hardware 1
-#define HW_NUM_Heater 2          //hardware 2
-#define HW_NUM_Generic 3         //hardware 3
-#define HW_NUM_Fan1 4            //hardware 4
-#define HW_NUM_Fan2 5            //hardware 5
-#define HW_NUM_Fan3 6            //hardware 6
-#define HW_NUM_ICT 7             //hardware 7
-#define HW_NUM_Sterilize 8       //hardware 8
-#define HW_NUM_Humidifier 9      //hardware 9
-#define HW_NUM_NTCHeater 10       //hardware 10
-#define HW_NUM_NTCRoom 11         //hardware 11
-#define HW_NUM_HUMSENSOR 12       //hardware 12
+#define HW_NUM_PowerEn 0         //hardware 1
+#define HW_NUM_Heater 1          //hardware 2
+#define HW_NUM_Generic 2         //hardware 3
+#define HW_NUM_Fan1 3            //hardware 4
+#define HW_NUM_Fan2 4            //hardware 5
+#define HW_NUM_Fan3 5            //hardware 6
+#define HW_NUM_ICT 6             //hardware 7
+#define HW_NUM_Sterilize 7       //hardware 8
+#define HW_NUM_Humidifier 8      //hardware 9
+#define HW_NUM_NTCHeater 9       //hardware 10
+#define HW_NUM_NTCRoom 10         //hardware 11
+#define HW_NUM_HUMSensor 11       //hardware 12
 
 
 //hardware critical check. 2 is a critical non interchangable hardware, 1 is a critical interchangable hardware, 0 a not critical and interchangable hardware.
@@ -178,10 +180,11 @@ byte errorHardwareCode[hardwareComponents];
 #define HW_CRIT_NTCRoom 2
 #define HW_CRIT_HUMSENSOR 2
 
-bool hardwareMounted[] = {HWPowerEn, HWHeater, HWGeneric, HWFan1, HWFan2, HWFan3, HWICT, HWSterilize, HWHumidifier, HWNTCHeater, HWNTCRoom};
-bool hardwareCritical[] = {HW_CRIT_PowerEn, HW_CRIT_Heater, HW_CRIT_Generic, HW_CRIT_Fan1, HW_CRIT_Fan2, HW_CRIT_Fan3, HW_CRIT_ICT, HW_CRIT_Sterilize, HW_CRIT_Humidifier, HW_CRIT_NTCHeater, HW_CRIT_NTCRoom};
-byte hardwareVerificationPin[] = {POWER_EN, HEATER, GENERIC, FAN1, FAN2, FAN3, ICT, STERILIZE, HUMIDIFIER, THERMISTOR_HEATER, THERMISTOR_ROOM};
-#define errorComponent[]={"Power enable MOSFET","Heater","Generic","Fan1","Fan2","Fan3","Jaundice LED","Sterilizer","Humidifier","Temperature sensor","Temperature sensor"}
+bool hardwareMounted[] = {HWPowerEn, HWHeater, HWGeneric, HWFan1, HWFan2, HWFan3, HWICT, HWSterilize, HWHumidifier, HWNTCHeater, HWNTCRoom, HWHUMSensor};
+bool hardwareCritical[] = {HW_CRIT_PowerEn, HW_CRIT_Heater, HW_CRIT_Generic, HW_CRIT_Fan1, HW_CRIT_Fan2, HW_CRIT_Fan3, HW_CRIT_ICT, HW_CRIT_Sterilize, HW_CRIT_Humidifier, HW_CRIT_NTCHeater, HW_CRIT_NTCRoom, HW_CRIT_HUMSENSOR};
+byte hardwareVerificationPin[] = {POWER_EN, HEATER, GENERIC, FAN1, FAN2, FAN3, ICT, STERILIZE, HUMIDIFIER};
+byte hardwareVerificationPin_FB[] = {POWER_EN_FB, HEATER_FB, GENERIC_FB, FAN1_FB, FAN2_FB, FAN3_FB, ICT_FB, STERILIZE_FB, HUMIDIFIER_FB};
+char* errorComponent[] = {"Power enable MOSFET", "Heater", "Generic", "Fan1", "Fan2", "Fan3", "Jaundice LED", "Sterilizer", "Humidifier", "Temperature sensor", "Temperature sensor", "Humidity sensor"};
 #define shortcircuit 2
 #define opencircuit 1
 bool testOK;
@@ -336,6 +339,9 @@ HardwareTimer roomPIDTimer(2);
 
 void setup() {
   Serial.begin(115200);
+  while (!Serial);
+  Serial.print("IN3ATOR, VERSION ");
+  Serial.println(FWversion);
   initEEPROM();
   pinDirection();
   initPIDTimers();
@@ -343,7 +349,15 @@ void setup() {
   tft.setRotation(1);
   loadLogo();
   dht.setup(DHTPIN);
-  //hardwareVerification();
+  while (1) {
+    tft.fillScreen(introTextColor);
+    tft.setTextColor(introBackColor);
+    hardwareVerification();
+    while (digitalRead(pulse));
+    delay(100);
+    while (!digitalRead(pulse));
+    delay(100);
+  }
   initEncoders();
   newPosition = myEncoderRead();
   oldPosition = newPosition;
@@ -362,4 +376,14 @@ void pinDirection() {
   pinMode(FAN3, OUTPUT);
   pinMode(STERILIZE, OUTPUT);
   pinMode(HUMIDIFIER, OUTPUT);
+
+  digitalWrite(SCREENBACKLIGHT, LOW);
+  digitalWrite(ICT, LOW);
+  digitalWrite(HEATER, LOW);
+  digitalWrite(POWER_EN, LOW);
+  digitalWrite(FAN1, LOW);
+  digitalWrite(FAN2, LOW);
+  digitalWrite(FAN3, LOW);
+  digitalWrite(STERILIZE, LOW);
+  digitalWrite(HUMIDIFIER, LOW);
 }
