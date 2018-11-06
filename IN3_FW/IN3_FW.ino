@@ -5,7 +5,7 @@
 #include "DHT.h"
 #include <PID_v1.h>
 
-#define FWversion "v1.11"
+#define FWversion "v1.12"
 #define headingTitle "in3ator"
 
 //configuration variables
@@ -339,7 +339,6 @@ HardwareTimer roomPIDTimer(2);
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial);
   Serial.print("IN3ATOR, VERSION ");
   Serial.println(FWversion);
   initEEPROM();
@@ -349,6 +348,7 @@ void setup() {
   tft.setRotation(1);
   loadLogo();
   dht.setup(DHTPIN);
+  /*
   while (1) {
     tft.fillScreen(introTextColor);
     tft.setTextColor(introBackColor);
@@ -358,6 +358,7 @@ void setup() {
     while (!digitalRead(pulse));
     delay(100);
   }
+  */
   initEncoders();
   newPosition = myEncoderRead();
   oldPosition = newPosition;
