@@ -1,5 +1,5 @@
 void settings() {
-  byte numWords = 5;
+  byte numWords = 6;
   page = settingsPage;
   print_text = 1;
   tft.setTextSize(1);
@@ -14,6 +14,7 @@ void settings() {
       words[autoLockGraphicPosition]  = "Auto lock";
       words[languageGraphicPosition] = "Language";
       words[heaterTempGraphicPosition] = "Heater temp";
+      words[fanGraphicPosition] = "Fan speed";
       words[setStandardValuesGraphicPosition] = "Set standard values";
       words[calibrateGraphicPosition] = "Calibrate";
       break;
@@ -21,6 +22,7 @@ void settings() {
       words[autoLockGraphicPosition]  = "Auto bloqueo";
       words[languageGraphicPosition] = "Idioma";
       words[heaterTempGraphicPosition] = "Temp calefactor";
+      words[fanGraphicPosition] = "Ventilador";
       words[setStandardValuesGraphicPosition] = "Fijar valores estandar";
       words[calibrateGraphicPosition] = "Calibrar";
       break;
@@ -28,6 +30,7 @@ void settings() {
       words[autoLockGraphicPosition]  = "verrouillage auto";
       words[languageGraphicPosition] = "Langue";
       words[heaterTempGraphicPosition] = "Temp chauffage";
+      words[fanGraphicPosition] = "Ventilateur";
       words[setStandardValuesGraphicPosition] = "definir valeurs standard";
       words[calibrateGraphicPosition] = "etalonner";
       break;

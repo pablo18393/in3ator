@@ -48,6 +48,8 @@ void loadStandardValues() {
   EEPROM.write(EEPROM_diffHumidity, diffHumidity);
   heaterLimitTemp = 70;
   EEPROM.write(EEPROM_heaterLimitTemp, heaterLimitTemp);
+  fanSpeed=60;
+  EEPROM.write(EEPROM_fanSpeed, fanSpeed);
 }
 
 void recapVariables() {
@@ -63,6 +65,7 @@ void recapVariables() {
     diffHumidity -= 65535;
   }
   heaterLimitTemp = EEPROM.read(EEPROM_heaterLimitTemp);
+  fanSpeed = EEPROM.read(EEPROM_fanSpeed);
   swapTempSensors = EEPROM.read(EEPROM_swapTempSensors);
   if (swapTempSensors) {
     asignCorrectTempSensorsPin();

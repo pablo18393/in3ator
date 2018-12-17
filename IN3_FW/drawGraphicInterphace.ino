@@ -97,6 +97,10 @@ void drawGraphicInterface() {
               drawRightNumber(heaterLimitTemp, 280, ypos);
               tft.drawRightString("C", unitPosition, ypos, textFontSize);
               break;
+            case fanGraphicPosition:
+              drawRightNumber(fanSpeed, 280, ypos);
+              tft.drawRightString("%", unitPosition, ypos, textFontSize);
+              break;
           }
           break;
         case calibrateSensorsPage:

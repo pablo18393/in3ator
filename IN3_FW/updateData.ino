@@ -76,7 +76,7 @@ bool readHumSensor() {
   timer.refresh();
   timer.resume();
   if (newHumidity && newTemp) {
-    temperature[numNTC + dhtSensor] = newTemp;
+//    temperature[numNTC + dhtSensor] = newTemp;
     humidity = newHumidity;
     humidity += diffHumidity;
     return (1);
@@ -192,15 +192,15 @@ void turnActuatorsOff() {
 }
 
 void turnFansOn() {
-  digitalWrite(FAN1, HIGH);
-  digitalWrite(FAN2, HIGH);
-  digitalWrite(FAN3, HIGH);
+  analogWrite(FAN_HP, fanSpeed*2.55);
+  digitalWrite(FAN_LP, HIGH);
+  digitalWrite(FAN_EXTRA, HIGH);
 }
 
 void turnFansOff() {
-  digitalWrite(FAN1, LOW);
-  digitalWrite(FAN2, LOW);
-  digitalWrite(FAN3, LOW);
+  analogWrite(FAN_HP, LOW);
+  digitalWrite(FAN_LP, LOW);
+  digitalWrite(FAN_EXTRA, LOW);
 }
 void checkSerialPort() {
   if (Serial.available()) {

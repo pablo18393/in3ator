@@ -263,6 +263,35 @@ void barSelection() {
                 move = 0;
               }
               break;
+            case fanGraphicPosition:
+              while (digitalRead(pulse)) {
+                updateData();
+                turnFansOn();
+                if (move && -move + fanSpeed >= 0 && -move + fanSpeed <= fanMaxSpeed) {
+                  tft.setTextColor(COLOR_MENU);
+                  drawRightNumber(fanSpeed, 280, ypos);
+                  if (!fanSpeed && move) {
+                    tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
+                    tft.setTextColor(COLOR_MENU_TEXT);
+                    tft.drawRightString("%", unitPosition, ypos, textFontSize);
+                  }
+                  fanSpeed -= 5 * move;
+                  EEPROM.write(EEPROM_fanSpeed, fanSpeed);
+                  tft.setTextColor(COLOR_MENU_TEXT);
+                  if (!fanSpeed && move) {
+                    tft.setTextColor(COLOR_MENU);
+                    tft.drawRightString("%", unitPosition, ypos, textFontSize);
+                    tft.setTextColor(COLOR_MENU_TEXT);
+                    tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
+                  }
+                  else {
+                    drawRightNumber(fanSpeed, 280, ypos);
+                  }
+                }
+                move = 0;
+              }
+              turnFansOff();
+              break;
             case setStandardValuesGraphicPosition:
               loadStandardValues();
               settings();

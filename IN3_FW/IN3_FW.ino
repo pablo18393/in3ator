@@ -5,7 +5,7 @@
 #include "DHT.h"
 #include <PID_v1.h>
 
-#define FWversion "v1.12"
+#define FWversion "v1.13"
 #define headingTitle "in3ator"
 
 //configuration variables
@@ -29,6 +29,7 @@ byte numSensors;
 #define EEPROM_autoLock 1
 #define EEPROM_language 2
 #define EEPROM_heaterLimitTemp 3
+#define EEPROM_fanSpeed 5
 #define EEPROM_diffHumidity 10
 #define EEPROM_diffTemperature 20
 #define EEPROM_swapTempSensors 30
@@ -93,8 +94,9 @@ bool print_text;
 #define autoLockGraphicPosition 0
 #define languageGraphicPosition 1
 #define heaterTempGraphicPosition 2
-#define setStandardValuesGraphicPosition 3
-#define calibrateGraphicPosition 4
+#define fanGraphicPosition 3
+#define setStandardValuesGraphicPosition 4
+#define calibrateGraphicPosition 5
 //settings
 #define temperatureCalibrationGraphicPosition 0
 #define humidityCalibrationGraphicPosition 1
@@ -116,9 +118,9 @@ byte THERMISTOR_ROOM = 11;
 #define ENCODER_A 12
 #define ENCODER_B 13
 #define POWER_EN 18
-#define FAN1 9
-#define FAN2 8
-#define FAN3 15
+#define FAN_HP 9
+#define FAN_LP 8
+#define FAN_EXTRA 15
 #define HEATER 16
 #define GENERIC 16
 #define ICT 25
@@ -126,9 +128,9 @@ byte THERMISTOR_ROOM = 11;
 #define HUMIDIFIER 27
 #define HEATER_FB 17
 #define POWER_EN_FB 19
-#define FAN1_FB 20
-#define FAN2_FB 21
-#define FAN3_FB 22
+#define FAN_HP_FB 20
+#define FAN_LP_FB 21
+#define FAN_EXTRA_FB 22
 #define GENERIC_FB 22
 #define ICT_FB 26
 #define STERILIZE_FB 29
@@ -141,9 +143,9 @@ byte errorHardwareCode[hardwareComponents];
 #define HWPowerEn 1
 #define HWHeater 1
 #define HWGeneric 1
-#define HWFan1 1
-#define HWFan2 1
-#define HWFan3 1
+#define HWFAN_HP 1
+#define HWFAN_LP 1
+#define HWFAN_EXTRA 1
 #define HWICT 1
 #define HWSterilize 1
 #define HWHumidifier 1
@@ -155,9 +157,9 @@ byte errorHardwareCode[hardwareComponents];
 #define HW_NUM_PowerEn 0         //hardware 1
 #define HW_NUM_Heater 1          //hardware 2
 #define HW_NUM_Generic 2         //hardware 3
-#define HW_NUM_Fan1 3            //hardware 4
-#define HW_NUM_Fan2 4            //hardware 5
-#define HW_NUM_Fan3 5            //hardware 6
+#define HW_NUM_FAN_HP 3            //hardware 4
+#define HW_NUM_FAN_LP 4            //hardware 5
+#define HW_NUM_FAN_EXTRA 5            //hardware 6
 #define HW_NUM_ICT 6             //hardware 7
 #define HW_NUM_Sterilize 7       //hardware 8
 #define HW_NUM_Humidifier 8      //hardware 9
@@ -170,9 +172,9 @@ byte errorHardwareCode[hardwareComponents];
 #define HW_CRIT_PowerEn 2
 #define HW_CRIT_Heater 1
 #define HW_CRIT_Generic 0
-#define HW_CRIT_Fan1 0
-#define HW_CRIT_Fan2 0
-#define HW_CRIT_Fan3 0
+#define HW_CRIT_FAN_HP 0
+#define HW_CRIT_FAN_LP 0
+#define HW_CRIT_FAN_EXTRA 0
 #define HW_CRIT_ICT 1
 #define HW_CRIT_Sterilize 1
 #define HW_CRIT_Humidifier 1
@@ -180,11 +182,11 @@ byte errorHardwareCode[hardwareComponents];
 #define HW_CRIT_NTCRoom 2
 #define HW_CRIT_HUMSENSOR 2
 
-bool hardwareMounted[] = {HWPowerEn, HWHeater, HWGeneric, HWFan1, HWFan2, HWFan3, HWICT, HWSterilize, HWHumidifier, HWNTCHeater, HWNTCRoom, HWHUMSensor};
-bool hardwareCritical[] = {HW_CRIT_PowerEn, HW_CRIT_Heater, HW_CRIT_Generic, HW_CRIT_Fan1, HW_CRIT_Fan2, HW_CRIT_Fan3, HW_CRIT_ICT, HW_CRIT_Sterilize, HW_CRIT_Humidifier, HW_CRIT_NTCHeater, HW_CRIT_NTCRoom, HW_CRIT_HUMSENSOR};
-byte hardwareVerificationPin[] = {POWER_EN, HEATER, GENERIC, FAN1, FAN2, FAN3, ICT, STERILIZE, HUMIDIFIER};
-byte hardwareVerificationPin_FB[] = {POWER_EN_FB, HEATER_FB, GENERIC_FB, FAN1_FB, FAN2_FB, FAN3_FB, ICT_FB, STERILIZE_FB, HUMIDIFIER_FB};
-char* errorComponent[] = {"Power enable MOSFET", "Heater", "Generic", "Fan1", "Fan2", "Fan3", "Jaundice LED", "Sterilizer", "Humidifier", "Temperature sensor", "Temperature sensor", "Humidity sensor"};
+bool hardwareMounted[] = {HWPowerEn, HWHeater, HWGeneric, HWFAN_HP, HWFAN_LP, HWFAN_EXTRA, HWICT, HWSterilize, HWHumidifier, HWNTCHeater, HWNTCRoom, HWHUMSensor};
+bool hardwareCritical[] = {HW_CRIT_PowerEn, HW_CRIT_Heater, HW_CRIT_Generic, HW_CRIT_FAN_HP, HW_CRIT_FAN_LP, HW_CRIT_FAN_EXTRA, HW_CRIT_ICT, HW_CRIT_Sterilize, HW_CRIT_Humidifier, HW_CRIT_NTCHeater, HW_CRIT_NTCRoom, HW_CRIT_HUMSENSOR};
+byte hardwareVerificationPin[] = {POWER_EN, HEATER, GENERIC, FAN_HP, FAN_LP, FAN_EXTRA, ICT, STERILIZE, HUMIDIFIER};
+byte hardwareVerificationPin_FB[] = {POWER_EN_FB, HEATER_FB, GENERIC_FB, FAN_HP_FB, FAN_LP_FB, FAN_EXTRA_FB, ICT_FB, STERILIZE_FB, HUMIDIFIER_FB};
+char* errorComponent[] = {"Power enable MOSFET", "Heater", "Generic", "FAN_HP", "FAN_LP", "FAN_EXTRA", "Jaundice LED", "Sterilizer", "Humidifier", "Temperature sensor", "Temperature sensor", "Humidity sensor"};
 #define shortcircuit 2
 #define opencircuit 1
 bool testOK;
@@ -372,9 +374,9 @@ void pinDirection() {
   pinMode(ICT, OUTPUT);
   pinMode(HEATER, OUTPUT);
   pinMode(POWER_EN, OUTPUT);
-  pinMode(FAN1, OUTPUT);
-  pinMode(FAN2, OUTPUT);
-  pinMode(FAN3, OUTPUT);
+  pinMode(FAN_HP, OUTPUT);
+  pinMode(FAN_LP, OUTPUT);
+  pinMode(FAN_EXTRA, OUTPUT);
   pinMode(STERILIZE, OUTPUT);
   pinMode(HUMIDIFIER, OUTPUT);
 
@@ -382,9 +384,9 @@ void pinDirection() {
   digitalWrite(ICT, LOW);
   digitalWrite(HEATER, LOW);
   digitalWrite(POWER_EN, LOW);
-  digitalWrite(FAN1, LOW);
-  digitalWrite(FAN2, LOW);
-  digitalWrite(FAN3, LOW);
+  digitalWrite(FAN_HP, LOW);
+  digitalWrite(FAN_LP, LOW);
+  digitalWrite(FAN_EXTRA, LOW);
   digitalWrite(STERILIZE, LOW);
   digitalWrite(HUMIDIFIER, LOW);
 }
