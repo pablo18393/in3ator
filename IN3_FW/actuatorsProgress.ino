@@ -94,6 +94,11 @@ void checkTempSensorPin() {
       updateData();
       back_mode();
     }
+    if (temperature[roomNTC] > temperature[heaterNTC] + CheckSensorRaiseTemp) {
+      swapTempSensors = 1;
+      EEPROM.write(EEPROM_swapTempSensors, swapTempSensors);
+      exitCheck = 1;
+    }
     if (millis() - timeElapsedChecking > CheckTempSensorPinTimeout) {
       //error
     }
@@ -157,9 +162,11 @@ void basicHumidityControl() {
 void heatUp() {
   if (temperature[heaterNTC] < heaterLimitTemp) {
     analogWrite(HEATER, maxHeaterPWM);
+    heaterPower = maxHeaterPWM;
   }
   else {
     analogWrite(HEATER, 0);
+    heaterPower = 0;
   }
 }
 

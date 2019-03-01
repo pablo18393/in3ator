@@ -5,13 +5,12 @@
 #include "DHT.h"
 #include <PID_v1.h>
 
-#define FWversion "v1.13"
+#define FWversion "v1.14"
 #define headingTitle "in3ator"
 
 //configuration variables
 #define debounceTime 100        //encoder debouncing time
 #define maxPWMvalue 255         //for maple mini
-#define maxHeaterPWM 255        //max power for heater, full power (255) is 50W
 #define temperature_fraction 20 //times to measure in a 
 #define mosfet_switch_time 100   //in millis, oversized
 #define timePressToSettings 5000 //in millis, time to press to go to settings window
@@ -22,6 +21,8 @@
 #define dhtSensor 1
 #define numNTC 2
 #define numTempSensors 3
+byte maxHeaterPWM = 170;      //max power for heater, full power (255) is 50W
+byte heaterPower;
 byte numSensors;
 
 //EEPROM VARIABLES
@@ -341,8 +342,6 @@ HardwareTimer roomPIDTimer(2);
 
 void setup() {
   Serial.begin(115200);
-  Serial.print("IN3ATOR, VERSION ");
-  Serial.println(FWversion);
   initEEPROM();
   pinDirection();
   initPIDTimers();
@@ -351,7 +350,7 @@ void setup() {
   loadLogo();
   dht.setup(DHTPIN);
   /*
-  while (1) {
+    while (1) {
     tft.fillScreen(introTextColor);
     tft.setTextColor(introBackColor);
     hardwareVerification();
@@ -359,8 +358,10 @@ void setup() {
     delay(100);
     while (!digitalRead(pulse));
     delay(100);
-  }
+    }
   */
+  Serial.print("IN3ATOR, VERSION ");
+  Serial.println(FWversion);
   initEncoders();
   newPosition = myEncoderRead();
   oldPosition = newPosition;

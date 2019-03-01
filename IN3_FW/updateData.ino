@@ -76,7 +76,7 @@ bool readHumSensor() {
   timer.refresh();
   timer.resume();
   if (newHumidity && newTemp) {
-//    temperature[numNTC + dhtSensor] = newTemp;
+    //    temperature[numNTC + dhtSensor] = newTemp;
     humidity = newHumidity;
     humidity += diffHumidity;
     return (1);
@@ -192,7 +192,7 @@ void turnActuatorsOff() {
 }
 
 void turnFansOn() {
-  analogWrite(FAN_HP, fanSpeed*2.55);
+  analogWrite(FAN_HP, fanSpeed * 2.55);
   digitalWrite(FAN_LP, HIGH);
   digitalWrite(FAN_EXTRA, HIGH);
 }
@@ -215,17 +215,26 @@ void checkSerialPort() {
             diffTemperature[heaterNTC] = temperature[heaterNTC] - readSerialData();
             temperature[heaterNTC] -= diffTemperature[heaterNTC];
             break;
-          case 'P':
-            Serial.println("ping");
-            break;
-          case 'R':
-            nvic_sys_reset();
-            break;
         }
         break;
       case 'H':
         diffHumidity = humidity - readSerialData();
         humidity -= diffHumidity;
+        break;
+      case 'P':
+        maxHeaterPWM = readSerialData();
+        Serial.print("Heater max PWM is: ");
+        Serial.println(maxHeaterPWM);
+        break;
+      case 'R':
+        nvic_sys_reset();
+        break;
+      case 'W':
+        byte humidifierPWM;
+        Serial.print("Humidifier working PWM is: ");
+        humidifierPWM = readSerialData();
+        analogWrite(HUMIDIFIER, humidifierPWM);
+        Serial.println(humidifierPWM);
         break;
     }
   }
@@ -257,6 +266,8 @@ void printStatus() {
   Serial.print(humidity);
   Serial.print(";");
   Serial.print(desiredRoomHum);
+  Serial.print(";");
+  Serial.print(heaterPower);
   Serial.print(";");
   Serial.println(PIDOutput[heaterNTC]);
 }
