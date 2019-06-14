@@ -26,7 +26,7 @@ void calibrateSensors() {
       break;
   }
   rectangles = numWords;
-  drawGraphicInterface();
+  graphics();
   drawHeading();
   while (!digitalRead(pulse)) {
     updateData();

@@ -46,4 +46,3 @@ void stopPID() {
   temperaturePIDcontrolStart = 0;
   analogWrite(HEATER, 0);
 }
-

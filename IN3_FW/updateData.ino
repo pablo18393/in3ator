@@ -1,3 +1,5 @@
+bool displayProcessPercentage = 0;
+
 int updateData() {
   newPosition = myEncoderRead();
   move = oldPosition - newPosition;
@@ -42,8 +44,10 @@ void updateSensors() {
   }
   if (page == actuatorsProgressPage) {
     if (controlTemperature) {
-      drawRightNumber(temperaturePercentage, tft.width() / 2, temperatureY);
       float previousTemperaturePercentage = temperaturePercentage;
+      if (displayProcessPercentage) {
+        drawRightNumber(temperaturePercentage, tft.width() / 2, temperatureY);
+      }
       temperaturePercentage = 100 - ((desiredRoomTemp - temperature[roomNTC]) * 100 / (desiredRoomTemp - temperatureAtStart));
       if (temperaturePercentage > 99) {
         temperaturePercentage = 100;
@@ -51,11 +55,14 @@ void updateSensors() {
       if (temperaturePercentage < 0) {
         temperaturePercentage = 0;
       }
+
       updateLoadingTemperatureBar(int(previousTemperaturePercentage), int(temperaturePercentage));
     }
     if (controlHumidity) {
-      drawRightNumber(humidityPercentage, tft.width() / 2, humidityY);
       float previousHumidityPercentage = humidityPercentage;
+      if (displayProcessPercentage) {
+        drawRightNumber(humidityPercentage, tft.width() / 2, humidityY);
+      }
       humidityPercentage = 100 - ((desiredRoomHum - humidity) * 100 / (desiredRoomHum - humidityAtStart));
       if (humidityPercentage > 99) {
         humidityPercentage = 100;
@@ -63,6 +70,7 @@ void updateSensors() {
       if (humidityPercentage < 0) {
         humidityPercentage = 0;
       }
+
       updateLoadingHumidityBar(int(previousHumidityPercentage), int(humidityPercentage));
     }
   }
@@ -70,11 +78,11 @@ void updateSensors() {
 }
 
 bool readHumSensor() {
-  timer.pause();
+  sensorsTimer.pause();
   int newTemp = dht.getTemperature();
   int newHumidity = dht.getHumidity();
-  timer.refresh();
-  timer.resume();
+  sensorsTimer.refresh();
+  sensorsTimer.resume();
   if (newHumidity && newTemp) {
     //    temperature[numNTC + dhtSensor] = newTemp;
     humidity = newHumidity;
@@ -144,10 +152,13 @@ void updateLoadingTemperatureBar(float prev, float actual) {
       barX -= barDiffWidth - 1;
     }
     tft.fillRect(barX, barY, barDiffWidth, barHeight, color);
-    tft.setTextColor(COLOR_MENU);
-    drawRightNumber(prev, tft.width() / 2, temperatureY);
-    tft.setTextColor(COLOR_MENU_TEXT);
-    drawRightNumber(actual, tft.width() / 2, temperatureY);
+    if (displayProcessPercentage) {
+      tft.setTextColor(COLOR_MENU);
+      drawRightNumber(prev, tft.width() / 2, temperatureY);
+      tft.setTextColor(COLOR_MENU_TEXT);
+      drawRightNumber(actual, tft.width() / 2, temperatureY);
+      tft.drawCentreString("%", tft.width() / 2 + 14, temperatureY , textFontSize);
+    }
   }
 }
 
@@ -168,10 +179,13 @@ void updateLoadingHumidityBar(float prev, float actual) {
       barX -= barDiffWidth - 1;
     }
     tft.fillRect(barX, barY, barDiffWidth, barHeight, color);
-    tft.setTextColor(COLOR_MENU);
-    drawRightNumber(prev, tft.width() / 2, humidityY);
-    tft.setTextColor(COLOR_MENU_TEXT);
-    drawRightNumber(actual, tft.width() / 2, humidityY);
+    if (displayProcessPercentage) {
+      tft.setTextColor(COLOR_MENU);
+      drawRightNumber(prev, tft.width() / 2, humidityY);
+      tft.setTextColor(COLOR_MENU_TEXT);
+      drawRightNumber(actual, tft.width() / 2, humidityY);
+      tft.drawCentreString("%", tft.width() / 2 + 14, humidityY, textFontSize);
+    }
   }
 }
 
@@ -271,4 +285,3 @@ void printStatus() {
   Serial.print(";");
   Serial.println(PIDOutput[heaterNTC]);
 }
-

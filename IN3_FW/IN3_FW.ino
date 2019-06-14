@@ -103,6 +103,34 @@ bool print_text;
 #define humidityCalibrationGraphicPosition 1
 #define restartCalibrationValuesTempGraphicPosition 2
 
+/*
+// Use hardware SPI lines+
+#define TFT_CS PC13
+#define TFT_DC PB9
+#define TFT_RST PD2
+#define DHTPIN PC10
+#define SCREENBACKLIGHT PB4
+byte THERMISTOR_HEATER = 11; //This is not #define because can be swaped with THERMISTOR_ROOM
+byte THERMISTOR_ROOM = 10;   //This is not #define because can be swaped with THERMISTOR_HEATER
+#define ENC_A PC8
+#define ENC_B PC9
+#define ENC_PULSE PC6
+#define POWER_EN PC11
+#define FAN_HP PB8
+#define FAN_LP PB11
+#define HEATER PA4
+#define JAUNDICE PB0
+#define STERILIZE PA15
+#define HUMIDIFIER PB14
+#define HEATER_FB PA0
+#define POWER_EN_FB PC12
+#define FAN_HP_FB PB5
+#define FAN_LP_FB PB2
+#define JAUNDICE_FB PC4
+#define STERILIZER_FB PC5
+#define HUMIDIFIER_FB PB13
+*/
+
 //pin declaration
 //boardPWMPins: 3, 4, 5, 8, 9, 10, 11, 15, 16, 25, 26, 27
 
@@ -137,6 +165,8 @@ byte THERMISTOR_ROOM = 11;
 #define STERILIZE_FB 29
 #define HUMIDIFIER_FB 30
 #define pulse 14
+
+#define PULSIOXIMETER PA1
 
 //hardware verification. 1 is a mounted hardware, 0 a not mounted.
 #define hardwareComponents 12
@@ -331,13 +361,13 @@ PID heaterPID(&temperature[heaterNTC], &PIDOutput[heaterNTC], &desiredHeaterTemp
 PID roomPID(&temperature[roomNTC], &PIDOutput[roomNTC], &desiredRoomTemp, Kp_room, Ki_room, Kd_room, P_ON_M, DIRECT);
 // timer
 #define temperaturePIDcontrol 0         //0 to disable, 1 to enable
-#define ENCODER_RATE 1000    // in microseconds; 
+#define sensorsRate 1000    // in microseconds; 
 #define NTCInterruptRate 20000    // in microseconds; 
 #define roomPIDRate 1000000    // in microseconds; 
 #define heaterPIDRate 200000   // times of roomPIDRate;
 int roomPIDfactor = roomPIDRate / NTCInterruptRate;
 int heaterPIDfactor = heaterPIDRate / NTCInterruptRate;
-HardwareTimer timer(1);
+HardwareTimer sensorsTimer(1);
 HardwareTimer roomPIDTimer(2);
 
 void setup() {
@@ -347,7 +377,7 @@ void setup() {
   initPIDTimers();
   tft.begin();
   tft.setRotation(1);
-  loadLogo();
+  //loadLogo();
   dht.setup(DHTPIN);
   /*
     while (1) {
@@ -362,7 +392,7 @@ void setup() {
   */
   Serial.print("IN3ATOR, VERSION ");
   Serial.println(FWversion);
-  initEncoders();
+  initSensors();
   newPosition = myEncoderRead();
   oldPosition = newPosition;
   menu();

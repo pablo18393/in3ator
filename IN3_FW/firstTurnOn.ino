@@ -66,7 +66,7 @@ void helpingMenu() {
   }
   rectangles = numWords;
   goToProcessRow = numWords;
-  drawGraphicInterface();
+  graphics();
   drawHeading();
   updateSensors();
   while (!digitalRead(pulse));

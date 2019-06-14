@@ -36,7 +36,7 @@ void settings() {
       break;
   }
   rectangles = numWords;
-  drawGraphicInterface();
+  graphics();
   drawHeading();
   while (!digitalRead(pulse)) {
     updateData();
@@ -44,6 +44,3 @@ void settings() {
   delay(debounceTime);
   barSelection();
 }
-
-
-

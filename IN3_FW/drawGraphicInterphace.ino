@@ -1,4 +1,6 @@
-void drawGraphicInterface() {
+bool display_drawStop = 0;
+
+void graphics() {
   if (!page) {
     tft.fillRect(width_select, height_heading, tft.width() - width_select, tft.height() - height_heading, COLOR_MENU);
   }
@@ -127,16 +129,16 @@ void setSensorsGraphicPosition() {
       temperatureY = graphicHeight(temperatureGraphicPosition);
       break;
     case actuatorsProgressPage:
-      barWidth = tft.width() / 4 * 3;
-      barHeight = 15;
+      barWidth = tft.width() / 4 * 2;
+      barHeight = 20;
       tempBarPosX = tft.width() / 2;
       tempBarPosY = tft.height() / 3 - 11;
       humBarPosX = tempBarPosX;
-      humBarPosY = 3 * tft.height() / 4 + 15;
-      temperatureX = tempBarPosX - barWidth / 2 - 38;
-      temperatureY = tempBarPosY + barHeight / 2 + 5;
-      humidityX = tempBarPosX - barWidth / 2;
-      humidityY = 4 * tft.height() / 5 + 17;
+      humBarPosY = 3 * tft.height() / 4 + 35;
+      temperatureX = letter_width;
+      temperatureY = tempBarPosY - barHeight / 2;
+      humidityX = letter_width;
+      humidityY = humBarPosY - barHeight / 2;
       break;
   }
 }
@@ -271,18 +273,20 @@ void drawCentreNumber(int n, int x, int i) {
 }
 
 void drawStop() {
-  switch (language) {
-    case spanish:
-      textToWrite = "Pulsa 2 seg para salir";
-      break;
-    case english:
-      textToWrite = "Press 2 sec to go back";
-      break;
-    case french:
-      textToWrite = "appuyez 2 sec pour voler";
-      break;
+  if (display_drawStop) {
+    switch (language) {
+      case spanish:
+        textToWrite = "Pulsa 2 seg para salir";
+        break;
+      case english:
+        textToWrite = "Press 2 sec to go back";
+        break;
+      case french:
+        textToWrite = "appuyez 2 sec pour voler";
+        break;
+    }
+    tft.drawCentreString(textToWrite, tft.width() / 2, tft.height() - letter_height, textFontSize);
   }
-  tft.drawCentreString(textToWrite, tft.width() / 2, tft.height() / 2, textFontSize);
 }
 
 int graphicHeight(int position) {
@@ -321,13 +325,13 @@ void drawStartMessage() {
 
 void drawActuatorsSeparators() {
   barThickness = 3;
-  tft.fillRect(0, tft.height() / 2 - letter_height / 3, tft.width(), barThickness, COLOR_FRAME_BAR);
-  tft.fillRect(0, tft.height() / 2 + letter_height, tft.width(), barThickness, COLOR_FRAME_BAR);
+  tft.fillRect(0, tft.height() / 3 + 5, tft.width(), barThickness, COLOR_FRAME_BAR);
+  tft.fillRect(0, tft.height() / 3 * 2 +10, tft.width(), barThickness, COLOR_FRAME_BAR);
 }
 
 void printLoadingHumidityBar() {
   barThickness = 3;
-  tft.drawFloat(desiredRoomHum, 1, humBarPosX + barWidth / 2 - 30, humidityY, textFontSize);
+  tft.drawFloat(desiredRoomHum, 1, humBarPosX + barWidth / 2 + 10, humidityY, textFontSize);
   for (int i = 1; i <= barThickness; i++) {
     tft.drawRect(humBarPosX - barWidth / 2 - i, humBarPosY - barHeight / 2 - i, barWidth + i * 2, barHeight + i * 2, COLOR_FRAME_BAR);
   }
@@ -335,7 +339,7 @@ void printLoadingHumidityBar() {
 
 void printLoadingTemperatureBar() {
   barThickness = 3;
-  tft.drawFloat(desiredRoomTemp, 1, tempBarPosX + barWidth / 2 - 30, temperatureY, textFontSize);
+  tft.drawFloat(desiredRoomTemp, 1, tft.width() - 5 * letter_width, temperatureY, textFontSize);
   for (int i = 1; i <= barThickness; i++) {
     tft.drawRect(tempBarPosX - barWidth / 2 - i, tempBarPosY - barHeight / 2 - i, barWidth + i * 2, barHeight + i * 2, COLOR_FRAME_BAR);
   }

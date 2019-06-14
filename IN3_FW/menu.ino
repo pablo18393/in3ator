@@ -38,7 +38,7 @@ void menu() {
   rectangles = numWords;
   setSensorsGraphicPosition();
   goToProcessRow = numWords;
-  drawGraphicInterface();
+  graphics();
   drawHeading();
   updateSensors();
   controlTemperature = 0;
@@ -50,4 +50,3 @@ void menu() {
   delay(debounceTime);
   barSelection();
 }
-

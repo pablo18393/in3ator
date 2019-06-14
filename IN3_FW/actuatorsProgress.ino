@@ -5,7 +5,7 @@ void actuatorsProgress() {
   tft.setTextSize(1);
   print_text = 0;
   rectangles = numWords;
-  drawGraphicInterface();
+  graphics();
   drawHeading();
   tft.setTextColor(COLOR_MENU_TEXT);
   setSensorsGraphicPosition();
@@ -23,7 +23,6 @@ void actuatorsProgress() {
         break;
     }
     tft.drawCentreString(textToWrite, tft.width() / 2, tempBarPosY - 4 * letter_height / 3, textFontSize);
-    tft.drawCentreString("%", tft.width() / 2 + 14, temperatureY , textFontSize);
   }
   if (controlHumidity) {
     humidityAtStart = humidity;
@@ -40,7 +39,6 @@ void actuatorsProgress() {
         break;
     }
     tft.drawCentreString(textToWrite, tft.width() / 2, humBarPosY - 4 * letter_height / 3, textFontSize);
-    tft.drawCentreString("%", tft.width() / 2 + 14, humidityY, textFontSize);
   }
   tft.setTextColor(COLOR_WARNING_TEXT);
   drawStop();
@@ -169,4 +167,3 @@ void heatUp() {
     heaterPower = 0;
   }
 }
-
