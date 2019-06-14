@@ -1,3 +1,15 @@
+//EEPROM variables
+#define EEPROM_firstTurnOn 0
+#define EEPROM_autoLock 1
+#define EEPROM_language 2
+#define EEPROM_heaterTempLimit 3
+#define EEPROM_fanSpeed 5
+#define EEPROM_diffHumidity 10
+#define EEPROM_diffTemperature 20
+#define EEPROM_swapTempSensors 30
+#define EEPROM_usedGenericMosfet 40
+#define EEPROM_checkStatus 100
+
 void initEEPROM() {
   EEPROM.PageBase0 = 0x801F000;
   EEPROM.PageBase1 = 0x801F800;
@@ -42,13 +54,13 @@ void loadStandardValues() {
   EEPROM.write(EEPROM_language, language);
   for (int i = 0; i < numTempSensors; i++) {
     diffTemperature[numTempSensors] = 0;
-    EEPROM.write(100 + i, diffTemperature[i]);
+    EEPROM.write(EEPROM_diffTemperature + i, diffTemperature[i]);
   }
   diffHumidity = 0;
   EEPROM.write(EEPROM_diffHumidity, diffHumidity);
-  heaterLimitTemp = 70;
-  EEPROM.write(EEPROM_heaterLimitTemp, heaterLimitTemp);
-  fanSpeed=60;
+  heaterTempLimit = standardHeaterTempLimit;
+  EEPROM.write(EEPROM_heaterTempLimit, heaterTempLimit);
+  fanSpeed = standardFanSpeed;
   EEPROM.write(EEPROM_fanSpeed, fanSpeed);
 }
 
@@ -64,7 +76,7 @@ void recapVariables() {
   if (diffHumidity > 1000) {
     diffHumidity -= 65535;
   }
-  heaterLimitTemp = EEPROM.read(EEPROM_heaterLimitTemp);
+  heaterTempLimit = EEPROM.read(EEPROM_heaterTempLimit);
   fanSpeed = EEPROM.read(EEPROM_fanSpeed);
   swapTempSensors = EEPROM.read(EEPROM_swapTempSensors);
   if (swapTempSensors) {

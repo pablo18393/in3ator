@@ -4,10 +4,10 @@ void barSelection() {
   ypos = (tft.height() - height_heading) / (2 * rectangles) + letter_height;
   while (1) {
     updateData();
-    if (move) {
+    if (EncMove) {
       if (!selected) {
-        if (move < 0) {
-          move++;
+        if (EncMove < 0) {
+          EncMove++;
           if (!page) {
             enableSetProcess = enableSet;
           }
@@ -21,7 +21,7 @@ void barSelection() {
           }
         }
         else {
-          move --;
+          EncMove --;
           if (bar_pos > 1) {
             eraseBar();
             bar_pos--;
@@ -55,56 +55,56 @@ void barSelection() {
             case temperatureGraphicPosition:
               while (digitalRead(pulse)) {
                 updateData();
-                if (move && -move + desiredRoomTemp >= minTemp && -move + desiredRoomTemp <= maxTemp) {
+                if (EncMove && -EncMove + desiredRoomTemp >= minTemp && -EncMove + desiredRoomTemp <= maxTemp) {
                   tft.setTextColor(COLOR_MENU);
                   if (!controlTemperature) {
                     controlTemperature = 1;
                     tft.drawRightString(initialSensorsValue, initialSensorPosition, temperatureY, textFontSize);
                   }
                   tft.drawFloat(desiredRoomTemp, 1, temperatureX - 65, temperatureY, textFontSize);
-                  desiredRoomTemp -= float(move) / 10;
+                  desiredRoomTemp -= float(EncMove) / 10;
                   tft.setTextColor(COLOR_MENU_TEXT);
                   tft.drawFloat(desiredRoomTemp, 1, temperatureX - 65, temperatureY, textFontSize);
                   enableSet = 1;
                 }
-                move = 0;
+                EncMove = 0;
               }
               drawStartMessage();
               break;
             case humidityGraphicPosition:
               while (digitalRead(pulse)) {
                 updateData();
-                if (move && -move + desiredRoomHum >= minHum && -move + desiredRoomHum <= maxHum) {
+                if (EncMove && -EncMove + desiredRoomHum >= minHum && -EncMove + desiredRoomHum <= maxHum) {
                   tft.setTextColor(COLOR_MENU);
                   if (!controlHumidity) {
                     controlHumidity = 1;
                     tft.drawRightString(initialSensorsValue, initialSensorPosition, humidityY, textFontSize);
                   }
                   drawCentreNumber(desiredRoomHum, humidityX - 65, humidityY);
-                  desiredRoomHum -= (move);
+                  desiredRoomHum -= (EncMove);
                   tft.setTextColor(COLOR_MENU_TEXT);
                   drawCentreNumber(desiredRoomHum, humidityX - 65, humidityY);
                   enableSet = 1;
                 }
-                move = 0;
+                EncMove = 0;
               }
               drawStartMessage();
               break;
             case LEDGraphicPosition:
               while (digitalRead(pulse) ) {
                 updateData();
-                if (move && -move + LEDIntensity >= 0 && -move + LEDIntensity <= LEDMaxIntensity) {
+                if (EncMove && -EncMove + LEDIntensity >= 0 && -EncMove + LEDIntensity <= LEDMaxIntensity) {
                   tft.setTextColor(COLOR_MENU);
                   drawRightNumber(LEDIntensity, 280, ypos);
-                  if (!LEDIntensity && move) {
+                  if (!LEDIntensity && EncMove) {
                     tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
                     tft.drawRightString("%", unitPosition, ypos, textFontSize);
                   }
-                  LEDIntensity -= 10 * move;
+                  LEDIntensity -= 10 * EncMove;
                   analogWrite(ICT, LEDIntensity);
                   tft.setTextColor(COLOR_MENU_TEXT);
-                  if (!LEDIntensity && move) {
+                  if (!LEDIntensity && EncMove) {
                     tft.setTextColor(COLOR_MENU);
                     tft.drawRightString("%", unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
@@ -114,7 +114,7 @@ void barSelection() {
                     drawRightNumber(LEDIntensity, 280, ypos);
                   }
                 }
-                move = 0;
+                EncMove = 0;
               }
               break;
             case settingsGraphicPosition:
@@ -130,7 +130,7 @@ void barSelection() {
             case autoLockGraphicPosition:
               while (digitalRead(pulse)) {
                 updateData();
-                if (move) {
+                if (EncMove) {
                   tft.setTextColor(COLOR_MENU);
                   if (auto_lock) {
                     switch (language) {
@@ -189,14 +189,14 @@ void barSelection() {
                   }
                   auto_lock = !auto_lock;
                   EEPROM.write(EEPROM_autoLock, auto_lock);
-                  move = 0;
+                  EncMove = 0;
                 }
               }
               break;
             case languageGraphicPosition:
               while (digitalRead(pulse)) {
                 updateData();
-                if (move) {
+                if (EncMove) {
                   tft.setTextColor(COLOR_MENU);
                   switch (language) {
                     case spanish:
@@ -210,7 +210,7 @@ void barSelection() {
                       break;
                   }
                   tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
-                  language -= move;
+                  language -= EncMove;
                   if (language < firstLanguage) {
                     language = numLanguages;
                   }
@@ -231,7 +231,7 @@ void barSelection() {
                   }
                   tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
                   EEPROM.write(EEPROM_language, language);
-                  move = 0;
+                  EncMove = 0;
                 }
               }
               settings();
@@ -239,46 +239,46 @@ void barSelection() {
             case heaterTempGraphicPosition:
               while (digitalRead(pulse) ) {
                 updateData();
-                if (move && -move + heaterLimitTemp >= 0 && -move + heaterLimitTemp <= heaterMaxTemp) {
+                if (EncMove && -EncMove + heaterTempLimit >= 0 && -EncMove + heaterTempLimit <= heaterMaxTemp) {
                   tft.setTextColor(COLOR_MENU);
-                  drawRightNumber(heaterLimitTemp, 280, ypos);
-                  if (!heaterLimitTemp && move) {
+                  drawRightNumber(heaterTempLimit, 280, ypos);
+                  if (!heaterTempLimit && EncMove) {
                     tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
                     tft.drawRightString("C", unitPosition, ypos, textFontSize);
                   }
-                  heaterLimitTemp -= 5 * move;
-                  EEPROM.write(EEPROM_heaterLimitTemp, heaterLimitTemp);
+                  heaterTempLimit -= 5 * EncMove;
+                  EEPROM.write(EEPROM_heaterTempLimit, heaterTempLimit);
                   tft.setTextColor(COLOR_MENU_TEXT);
-                  if (!heaterLimitTemp && move) {
+                  if (!heaterTempLimit && EncMove) {
                     tft.setTextColor(COLOR_MENU);
                     tft.drawRightString("C", unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
                     tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
                   }
                   else {
-                    drawRightNumber(heaterLimitTemp, 280, ypos);
+                    drawRightNumber(heaterTempLimit, 280, ypos);
                   }
                 }
-                move = 0;
+                EncMove = 0;
               }
               break;
             case fanGraphicPosition:
               while (digitalRead(pulse)) {
                 updateData();
                 turnFansOn();
-                if (move && -move + fanSpeed >= 0 && -move + fanSpeed <= fanMaxSpeed) {
+                if (EncMove && -EncMove + fanSpeed >= 0 && -EncMove + fanSpeed <= fanMaxSpeed) {
                   tft.setTextColor(COLOR_MENU);
                   drawRightNumber(fanSpeed, 280, ypos);
-                  if (!fanSpeed && move) {
+                  if (!fanSpeed && EncMove) {
                     tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
                     tft.drawRightString("%", unitPosition, ypos, textFontSize);
                   }
-                  fanSpeed -= 5 * move;
+                  fanSpeed -= 5 * EncMove;
                   EEPROM.write(EEPROM_fanSpeed, fanSpeed);
                   tft.setTextColor(COLOR_MENU_TEXT);
-                  if (!fanSpeed && move) {
+                  if (!fanSpeed && EncMove) {
                     tft.setTextColor(COLOR_MENU);
                     tft.drawRightString("%", unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
@@ -288,7 +288,7 @@ void barSelection() {
                     drawRightNumber(fanSpeed, 280, ypos);
                   }
                 }
-                move = 0;
+                EncMove = 0;
               }
               turnFansOff();
               break;
@@ -306,15 +306,15 @@ void barSelection() {
             case temperatureCalibrationGraphicPosition:
               while (digitalRead(pulse)) {
                 updateData();
-                if (move) {
+                if (EncMove) {
                   tft.setTextColor(COLOR_MENU);
                   tft.drawFloat(previousTemperature[roomNTC], 1, valuePosition, ypos, textFontSize);
                   tft.setTextColor(COLOR_MENU_TEXT);
-                  diffTemperature[roomNTC] += move * (0.1);
-                  temperature[roomNTC] += move * (0.1);
+                  diffTemperature[roomNTC] += EncMove * (0.1);
+                  temperature[roomNTC] += EncMove * (0.1);
                   tft.drawFloat(temperature[roomNTC], 1, valuePosition, ypos, textFontSize);
                   previousTemperature[roomNTC] = temperature[roomNTC];
-                  move = 0;
+                  EncMove = 0;
                   EEPROM.write(EEPROM_diffTemperature, int(diffTemperature[roomNTC] * 10));
                 }
               }
@@ -322,14 +322,14 @@ void barSelection() {
             case humidityCalibrationGraphicPosition:
               while (digitalRead(pulse)) {
                 updateData();
-                if (move) {
+                if (EncMove) {
                   tft.setTextColor(COLOR_MENU);
                   tft.drawFloat(humidity, 0, valuePosition, ypos, textFontSize);
                   tft.setTextColor(COLOR_MENU_TEXT);
-                  diffHumidity += move;
-                  humidity += move;
+                  diffHumidity += EncMove;
+                  humidity += EncMove;
                   tft.drawFloat(humidity, 0, valuePosition, ypos, textFontSize);
-                  move = 0;
+                  EncMove = 0;
                   EEPROM.write(EEPROM_diffHumidity, diffHumidity );
                 }
               }
@@ -340,7 +340,7 @@ void barSelection() {
               EEPROM.write(EEPROM_diffTemperature, diffTemperature[roomNTC]);
               EEPROM.write(EEPROM_diffHumidity, diffHumidity);
               readHumSensor();
-              updateTemp(bothNTC);
+              updateTemp(numNTC);
               calibrateSensors();
               break;
           }
@@ -428,4 +428,3 @@ void back_mode() {
   }
   delay(50);
 }
-

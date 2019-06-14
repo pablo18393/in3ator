@@ -1,18 +1,20 @@
 bool displayProcessPercentage = 0;
 
 int updateData() {
-  newPosition = myEncoderRead();
-  move = oldPosition - newPosition;
-  if (abs(move) > 1) {
-    if (move > 0) {
-      move = 1;
+  //check rotary encoder position
+  EncNewPosition = myEncoderRead();
+  EncMove = EncOldPosition - EncNewPosition;
+  if (abs(EncMove) > 1) {
+    if (EncMove > 0) {
+      EncMove = 1;
     }
     else {
-      move = -1;
+      EncMove = -1;
     }
   }
   lastEncoderPos[counter] = encoderpos[counter];
-  oldPosition = newPosition;
+  EncOldPosition = EncNewPosition;
+  
   if (page == menuPage || page == actuatorsProgressPage) {
     if (millis() - last_temp_update > temp_update_rate) {
       updateSensors();
@@ -25,7 +27,7 @@ int updateData() {
     checkSetMessage();
   }
   checkSerialPort();
-  return move;
+  return EncMove;
 }
 
 void updateSensors() {
@@ -36,7 +38,7 @@ void updateSensors() {
   if (page != actuatorsProgressPage || controlHumidity) {
     drawHumidity();
   }
-  updateTemp(bothNTC);
+  updateTemp(numNTC);
   tft.setTextColor(COLOR_MENU_TEXT);
   if (page == menuPage || (page == actuatorsProgressPage && controlTemperature)) {
     tft.drawFloat(temperature[roomNTC], 1, temperatureX, temperatureY, textFontSize);
@@ -77,145 +79,6 @@ void updateSensors() {
   last_temp_update = millis();
 }
 
-bool readHumSensor() {
-  sensorsTimer.pause();
-  int newTemp = dht.getTemperature();
-  int newHumidity = dht.getHumidity();
-  sensorsTimer.refresh();
-  sensorsTimer.resume();
-  if (newHumidity && newTemp) {
-    //    temperature[numNTC + dhtSensor] = newTemp;
-    humidity = newHumidity;
-    humidity += diffHumidity;
-    return (1);
-  }
-  return (0);
-}
-
-void updateTemp(byte sensor) {
-  //Valores fijos del circuito
-  float rAux = 10000.0;
-  float vcc = 3.3;
-  float beta = 3950.0;
-  float temp0 = 298.0;
-  float r0 = 10000.0;
-  float temperatureMean;
-  byte startSensor;
-  byte endSensor;
-
-  switch (sensor) {
-    case roomNTC:
-      startSensor = roomNTC;
-      endSensor = roomNTC;
-      break;
-    case heaterNTC:
-      startSensor = heaterNTC;
-      endSensor = heaterNTC;
-      break;
-    case bothNTC:
-      startSensor = roomNTC;
-      endSensor = heaterNTC;
-      break;
-  }
-
-  //Bloque de cálculo
-  for (int ntc = startSensor; ntc <= endSensor; ntc++) {
-    //Variables usadas en el cálculo
-    float vm = 0.0;
-    float rntc = 0.0;
-    temperatureMean = 0;
-    for (int i = 0; i < temperature_fraction; i++) {
-      temperatureMean += temperatureArray[ntc][i];
-    }
-    temperatureMean /= temperature_fraction;
-    vm = (vcc) * ( temperatureMean / 4098 );          //Calcular tensión en la entrada
-    rntc = rAux / ((vcc / vm) - 1);                   //Calcular la resistencia de la NTC
-    temperature[ntc] = beta / (log(rntc / r0) + (beta / temp0)) - 273; //Calcular la temperatura en Celsius
-    temperature[ntc] += diffTemperature[ntc];
-  }
-}
-
-void updateLoadingTemperatureBar(float prev, float actual) {
-  if (prev != actual) {
-    float diff = (actual - prev) / 100;
-    int color;
-    float barX;
-    int barY, barDiffWidth;
-    barX = tempBarPosX - (barWidth / 2) * (1 - prev / 50);
-    barY = tempBarPosY - barHeight / 2;
-    barDiffWidth = barWidth * abs(diff) + 1;
-    if (diff > 0) {
-      color = COLOR_LOADING_BAR;
-    }
-    else {
-      color = COLOR_MENU;
-      barX -= barDiffWidth - 1;
-    }
-    tft.fillRect(barX, barY, barDiffWidth, barHeight, color);
-    if (displayProcessPercentage) {
-      tft.setTextColor(COLOR_MENU);
-      drawRightNumber(prev, tft.width() / 2, temperatureY);
-      tft.setTextColor(COLOR_MENU_TEXT);
-      drawRightNumber(actual, tft.width() / 2, temperatureY);
-      tft.drawCentreString("%", tft.width() / 2 + 14, temperatureY , textFontSize);
-    }
-  }
-}
-
-void updateLoadingHumidityBar(float prev, float actual) {
-  if (prev != actual) {
-    float diff = (actual - prev) / 100;
-    int color;
-    float barX;
-    int barY, barDiffWidth;
-    barX = humBarPosX - (barWidth / 2) * (1 - prev / 50);
-    barY = humBarPosY - barHeight / 2;
-    barDiffWidth = barWidth * abs(diff) + 1;
-    if (diff > 0) {
-      color = COLOR_LOADING_BAR;
-    }
-    else {
-      color = COLOR_MENU;
-      barX -= barDiffWidth - 1;
-    }
-    tft.fillRect(barX, barY, barDiffWidth, barHeight, color);
-    if (displayProcessPercentage) {
-      tft.setTextColor(COLOR_MENU);
-      drawRightNumber(prev, tft.width() / 2, humidityY);
-      tft.setTextColor(COLOR_MENU_TEXT);
-      drawRightNumber(actual, tft.width() / 2, humidityY);
-      tft.drawCentreString("%", tft.width() / 2 + 14, humidityY, textFontSize);
-    }
-  }
-}
-
-void measureAllNTC() {
-  for (int ntc = 0; ntc < numNTC; ntc++) {
-    temperatureArray[ntc][temperature_measured] = analogRead(NTCpin[ntc]);
-  }
-  temperature_measured++;
-  if (temperature_measured == temperature_fraction) {
-    temperature_measured = 0;
-  }
-}
-
-void turnActuatorsOff() {
-  digitalWrite(HEATER, LOW);
-  analogWrite(HEATER, 0);
-  digitalWrite(HUMIDIFIER, LOW);
-}
-
-void turnFansOn() {
-  analogWrite(FAN_HP, fanSpeed * 2.55);
-  digitalWrite(FAN_LP, HIGH);
-  digitalWrite(FAN_EXTRA, HIGH);
-}
-
-void turnFansOff() {
-  analogWrite(FAN_HP, LOW);
-  digitalWrite(FAN_LP, LOW);
-  digitalWrite(FAN_EXTRA, LOW);
-}
 void checkSerialPort() {
   if (Serial.available()) {
     switch (Serial.read()) {
@@ -269,7 +132,7 @@ void printStatus() {
   Serial.print(";");
   Serial.print(desiredRoomTemp);
   Serial.print(";");
-  Serial.print(heaterLimitTemp);
+  Serial.print(heaterTempLimit);
   Serial.print(";");
   for (int i = 0; i < numTempSensors; i++) {
     Serial.print(temperature[i]);
