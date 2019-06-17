@@ -1,5 +1,3 @@
-bool displayProcessPercentage = 0;
-
 int updateData() {
   //check rotary encoder position
   EncNewPosition = myEncoderRead();
@@ -14,7 +12,7 @@ int updateData() {
   }
   lastEncoderPos[counter] = encoderpos[counter];
   EncOldPosition = EncNewPosition;
-  
+
   if (page == menuPage || page == actuatorsProgressPage) {
     if (millis() - last_temp_update > temp_update_rate) {
       updateSensors();
@@ -27,7 +25,20 @@ int updateData() {
     checkSetMessage();
   }
   checkSerialPort();
+  checkNewPulsioximeterData();
   return EncMove;
+}
+
+void checkNewPulsioximeterData() {
+  if (pulsioximeterCounter[pulsioximeterDrawn] = !pulsioximeterCounter[pulsioximeterSampled]) {
+    drawPulsioximeter();
+    if (pulsioximeterCounter[pulsioximeterDrawn] == maxPulsioximeterSamples) {
+      pulsioximeterCounter[pulsioximeterDrawn] = 0;
+    }
+    else {
+      pulsioximeterCounter[pulsioximeterDrawn]++;
+    }
+  }
 }
 
 void updateSensors() {

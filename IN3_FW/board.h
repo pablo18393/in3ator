@@ -28,13 +28,14 @@
 
 #define THERMISTOR_INBOARD_LEFT 10 //PC3
 #define THERMISTOR_INBOARD_RIGHT 11 //PC2
+#define PULSIOXIMETER 7
 
 //pin declaration
 //boardPWMPins: 3, 4, 5, 8, 9, 10, 11, 15, 16, 25, 26, 27
 
 // Use hardware SPI lines+
 //Pins from 4-6 are SPI
-#define TFT_CS         7
+#define TFT_CS         2
 #define TFT_DC         31
 #define TFT_RST        2
 
@@ -64,6 +65,5 @@ byte THERMISTOR_ROOM = 11;
 #define HUMIDIFIER_FB 30
 #define pulse 14
 
-#define PULSIOXIMETER PA1
-#define maxADCvalue = 4098;
+#define maxADCvalue 4098
 #define maxPWMvalue 255         //for maple mini with arduino IDE

@@ -1,55 +1,3 @@
-//temperature variables
-#define CheckSensorRaiseTemp 3   //in celsius degrees, the amount of degrees to differentiate heater or room NTC
-#define roomNTC 0
-#define heaterNTC 1
-#define inBoardLeftNTC 2
-#define inBoardRightNTC 3
-#define dhtSensor 1
-#define numNTC 4
-#define numTempSensors 5
-#define temperature_fraction 20 //numbers of measures of the temperatures sensors
-
-int temperatureArray [numNTC][temperature_fraction];
-bool faultNTC[numNTC];
-byte heaterPower;
-byte numSensors;
-double temperature[numTempSensors];
-double previousTemperature[numTempSensors];
-int humidity;
-int previousHumidity;
-
-//Sensor check rate (in ms)
-byte pulsioximeterRate = 5;
-byte pulsioximeterCount = 0;
-byte encoderRate = 1;
-byte encoderCount = 0;
-
-//sensor variables
-int pulsioximeterMean;
-int pulsioximeterFilterFactor = 3;
-
-//constants
-const byte heaterMaxTemp = 100;
-const byte minTemp = 15;
-const byte maxTemp = 45;
-const byte maxHum = 100;
-const byte minHum = 20;
-
-//Encoder variables
-#define NUMENCODERS 1
-byte NTCpin[numNTC] = {THERMISTOR_HEATER, THERMISTOR_ROOM, THERMISTOR_INBOARD_LEFT, THERMISTOR_INBOARD_RIGHT};
-volatile int encstate[NUMENCODERS];
-volatile int encflag[NUMENCODERS];
-boolean A_set[NUMENCODERS];
-boolean B_set[NUMENCODERS];
-volatile int16_t encoderpos[NUMENCODERS];
-volatile int  encodertimer = millis(); // acceleration measurement
-int encoderpinA[NUMENCODERS] = {ENCODER_A}; // pin array of all encoder A inputs
-int encoderpinB[NUMENCODERS] = {ENCODER_B}; // pin array of all encoder B inputs
-unsigned int lastEncoderPos[NUMENCODERS];
-int EncOldPosition;
-int EncNewPosition;
-
 void initSensors() {
   encodertimer = millis(); // acceleration measurement
   for (byte counter = 0; counter < NUMENCODERS; counter++)
@@ -64,11 +12,12 @@ void initSensors() {
     lastEncoderPos[counter] = 1;
   }
   // timer setup for encoder
+  initPulsioximeterVariables();
   sensorsTimer.pause();
   sensorsTimer.setPeriod(sensorsRate); // in microseconds
   sensorsTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
   sensorsTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
-  sensorsTimer.attachCompare1Interrupt(readSensors);
+  sensorsTimer.attachCompare1Interrupt(sensorsISR);
   sensorsTimer.refresh();
   sensorsTimer.resume();
 }
@@ -81,17 +30,22 @@ int myEncoderRead() {
   return (encoderpos[counter]);
 }
 
-void readSensors() {
+void sensorsISR() {
   if (!encoderCount) {
     encoderCount = encoderRate;
     readEncoder();
   }
   encoderCount--;
+  readPulsioximeter();
   if (!pulsioximeterCount) {
     pulsioximeterCount = pulsioximeterRate;
-    readPulsioximeter();
+    calculatePulsioximeterValues();
   }
   pulsioximeterCount--;
+}
+
+void initPulsioximeterVariables() {
+
 }
 
 void readEncoder() {
@@ -126,8 +80,28 @@ void readEncoder() {
 }
 
 void readPulsioximeter() {
-
+  pulsioximeterInterSamples[pulsioximeterCount] = analogRead(PULSIOXIMETER);
+  pulsioximeterMean *= (pulsioximeterMultiplierFilterFactor - pulsioximeterRestFilterFactor) / pulsioximeterMultiplierFilterFactor;
+  pulsioximeterMean +=  pulsioximeterInterSamples[pulsioximeterCount] * pulsioximeterRestFilterFactor / pulsioximeterMultiplierFilterFactor;
 }
+
+void calculatePulsioximeterValues() {
+  int meanPulsioximeterSamples;
+  int pulsioximeterInterMean;
+  for (int i = 0; i < pulsioximeterRate; i++) {
+    pulsioximeterInterMean += pulsioximeterInterSamples[i] - pulsioximeterMean;
+  }
+  pulsioximeterInterMean /= pulsioximeterRate;
+  pulsioximeterSample[pulsioximeterCounter[pulsioximeterSampled]][pulsioximeterSampled] = pulsioximeterInterMean;
+
+  if (pulsioximeterCounter[pulsioximeterSampled] == maxPulsioximeterSamples) {
+    pulsioximeterCounter[pulsioximeterSampled] = 0;
+  }
+  else {
+    pulsioximeterCounter[pulsioximeterSampled]++;
+  }
+}
+
 
 void measurenumNTC() {
   for (int ntc = 0; ntc < numNTC; ntc++) {
@@ -167,7 +141,7 @@ void updateTemp(byte sensor) {
 
   //Bloque de cálculo
   for (int ntc = startSensor; ntc <= endSensor; ntc++) {
-    //Variables usadas en el cálculo
+    //Variables used in calculus
     float vm = 0.0;
     float rntc = 0.0;
     temperatureMean = 0;

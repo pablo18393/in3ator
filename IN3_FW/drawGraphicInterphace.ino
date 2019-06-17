@@ -1,81 +1,3 @@
-//display graphic geometric variables
-#define introDelay    1000      //initial delay between intro and menu
-#define brightenRate  30        //intro brighten speed (Higher value, slower)
-#define valuePosition 245
-#define separatorPosition 240
-#define unitPosition 315
-#define textFontSize 4          //text standard size
-#define helpTextMenuCentreX tft.width()/2;
-#define width_select  7
-#define height_heading  34
-#define width_indentation  4
-#define width_back  50
-#define side_gap  4
-#define letter_height  26
-#define letter_width  14
-#define triang  6
-#define radius  12
-#define circle  8
-#define logo  40
-#define battery_lenght  50
-#define battery_height  6
-#define battery_gap  2
-#define battery_margin  20
-#define battery_round  4
-#define arrow_height  6
-#define arrow_tail  5
-//graphic positions
-#define graphicTextOffset 1                //bar pos is counted from 1, but text from 0
-//menu
-#define temperatureGraphicPosition 0
-#define humidityGraphicPosition 1
-#define LEDGraphicPosition 2
-#define settingsGraphicPosition 4
-#define startGraphicPosition 3
-//settings
-#define autoLockGraphicPosition 0
-#define languageGraphicPosition 1
-#define heaterTempGraphicPosition 2
-#define fanGraphicPosition 3
-#define setStandardValuesGraphicPosition 4
-#define calibrateGraphicPosition 5
-//settings
-#define temperatureCalibrationGraphicPosition 0
-#define humidityCalibrationGraphicPosition 1
-#define restartCalibrationValuesTempGraphicPosition 2
-//colors
-#define BLACK 0x0000
-#define BLUE 0x001F
-#define RED 0xF800
-#define GREEN 0x07E0
-#define CYAN 0x07FF
-#define MAGENTA 0xF81F
-#define YELLOW 0xFFE0
-#define WHITE 0xFFFF
-#define COLOR_WARNING_TEXT ILI9341_ORANGE
-#define COLOR_MENU BLACK
-#define COLOR_BAR  BLACK
-#define COLOR_MENU_TEXT WHITE
-#define COLOR_SELECTED WHITE
-#define COLOR_CHOSEN BLUE
-#define COLOR_HEADING BLUE
-#define COLOR_ARROW BLACK
-#define COLOR_BATTERY BLACK
-#define COLOR_BATTERY_LEFT BLACK
-#define COLOR_FRAME_BAR WHITE
-#define COLOR_LOADING_BAR RED
-#define COLOR_COMPLETED_BAR GREEN
-#define introBackColor WHITE
-#define introTextColor BLACK
-#define transitionEffect BLACK
-
-int initialSensorPosition = separatorPosition - letter_width;
-char* initialSensorsValue = "XX";
-bool controlTemperature;
-bool controlHumidity;
-int ypos;
-bool print_text;
-bool display_drawStop = 0;
 
 
 void graphics() {
@@ -217,6 +139,11 @@ void setSensorsGraphicPosition() {
       temperatureY = tempBarPosY - barHeight / 2;
       humidityX = letter_width;
       humidityY = humBarPosY - barHeight / 2;
+      separatorTopYPos = tft.height() / 3 + 5;
+      separatorBotYPos = tft.height() * 2 / 3 + 10;
+      minPulsioximeterCoordinate = separatorTopYPos + barThickness;
+      maxPulsioximeterCoordinate = separatorBotYPos + barThickness;
+      pulsioximeterYPos = separatorBotYPos - (separatorBotYPos - separatorTopYPos) * 2 / 3;
       break;
   }
 }
@@ -403,8 +330,8 @@ void drawStartMessage() {
 
 void drawActuatorsSeparators() {
   barThickness = 3;
-  tft.fillRect(0, tft.height() / 3 + 5, tft.width(), barThickness, COLOR_FRAME_BAR);
-  tft.fillRect(0, tft.height() / 3 * 2 + 10, tft.width(), barThickness, COLOR_FRAME_BAR);
+  tft.fillRect(0, separatorTopYPos, tft.width(), barThickness, COLOR_FRAME_BAR);
+  tft.fillRect(0, separatorBotYPos, tft.width(), barThickness, COLOR_FRAME_BAR);
 }
 
 void printLoadingTemperatureBar() {
@@ -475,4 +402,10 @@ void updateLoadingHumidityBar(float prev, float actual) {
       tft.drawCentreString("%", tft.width() / 2 + 14, humidityY, textFontSize);
     }
   }
+}
+
+void drawPulsioximeter() {
+  tft.drawPixel(pulsioximeterCounter[pulsioximeterDrawn], 0, PULSIOXIMETERCOLOR);
+  pulsioximeterCounter[pulsioximeterDrawn]++;
+
 }
