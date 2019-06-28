@@ -1,7 +1,7 @@
 /*
   // Use hardware SPI lines+
   #define TFT_CS PC13
-  #define TFT_DC PB9
+  #define TFT_DC PB8
   #define TFT_RST PD2
   #define DHTPIN PC10
   #define SCREENBACKLIGHT PB4
@@ -35,16 +35,16 @@
 
 // Use hardware SPI lines+
 //Pins from 4-6 are SPI
-#define TFT_CS         2
-#define TFT_DC         31
-#define TFT_RST        2
+#define TFT_CS PC13
+#define TFT_DC PB8
+#define TFT_RST PD2
 
 #define DHTPIN 0
-#define SCREENBACKLIGHT 3
+#define SCREENBACKLIGHT PB4
 byte THERMISTOR_HEATER = 10;
 byte THERMISTOR_ROOM = 11;
-#define ENCODER_A 12
-#define ENCODER_B 13
+#define ENCODER_A PC8
+#define ENCODER_B PC9
 #define POWER_EN 18
 #define FAN_HP 9
 #define FAN_LP 8
@@ -63,7 +63,7 @@ byte THERMISTOR_ROOM = 11;
 #define ICT_FB 26
 #define STERILIZE_FB 29
 #define HUMIDIFIER_FB 30
-#define pulse 14
+#define pulse PC6
 
 #define maxADCvalue 4098
 #define maxPWMvalue 255         //for maple mini with arduino IDE

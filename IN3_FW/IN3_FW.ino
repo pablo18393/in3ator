@@ -6,7 +6,7 @@
 #include <PID_v1.h>
 #include "board.h"
 
-#define FWversion "v2.1"
+#define FWversion "v2.3"
 #define headingTitle "in3ator"
 
 //configuration variables
@@ -53,6 +53,12 @@ const byte pulsioximeterRate = 5;
 byte pulsioximeterCount = 0;
 byte encoderRate = 1;
 byte encoderCount = 0;
+
+//GPRS variables
+#define environmental 1
+#define pulseSensorVariables 2
+#define pulseSensorRaw 3
+#define turnedOn 4
 
 //sensor variables
 int pulsioximeterMean;
