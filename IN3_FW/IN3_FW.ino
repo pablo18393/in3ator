@@ -58,8 +58,8 @@ byte encoderCount = 0;
 //GPRS variables
 #define aliveRefresh 0
 #define environmental 1
-#define pulseSensorVariables 2
-#define pulseSensorRaw 3
+#define ENC_PULSESensorVariables 2
+#define ENC_PULSESensorRaw 3
 #define turnedOn 4
 
 
@@ -98,8 +98,8 @@ boolean A_set[NUMENCODERS];
 boolean B_set[NUMENCODERS];
 volatile int16_t encoderpos[NUMENCODERS];
 volatile int  encodertimer = millis(); // acceleration measurement
-int encoderpinA[NUMENCODERS] = {ENCODER_A}; // pin array of all encoder A inputs
-int encoderpinB[NUMENCODERS] = {ENCODER_B}; // pin array of all encoder B inputs
+int encoderpinA[NUMENCODERS] = {ENC_A}; // pin array of all encoder A inputs
+int encoderpinB[NUMENCODERS] = {ENC_B}; // pin array of all encoder B inputs
 unsigned int lastEncoderPos[NUMENCODERS];
 int EncOldPosition;
 int EncNewPosition;
@@ -131,7 +131,7 @@ int EncNewPosition;
 #define arrow_height  6
 #define arrow_tail  5
 //graphic positions
-#define graphicTextOffset 1                //bar pos is counted from 1, but text from 0
+#define graphJAUNDICEextOffset 1                //bar pos is counted from 1, but text from 0
 //menu
 #define centered 1
 #define leftMargin 0
@@ -196,11 +196,9 @@ bool display_drawStop = 0;
 byte errorHardwareCode[hardwareComponents];
 #define HWPowerEn 1
 #define HWHeater 1
-#define HWGeneric 1
 #define HWFAN_HP 1
 #define HWFAN_LP 1
-#define HWFAN_EXTRA 1
-#define HWICT 1
+#define HWJAUNDICE 1
 #define HWSterilize 1
 #define HWHumidifier 1
 #define HWNTCHeater 1
@@ -210,11 +208,9 @@ byte errorHardwareCode[hardwareComponents];
 //number assigned to hardware
 #define HW_NUM_PowerEn 0         //hardware 1
 #define HW_NUM_Heater 1          //hardware 2
-#define HW_NUM_Generic 2         //hardware 3
 #define HW_NUM_FAN_HP 3            //hardware 4
 #define HW_NUM_FAN_LP 4            //hardware 5
-#define HW_NUM_FAN_EXTRA 5            //hardware 6
-#define HW_NUM_ICT 6             //hardware 7
+#define HW_NUM_JAUNDICE 6             //hardware 7
 #define HW_NUM_Sterilize 7       //hardware 8
 #define HW_NUM_Humidifier 8      //hardware 9
 #define HW_NUM_NTCHeater 9       //hardware 10
@@ -225,11 +221,9 @@ byte errorHardwareCode[hardwareComponents];
 //hardware critical check. 2 is a critical non interchangable hardware, 1 is a critical interchangable hardware, 0 a not critical and interchangable hardware.
 #define HW_CRIT_PowerEn 2
 #define HW_CRIT_Heater 1
-#define HW_CRIT_Generic 0
 #define HW_CRIT_FAN_HP 0
 #define HW_CRIT_FAN_LP 0
-#define HW_CRIT_FAN_EXTRA 0
-#define HW_CRIT_ICT 1
+#define HW_CRIT_JAUNDICE 1
 #define HW_CRIT_Sterilize 1
 #define HW_CRIT_Humidifier 1
 #define HW_CRIT_NTCHeater 2
@@ -239,11 +233,11 @@ byte errorHardwareCode[hardwareComponents];
 #define shortcircuit 2
 #define opencircuit 1
 
-bool hardwareMounted[] = {HWPowerEn, HWHeater, HWGeneric, HWFAN_HP, HWFAN_LP, HWFAN_EXTRA, HWICT, HWSterilize, HWHumidifier, HWNTCHeater, HWNTCRoom, HWHUMSensor};
-bool hardwareCritical[] = {HW_CRIT_PowerEn, HW_CRIT_Heater, HW_CRIT_Generic, HW_CRIT_FAN_HP, HW_CRIT_FAN_LP, HW_CRIT_FAN_EXTRA, HW_CRIT_ICT, HW_CRIT_Sterilize, HW_CRIT_Humidifier, HW_CRIT_NTCHeater, HW_CRIT_NTCRoom, HW_CRIT_HUMSENSOR};
-byte hardwareVerificationPin[] = {POWER_EN, HEATER, GENERIC, FAN_HP, FAN_LP, FAN_EXTRA, ICT, STERILIZE, HUMIDIFIER};
-byte hardwareVerificationPin_FB[] = {POWER_EN_FB, HEATER_FB, GENERIC_FB, FAN_HP_FB, FAN_LP_FB, FAN_EXTRA_FB, ICT_FB, STERILIZE_FB, HUMIDIFIER_FB};
-char* errorComponent[] = {"Power enable MOSFET", "Heater", "Generic", "FAN_HP", "FAN_LP", "FAN_EXTRA", "Jaundice LED", "Sterilizer", "Humidifier", "Temperature sensor", "Temperature sensor", "Humidity sensor"};
+bool hardwareMounted[] = {HWPowerEn, HWHeater, HWFAN_HP, HWFAN_LP, HWJAUNDICE, HWSterilize, HWHumidifier, HWNTCHeater, HWNTCRoom, HWHUMSensor};
+bool hardwareCritical[] = {HW_CRIT_PowerEn, HW_CRIT_Heater, HW_CRIT_FAN_HP, HW_CRIT_FAN_LP, HW_CRIT_JAUNDICE, HW_CRIT_Sterilize, HW_CRIT_Humidifier, HW_CRIT_NTCHeater, HW_CRIT_NTCRoom, HW_CRIT_HUMSENSOR};
+byte hardwareVerificationPin[] = {POWER_EN, HEATER, FAN_HP, FAN_LP, JAUNDICE, STERILIZE, HUMIDIFIER};
+byte hardwareVerificationPin_FB[] = {POWER_EN_FB, HEATER_FB, FAN_HP_FB, FAN_LP_FB, JAUNDICE_FB, STERILIZER_FB, HUMIDIFIER_FB};
+char* errorComponent[] = {"Power enable MOSFET", "Heater", "FAN_HP", "FAN_LP", "Jaundice LED", "Sterilizer", "Humidifier", "Temperature sensor", "Temperature sensor", "Humidity sensor"};
 bool testOK;
 bool testCritical;
 bool criticalError;
@@ -279,7 +273,7 @@ int data, instant_read;
 byte text_size;
 bool pos_text[8];
 volatile int EncMove;
-long last_pulsed;
+long last_ENC_PULSEd;
 char* textToWrite;
 char* words[8];
 char* helpMessage;
@@ -296,7 +290,7 @@ byte missed;
 const byte limit_speed = 40; //40
 bool int_length, int_length_0;
 float factor;
-bool pulsed, pulsed_before;
+bool ENC_PULSEd, ENC_PULSEd_before;
 int time_lock = 16000;
 long CheckTempSensorPinTimeout = 45000; //timeout for checking the thermistor pinout
 bool auto_lock;
@@ -352,9 +346,9 @@ void setup() {
     tft.fillScreen(introTextColor);
     tft.setTextColor(introBackColor);
     hardwareVerification();
-    while (digitalRead(pulse));
+    while (digitalRead(ENC_PULSE));
     delay(100);
-    while (!digitalRead(pulse));
+    while (!digitalRead(ENC_PULSE));
     delay(100);
     }
   */
@@ -369,23 +363,21 @@ void setup() {
 
 void pinDirection() {
   pinMode(SCREENBACKLIGHT, OUTPUT);
-  pinMode(pulse, INPUT_PULLUP);
-  pinMode(ICT, OUTPUT);
+  pinMode(ENC_PULSE, INPUT_PULLUP);
+  pinMode(JAUNDICE, OUTPUT);
   pinMode(HEATER, OUTPUT);
   pinMode(POWER_EN, OUTPUT);
   pinMode(FAN_HP, OUTPUT);
   pinMode(FAN_LP, OUTPUT);
-  pinMode(FAN_EXTRA, OUTPUT);
   pinMode(STERILIZE, OUTPUT);
   pinMode(HUMIDIFIER, OUTPUT);
 
   digitalWrite(SCREENBACKLIGHT, LOW);
-  digitalWrite(ICT, LOW);
+  digitalWrite(JAUNDICE, LOW);
   digitalWrite(HEATER, LOW);
   digitalWrite(POWER_EN, LOW);
   digitalWrite(FAN_HP, LOW);
   digitalWrite(FAN_LP, LOW);
-  digitalWrite(FAN_EXTRA, LOW);
   digitalWrite(STERILIZE, LOW);
   digitalWrite(HUMIDIFIER, LOW);
 }

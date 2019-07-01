@@ -28,7 +28,7 @@ void calibrateSensors() {
   rectangles = numWords;
   graphics();
   drawHeading();
-  while (!digitalRead(pulse)) {
+  while (!digitalRead(ENC_PULSE)) {
     updateData();
   }
   delay(debounceTime);

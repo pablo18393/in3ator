@@ -47,7 +47,7 @@ void actuatorsProgress() {
   if (swapTempSensors) {
     asignCorrectTempSensorsPin();
   }
-  while (!digitalRead(pulse));
+  while (!digitalRead(ENC_PULSE));
   turnFansOn();
   if (temperatureAtStart > temperature[roomNTC]) {
     temperatureAtStart = temperature[roomNTC];
@@ -61,13 +61,13 @@ void actuatorsProgress() {
     updateData();
     if (controlTemperature) {
       if (!temperaturePIDcontrol) {
-        basicTemperatureControl();
+        basJAUNDICEemperatureControl();
       }
     }
     if (controlHumidity) {
       basicHumidityControl();
     }
-    while (!digitalRead(pulse)) {
+    while (!digitalRead(ENC_PULSE)) {
       updateData();
       back_mode();
     }
@@ -88,7 +88,7 @@ void checkTempSensorPin() {
   heatUp();
   while (!exitCheck) {
     updateData();
-    while (!digitalRead(pulse)) {
+    while (!digitalRead(ENC_PULSE)) {
       updateData();
       back_mode();
     }
@@ -139,7 +139,7 @@ void blinkGoBackMessage() {
   }
 }
 
-void basicTemperatureControl() {
+void basJAUNDICEemperatureControl() {
   if (temperature[roomNTC] < desiredRoomTemp) {
     heatUp();
   }
@@ -177,11 +177,9 @@ void turnActuatorsOff() {
 void turnFansOn() {
   analogWrite(FAN_HP, fanSpeed * 2.55);
   digitalWrite(FAN_LP, HIGH);
-  digitalWrite(FAN_EXTRA, HIGH);
 }
 
 void turnFansOff() {
   analogWrite(FAN_HP, LOW);
   digitalWrite(FAN_LP, LOW);
-  digitalWrite(FAN_EXTRA, LOW);
 }

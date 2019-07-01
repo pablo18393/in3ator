@@ -7,8 +7,8 @@ int GPRSPartialMessageLength;
 
 //GPRS variables
 #define environmentalWords[] = "TimeOn","Temperature","Humidity","DesiredTemp","HeaterPower","PIDOutput","HeaterTempLimit";
-#define pulseSensorVariablesWords[] = "BPM","IBI";
-#define pulseSensorRawWords[] = "PulseMeasurements";
+#define ENC_PULSESensorVariablesWords[] = "BPM","IBI";
+#define ENC_PULSESensorRawWords[] = "ENC_PULSEMeasurements";
 #define aliveRefreshWords[] = "timeOn","LEDsON";
 
 bool initGPRS() {
@@ -59,9 +59,9 @@ bool postGPRS(int variable) {
   switch (variable) {
     case environmental:
       break;
-    case pulseSensorVariables:
+    case ENC_PULSESensorVariables:
       break;
-    case pulseSensorRaw:
+    case ENC_PULSESensorRaw:
       break;
     case turnedOn:
       break;
