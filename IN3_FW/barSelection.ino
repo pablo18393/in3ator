@@ -419,7 +419,12 @@ void back_mode() {
       tft.drawLine(width_back - back_bar, 0, width_back - back_bar, height_heading, COLOR_MENU);
     }
     if (back_bar == width_back) {
-      menu();
+      if (page == actuatorsProgressPage) {
+        askSuccess();
+      }
+      else {
+        menu();
+      }
     }
     delay((time_back_draw + time_back_wait) / width_back);
   }

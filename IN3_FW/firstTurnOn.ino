@@ -7,7 +7,7 @@ void firstTurnOn() {
   drawIntroMessage();
   tft.setTextColor(introTextColor);
   for (int i = 0; i < numWords; i++) {
-    pos_text[i] = 0;
+    pos_text[i] = leftMargin;
   }
   if (!language) {
     words[0]  = "pulse to start";
@@ -38,10 +38,10 @@ void helpingMenu() {
   tft.setTextSize(1);
   tft.setTextColor(COLOR_MENU_TEXT);
   for (int i = 0; i < numWords; i++) {
-    pos_text[i] = 0;
+    pos_text[i] = leftMargin;
   }
-  pos_text[2] = 1;
-  pos_text[3] = 1;
+  pos_text[2] = centered;
+  pos_text[3] = centered;
   if (language) {
     words[0]  = "Temperatura";
     words[1] = "LEDS";

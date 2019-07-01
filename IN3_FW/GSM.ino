@@ -9,7 +9,7 @@ int GPRSPartialMessageLength;
 #define environmentalWords[] = "TimeOn","Temperature","Humidity","DesiredTemp","HeaterPower","PIDOutput","HeaterTempLimit";
 #define pulseSensorVariablesWords[] = "BPM","IBI";
 #define pulseSensorRawWords[] = "PulseMeasurements";
-#define turnedOnWords[] = "HardwareErrorCode";
+#define aliveRefreshWords[] = "timeOn","LEDsON";
 
 bool initGPRS() {
   Serial1.begin(115200);

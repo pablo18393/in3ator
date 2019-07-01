@@ -5,7 +5,7 @@ void calibrateSensors() {
   tft.setTextSize(1);
   tft.setTextColor(COLOR_MENU_TEXT);
   for (int i = 0; i < numWords; i++) {
-    pos_text[i] = 0;
+    pos_text[i] = leftMargin;
   }
   pos_text[2] = 1;
   switch (language) {

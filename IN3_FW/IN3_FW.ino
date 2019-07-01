@@ -19,6 +19,7 @@
 #define actuatorsProgressPage 1
 #define settingsPage 2
 #define calibrateSensorsPage 3
+#define askSuccessPage 4
 
 //languages
 #define firstLanguage 1
@@ -55,10 +56,12 @@ byte encoderRate = 1;
 byte encoderCount = 0;
 
 //GPRS variables
+#define aliveRefresh 0
 #define environmental 1
 #define pulseSensorVariables 2
 #define pulseSensorRaw 3
 #define turnedOn 4
+
 
 //sensor variables
 int pulsioximeterMean;
@@ -130,6 +133,8 @@ int EncNewPosition;
 //graphic positions
 #define graphicTextOffset 1                //bar pos is counted from 1, but text from 0
 //menu
+#define centered 1
+#define leftMargin 0
 #define temperatureGraphicPosition 0
 #define humidityGraphicPosition 1
 #define LEDGraphicPosition 2
@@ -142,10 +147,14 @@ int EncNewPosition;
 #define fanGraphicPosition 3
 #define setStandardValuesGraphicPosition 4
 #define calibrateGraphicPosition 5
-//settings
+//calibration
 #define temperatureCalibrationGraphicPosition 0
 #define humidityCalibrationGraphicPosition 1
 #define restartCalibrationValuesTempGraphicPosition 2
+//askSuccess
+#define successQuestionGraphicPosition 0
+#define afirmativeGraphicPosition 1
+#define negativeGraphicPosition 2
 //colors
 #define BLACK 0x0000
 #define BLUE 0x001F
