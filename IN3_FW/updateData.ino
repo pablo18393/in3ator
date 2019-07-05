@@ -91,6 +91,28 @@ void updateSensors() {
 }
 
 void checkSerialPort() {
+  if (Serial1.available()) {
+    switch (Serial1.read()) {
+      case 'T':
+        Serial1.println(temperature[0]);
+        break;
+      case 'P':
+        Serial1.println("PING");
+        break;
+      case 'I':
+        pinMode(PB1, INPUT_PULLUP);
+        Serial1.println("INPUT");
+        break;
+      case 'A':
+        Serial1.println(analogRead(PB1));
+        /*        while (1) {
+                  Serial1.println(analogRead(PB1));
+                  delay(15);
+                  }
+        */
+        break;
+    }
+  }
   if (Serial.available()) {
     switch (Serial.read()) {
       case 'T':

@@ -5,8 +5,8 @@
 #define TFT_RST PD2
 #define DHTPIN PC10
 #define SCREENBACKLIGHT PB4
-word THERMISTOR_HEATER = PB1; //This is not #define because can be swaped with THERMISTOR_ROOM
-word THERMISTOR_ROOM = PC1;   //This is not #define because can be swaped with THERMISTOR_HEATER
+word THERMISTOR_HEATER = PC1; //This is not #define because can be swaped with THERMISTOR_ROOM
+word THERMISTOR_ROOM = PB1;   //This is not #define because can be swaped with THERMISTOR_HEATER
 #define ENC_A PC8
 #define ENC_B PC9
 #define ENC_ENC_PULSE PC6

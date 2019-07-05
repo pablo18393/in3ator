@@ -1,27 +1,3 @@
-void initSensors() {
-  encodertimer = millis(); // acceleration measurement
-  for (byte counter = 0; counter < NUMENCODERS; counter++)
-  {
-    encstate[counter] = HIGH;
-    encflag[counter] = HIGH;
-    A_set[counter] = false;
-    B_set[counter] = false;
-    encoderpos[counter] = 0;
-    pinMode(encoderpinA[counter], INPUT_PULLUP);
-    pinMode(encoderpinB[counter], INPUT_PULLUP);
-    lastEncoderPos[counter] = 1;
-  }
-  // timer setup for encoder
-  initPulsioximeterVariables();
-  sensorsTimer.pause();
-  sensorsTimer.setPeriod(sensorsRate); // in microseconds
-  sensorsTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
-  sensorsTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
-  sensorsTimer.attachCompare1Interrupt(sensorsISR);
-  sensorsTimer.refresh();
-  sensorsTimer.resume();
-}
-
 int myEncoderRead() {
   if ((lastEncoderPos[counter] != encoderpos[counter])) {
     encflag[counter] = LOW;

@@ -35,7 +35,7 @@
 #define inBoardLeftNTC 2
 #define inBoardRightNTC 3
 #define dhtSensor 1
-#define numNTC 4
+#define numNTC 2
 #define numTempSensors 5
 #define temperature_fraction 20 //numbers of measures of the temperatures sensors
 
@@ -91,7 +91,7 @@ const byte minHum = 20;
 
 //Encoder variables
 #define NUMENCODERS 1
-byte NTCpin[numNTC] = {THERMISTOR_HEATER, THERMISTOR_ROOM, THERMISTOR_INBOARD_LEFT, THERMISTOR_INBOARD_RIGHT};
+byte NTCpin[numNTC] = {THERMISTOR_HEATER, THERMISTOR_ROOM};
 volatile int encstate[NUMENCODERS];
 volatile int encflag[NUMENCODERS];
 boolean A_set[NUMENCODERS];
@@ -305,7 +305,7 @@ int fanSpeed;
 int LEDIntensity;
 long last_temp_update;
 long temp_update_rate = 1000;
-int backlight_intensity = 100;
+int backlight_intensity = 50;
 bool enableSet;
 float temperaturePercentage, temperatureAtStart;
 float humidityPercentage, humidityAtStart;
@@ -333,14 +333,7 @@ HardwareTimer sensorsTimer(1);
 HardwareTimer roomPIDTimer(2);
 
 void setup() {
-  Serial.begin(115200);
-  initEEPROM();
-  pinDirection();
-  initPIDTimers();
-  tft.begin();
-  tft.setRotation(1);
-  //loadLogo();
-  dht.setup(DHTPIN);
+  initBoard();
   /*
     while (1) {
     tft.fillScreen(introTextColor);
@@ -352,32 +345,5 @@ void setup() {
     delay(100);
     }
   */
-  Serial.print("IN3ATOR, VERSION ");
-  Serial.println(FWversion);
-  initSensors();
-  EncNewPosition = myEncoderRead();
-  EncOldPosition = EncNewPosition;
   menu();
-}
-
-
-void pinDirection() {
-  pinMode(SCREENBACKLIGHT, OUTPUT);
-  pinMode(ENC_PULSE, INPUT_PULLUP);
-  pinMode(JAUNDICE, OUTPUT);
-  pinMode(HEATER, OUTPUT);
-  pinMode(POWER_EN, OUTPUT);
-  pinMode(FAN_HP, OUTPUT);
-  pinMode(FAN_LP, OUTPUT);
-  pinMode(STERILIZE, OUTPUT);
-  pinMode(HUMIDIFIER, OUTPUT);
-
-  digitalWrite(SCREENBACKLIGHT, LOW);
-  digitalWrite(JAUNDICE, LOW);
-  digitalWrite(HEATER, LOW);
-  digitalWrite(POWER_EN, LOW);
-  digitalWrite(FAN_HP, LOW);
-  digitalWrite(FAN_LP, LOW);
-  digitalWrite(STERILIZE, LOW);
-  digitalWrite(HUMIDIFIER, LOW);
 }
