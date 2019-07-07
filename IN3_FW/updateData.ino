@@ -13,7 +13,7 @@ int updateData() {
   lastEncoderPos[counter] = encoderpos[counter];
   EncOldPosition = EncNewPosition;
 
-  if (page == menuPage || page == actuatorsProgressPage) {
+  if (page == advancedModePage || page == actuatorsProgressPage) {
     if (millis() - last_temp_update > temp_update_rate) {
       updateSensors();
       if (page == actuatorsProgressPage) {
@@ -21,7 +21,7 @@ int updateData() {
       }
     }
   }
-  if (!page && !enableSet) {
+  if ((page == mainMenuPage || page == advancedModePage) && !enableSet) {
     checkSetMessage();
   }
   checkSerialPort();
@@ -43,7 +43,7 @@ void checkNewPulsioximeterData() {
 
 void updateSensors() {
   tft.setTextColor(COLOR_MENU);
-  if (page == menuPage || (page == actuatorsProgressPage && controlTemperature)) {
+  if (page == advancedModePage || (page == actuatorsProgressPage && controlTemperature)) {
     tft.drawFloat(previousTemperature[roomNTC], 1, temperatureX, temperatureY, textFontSize);
   }
   if (page != actuatorsProgressPage || controlHumidity) {
@@ -51,7 +51,7 @@ void updateSensors() {
   }
   updateTemp(numNTC);
   tft.setTextColor(COLOR_MENU_TEXT);
-  if (page == menuPage || (page == actuatorsProgressPage && controlTemperature)) {
+  if (page == advancedModePage || (page == actuatorsProgressPage && controlTemperature)) {
     tft.drawFloat(temperature[roomNTC], 1, temperatureX, temperatureY, textFontSize);
     previousTemperature[roomNTC] = temperature[roomNTC];
   }
@@ -61,7 +61,7 @@ void updateSensors() {
       if (displayProcessPercentage) {
         drawRightNumber(temperaturePercentage, tft.width() / 2, temperatureY);
       }
-      temperaturePercentage = 100 - ((desiredRoomTemp - temperature[roomNTC]) * 100 / (desiredRoomTemp - temperatureAtStart));
+      temperaturePercentage = 100 - ((desiredSkinTemp - temperature[roomNTC]) * 100 / (desiredSkinTemp - temperatureAtStart));
       if (temperaturePercentage > 99) {
         temperaturePercentage = 100;
       }
@@ -163,7 +163,7 @@ int readSerialData() {
 void printStatus() {
   Serial.print(millis() / 1000);
   Serial.print(";");
-  Serial.print(desiredRoomTemp);
+  Serial.print(desiredSkinTemp);
   Serial.print(";");
   Serial.print(heaterTempLimit);
   Serial.print(";");

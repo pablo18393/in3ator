@@ -15,11 +15,12 @@
 #define timePressToSettings 5000 //in millis, time to press to go to settings window
 
 //pages
-#define menuPage 0
-#define actuatorsProgressPage 1
-#define settingsPage 2
-#define calibrateSensorsPage 3
-#define askSuccessPage 4
+#define mainMenuPage 0
+#define advancedModePage 1
+#define actuatorsProgressPage 2
+#define settingsPage 3
+#define calibrateSensorsPage 4
+#define askSuccessPage 5
 
 //languages
 #define firstLanguage 1
@@ -39,7 +40,7 @@
 #define numTempSensors 5
 #define temperature_fraction 20 //numbers of measures of the temperatures sensors
 
-
+int gestationWeeks = 28;
 int temperatureArray [numNTC][temperature_fraction];
 bool faultNTC[numNTC];
 byte heaterPower;
@@ -88,6 +89,8 @@ const byte minTemp = 15;
 const byte maxTemp = 45;
 const byte maxHum = 100;
 const byte minHum = 20;
+const byte maxGestation = 100;
+const byte minGestation = 1;
 
 //Encoder variables
 #define NUMENCODERS 1
@@ -131,10 +134,15 @@ int EncNewPosition;
 #define arrow_height  6
 #define arrow_tail  5
 //graphic positions
-#define graphJAUNDICEextOffset 1                //bar pos is counted from 1, but text from 0
-//menu
+#define graphicTextOffset  1                //bar pos is counted from 1, but text from 0
 #define centered 1
 #define leftMargin 0
+//mainMenu
+#define gestationGraphicPosition 0
+#define advancedModeGraphicPosition 1
+#define LEDGraphicPosition 2
+#define startGraphicPosition 3
+//Advanced mode
 #define temperatureGraphicPosition 0
 #define humidityGraphicPosition 1
 #define LEDGraphicPosition 2
@@ -250,6 +258,8 @@ Adafruit_ILI9341_STM tft = Adafruit_ILI9341_STM(TFT_CS, TFT_DC, TFT_RST); // Use
 DHT dht;
 
 //Text Graphic position
+int gestationWeeksXPos;
+int LEDXPos;
 int humidityX;
 int humidityY;
 int temperatureX;
@@ -273,7 +283,7 @@ int data, instant_read;
 byte text_size;
 bool pos_text[8];
 volatile int EncMove;
-long last_ENC_PULSEd;
+long last_encPulsed;
 char* textToWrite;
 char* words[8];
 char* helpMessage;
@@ -290,7 +300,7 @@ byte missed;
 const byte limit_speed = 40; //40
 bool int_length, int_length_0;
 float factor;
-bool ENC_PULSEd, ENC_PULSEd_before;
+bool encPulsed, encPulsedBefore;
 int time_lock = 16000;
 long CheckTempSensorPinTimeout = 45000; //timeout for checking the thermistor pinout
 bool auto_lock;
@@ -298,7 +308,7 @@ int language;
 bool swapTempSensors;
 int goBackTextY = tft.height() / 2;
 double desiredHeaterTemp;
-double desiredRoomTemp = 36.5;
+double desiredSkinTemp = 36.5;
 int desiredRoomHum = 80;
 double heaterTempLimit;
 int fanSpeed;
@@ -345,5 +355,5 @@ void setup() {
     delay(100);
     }
   */
-  menu();
+  mainMenu();
 }

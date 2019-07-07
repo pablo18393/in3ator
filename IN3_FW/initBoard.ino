@@ -1,22 +1,8 @@
 void initBoard() {
-  Serial.begin(115200);
-  Serial.print("IN3ATOR, VERSION ");
-  Serial.println(FWversion);
-  pinMode(PC11, OUTPUT);
-  digitalWrite(PC11, HIGH);
-  delay(1000);
-  pinMode(PC14, OUTPUT);
-  delay(1200);
-  digitalWrite(PC14, HIGH);
-  delay(1200);
-  digitalWrite(PC14, LOW);
-
-  Serial1.begin(115200);
-  Serial1.print("HELLO");
   initEEPROM();
   pinDirection();
   initPIDTimers();
-  tft.begin(); 
+  tft.begin();
   tft.setRotation(1);
   //loadLogo();
   dht.setup(DHTPIN);

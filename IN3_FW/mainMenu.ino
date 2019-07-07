@@ -1,5 +1,5 @@
-void menu() {
-  page = menuPage;
+void mainMenu() {
+  page = mainMenuPage;
   byte numWords = 4;
   print_text = 1;
   tft.setTextSize(1);
@@ -7,9 +7,22 @@ void menu() {
   for (int i = 0; i < numWords; i++) {
     pos_text[i] = leftMargin;
   }
-  pos_text[settingsGraphicPosition] = centered;
+  pos_text[advancedModeGraphicPosition] = centered;
   pos_text[startGraphicPosition] = centered;
-
+  switch (language) {
+    case spanish:
+      words[gestationGraphicPosition]  = "Semanas gestacion";
+      words[advancedModeGraphicPosition] = "Modo avanzado";
+      break;
+    case english:
+      words[gestationGraphicPosition]  = "Gestation weeks";
+      words[advancedModeGraphicPosition] = "Advanced mode";
+      break;
+    case french:
+      words[gestationGraphicPosition]  = "Semaines de gestation";
+      words[advancedModeGraphicPosition] = "Mode avance";
+      break;
+  }
   words[LEDGraphicPosition] = "LED";
   words[startGraphicPosition] = "";
   rectangles = numWords;

@@ -1,5 +1,3 @@
-
-
 void graphics() {
   if (!page) {
     tft.fillRect(width_select, height_heading, tft.width() - width_select, tft.height() - height_heading, COLOR_MENU);
@@ -27,7 +25,23 @@ void graphics() {
         tft.drawCentreString(words[i], width_select + (tft.width() - width_select) / 2, ypos, textFontSize);
       }
       switch (page) {
-        case menuPage:
+        case mainMenuPage:
+          switch (i) {
+            case gestationGraphicPosition:
+              tft.drawRightString(initialSensorsValue, gestationWeeksXPos, ypos, textFontSize);
+              break;
+            case LEDGraphicPosition:
+              if (LEDIntensity) {
+                drawRightNumber(LEDIntensity, LEDXPos, ypos);
+                tft.drawRightString("%", unitPosition, ypos, textFontSize);
+              }
+              else {
+                tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
+              }
+              break;
+          }
+          break;
+        case advancedModePage:
           switch (i) {
             case temperatureGraphicPosition:
               drawTemperatureUnits();
@@ -36,7 +50,7 @@ void graphics() {
               break;
             case LEDGraphicPosition:
               if (LEDIntensity) {
-                drawRightNumber(LEDIntensity, 280, ypos);
+                drawRightNumber(LEDIntensity, LEDXPos, ypos);
                 tft.drawRightString("%", unitPosition, ypos, textFontSize);
               }
               else {
@@ -122,11 +136,16 @@ void graphics() {
 
 void setSensorsGraphicPosition() {
   switch (page) {
-    case menuPage:
+    case mainMenuPage:
+      gestationWeeksXPos = tft.width() - letter_width * 2;
+      LEDXPos = tft.width() - letter_width * 2;
+      break;
+    case advancedModePage:
       humidityX = tft.width() - 50;
       humidityY = graphicHeight(humidityGraphicPosition);
       temperatureX = tft.width() - 79;
       temperatureY = graphicHeight(temperatureGraphicPosition);
+      LEDXPos = tft.width() - letter_width * 2;
       break;
     case actuatorsProgressPage:
       barWidth = tft.width() / 4 * 2;
@@ -169,7 +188,7 @@ void updateBar() {
   }
 }
 
-void clearMenu() {
+void clearmainMenu() {
   tft.fillRect(0, height_heading, tft.width(), tft.height() - height_heading, BLACK);
 }
 
@@ -336,7 +355,7 @@ void drawActuatorsSeparators() {
 
 void printLoadingTemperatureBar() {
   barThickness = 3;
-  tft.drawFloat(desiredRoomTemp, 1, tft.width() - 5 * letter_width, temperatureY, textFontSize);
+  tft.drawFloat(desiredSkinTemp, 1, tft.width() - 5 * letter_width, temperatureY, textFontSize);
   for (int i = 1; i <= barThickness; i++) {
     tft.drawRect(tempBarPosX - barWidth / 2 - i, tempBarPosY - barHeight / 2 - i, barWidth + i * 2, barHeight + i * 2, COLOR_FRAME_BAR);
   }

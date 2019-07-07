@@ -22,7 +22,7 @@ void firstTurnOn() {
   }
   while (digitalRead(ENC_PULSE));
   delay(debounceTime);
-  void helpingMenu();
+  void helpingmainMenu();
   displayMenuHelp();
   displayTemperatureHelp();
   displaySettingsHelp();
@@ -30,9 +30,9 @@ void firstTurnOn() {
   while (1);
 }
 
-void helpingMenu() {
+void helpingmainMenu() {
   tft.fillScreen(COLOR_MENU);
-  page = menuPage;
+  page = advancedModePage;
   byte  numWords = 4;
   setSensorsGraphicPosition();
   tft.setTextSize(1);
@@ -76,7 +76,7 @@ void helpingMenu() {
 void waitForENC_PULSE() {
   while (digitalRead(ENC_PULSE));
   delay(debounceTime);
-  helpingMenu();
+  helpingmainMenu();
   while (!digitalRead(ENC_PULSE));
   delay(debounceTime);
 }

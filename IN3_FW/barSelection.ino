@@ -44,27 +44,88 @@ void barSelection() {
       }
       while (!digitalRead(ENC_PULSE)) {
         checkEncoderPress();
-        if (page != menuPage) {
+        if (page != mainMenuPage) {
           back_mode();
         }
       }
       delay(debounceTime);
       switch (page) {
-        case menuPage:
-          switch (bar_pos - graphJAUNDICEextOffset) {
+        case mainMenuPage:
+          switch (bar_pos - graphicTextOffset ) {
+            case gestationGraphicPosition:
+              while (digitalRead(ENC_PULSE)) {
+                updateData();
+                if (EncMove && -EncMove + desiredSkinTemp >= minGestation && -EncMove + desiredSkinTemp <= maxGestation) {
+                  tft.setTextColor(COLOR_MENU);
+                  if (!controlTemperature || !controlHumidity) {
+                    controlTemperature = 1;
+                    controlHumidity = 1;
+                    tft.drawRightString(initialSensorsValue, gestationWeeksXPos, ypos, textFontSize);
+                  }
+                  drawRightNumber(gestationWeeks, gestationWeeksXPos, ypos);
+                  gestationWeeks -= EncMove;
+                  setPresetEnvironmentalValues();
+                  tft.setTextColor(COLOR_MENU_TEXT);
+                  drawRightNumber(gestationWeeks, gestationWeeksXPos, ypos);
+                  enableSet = 1;
+                }
+                EncMove = 0;
+              }
+              drawStartMessage();
+              break;
+            case advancedModeGraphicPosition:
+              advancedMode();
+              break;
+            case LEDGraphicPosition:
+              while (digitalRead(ENC_PULSE) ) {
+                updateData();
+                if (EncMove && -EncMove + LEDIntensity >= 0 && -EncMove + LEDIntensity <= LEDMaxIntensity) {
+                  tft.setTextColor(COLOR_MENU);
+                  drawRightNumber(LEDIntensity, LEDXPos, ypos);
+                  if (!LEDIntensity && EncMove) {
+                    tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
+                    tft.setTextColor(COLOR_MENU_TEXT);
+                    tft.drawRightString("%", unitPosition, ypos, textFontSize);
+                  }
+                  LEDIntensity -= 10 * EncMove;
+                  analogWrite(JAUNDICE, LEDIntensity);
+                  tft.setTextColor(COLOR_MENU_TEXT);
+                  if (!LEDIntensity && EncMove) {
+                    tft.setTextColor(COLOR_MENU);
+                    tft.drawRightString("%", unitPosition, ypos, textFontSize);
+                    tft.setTextColor(COLOR_MENU_TEXT);
+                    tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
+                  }
+                  else {
+                    drawRightNumber(LEDIntensity, LEDXPos, ypos);
+                  }
+                }
+                EncMove = 0;
+              }
+              break;
+            case settingsGraphicPosition:
+              settings();
+              break;
+            case startGraphicPosition:
+              actuatorsProgress();
+              break;
+          }
+          break;
+        case advancedModePage:
+          switch (bar_pos - graphicTextOffset ) {
             case temperatureGraphicPosition:
               while (digitalRead(ENC_PULSE)) {
                 updateData();
-                if (EncMove && -EncMove + desiredRoomTemp >= minTemp && -EncMove + desiredRoomTemp <= maxTemp) {
+                if (EncMove && -EncMove + desiredSkinTemp >= minTemp && -EncMove + desiredSkinTemp <= maxTemp) {
                   tft.setTextColor(COLOR_MENU);
                   if (!controlTemperature) {
                     controlTemperature = 1;
                     tft.drawRightString(initialSensorsValue, initialSensorPosition, temperatureY, textFontSize);
                   }
-                  tft.drawFloat(desiredRoomTemp, 1, temperatureX - 65, temperatureY, textFontSize);
-                  desiredRoomTemp -= float(EncMove) / 10;
+                  tft.drawFloat(desiredSkinTemp, 1, temperatureX - 65, temperatureY, textFontSize);
+                  desiredSkinTemp -= float(EncMove) / 10;
                   tft.setTextColor(COLOR_MENU_TEXT);
-                  tft.drawFloat(desiredRoomTemp, 1, temperatureX - 65, temperatureY, textFontSize);
+                  tft.drawFloat(desiredSkinTemp, 1, temperatureX - 65, temperatureY, textFontSize);
                   enableSet = 1;
                 }
                 EncMove = 0;
@@ -95,7 +156,7 @@ void barSelection() {
                 updateData();
                 if (EncMove && -EncMove + LEDIntensity >= 0 && -EncMove + LEDIntensity <= LEDMaxIntensity) {
                   tft.setTextColor(COLOR_MENU);
-                  drawRightNumber(LEDIntensity, 280, ypos);
+                  drawRightNumber(LEDIntensity, LEDXPos, ypos);
                   if (!LEDIntensity && EncMove) {
                     tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
@@ -111,7 +172,7 @@ void barSelection() {
                     tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
                   }
                   else {
-                    drawRightNumber(LEDIntensity, 280, ypos);
+                    drawRightNumber(LEDIntensity, LEDXPos, ypos);
                   }
                 }
                 EncMove = 0;
@@ -126,7 +187,7 @@ void barSelection() {
           }
           break;
         case settingsPage:
-          switch (bar_pos - graphJAUNDICEextOffset) {
+          switch (bar_pos - graphicTextOffset ) {
             case autoLockGraphicPosition:
               while (digitalRead(ENC_PULSE)) {
                 updateData();
@@ -302,7 +363,7 @@ void barSelection() {
           }
           break;
         case calibrateSensorsPage:
-          switch (bar_pos - graphJAUNDICEextOffset) {
+          switch (bar_pos - graphicTextOffset ) {
             case temperatureCalibrationGraphicPosition:
               while (digitalRead(ENC_PULSE)) {
                 updateData();
@@ -350,7 +411,7 @@ void barSelection() {
       tft.fillRect(0, (tft.height() - height_heading) * (bar_pos - 1) / rectangles + height_heading, width_select, (tft.height() - height_heading) / rectangles, WHITE);
       while (!digitalRead(ENC_PULSE)) {
         checkEncoderPress();
-        if (page != menuPage) {
+        if (page != mainMenuPage) {
           back_mode();
         }
       }
@@ -361,7 +422,7 @@ void barSelection() {
 
 void checkEncoderPress() {
   updateData();
-  if (page == menuPage) {
+  if (page == mainMenuPage) {
     long timePressed = millis();
     while (!digitalRead(ENC_PULSE)) {
       updateData();
@@ -389,32 +450,73 @@ void checkSetMessage() {
     blinkSetMessageState = !blinkSetMessageState;
     if (blinkSetMessageState) {
       tft.setTextColor(COLOR_WARNING_TEXT);
+
     }
     else {
       tft.setTextColor(COLOR_MENU);
     }
-    switch (language) {
-      case english:
-        helpMessage = "Set desired temperature";
-        break;
-      case spanish:
-        helpMessage = "Introduce temperatura";
-        break;
-      case french:
-        helpMessage = "Regler temperature desiree";
-        break;
+    if (page == mainMenuPage) {
+      switch (language) {
+        case english:
+          helpMessage = "Set gestation weeks";
+          break;
+        case spanish:
+          helpMessage = "Introduce semanas de gestacion";
+          break;
+        case french:
+          helpMessage = "Regler semaines de gestation";
+          break;
+      }
+    }
+    else if (page == advancedModePage) {
+      switch (language) {
+        case english:
+          helpMessage = "Set desired temperature";
+          break;
+        case spanish:
+          helpMessage = "Introduce temperatura";
+          break;
+        case french:
+          helpMessage = "Regler temperature desiree";
+          break;
+      }
     }
     tft.drawCentreString(helpMessage, width_select + (tft.width() - width_select) / 2, getYpos(goToProcessRow), textFontSize);
+
+  }
+}
+
+void setPresetEnvironmentalValues() {
+  if (gestationWeeks <= 29) {
+    desiredSkinTemp = 36.8;
+  }
+  else {
+    desiredSkinTemp = 36.8;
+  }
+  if (gestationWeeks <= 28) {
+    desiredRoomHum = 100;
+  }
+  else if (gestationWeeks <= 32) {
+    desiredRoomHum = 75;
+  }
+  else if (gestationWeeks <= 34) {
+    desiredRoomHum = 55;
+  }
+  else if (gestationWeeks <= 35) {
+    desiredRoomHum = 50;
+  }
+  else {
+    desiredRoomHum = 30;
   }
 }
 
 void back_mode() {
   delay(debounceTime);
-  last_ENC_PULSEd = millis();
+  last_encPulsed = millis();
   byte back_bar = 0;
   while (!digitalRead(ENC_PULSE)) {
     updateData();
-    if (millis() - last_ENC_PULSEd > time_back_wait) {
+    if (millis() - last_encPulsed > time_back_wait) {
       back_bar++;
       tft.drawLine(width_back - back_bar, 0, width_back - back_bar, height_heading, COLOR_MENU);
     }
@@ -423,12 +525,12 @@ void back_mode() {
         askSuccess();
       }
       else {
-        menu();
+        mainMenu();
       }
     }
     delay((time_back_draw + time_back_wait) / width_back);
   }
-  if (millis() - last_ENC_PULSEd > time_back_wait) {
+  if (millis() - last_encPulsed > time_back_wait) {
     drawBack();
   }
   delay(50);

@@ -140,7 +140,7 @@ void blinkGoBackMessage() {
 }
 
 void basJAUNDICEemperatureControl() {
-  if (temperature[roomNTC] < desiredRoomTemp) {
+  if (temperature[roomNTC] < desiredSkinTemp) {
     heatUp();
   }
   else {

@@ -148,11 +148,11 @@ bool readHumSensor() {
 }
 
 void asleep() {
-  ENC_PULSEd = digitalRead(ENC_PULSE);
-  if (ENC_PULSEd != ENC_PULSEd_before) {
+  encPulsed = digitalRead(ENC_PULSE);
+  if (encPulsed != encPulsedBefore) {
     last_something = millis();
   }
-  ENC_PULSEd_before = ENC_PULSEd;
+  encPulsedBefore = encPulsed;
   if (auto_lock) {
     if (millis() - last_something > time_lock) {
       analogWrite(SCREENBACKLIGHT, 0);
