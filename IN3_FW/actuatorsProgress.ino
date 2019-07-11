@@ -61,7 +61,7 @@ void actuatorsProgress() {
     updateData();
     if (controlTemperature) {
       if (!temperaturePIDcontrol) {
-        basJAUNDICEemperatureControl();
+        basictemperatureControl();
       }
     }
     if (controlHumidity) {
@@ -139,7 +139,7 @@ void blinkGoBackMessage() {
   }
 }
 
-void basJAUNDICEemperatureControl() {
+void basictemperatureControl() {
   if (temperature[roomNTC] < desiredSkinTemp) {
     heatUp();
   }
@@ -159,8 +159,8 @@ void basicHumidityControl() {
 
 void heatUp() {
   if (temperature[heaterNTC] < heaterTempLimit) {
-    analogWrite(HEATER, maxHeaterPWM);
-    heaterPower = maxHeaterPWM;
+    dac_write_channel(DAC, HEATER, maxDACvalueHeater);
+    heaterPower = maxDACvalueHeater;
   }
   else {
     analogWrite(HEATER, 0);
@@ -170,7 +170,7 @@ void heatUp() {
 
 void turnActuatorsOff() {
   digitalWrite(HEATER, LOW);
-  analogWrite(HEATER, 0);
+  dac_write_channel(DAC, HEATER, 0);
   digitalWrite(HUMIDIFIER, LOW);
 }
 

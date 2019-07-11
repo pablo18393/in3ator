@@ -5,6 +5,7 @@
 #include "DHT.h"
 #include <PID_v1.h>
 #include "board.h"
+#include "libmaple/dac.h"
 
 #define FWversion "v2.3"
 #define headingTitle "in3ator"
@@ -274,7 +275,7 @@ const byte fanMaxSpeed = 100;
 const byte LEDMaxIntensity = 100;
 const byte standardHeaterTempLimit = 85; //max heater temperature
 const byte standardFanSpeed = 100;
-byte maxHeaterPWM = 255;      //max power for heater, full power (255) is 50W
+byte maxDACvalueHeater = maxDACvalue;      //max power for heater, full power (255) is 50W
 
 
 int page, page0;
@@ -339,7 +340,16 @@ volatile long interruptcounter;
 #define heaterPIDRate 200000   // times of roomPIDRate;
 int roomPIDfactor = roomPIDRate / NTCInterruptRate;
 int heaterPIDfactor = heaterPIDRate / NTCInterruptRate;
-HardwareTimer sensorsTimer(1);
+/*
+STM32F103RE Timers
+Timer Ch. 1 Ch. 2 Ch. 3 Ch. 4
+1     PA8   PA9   PA10  
+2     PA0   PA1   PA2    PA3
+3     PA6   PA7   PB0    PB1
+4     PB6   PB7   PB8    PB9
+8     PC6   PC7   PC8    PC9
+ */
+HardwareTimer sensorsTimer(8);
 HardwareTimer roomPIDTimer(2);
 
 void setup() {

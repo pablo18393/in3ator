@@ -11,9 +11,9 @@ word THERMISTOR_ROOM = PB1;   //This is not #define because can be swaped with T
 #define ENC_B PC9
 #define ENC_ENC_PULSE PC6
 #define POWER_EN PC11
-#define FAN_HP PB8
+#define FAN_HP PA8
 #define FAN_LP PB11
-#define HEATER PA4
+#define HEATER DAC_CH1 //PA4 pin
 #define JAUNDICE PB0
 #define STERILIZE PA15
 #define HUMIDIFIER PB14
@@ -66,5 +66,6 @@ word THERMISTOR_ROOM = PB1;   //This is not #define because can be swaped with T
   #define HUMIDIFIER_FB 30
   #define ENC_PULSE PC6
 */
-#define maxADCvalue 4098
-#define maxPWMvalue 255         //for maple mini with arduino IDE
+#define maxADCvalue 4095
+#define maxPWMvalue 255         //for STM32F103RE with arduino IDE
+#define maxDACvalue 4095         //for STM32F103RE with arduino IDE

@@ -1,15 +1,19 @@
 void initBoard() {
-  initEEPROM();
   pinDirection();
-  initPIDTimers();
+  initEEPROM();
+  initGPRS();
+  initTimers();
   tft.begin();
   tft.setRotation(1);
   //loadLogo();
-  dht.setup(DHTPIN);
-  initSensors();
+  //initSensors();
+
+  analogWrite(PA8, 125);
+  while (1);
 }
 
 void initSensors() {
+  dht.setup(DHTPIN);
   encodertimer = millis(); // acceleration measurement
   for (byte counter = 0; counter < NUMENCODERS; counter++)
   {
@@ -24,25 +28,19 @@ void initSensors() {
   }
   // timer setup for encoder
   initPulsioximeterVariables();
-  sensorsTimer.pause();
-  sensorsTimer.setPeriod(sensorsRate); // in microseconds
-  sensorsTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
-  sensorsTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
-  sensorsTimer.attachCompare1Interrupt(sensorsISR);
-  sensorsTimer.refresh();
-  sensorsTimer.resume();
 }
 
 void pinDirection() {
   pinMode(SCREENBACKLIGHT, OUTPUT);
   pinMode(ENC_PULSE, INPUT_PULLUP);
   pinMode(JAUNDICE, OUTPUT);
-  pinMode(HEATER, OUTPUT);
   pinMode(POWER_EN, OUTPUT);
   pinMode(FAN_HP, OUTPUT);
   pinMode(FAN_LP, OUTPUT);
   pinMode(STERILIZE, OUTPUT);
   pinMode(HUMIDIFIER, OUTPUT);
+  dac_init(DAC, HEATER);   // Enable DAC channel in heater pin
+  pinMode(HEATER, OUTPUT);
 
   digitalWrite(SCREENBACKLIGHT, HIGH);
   digitalWrite(JAUNDICE, LOW);
@@ -52,4 +50,28 @@ void pinDirection() {
   digitalWrite(FAN_LP, LOW);
   digitalWrite(STERILIZE, LOW);
   digitalWrite(HUMIDIFIER, LOW);
+}
+
+
+void initTimers() {
+  // PID setup for encoder
+  roomPIDTimer.pause();
+  roomPIDTimer.setPeriod(NTCInterruptRate); // in microseconds
+  roomPIDTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
+  roomPIDTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
+  roomPIDTimer.attachCompare1Interrupt(roomPIDInterrupt);
+  roomPIDTimer.refresh();
+  roomPIDTimer.resume();
+
+  roomPID.SetSampleTime(roomPIDRate / 1000);       //in milliseconds
+  heaterPID.SetSampleTime(heaterPIDRate / 1000); //in milliseconds
+  heaterPID.SetOutputLimits(0, maxDACvalueHeater);
+
+  sensorsTimer.pause();
+  sensorsTimer.setPeriod(sensorsRate); // in microseconds
+  sensorsTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
+  sensorsTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
+  sensorsTimer.attachCompare1Interrupt(sensorsISR);
+  sensorsTimer.refresh();
+  sensorsTimer.resume();
 }

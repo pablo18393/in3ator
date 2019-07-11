@@ -131,10 +131,10 @@ void checkSerialPort() {
         diffHumidity = humidity - readSerialData();
         humidity -= diffHumidity;
         break;
-      case 'P':
-        maxHeaterPWM = readSerialData();
+      case 'P':      
+        maxDACvalueHeater = readSerialData();
         Serial.print("Heater max PWM is: ");
-        Serial.println(maxHeaterPWM);
+        Serial.println(maxDACvalue);        
         break;
       case 'R':
         nvic_sys_reset();
