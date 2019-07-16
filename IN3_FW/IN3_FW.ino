@@ -44,7 +44,7 @@
 int gestationWeeks = 28;
 int temperatureArray [numNTC][temperature_fraction];
 bool faultNTC[numNTC];
-byte heaterPower;
+int heaterPower;
 byte numSensors;
 double temperature[numTempSensors];
 double previousTemperature[numTempSensors];
@@ -275,8 +275,7 @@ const byte fanMaxSpeed = 100;
 const byte LEDMaxIntensity = 100;
 const byte standardHeaterTempLimit = 85; //max heater temperature
 const byte standardFanSpeed = 100;
-byte maxDACvalueHeater = maxDACvalue;      //max power for heater, full power (255) is 50W
-
+int maxDACvalueHeater = maxDACvalue;      //max power for heater, full power (4095) is 50W
 
 int page, page0;
 bool selected;

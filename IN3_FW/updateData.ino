@@ -134,7 +134,7 @@ void checkSerialPort() {
       case 'P':      
         maxDACvalueHeater = readSerialData();
         Serial.print("Heater max PWM is: ");
-        Serial.println(maxDACvalue);        
+        Serial.println(maxDACvalueHeater);        
         break;
       case 'R':
         nvic_sys_reset();

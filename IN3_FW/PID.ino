@@ -19,7 +19,8 @@ void roomPIDInterrupt() {
     if (!(interruptcounter % heaterPIDfactor)) {
       updateTemp(heaterNTC);
       heaterPID.Compute();
-      dac_write_channel(DAC, HEATER, PIDOutput[heaterNTC]);
+      heaterPower = PIDOutput[heaterNTC];
+      dac_write_channel(DAC, HEATER, heaterPower);
     }
     interruptcounter++;
   }

@@ -159,11 +159,11 @@ void basicHumidityControl() {
 
 void heatUp() {
   if (temperature[heaterNTC] < heaterTempLimit) {
-    dac_write_channel(DAC, HEATER, maxDACvalueHeater);
     heaterPower = maxDACvalueHeater;
+    dac_write_channel(DAC, HEATER, maxDACvalueHeater);
   }
   else {
-    analogWrite(HEATER, 0);
+    dac_write_channel(DAC, HEATER, 0);
     heaterPower = 0;
   }
 }

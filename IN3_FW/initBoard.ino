@@ -6,10 +6,7 @@ void initBoard() {
   tft.begin();
   tft.setRotation(1);
   //loadLogo();
-  //initSensors();
-
-  analogWrite(PA8, 125);
-  while (1);
+  initSensors();
 }
 
 void initSensors() {
@@ -63,10 +60,6 @@ void initTimers() {
   roomPIDTimer.refresh();
   roomPIDTimer.resume();
 
-  roomPID.SetSampleTime(roomPIDRate / 1000);       //in milliseconds
-  heaterPID.SetSampleTime(heaterPIDRate / 1000); //in milliseconds
-  heaterPID.SetOutputLimits(0, maxDACvalueHeater);
-
   sensorsTimer.pause();
   sensorsTimer.setPeriod(sensorsRate); // in microseconds
   sensorsTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
@@ -74,4 +67,8 @@ void initTimers() {
   sensorsTimer.attachCompare1Interrupt(sensorsISR);
   sensorsTimer.refresh();
   sensorsTimer.resume();
+
+  roomPID.SetSampleTime(roomPIDRate / 1000);       //in milliseconds
+  heaterPID.SetSampleTime(heaterPIDRate / 1000); //in milliseconds
+  heaterPID.SetOutputLimits(0, maxDACvalueHeater);
 }
