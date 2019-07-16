@@ -25,7 +25,7 @@ word THERMISTOR_ROOM = PB1;   //This is not #define because can be swaped with T
 #define STERILIZER_FB PC5
 #define HUMIDIFIER_FB PB13
 #define ENC_PULSE PC6
-
+#define GSM_PWRKEY PC14
 
 #define THERMISTOR_INBOARD_LEFT 10 //PC3
 #define THERMISTOR_INBOARD_RIGHT 11 //PC2

@@ -14,6 +14,7 @@ int GPRSPartialMessageLength;
 bool initGPRS() {
   Serial1.begin(115200);
   bool initOK = 0;
+  powerGSM();
   if (GSM_command("AT", "OK")) {
     if (GSM_command("AT+CFUN=1", "OK")) {
       if (GSM_command("AT+CPIN?", "+CPIN:READY")) {
@@ -27,6 +28,12 @@ bool initGPRS() {
     }
   }
   return (initOK);
+}
+
+void powerGSM(){
+  digitalWrite(GSM_PWRKEY,HIGH);
+  delay(2000);
+  digitalWrite(GSM_PWRKEY,LOW);
 }
 
 void getServerLength() {

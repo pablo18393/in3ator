@@ -38,6 +38,7 @@ void pinDirection() {
   pinMode(HUMIDIFIER, OUTPUT);
   dac_init(DAC, HEATER);   // Enable DAC channel in heater pin
   pinMode(HEATER, OUTPUT);
+  pinMode(GSM_PWRKEY, OUTPUT);
 
   digitalWrite(SCREENBACKLIGHT, HIGH);
   digitalWrite(JAUNDICE, LOW);
@@ -47,6 +48,7 @@ void pinDirection() {
   digitalWrite(FAN_LP, LOW);
   digitalWrite(STERILIZE, LOW);
   digitalWrite(HUMIDIFIER, LOW);
+  digitalWrite(GSM_PWRKEY, LOW);
 }
 
 
