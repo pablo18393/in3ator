@@ -1,12 +1,13 @@
 void initBoard() {
   pinDirection();
+  //hardwareVerification();
   initEEPROM();
   initGPRS();
-  initTimers();
-  tft.begin();
-  tft.setRotation(1);
-  //loadLogo();
   initSensors();
+  initTFT();
+  initTimers();
+  dac_write_channel(DAC, HEATER, 3000);
+  while (1);
 }
 
 void initSensors() {
@@ -27,9 +28,16 @@ void initSensors() {
   initPulsioximeterVariables();
 }
 
+void initTFT() {
+  //SPI.setModule(2);
+  tft.begin();
+  tft.setRotation(1);
+  //loadLogo();
+}
+
 void pinDirection() {
   pinMode(SCREENBACKLIGHT, OUTPUT);
-  pinMode(ENC_PULSE, INPUT_PULLUP);
+  pinMode(ENC_SWITCH, INPUT_PULLUP);
   pinMode(JAUNDICE, OUTPUT);
   pinMode(POWER_EN, OUTPUT);
   pinMode(FAN_HP, OUTPUT);

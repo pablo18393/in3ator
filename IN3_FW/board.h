@@ -9,7 +9,7 @@ word THERMISTOR_HEATER = PC1; //This is not #define because can be swaped with T
 word THERMISTOR_ROOM = PB1;   //This is not #define because can be swaped with THERMISTOR_HEATER
 #define ENC_A PC8
 #define ENC_B PC9
-#define ENC_ENC_PULSE PC6
+#define ENC_ENC_SWITCH PC6
 #define POWER_EN PC11
 #define FAN_HP PA8
 #define FAN_LP PB11
@@ -24,7 +24,7 @@ word THERMISTOR_ROOM = PB1;   //This is not #define because can be swaped with T
 #define JAUNDICE_FB PC4
 #define STERILIZER_FB PC5
 #define HUMIDIFIER_FB PB13
-#define ENC_PULSE PC6
+#define ENC_SWITCH PC6
 #define GSM_PWRKEY PC14
 
 #define THERMISTOR_INBOARD_LEFT 10 //PC3
@@ -64,7 +64,7 @@ word THERMISTOR_ROOM = PB1;   //This is not #define because can be swaped with T
   #define JAUNDICE_FB 26
   #define STERILIZER_FB 29
   #define HUMIDIFIER_FB 30
-  #define ENC_PULSE PC6
+  #define ENC_SWITCH PC6
 */
 #define maxADCvalue 4095
 #define maxPWMvalue 255         //for STM32F103RE with arduino IDE

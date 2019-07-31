@@ -269,7 +269,7 @@ void drawHardwareErrorMessage() {
     yErrorPos += letter_height;
     tft.drawCentreString("temperature, jaundice LED", tft.width() / 2, yErrorPos , textFontSize);
     yErrorPos += letter_height;
-    tft.drawCentreString("ENC_PULSE to continue", tft.width() / 2, yErrorPos , textFontSize);
+    tft.drawCentreString("ENC_SWITCH to continue", tft.width() / 2, yErrorPos , textFontSize);
   }
 }
 

@@ -47,7 +47,7 @@ void actuatorsProgress() {
   if (swapTempSensors) {
     asignCorrectTempSensorsPin();
   }
-  while (!digitalRead(ENC_PULSE));
+  while (!digitalRead(ENC_SWITCH));
   turnFansOn();
   if (temperatureAtStart > temperature[roomNTC]) {
     temperatureAtStart = temperature[roomNTC];
@@ -67,7 +67,7 @@ void actuatorsProgress() {
     if (controlHumidity) {
       basicHumidityControl();
     }
-    while (!digitalRead(ENC_PULSE)) {
+    while (!digitalRead(ENC_SWITCH)) {
       updateData();
       back_mode();
     }
@@ -88,7 +88,7 @@ void checkTempSensorPin() {
   heatUp();
   while (!exitCheck) {
     updateData();
-    while (!digitalRead(ENC_PULSE)) {
+    while (!digitalRead(ENC_SWITCH)) {
       updateData();
       back_mode();
     }

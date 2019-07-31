@@ -10,7 +10,7 @@ void firstTurnOn() {
     pos_text[i] = leftMargin;
   }
   if (!language) {
-    words[0]  = "ENC_PULSE to start";
+    words[0]  = "ENC_SWITCH to start";
     words[1]  = "Welcome to in3";
   }
   else {
@@ -20,7 +20,7 @@ void firstTurnOn() {
   for (int i = 0; i < numWords; i++) {
     tft.drawCentreString(words[i], tft.width() / 2, tft.height() / 2 - letter_height * 2 * i , textFontSize);
   }
-  while (digitalRead(ENC_PULSE));
+  while (digitalRead(ENC_SWITCH));
   delay(debounceTime);
   void helpingmainMenu();
   displayMenuHelp();
@@ -69,32 +69,32 @@ void helpingmainMenu() {
   graphics();
   drawHeading();
   updateSensors();
-  while (!digitalRead(ENC_PULSE));
+  while (!digitalRead(ENC_SWITCH));
   delay(debounceTime);
 }
 
-void waitForENC_PULSE() {
-  while (digitalRead(ENC_PULSE));
+void waitForENC_SWITCH() {
+  while (digitalRead(ENC_SWITCH));
   delay(debounceTime);
   helpingmainMenu();
-  while (!digitalRead(ENC_PULSE));
+  while (!digitalRead(ENC_SWITCH));
   delay(debounceTime);
 }
 
 void displayMenuHelp() {
   drawMenuHelpText();
-  waitForENC_PULSE();
+  waitForENC_SWITCH();
 }
 
 void displayTemperatureHelp() {
-  waitForENC_PULSE();
+  waitForENC_SWITCH();
 }
 
 void displaySettingsHelp() {
-  waitForENC_PULSE();
+  waitForENC_SWITCH();
 }
 void displayStartHelp() {
-  waitForENC_PULSE();
+  waitForENC_SWITCH();
 }
 
 void drawMenuHelpText() {

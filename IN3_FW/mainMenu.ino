@@ -34,7 +34,7 @@ void mainMenu() {
   controlTemperature = 0;
   controlHumidity = 0;
   enableSet = 0;
-  while (!digitalRead(ENC_PULSE)) {
+  while (!digitalRead(ENC_SWITCH)) {
     updateData();
   }
   delay(debounceTime);
@@ -65,7 +65,7 @@ void askSuccess() {
   goToProcessRow = numWords;
   graphics();
   drawHeading();
-  while (!digitalRead(ENC_PULSE)) {
+  while (!digitalRead(ENC_SWITCH)) {
     updateData();
   }
   delay(debounceTime);

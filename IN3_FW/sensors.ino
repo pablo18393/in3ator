@@ -148,7 +148,7 @@ bool readHumSensor() {
 }
 
 void asleep() {
-  encPulsed = digitalRead(ENC_PULSE);
+  encPulsed = digitalRead(ENC_SWITCH);
   if (encPulsed != encPulsedBefore) {
     last_something = millis();
   }

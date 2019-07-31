@@ -31,7 +31,7 @@ void barSelection() {
         ypos = graphicHeight(bar_pos - 1);
       }
     }
-    if (!digitalRead(ENC_PULSE)) {
+    if (!digitalRead(ENC_SWITCH)) {
       selected = ! selected;
       if (selected) {
         tft.fillRect(0, (tft.height() - height_heading) * (bar_pos - 1) / rectangles + height_heading, width_select, (tft.height() - height_heading) / rectangles, COLOR_CHOSEN);
@@ -42,7 +42,7 @@ void barSelection() {
       for (int i = 2; i <= rectangles; i++) {
         tft.fillRect(0, (tft.height() - height_heading) * (i - 1) / rectangles + height_heading - 1, tft.height(), width_indentation, WHITE); //mejorable
       }
-      while (!digitalRead(ENC_PULSE)) {
+      while (!digitalRead(ENC_SWITCH)) {
         checkEncoderPress();
         if (page != mainMenuPage) {
           back_mode();
@@ -53,7 +53,7 @@ void barSelection() {
         case mainMenuPage:
           switch (bar_pos - graphicTextOffset ) {
             case gestationGraphicPosition:
-              while (digitalRead(ENC_PULSE)) {
+              while (digitalRead(ENC_SWITCH)) {
                 updateData();
                 if (EncMove && -EncMove + desiredSkinTemp >= minGestation && -EncMove + desiredSkinTemp <= maxGestation) {
                   tft.setTextColor(COLOR_MENU);
@@ -77,7 +77,7 @@ void barSelection() {
               advancedMode();
               break;
             case LEDGraphicPosition:
-              while (digitalRead(ENC_PULSE) ) {
+              while (digitalRead(ENC_SWITCH) ) {
                 updateData();
                 if (EncMove && -EncMove + LEDIntensity >= 0 && -EncMove + LEDIntensity <= LEDMaxIntensity) {
                   tft.setTextColor(COLOR_MENU);
@@ -114,7 +114,7 @@ void barSelection() {
         case advancedModePage:
           switch (bar_pos - graphicTextOffset ) {
             case temperatureGraphicPosition:
-              while (digitalRead(ENC_PULSE)) {
+              while (digitalRead(ENC_SWITCH)) {
                 updateData();
                 if (EncMove && -EncMove + desiredSkinTemp >= minTemp && -EncMove + desiredSkinTemp <= maxTemp) {
                   tft.setTextColor(COLOR_MENU);
@@ -133,7 +133,7 @@ void barSelection() {
               drawStartMessage();
               break;
             case humidityGraphicPosition:
-              while (digitalRead(ENC_PULSE)) {
+              while (digitalRead(ENC_SWITCH)) {
                 updateData();
                 if (EncMove && -EncMove + desiredRoomHum >= minHum && -EncMove + desiredRoomHum <= maxHum) {
                   tft.setTextColor(COLOR_MENU);
@@ -152,7 +152,7 @@ void barSelection() {
               drawStartMessage();
               break;
             case LEDGraphicPosition:
-              while (digitalRead(ENC_PULSE) ) {
+              while (digitalRead(ENC_SWITCH) ) {
                 updateData();
                 if (EncMove && -EncMove + LEDIntensity >= 0 && -EncMove + LEDIntensity <= LEDMaxIntensity) {
                   tft.setTextColor(COLOR_MENU);
@@ -189,7 +189,7 @@ void barSelection() {
         case settingsPage:
           switch (bar_pos - graphicTextOffset ) {
             case autoLockGraphicPosition:
-              while (digitalRead(ENC_PULSE)) {
+              while (digitalRead(ENC_SWITCH)) {
                 updateData();
                 if (EncMove) {
                   tft.setTextColor(COLOR_MENU);
@@ -255,7 +255,7 @@ void barSelection() {
               }
               break;
             case languageGraphicPosition:
-              while (digitalRead(ENC_PULSE)) {
+              while (digitalRead(ENC_SWITCH)) {
                 updateData();
                 if (EncMove) {
                   tft.setTextColor(COLOR_MENU);
@@ -298,7 +298,7 @@ void barSelection() {
               settings();
               break;
             case heaterTempGraphicPosition:
-              while (digitalRead(ENC_PULSE) ) {
+              while (digitalRead(ENC_SWITCH) ) {
                 updateData();
                 if (EncMove && -EncMove + heaterTempLimit >= 0 && -EncMove + heaterTempLimit <= heaterMaxTemp) {
                   tft.setTextColor(COLOR_MENU);
@@ -325,7 +325,7 @@ void barSelection() {
               }
               break;
             case fanGraphicPosition:
-              while (digitalRead(ENC_PULSE)) {
+              while (digitalRead(ENC_SWITCH)) {
                 updateData();
                 turnFansOn();
                 if (EncMove && -EncMove + fanSpeed >= 0 && -EncMove + fanSpeed <= fanMaxSpeed) {
@@ -365,7 +365,7 @@ void barSelection() {
         case calibrateSensorsPage:
           switch (bar_pos - graphicTextOffset ) {
             case temperatureCalibrationGraphicPosition:
-              while (digitalRead(ENC_PULSE)) {
+              while (digitalRead(ENC_SWITCH)) {
                 updateData();
                 if (EncMove) {
                   tft.setTextColor(COLOR_MENU);
@@ -381,7 +381,7 @@ void barSelection() {
               }
               break;
             case humidityCalibrationGraphicPosition:
-              while (digitalRead(ENC_PULSE)) {
+              while (digitalRead(ENC_SWITCH)) {
                 updateData();
                 if (EncMove) {
                   tft.setTextColor(COLOR_MENU);
@@ -409,7 +409,7 @@ void barSelection() {
       }
       selected = 0;
       tft.fillRect(0, (tft.height() - height_heading) * (bar_pos - 1) / rectangles + height_heading, width_select, (tft.height() - height_heading) / rectangles, WHITE);
-      while (!digitalRead(ENC_PULSE)) {
+      while (!digitalRead(ENC_SWITCH)) {
         checkEncoderPress();
         if (page != mainMenuPage) {
           back_mode();
@@ -424,7 +424,7 @@ void checkEncoderPress() {
   updateData();
   if (page == mainMenuPage) {
     long timePressed = millis();
-    while (!digitalRead(ENC_PULSE)) {
+    while (!digitalRead(ENC_SWITCH)) {
       updateData();
       if (millis() - timePressed > timePressToSettings) {
         settings();
@@ -514,7 +514,7 @@ void back_mode() {
   delay(debounceTime);
   last_encPulsed = millis();
   byte back_bar = 0;
-  while (!digitalRead(ENC_PULSE)) {
+  while (!digitalRead(ENC_SWITCH)) {
     updateData();
     if (millis() - last_encPulsed > time_back_wait) {
       back_bar++;

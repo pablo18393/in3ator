@@ -7,8 +7,8 @@ int GPRSPartialMessageLength;
 
 //GPRS variables
 #define environmentalWords[] = "TimeOn","Temperature","Humidity","DesiredTemp","HeaterPower","PIDOutput","HeaterTempLimit";
-#define ENC_PULSESensorVariablesWords[] = "BPM","IBI";
-#define ENC_PULSESensorRawWords[] = "ENC_PULSEMeasurements";
+#define ENC_SWITCHSensorVariablesWords[] = "BPM","IBI";
+#define ENC_SWITCHSensorRawWords[] = "ENC_SWITCHMeasurements";
 #define aliveRefreshWords[] = "timeOn","LEDsON";
 
 bool initGPRS() {
@@ -63,16 +63,18 @@ bool postGPRS(int variable) {
   Serial.println(serverAutorization);
   Serial.println(serverToken);
   Serial.println(dataContentLength);
+  /*
   switch (variable) {
     case environmental:
       break;
-    case ENC_PULSESensorVariables:
+    case ENC_SWITCHSensorVariables:
       break;
-    case ENC_PULSESensorRaw:
+    case ENC_SWITCHSensorRaw:
       break;
     case turnedOn:
       break;
   }
+  */
   if (variable == environmental) {
 
   }
@@ -81,7 +83,7 @@ bool postGPRS(int variable) {
   GSM_command("AT+CIPCLOSE", "CLOSE OK");
 }
 
-bool GSM_command(char command[64], char expectedResponse[64]) {
+bool GSM_command(char command[], char expectedResponse[]) {
   clearSerialBuffer();
   Serial1.println(command);
   delay(200);
@@ -93,12 +95,11 @@ bool GSM_command(char command[64], char expectedResponse[64]) {
     }
     while (Serial1.available()) {
       response[i] = Serial1.read();
-      Serial.write(response);
-      i++;
+      if ((response[i] != 10) && (response[i] != 13)) {
+        i++;
+      }
     }
-    //response[i - 2] = '\0';
-    Serial.println(strlen(response));
-    Serial.println(strlen(expectedResponse));
+    response[i] = '\0';
   }
   if (!strcmp(expectedResponse, response)) {
     Serial.println("success");
@@ -110,6 +111,6 @@ bool GSM_command(char command[64], char expectedResponse[64]) {
 
 void clearSerialBuffer() {
   while (Serial1.available()) {
-    Serial.read();
+    Serial1.read();
   }
 }
