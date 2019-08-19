@@ -1,3 +1,4 @@
+
 #define serverDirectory "POST /In3/public/api/v1/session HTTP/1.1"
 #define serverAdress "Host pub.scar.io"
 #define serverAutorization "Authorization: Bearer"

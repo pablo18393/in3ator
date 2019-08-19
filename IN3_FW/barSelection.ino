@@ -1,3 +1,4 @@
+
 void barSelection() {
   bar_pos = 1;
   selected = 0;

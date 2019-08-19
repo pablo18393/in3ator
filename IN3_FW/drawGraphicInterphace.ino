@@ -1,3 +1,4 @@
+
 void graphics() {
   if (!page) {
     tft.fillRect(width_select, height_heading, tft.width() - width_select, tft.height() - height_heading, COLOR_MENU);

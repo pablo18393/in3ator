@@ -1,3 +1,4 @@
+
 int updateData() {
   //check rotary encoder position
   EncNewPosition = myEncoderRead();

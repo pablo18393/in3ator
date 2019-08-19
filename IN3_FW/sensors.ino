@@ -1,3 +1,4 @@
+
 int myEncoderRead() {
   if ((lastEncoderPos[counter] != encoderpos[counter])) {
     encflag[counter] = LOW;

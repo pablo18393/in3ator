@@ -1,3 +1,4 @@
+
 void advancedMode() {
   page = advancedModePage;
   byte numWords = 4;

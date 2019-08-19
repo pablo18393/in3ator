@@ -1,5 +1,6 @@
 
 
+
 void hardwareVerification() {
   numSensors = numNTC + dhtSensor;
   testOK = 1;

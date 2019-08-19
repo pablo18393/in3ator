@@ -1,3 +1,4 @@
+
 void firstTurnOn() {
   analogWrite(SCREENBACKLIGHT, backlight_intensity);
   byte numWords = 2;

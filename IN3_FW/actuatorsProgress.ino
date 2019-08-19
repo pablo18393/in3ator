@@ -1,3 +1,4 @@
+
 void actuatorsProgress() {
   byte  numWords = 0;
   temperaturePercentage = 0;

@@ -1,3 +1,4 @@
+
 //EEPROM variables
 #define EEPROM_firstTurnOn 0
 #define EEPROM_autoLock 1
