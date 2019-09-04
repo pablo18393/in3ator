@@ -7,12 +7,15 @@ void initBoard() {
   initSensors();
   initTFT();
   initTimers();
-  dac_write_channel(DAC, HEATER, 3000);
-  while (1);
 }
 
 void initSensors() {
-  dht.setup(DHTPIN);
+  if (DHTSensor) {
+    dht.setup(DHTPIN);
+  }
+  if (BME280Sensor) {
+    bme.begin();
+  }
   encodertimer = millis(); // acceleration measurement
   for (byte counter = 0; counter < NUMENCODERS; counter++)
   {
@@ -30,7 +33,7 @@ void initSensors() {
 }
 
 void initTFT() {
-  //SPI.setModule(2);
+  //SPI.setModule(SPI_SEL);
   tft.begin();
   tft.setRotation(1);
   //loadLogo();

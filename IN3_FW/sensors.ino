@@ -134,18 +134,37 @@ void updateTemp(byte sensor) {
 }
 
 bool readHumSensor() {
-  sensorsTimer.pause();
-  int newTemp = dht.getTemperature();
-  int newHumidity = dht.getHumidity();
-  sensorsTimer.refresh();
-  sensorsTimer.resume();
-  if (newHumidity && newTemp) {
-    //    temperature[numNTC + dhtSensor] = newTemp;
+  bool DHTOK = 0;
+  bool BME280OK = 0;
+  int DHTTemperature;
+  int DHTHumidity;
+  int BME280Temperature;
+  int BME280Humidity;
+  if (DHTSensor) {
+    sensorsTimer.pause();
+    DHTTemperature = dht.getTemperature();
+    DHTHumidity = dht.getHumidity();
+    sensorsTimer.resume();
+    if (DHTHumidity && DHTTemperature) {
+      //    temperature[numNTC + dhtSensor] = DHTTemperature; //Add here measurement to temp array
+      DHTOK = 1;
+    }
+  }
+  if (BME280Sensor) {
+    BME280Temperature = bme.readTemperature();
+    BME280Humidity = bme.readHumidity();
+    if (DHTHumidity && DHTTemperature) {
+      //    temperature[numNTC + dhtSensor] = DHTTemperature; //Add here measurement to temp array
+      BME280OK = 1;
+    }
+  }
+  /*
+  if (DHTOK || BME280OK) {
     humidity = newHumidity;
     humidity += diffHumidity;
-    return (1);
   }
-  return (0);
+  */
+  return (DHTOK || BME280OK);
 }
 
 void asleep() {

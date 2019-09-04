@@ -1,5 +1,3 @@
-
-
 // Use hardware SPI lines+
 #define TFT_CS PC13
 #define TFT_DC PB8
@@ -27,10 +25,15 @@ word THERMISTOR_ROOM = PB1;   //This is not #define because can be swaped with T
 #define HUMIDIFIER_FB PB13
 #define ENC_SWITCH PC6
 #define GSM_PWRKEY PC14
-
-#define THERMISTOR_INBOARD_LEFT 10 //PC3
-#define THERMISTOR_INBOARD_RIGHT 11 //PC2
+#define BME_CS PA2
+#define THERMISTOR_INBOARD_LEFT PC3 //PC3
+#define THERMISTOR_INBOARD_RIGHT PC2 //PC2
 #define PULSIOXIMETER 7
+
+//Hardware
+#define DHTSensor 0
+#define BME280Sensor 0
+#define SPI_SEL 1
 
 //pin declaration
 //boardPWMPins: 3, 4, 5, 8, 9, 10, 11, 15, 16, 25, 26, 27

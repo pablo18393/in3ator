@@ -7,9 +7,16 @@
 #include <PID_v1.h>
 #include "board.h"
 #include "libmaple/dac.h"
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BME280.h>
 
 #define FWversion "v2.3"
 #define headingTitle "in3ator"
+
+//BME280 configuration variables
+#define SEALEVELPRESSURE_HPA (1013.25)
+Adafruit_BME280 bme(BME_CS); // hardware SPI
 
 //configuration variables
 #define debounceTime 100        //encoder debouncing time
