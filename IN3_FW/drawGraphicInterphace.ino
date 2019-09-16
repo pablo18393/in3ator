@@ -32,8 +32,8 @@ void graphics() {
               tft.drawRightString(initialSensorsValue, gestationWeeksXPos, ypos, textFontSize);
               break;
             case LEDGraphicPosition:
-              if (backlight_intensity) {
-                drawRightNumber(backlight_intensity, LEDXPos, ypos);
+              if (jaundice_LED_intensity) {
+                drawRightNumber(jaundice_LED_intensity, LEDXPos, ypos);
                 tft.drawRightString("%", unitPosition, ypos, textFontSize);
               }
               else {
@@ -50,8 +50,8 @@ void graphics() {
               tft.drawRightString(initialSensorsValue, initialSensorPosition, temperatureY, textFontSize);
               break;
             case LEDGraphicPosition:
-              if (backlight_intensity) {
-                drawRightNumber(backlight_intensity, LEDXPos, ypos);
+              if (jaundice_LED_intensity) {
+                drawRightNumber(jaundice_LED_intensity, LEDXPos, ypos);
                 tft.drawRightString("%", unitPosition, ypos, textFontSize);
               }
               else {
@@ -214,7 +214,7 @@ void loadLogo() {
   tft.fillScreen(introBackColor);
   tft.setTextColor(introTextColor);
   drawIntroMessage();
-  for (int i = maxPWMvalue; i >= backlight_intensity; i--) {
+  for (int i = maxPWMvalue; i >= TFT_LED; i--) {
     analogWrite(SCREENBACKLIGHT, i);
     delay(brightenRate);
   }

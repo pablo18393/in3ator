@@ -1,6 +1,6 @@
 
 void firstTurnOn() {
-  analogWrite(SCREENBACKLIGHT, backlight_intensity);
+  analogWrite(SCREENBACKLIGHT, TFT_LED);
   byte numWords = 2;
   print_text = 1;
   tft.setTextSize(1);

@@ -184,6 +184,6 @@ void asleep() {
     }
   }
   else {
-    analogWrite(SCREENBACKLIGHT, backlight_intensity);
+    analogWrite(SCREENBACKLIGHT, TFT_LED);
   }
 }

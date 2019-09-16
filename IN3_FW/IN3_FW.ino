@@ -16,7 +16,6 @@
 #define headingTitle "in3ator"
 
 //BME280 (humidity, pressure and temperature sensor) configuration variables
-#define SEALEVELPRESSURE_HPA (1013.25)
 Adafruit_BME280 bme(BME_CS); // hardware SPI
 
 //configuration variables
@@ -196,7 +195,8 @@ byte barThickness;
 //User Interface display variables
 bool auto_lock; //setting that enables backlight switch OFF after a given time of no user actions
 int time_lock = 16000; //time to lock screen if no user actions
-int backlight_intensity = 50; //PWM that will be supplied to backlight LEDs
+int TFT_LED = 50; //PWM that will be supplied to backlight LEDs
+int jaundice_LED_intensity = 0; //PWM that will be supplied to jaundice LEDs
 const byte time_back_draw = 255;
 const byte time_back_wait = 255;
 long last_something; //last time there was a encoder movement or pulse
