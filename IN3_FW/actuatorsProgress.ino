@@ -160,18 +160,18 @@ void basicHumidityControl() {
 
 void heatUp() {
   if (temperature[heaterNTC] < heaterTempLimit) {
-    heaterPower = maxDACvalueHeater;
-    dac_write_channel(DAC, HEATER, maxDACvalueHeater);
+    heaterPower = HeatermaxPWM;
+    analogWrite(HEATER, HeatermaxPWM);
   }
   else {
-    dac_write_channel(DAC, HEATER, 0);
+    analogWrite(HEATER, 0);
     heaterPower = 0;
   }
 }
 
 void turnActuatorsOff() {
   digitalWrite(HEATER, LOW);
-  dac_write_channel(DAC, HEATER, 0);
+  analogWrite(HEATER, 0);
   digitalWrite(HUMIDIFIER, LOW);
 }
 

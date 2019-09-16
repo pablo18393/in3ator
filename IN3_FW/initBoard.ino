@@ -33,7 +33,7 @@ void initSensors() {
 }
 
 void initTFT() {
-  //SPI.setModule(SPI_SEL);
+  SPI.setModule(SPI_SEL);
   tft.begin();
   tft.setRotation(1);
   //loadLogo();
@@ -48,7 +48,7 @@ void pinDirection() {
   pinMode(FAN_LP, OUTPUT);
   pinMode(STERILIZE, OUTPUT);
   pinMode(HUMIDIFIER, OUTPUT);
-  dac_init(DAC, HEATER);   // Enable DAC channel in heater pin
+  pinMode(HEATER, OUTPUT);
   pinMode(HEATER, OUTPUT);
   pinMode(GSM_PWRKEY, OUTPUT);
 
@@ -84,5 +84,5 @@ void initTimers() {
 
   roomPID.SetSampleTime(roomPIDRate / 1000);       //in milliseconds
   heaterPID.SetSampleTime(heaterPIDRate / 1000); //in milliseconds
-  heaterPID.SetOutputLimits(0, maxDACvalueHeater);
+  heaterPID.SetOutputLimits(0, HeatermaxPWM);
 }

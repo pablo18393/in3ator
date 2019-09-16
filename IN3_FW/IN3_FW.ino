@@ -283,7 +283,7 @@ const byte fanMaxSpeed = 100;
 const byte LEDMaxIntensity = 100;
 const byte standardHeaterTempLimit = 85; //max heater temperature
 const byte standardFanSpeed = 100;
-int maxDACvalueHeater = maxDACvalue;      //max power for heater, full power (4095) is 50W
+int HeatermaxPWM = maxPWMvalue;      //max power for heater, full power is 50W
 
 
 int page, page0;
@@ -362,16 +362,5 @@ HardwareTimer roomPIDTimer(2);
 
 void setup() {
   initBoard();
-  /*
-    while (1) {
-    tft.fillScreen(introTextColor);
-    tft.setTextColor(introBackColor);
-    hardwareVerification();
-    while (digitalRead(ENC_PULSE));
-    delay(100);
-    while (!digitalRead(ENC_PULSE));
-    delay(100);
-    }
-  */
   mainMenu();
 }

@@ -62,8 +62,8 @@ void sensorsTest() {
   if ((analogRead(THERMISTOR_ROOM) > 3200 || analogRead(THERMISTOR_ROOM) < 1200) && HWNTCRoom) {
     errorHardwareCode[HW_NUM_NTCRoom] = opencircuit;
   }
-  Serial.println(readHumSensor());
-  if (HWHUMSensor && !readHumSensor()) {
+  Serial.println(updateHumidity());
+  if (HWHUMSensor && !updateHumidity()) {
     errorHardwareCode[HW_NUM_HUMSensor] = opencircuit;
   }
 }

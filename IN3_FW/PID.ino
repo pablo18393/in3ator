@@ -21,7 +21,7 @@ void roomPIDInterrupt() {
       updateTemp(heaterNTC);
       heaterPID.Compute();
       heaterPower = PIDOutput[heaterNTC];
-      dac_write_channel(DAC, HEATER, heaterPower);
+      analogWrite(HEATER, heaterPower);
     }
     interruptcounter++;
   }
@@ -38,5 +38,5 @@ void stopPID() {
   roomPID.SetMode(MANUAL);
   heaterPID.SetMode(MANUAL);
   temperaturePIDcontrolStart = 0;
-  dac_write_channel(DAC, HEATER, 0);
+  analogWrite(HEATER, 0);
 }

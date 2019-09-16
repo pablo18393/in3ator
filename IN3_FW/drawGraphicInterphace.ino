@@ -319,7 +319,7 @@ int graphicHeight(int position) {
 }
 
 void drawHumidity() {
-  if (readHumSensor()) {
+  if (updateHumidity()) {
     tft.setTextColor(COLOR_MENU);
     drawCentreNumber(previousHumidity, humidityX, humidityY);
     tft.setTextColor(COLOR_MENU_TEXT);

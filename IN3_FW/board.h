@@ -12,7 +12,7 @@ word THERMISTOR_ROOM = PB1;   //This is not #define because can be swaped with T
 #define POWER_EN PC11
 #define FAN_HP PA8
 #define FAN_LP PB11
-#define HEATER DAC_CH1 //PA4 pin
+#define HEATER PA4 //PA4 pin
 #define JAUNDICE PB0
 #define STERILIZE PA15
 #define HUMIDIFIER PB14
@@ -30,10 +30,11 @@ word THERMISTOR_ROOM = PB1;   //This is not #define because can be swaped with T
 #define THERMISTOR_INBOARD_RIGHT PC2 //PC2
 #define PULSIOXIMETER 7
 
+
 //Hardware
 #define DHTSensor 0
-#define BME280Sensor 0
-#define SPI_SEL 1
+#define BME280Sensor 1
+#define SPI_SEL 2
 
 //pin declaration
 //boardPWMPins: 3, 4, 5, 8, 9, 10, 11, 15, 16, 25, 26, 27

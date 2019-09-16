@@ -133,7 +133,7 @@ void updateTemp(byte sensor) {
   }
 }
 
-bool readHumSensor() {
+bool updateHumidity() {
   bool DHTOK = 0;
   bool BME280OK = 0;
   int DHTTemperature;
@@ -158,12 +158,17 @@ bool readHumSensor() {
       BME280OK = 1;
     }
   }
-  /*
   if (DHTOK || BME280OK) {
-    humidity = newHumidity;
+    humidity = 0;
+    humidity += DHTHumidity;
+    humidity += BME280Humidity;
     humidity += diffHumidity;
   }
-  */
+  if (DHTOK && BME280OK) {
+    humidity -= diffHumidity;
+    humidity /= 2;
+    humidity += diffHumidity;
+  }
   return (DHTOK || BME280OK);
 }
 
