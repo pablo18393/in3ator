@@ -32,8 +32,8 @@ void graphics() {
               tft.drawRightString(initialSensorsValue, gestationWeeksXPos, ypos, textFontSize);
               break;
             case LEDGraphicPosition:
-              if (LEDIntensity) {
-                drawRightNumber(LEDIntensity, LEDXPos, ypos);
+              if (backlight_intensity) {
+                drawRightNumber(backlight_intensity, LEDXPos, ypos);
                 tft.drawRightString("%", unitPosition, ypos, textFontSize);
               }
               else {
@@ -50,8 +50,8 @@ void graphics() {
               tft.drawRightString(initialSensorsValue, initialSensorPosition, temperatureY, textFontSize);
               break;
             case LEDGraphicPosition:
-              if (LEDIntensity) {
-                drawRightNumber(LEDIntensity, LEDXPos, ypos);
+              if (backlight_intensity) {
+                drawRightNumber(backlight_intensity, LEDXPos, ypos);
                 tft.drawRightString("%", unitPosition, ypos, textFontSize);
               }
               else {
@@ -111,7 +111,7 @@ void graphics() {
               tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
               break;
             case heaterTempGraphicPosition:
-              drawRightNumber(heaterTempLimit, 280, ypos);
+              drawRightNumber(maxHeaterTemp, 280, ypos);
               tft.drawRightString("C", unitPosition, ypos, textFontSize);
               break;
             case fanGraphicPosition:

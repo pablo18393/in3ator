@@ -15,7 +15,7 @@ void roomPIDInterrupt() {
       interruptcounter = 0;
       updateTemp(roomNTC);
       roomPID.Compute();
-      desiredHeaterTemp = PIDOutput[roomNTC] * (heaterTempLimit - desiredSkinTemp) / (maxPWMvalue) + desiredSkinTemp;  //map function: min value is
+      desiredHeaterTemp = PIDOutput[roomNTC] * (maxHeaterTemp - desiredSkinTemp) / (maxPWMvalue) + desiredSkinTemp;  //map function: min value is
     }
     if (!(interruptcounter % heaterPIDfactor)) {
       updateTemp(heaterNTC);

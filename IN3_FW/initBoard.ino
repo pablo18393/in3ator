@@ -19,14 +19,14 @@ void initSensors() {
   encodertimer = millis(); // acceleration measurement
   for (byte counter = 0; counter < NUMENCODERS; counter++)
   {
-    encstate[counter] = HIGH;
-    encflag[counter] = HIGH;
-    A_set[counter] = false;
-    B_set[counter] = false;
-    encoderpos[counter] = 0;
-    pinMode(encoderpinA[counter], INPUT_PULLUP);
-    pinMode(encoderpinB[counter], INPUT_PULLUP);
-    lastEncoderPos[counter] = 1;
+    encstate[ENC_counter] = HIGH;
+    encflag[ENC_counter] = HIGH;
+    A_set[ENC_counter] = false;
+    B_set[ENC_counter] = false;
+    encoderpos[ENC_counter] = 0;
+    pinMode(encoderpinA[ENC_counter], INPUT_PULLUP);
+    pinMode(encoderpinB[ENC_counter], INPUT_PULLUP);
+    lastEncoderPos[ENC_counter] = 1;
   }
   // timer setup for encoder
   initPulsioximeterVariables();

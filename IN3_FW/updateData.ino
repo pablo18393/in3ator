@@ -11,7 +11,7 @@ int updateData() {
       EncMove = -1;
     }
   }
-  lastEncoderPos[counter] = encoderpos[counter];
+  lastEncoderPos[ENC_counter] = encoderpos[ENC_counter];
   EncOldPosition = EncNewPosition;
 
   if (page == advancedModePage || page == actuatorsProgressPage) {
@@ -166,7 +166,7 @@ void printStatus() {
   Serial.print(";");
   Serial.print(desiredSkinTemp);
   Serial.print(";");
-  Serial.print(heaterTempLimit);
+  Serial.print(maxHeaterTemp);
   Serial.print(";");
   for (int i = 0; i < numTempSensors; i++) {
     Serial.print(temperature[i]);

@@ -2,7 +2,7 @@
 
 
 void hardwareVerification() {
-  numSensors = numNTC + dhtSensor;
+  numSensors = numNTC + DHTSensor;
   testOK = 1;
   testCritical = 0;
   for (int i = 0; i < hardwareComponents; i++) {

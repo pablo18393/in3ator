@@ -3,7 +3,7 @@
 #define EEPROM_firstTurnOn 0
 #define EEPROM_autoLock 1
 #define EEPROM_language 2
-#define EEPROM_heaterTempLimit 3
+#define EEPROM_maxHeaterTemp 3
 #define EEPROM_fanSpeed 5
 #define EEPROM_diffHumidity 10
 #define EEPROM_diffTemperature 20
@@ -59,8 +59,8 @@ void loadStandardValues() {
   }
   diffHumidity = 0;
   EEPROM.write(EEPROM_diffHumidity, diffHumidity);
-  heaterTempLimit = standardHeaterTempLimit;
-  EEPROM.write(EEPROM_heaterTempLimit, heaterTempLimit);
+  maxHeaterTemp = standardmaxHeaterTemp;
+  EEPROM.write(EEPROM_maxHeaterTemp, maxHeaterTemp);
   fanSpeed = standardFanSpeed;
   EEPROM.write(EEPROM_fanSpeed, fanSpeed);
 }
@@ -77,7 +77,7 @@ void recapVariables() {
   if (diffHumidity > 1000) {
     diffHumidity -= 65535;
   }
-  heaterTempLimit = EEPROM.read(EEPROM_heaterTempLimit);
+  maxHeaterTemp = EEPROM.read(EEPROM_maxHeaterTemp);
   fanSpeed = EEPROM.read(EEPROM_fanSpeed);
   swapTempSensors = EEPROM.read(EEPROM_swapTempSensors);
   if (swapTempSensors) {

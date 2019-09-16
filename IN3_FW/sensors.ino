@@ -1,10 +1,10 @@
 
 int myEncoderRead() {
-  if ((lastEncoderPos[counter] != encoderpos[counter])) {
-    encflag[counter] = LOW;
-    lastEncoderPos[counter] = encoderpos[counter];
+  if ((lastEncoderPos[ENC_counter] != encoderpos[ENC_counter])) {
+    encflag[ENC_counter] = LOW;
+    lastEncoderPos[ENC_counter] = encoderpos[ENC_counter];
   }
-  return (encoderpos[counter]);
+  return (encoderpos[ENC_counter]);
 }
 
 void sensorsISR() {
@@ -28,27 +28,27 @@ void initPulsioximeterVariables() {
 void readEncoder() {
   for (byte counter = 0; counter < NUMENCODERS; counter++)
   {
-    if ( (gpio_read_bit(PIN_MAP[encoderpinA[counter]].gpio_device, PIN_MAP[encoderpinA[counter]].gpio_bit) ? HIGH : LOW) != A_set[counter] )
+    if ( (gpio_read_bit(PIN_MAP[encoderpinA[ENC_counter]].gpio_device, PIN_MAP[encoderpinA[ENC_counter]].gpio_bit) ? HIGH : LOW) != A_set[ENC_counter] )
     {
-      A_set[counter] = !A_set[counter];
-      if ( A_set[counter] && !B_set[counter] )
+      A_set[ENC_counter] = !A_set[ENC_counter];
+      if ( A_set[ENC_counter] && !B_set[ENC_counter] )
       {
         if (millis() - encodertimer < -1)
-          encoderpos[counter] += 1;
+          encoderpos[ENC_counter] += 1;
         else
-          encoderpos[counter] += 5;
+          encoderpos[ENC_counter] += 5;
       }
       encodertimer = millis();
       last_something = millis();
     }
-    if ( (gpio_read_bit(PIN_MAP[encoderpinB[counter]].gpio_device, PIN_MAP[encoderpinB[counter]].gpio_bit) ? HIGH : LOW) != B_set[counter] )
+    if ( (gpio_read_bit(PIN_MAP[encoderpinB[ENC_counter]].gpio_device, PIN_MAP[encoderpinB[ENC_counter]].gpio_bit) ? HIGH : LOW) != B_set[ENC_counter] )
     {
-      B_set[counter] = !B_set[counter];
-      if ( B_set[counter] && !A_set[counter] )
+      B_set[ENC_counter] = !B_set[ENC_counter];
+      if ( B_set[ENC_counter] && !A_set[ENC_counter] )
         if (millis() - encodertimer < -1)
-          encoderpos[counter] -= 1;
+          encoderpos[ENC_counter] -= 1;
         else
-          encoderpos[counter] -= 5;
+          encoderpos[ENC_counter] -= 5;
       encodertimer = millis();
       last_something = millis();
     }
@@ -146,7 +146,7 @@ bool updateHumidity() {
     DHTHumidity = dht.getHumidity();
     sensorsTimer.resume();
     if (DHTHumidity && DHTTemperature) {
-      //    temperature[numNTC + dhtSensor] = DHTTemperature; //Add here measurement to temp array
+      //    temperature[numNTC + DHTSensor] = DHTTemperature; //Add here measurement to temp array
       DHTOK = 1;
     }
   }
@@ -154,7 +154,7 @@ bool updateHumidity() {
     BME280Temperature = bme.readTemperature();
     BME280Humidity = bme.readHumidity();
     if (DHTHumidity && DHTTemperature) {
-      //    temperature[numNTC + dhtSensor] = DHTTemperature; //Add here measurement to temp array
+      //    temperature[numNTC + DHTSensor] = DHTTemperature; //Add here measurement to temp array
       BME280OK = 1;
     }
   }

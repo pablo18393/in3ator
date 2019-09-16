@@ -7,7 +7,7 @@
 int GPRSPartialMessageLength;
 
 //GPRS variables
-#define environmentalWords[] = "TimeOn","Temperature","Humidity","DesiredTemp","HeaterPower","PIDOutput","HeaterTempLimit";
+#define environmentalWords[] = "TimeOn","Temperature","Humidity","DesiredTemp","HeaterPower","PIDOutput","maxHeaterTemp";
 #define ENC_SWITCHSensorVariablesWords[] = "BPM","IBI";
 #define ENC_SWITCHSensorRawWords[] = "ENC_SWITCHMeasurements";
 #define aliveRefreshWords[] = "timeOn","LEDsON";

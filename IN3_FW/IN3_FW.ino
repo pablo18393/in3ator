@@ -1,4 +1,4 @@
-
+//include libraries
 #include <Adafruit_GFX_AS.h>
 #include <EEPROM.h>
 #include <Adafruit_ILI9341_STM.h> // STM32 DMA Hardware-specific library
@@ -11,19 +11,21 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 
+//Firmware version and head title of UI screen
 #define FWversion "v2.3"
 #define headingTitle "in3ator"
 
-//BME280 configuration variables
+//BME280 (humidity, pressure and temperature sensor) configuration variables
 #define SEALEVELPRESSURE_HPA (1013.25)
 Adafruit_BME280 bme(BME_CS); // hardware SPI
 
 //configuration variables
-#define debounceTime 100        //encoder debouncing time
-#define mosfet_switch_time 100   //in millis, oversized
-#define timePressToSettings 5000 //in millis, time to press to go to settings window
+#define debounceTime 100         //encoder debouncing time
+#define mosfet_switch_time 100   //delay to wait for mosfet to switch (in millis), oversized
+#define timePressToSettings 5000 //in millis, time to press to go to settings window in UI
 
-//pages
+//pages number in UI. Configuration and information will be displayed depending on the page number
+int page;
 #define mainMenuPage 0
 #define advancedModePage 1
 #define actuatorsProgressPage 2
@@ -31,46 +33,53 @@ Adafruit_BME280 bme(BME_CS); // hardware SPI
 #define calibrateSensorsPage 4
 #define askSuccessPage 5
 
-//languages
-#define firstLanguage 1
+//languages numbers that will be called in language variable
+#define firstLanguage 2 //Preset number configuration when booting for first time
 #define spanish 1
 #define english 2
 #define french 3
 #define numLanguages 3
+int language;
 
 //temperature variables
-#define CheckSensorRaiseTemp 3   //in celsius degrees, the amount of degrees to differentiate heater or room NTC
-#define roomNTC 0
+#define CheckSensorRaiseTemp 3   //(in celsius degrees) Due to a probable missplacement issue, a Temperature difference threshold is set to distinguish between heater or room NTC at the beggining of a thermal control
+
+//number assignment of each enviromental sensor for later call in variable
+#define roomNTC 0                
 #define heaterNTC 1
 #define inBoardLeftNTC 2
 #define inBoardRightNTC 3
-#define dhtSensor 1
-#define numNTC 2
-#define numTempSensors 5
-#define temperature_fraction 20 //numbers of measures of the temperatures sensors
+#define digitalTempSensor 4
 
-int gestationWeeks = 28;
-int temperatureArray [numNTC][temperature_fraction];
-bool faultNTC[numNTC];
-byte heaterPower;
-byte numSensors;
+#define numNTC 2 //number of out of board NTC
+#define numTempSensors 5 //number of total temperature sensors in system
+#define temperature_fraction 20 //amount of temperature samples to filter
 double temperature[numTempSensors];
 double previousTemperature[numTempSensors];
-int humidity;
-int previousHumidity;
+int temperatureArray [numNTC][temperature_fraction]; //variable to handle each NTC with the array of last samples (only for NTC)
+byte temperature_measured; //temperature sensor number turn to measure
+float diffTemperature[numTempSensors]; //difference between measured temperature and user input real temperature
+bool faultNTC[numNTC]; //variable to control a failure in NTC
+byte numSensors; //number of total sensors
+int humidity; // environmental humidity variable
+int previousHumidity; //previous sampled humidity
+int diffHumidity; //difference between measured humidity and user input real humidity
 
-//Sensor check rate (in ms)
+int gestationWeeks = 28; //preterm baby gestation time in weeks
+int heaterPower; //duty cycle of control signal of system heater
+
+//Sensor check rate (in ms). Both sensors are checked in same interrupt and they have different check rates
 const byte pulsioximeterRate = 5;
 byte pulsioximeterCount = 0;
 byte encoderRate = 1;
 byte encoderCount = 0;
 
-//GPRS variables
-#define aliveRefresh 0
-#define environmental 1
-#define ENC_PULSESensorVariables 2
-#define ENC_PULSESensorRaw 3
-#define turnedOn 4
+//GPRS variables to transmit
+#define turnedOn 0 //transmit first turned ON with hardware verification
+#define environmental 1 //transmit environmental variables
+#define pulsioximeterSensorVariables 2 //transmit heart rate between others
+#define pulsioximeterSensorRaw 3 //transmit raw pulsioximeter signal
+#define aliveRefresh 4 //message to let know that incubator is still ON
 
 
 //sensor variables
@@ -92,31 +101,50 @@ int pulsioximeterRestFilterFactor = 1;
 int pulsioximeterAmplitud;
 int pulsioximeterCounter[2];
 
+//environmental variables
+double desiredSkinTemp = 36.5; //preset baby skin temperature
+int desiredRoomHum = 80; //preset enviromental humidity
+int fanSpeed; //PWM that controls fan speed
+int Jaundice_LED_intensity; //PWM that controls jaundice LED intensity
+double maxHeaterTemp; //maximum heater temperature
+double desiredHeaterTemp; //desired temperature in heater
+
+//preset environmental variables
+const byte standardmaxHeaterTemp = 85; //preset max heater temperature in celsious
+const byte standardFanSpeed = 100;
+
 //constants
-const byte heaterMaxTemp = 100;
-const byte minTemp = 15;
-const byte maxTemp = 45;
-const byte maxHum = 100;
-const byte minHum = 20;
-const byte maxGestation = 100;
-const byte minGestation = 1;
+const byte heaterMaxTemp = 100; //maximum temperature in heater to be set
+const byte minTemp = 15; //minimum allowed temperature to be set
+const byte maxTemp = 45; //maximum allowed temperature to be set
+const byte maxHum = 100; //maximum allowed humidity to be set
+const byte minHum = 20; //minimum allowed humidity to be set
+const byte maxGestation = 99; //maximum gestation weeks to be set
+const byte minGestation = 1; //minimum gestation weeks to be set
+const byte LEDMaxIntensity = 100; //max LED intensity to be set
+const byte fanMaxSpeed = 100; //max fan speed (percentage) to be set
 
 //Encoder variables
-#define NUMENCODERS 1
-byte NTCpin[numNTC] = {THERMISTOR_HEATER, THERMISTOR_ROOM};
-volatile int encstate[NUMENCODERS];
-volatile int encflag[NUMENCODERS];
+#define NUMENCODERS 1 //number of encoders in circuit
+byte NTCpin[numNTC] = {THERMISTOR_HEATER, THERMISTOR_ROOM}; //variable that handles which pin number is heater/room NTC (could be swapped by user in mounting stage)
+bool swapTempSensors; //variable to swap room and heater pin map in case are swapped
+volatile int encstate[NUMENCODERS]; //encoder state
+volatile int encflag[NUMENCODERS]; //encoder movement flag
 boolean A_set[NUMENCODERS];
 boolean B_set[NUMENCODERS];
 volatile int16_t encoderpos[NUMENCODERS];
 volatile int  encodertimer = millis(); // acceleration measurement
 int encoderpinA[NUMENCODERS] = {ENC_A}; // pin array of all encoder A inputs
 int encoderpinB[NUMENCODERS] = {ENC_B}; // pin array of all encoder B inputs
-unsigned int lastEncoderPos[NUMENCODERS];
-int EncOldPosition;
-int EncNewPosition;
+unsigned int lastEncoderPos[NUMENCODERS]; //last encoder position
+int EncOldPosition; //old encoder position
+int EncNewPosition; //new encoder position
+bool encPulsed, encPulsedBefore; //encoder switch status
+volatile int EncMove; //moved encoder
+long last_encPulsed; //last time encoder was pulsed
+int ENC_counter;
 
-//display graphic geometric variables
+//User Interface display constants
 #define introDelay    1000      //initial delay between intro and menu
 #define brightenRate  30        //intro brighten speed (Higher value, slower)
 #define valuePosition 245
@@ -131,21 +159,72 @@ int EncNewPosition;
 #define side_gap  4
 #define letter_height  26
 #define letter_width  14
-#define triang  6
-#define radius  12
-#define circle  8
 #define logo  40
-#define battery_lenght  50
-#define battery_height  6
-#define battery_gap  2
-#define battery_margin  20
-#define battery_round  4
 #define arrow_height  6
 #define arrow_tail  5
-//graphic positions
+
+//Text Graphic position variables
+int gestationWeeksXPos;
+int LEDXPos;
+int humidityX;
+int humidityY;
+int temperatureX;
+int temperatureY;
+int separatorTopYPos;
+int separatorBotYPos;
+int pulsioximeterYPos;
+int pulsioximeterXPos;
+bool controlTemperature;
+bool controlHumidity;
+int ypos;
+bool displayProcessPercentage = 0;
+bool print_text;
+bool display_drawStop = 0;
+char* initialSensorsValue = "XX";
+int initialSensorPosition = separatorPosition - letter_width;
+byte text_size;
+bool pos_text[8];
+
+
+//Graphic variables
+bool enableSet;
+float temperaturePercentage, temperatureAtStart;
+float humidityPercentage, humidityAtStart;
+int barWidth, barHeight, tempBarPosX, tempBarPosY, humBarPosX, humBarPosY;
+byte barThickness;
+
+//User Interface display variables
+bool auto_lock; //setting that enables backlight switch OFF after a given time of no user actions
+int time_lock = 16000; //time to lock screen if no user actions
+int backlight_intensity = 50; //PWM that will be supplied to backlight LEDs
+const byte time_back_draw = 255;
+const byte time_back_wait = 255;
+long last_something; //last time there was a encoder movement or pulse
+long CheckTempSensorPinTimeout = 45000; //timeout for checking the thermistor pinout
+long temp_update_rate = 1000;
+int blinkTimeON = 1000; //displayed text ON time
+int blinkTimeOFF = 100; //displayed text OFF time
+bool selected;
+char* textToWrite;
+char* words[8];
+char* helpMessage;
+byte bar_pos;
+byte rectangles;
+byte length;
+long last_temp_update;
+bool enableSetProcess;
+long blinking;
+bool state_blink;
+bool blinkSetMessageState;
+long lastBlinkSetMessage;
+byte goToProcessRow;
+
+//graphic text configurations
 #define graphicTextOffset  1                //bar pos is counted from 1, but text from 0
 #define centered 1
 #define leftMargin 0
+
+//below are all the different variables positions that will be displayed in user interface
 //mainMenu
 #define gestationGraphicPosition 0
 #define advancedModeGraphicPosition 1
@@ -172,7 +251,8 @@ int EncNewPosition;
 #define successQuestionGraphicPosition 0
 #define afirmativeGraphicPosition 1
 #define negativeGraphicPosition 2
-//colors
+
+//color options 
 #define BLACK 0x0000
 #define BLUE 0x001F
 #define RED 0xF800
@@ -199,18 +279,11 @@ int EncNewPosition;
 #define introTextColor BLACK
 #define transitionEffect BLACK
 
-int initialSensorPosition = separatorPosition - letter_width;
-int pulsioximeterXPos;
-char* initialSensorsValue = "XX";
-bool controlTemperature;
-bool controlHumidity;
-int ypos;
-bool print_text;
-bool display_drawStop = 0;
-
-//hardware verification. 1 is a mounted hardware, 0 a not mounted.
+//hardware verification variables 
 #define hardwareComponents 12
 byte errorHardwareCode[hardwareComponents];
+
+//hardware verification. 1 is a mounted hardware, 0 a not mounted.
 #define HWPowerEn 1
 #define HWHeater 1
 #define HWFAN_HP 1
@@ -259,95 +332,19 @@ bool testOK;
 bool testCritical;
 bool criticalError;
 
-bool displayProcessPercentage = 0;
-int counter;
+Adafruit_ILI9341_STM tft = Adafruit_ILI9341_STM(TFT_CS, TFT_DC, TFT_RST); // Use hardware SPI, tft class definition
+DHT dht; //dht sensor class definition
 
-Adafruit_ILI9341_STM tft = Adafruit_ILI9341_STM(TFT_CS, TFT_DC, TFT_RST); // Use hardware SPI
-
-DHT dht;
-
-//Text Graphic position
-int gestationWeeksXPos;
-int LEDXPos;
-int humidityX;
-int humidityY;
-int temperatureX;
-int temperatureY;
-int separatorTopYPos;
-int separatorBotYPos;
-int pulsioximeterYPos;
-
-const byte time_back_draw = 255;
-const byte time_back_wait = 255;
-const byte fanMaxSpeed = 100;
-const byte LEDMaxIntensity = 100;
-const byte standardHeaterTempLimit = 85; //max heater temperature
-const byte standardFanSpeed = 100;
 int HeatermaxPWM = maxPWMvalue;      //max power for heater, full power is 50W
 
-
-int page, page0;
-bool selected;
-int data, instant_read;
-byte text_size;
-bool pos_text[8];
-volatile int EncMove;
-long last_encPulsed;
-char* textToWrite;
-char* words[8];
-char* helpMessage;
-byte bar_pos;
-byte rectangles;
-bool mode;
-byte length;
-bool manual_state = 0;
-long blinking;
-long last_something;
-bool state_blink;
-const int time_blink = 500;
-byte missed;
-const byte limit_speed = 40; //40
-bool int_length, int_length_0;
-float factor;
-bool encPulsed, encPulsedBefore;
-int time_lock = 16000;
-long CheckTempSensorPinTimeout = 45000; //timeout for checking the thermistor pinout
-bool auto_lock;
-int language;
-bool swapTempSensors;
-int goBackTextY = tft.height() / 2;
-double desiredHeaterTemp;
-double desiredSkinTemp = 36.5;
-int desiredRoomHum = 80;
-double heaterTempLimit;
-int fanSpeed;
-int LEDIntensity;
-long last_temp_update;
-long temp_update_rate = 1000;
-int backlight_intensity = 50;
-bool enableSet;
-float temperaturePercentage, temperatureAtStart;
-float humidityPercentage, humidityAtStart;
-byte temperaturePos, temperature_measured;
-int barWidth, barHeight, tempBarPosX, tempBarPosY, humBarPosX, humBarPosY;
-byte barThickness;
-float diffTemperature[numTempSensors];
-int diffHumidity;
-bool enableSetProcess;
-bool blinkSetMessageState;
-int blinkTimeON = 1000;
-int blinkTimeOFF = 100;
-long lastBlinkSetMessage;
-byte goToProcessRow;
-volatile long interruptcounter;
-
-// timers
+// timers configuration
 #define sensorsRate 1000    // in microseconds; 
 #define NTCInterruptRate 20000    // in microseconds; 
 #define roomPIDRate 1000000    // in microseconds; 
 #define heaterPIDRate 200000   // times of roomPIDRate;
 int roomPIDfactor = roomPIDRate / NTCInterruptRate;
 int heaterPIDfactor = heaterPIDRate / NTCInterruptRate;
+volatile long interruptcounter;
 /*
 STM32F103RE Timers
 Timer Ch. 1 Ch. 2 Ch. 3 Ch. 4

@@ -80,25 +80,25 @@ void barSelection() {
             case LEDGraphicPosition:
               while (digitalRead(ENC_SWITCH) ) {
                 updateData();
-                if (EncMove && -EncMove + LEDIntensity >= 0 && -EncMove + LEDIntensity <= LEDMaxIntensity) {
+                if (EncMove && -EncMove + backlight_intensity >= 0 && -EncMove + backlight_intensity <= LEDMaxIntensity) {
                   tft.setTextColor(COLOR_MENU);
-                  drawRightNumber(LEDIntensity, LEDXPos, ypos);
-                  if (!LEDIntensity && EncMove) {
+                  drawRightNumber(backlight_intensity, LEDXPos, ypos);
+                  if (!backlight_intensity && EncMove) {
                     tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
                     tft.drawRightString("%", unitPosition, ypos, textFontSize);
                   }
-                  LEDIntensity -= 10 * EncMove;
-                  analogWrite(JAUNDICE, LEDIntensity);
+                  backlight_intensity -= 10 * EncMove;
+                  analogWrite(JAUNDICE, backlight_intensity);
                   tft.setTextColor(COLOR_MENU_TEXT);
-                  if (!LEDIntensity && EncMove) {
+                  if (!backlight_intensity && EncMove) {
                     tft.setTextColor(COLOR_MENU);
                     tft.drawRightString("%", unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
                     tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
                   }
                   else {
-                    drawRightNumber(LEDIntensity, LEDXPos, ypos);
+                    drawRightNumber(backlight_intensity, LEDXPos, ypos);
                   }
                 }
                 EncMove = 0;
@@ -155,25 +155,25 @@ void barSelection() {
             case LEDGraphicPosition:
               while (digitalRead(ENC_SWITCH) ) {
                 updateData();
-                if (EncMove && -EncMove + LEDIntensity >= 0 && -EncMove + LEDIntensity <= LEDMaxIntensity) {
+                if (EncMove && -EncMove + backlight_intensity >= 0 && -EncMove + backlight_intensity <= LEDMaxIntensity) {
                   tft.setTextColor(COLOR_MENU);
-                  drawRightNumber(LEDIntensity, LEDXPos, ypos);
-                  if (!LEDIntensity && EncMove) {
+                  drawRightNumber(backlight_intensity, LEDXPos, ypos);
+                  if (!backlight_intensity && EncMove) {
                     tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
                     tft.drawRightString("%", unitPosition, ypos, textFontSize);
                   }
-                  LEDIntensity -= 10 * EncMove;
-                  analogWrite(JAUNDICE, LEDIntensity);
+                  backlight_intensity -= 10 * EncMove;
+                  analogWrite(JAUNDICE, backlight_intensity);
                   tft.setTextColor(COLOR_MENU_TEXT);
-                  if (!LEDIntensity && EncMove) {
+                  if (!backlight_intensity && EncMove) {
                     tft.setTextColor(COLOR_MENU);
                     tft.drawRightString("%", unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
                     tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
                   }
                   else {
-                    drawRightNumber(LEDIntensity, LEDXPos, ypos);
+                    drawRightNumber(backlight_intensity, LEDXPos, ypos);
                   }
                 }
                 EncMove = 0;
@@ -301,25 +301,25 @@ void barSelection() {
             case heaterTempGraphicPosition:
               while (digitalRead(ENC_SWITCH) ) {
                 updateData();
-                if (EncMove && -EncMove + heaterTempLimit >= 0 && -EncMove + heaterTempLimit <= heaterMaxTemp) {
+                if (EncMove && -EncMove + maxHeaterTemp >= 0 && -EncMove + maxHeaterTemp <= heaterMaxTemp) {
                   tft.setTextColor(COLOR_MENU);
-                  drawRightNumber(heaterTempLimit, 280, ypos);
-                  if (!heaterTempLimit && EncMove) {
+                  drawRightNumber(maxHeaterTemp, 280, ypos);
+                  if (!maxHeaterTemp && EncMove) {
                     tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
                     tft.drawRightString("C", unitPosition, ypos, textFontSize);
                   }
-                  heaterTempLimit -= 5 * EncMove;
-                  EEPROM.write(EEPROM_heaterTempLimit, heaterTempLimit);
+                  maxHeaterTemp -= 5 * EncMove;
+                  EEPROM.write(EEPROM_maxHeaterTemp, maxHeaterTemp);
                   tft.setTextColor(COLOR_MENU_TEXT);
-                  if (!heaterTempLimit && EncMove) {
+                  if (!maxHeaterTemp && EncMove) {
                     tft.setTextColor(COLOR_MENU);
                     tft.drawRightString("C", unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
                     tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
                   }
                   else {
-                    drawRightNumber(heaterTempLimit, 280, ypos);
+                    drawRightNumber(maxHeaterTemp, 280, ypos);
                   }
                 }
                 EncMove = 0;

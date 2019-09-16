@@ -159,7 +159,7 @@ void basicHumidityControl() {
 }
 
 void heatUp() {
-  if (temperature[heaterNTC] < heaterTempLimit) {
+  if (temperature[heaterNTC] < maxHeaterTemp) {
     heaterPower = HeatermaxPWM;
     analogWrite(HEATER, HeatermaxPWM);
   }
