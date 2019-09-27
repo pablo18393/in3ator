@@ -3,7 +3,7 @@ void initBoard() {
   pinDirection();
   //hardwareVerification();
   initEEPROM();
-  initGPRS();
+  //initGPRS();
   initSensors();
   initTFT();
   initTimers();
@@ -33,7 +33,7 @@ void initSensors() {
 }
 
 void initTFT() {
-  SPI.setModule(SPI_SEL);
+  SPI.setModule(1);
   tft.begin();
   tft.setRotation(1);
   //loadLogo();

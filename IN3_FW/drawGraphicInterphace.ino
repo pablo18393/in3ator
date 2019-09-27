@@ -170,7 +170,7 @@ void setSensorsGraphicPosition() {
 
 void drawHeading() {
   tft.fillRect(0, 0, tft.width(), height_heading, COLOR_HEADING);
-  if (page) {
+  if (page != mainMenuPage && page != askSuccessPage) {
     drawBack();
   }
   tft.setTextColor(COLOR_MENU);

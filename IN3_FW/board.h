@@ -32,8 +32,8 @@ word THERMISTOR_ROOM = PB1;   //This is not #define because can be swaped with T
 #define GSMRXPIN PA10
 
 //Hardware
-#define DHTSensor 0
-#define BME280Sensor 1
+#define DHTSensor 1
+#define BME280Sensor 0
 #define SPI_SEL 2
 
 //pin declaration

@@ -3,13 +3,18 @@ void barSelection() {
   bar_pos = 1;
   selected = 0;
   ypos = (tft.height() - height_heading) / (2 * rectangles) + letter_height;
+  if (page == askSuccessPage) {
+    eraseBar();
+    bar_pos++;
+    updateBar();
+  }
   while (1) {
     updateData();
     if (EncMove) {
       if (!selected) {
         if (EncMove < 0) {
           EncMove++;
-          if (!page) {
+          if (page == mainMenuPage) {
             enableSetProcess = enableSet;
           }
           else {
@@ -23,7 +28,7 @@ void barSelection() {
         }
         else {
           EncMove --;
-          if (bar_pos > 1) {
+          if (bar_pos > (1 + checkAskSuccessPage())) {
             eraseBar();
             bar_pos--;
             updateBar();
@@ -45,7 +50,7 @@ void barSelection() {
       }
       while (!digitalRead(ENC_SWITCH)) {
         checkEncoderPress();
-        if (page != mainMenuPage) {
+        if (page != mainMenuPage && page != askSuccessPage) {
           back_mode();
         }
       }
@@ -186,6 +191,17 @@ void barSelection() {
               actuatorsProgress();
               break;
           }
+          break;
+        case askSuccessPage:
+          switch (bar_pos - graphicTextOffset ) {
+            case afirmativeGraphicPosition:
+              //add here affirmative message to GSM transmit
+              break;
+            case negativeGraphicPosition:
+              //add here affirmative message to GSM transmit
+              break;
+          }
+          mainMenu();
           break;
         case settingsPage:
           switch (bar_pos - graphicTextOffset ) {
@@ -412,7 +428,7 @@ void barSelection() {
       tft.fillRect(0, (tft.height() - height_heading) * (bar_pos - 1) / rectangles + height_heading, width_select, (tft.height() - height_heading) / rectangles, WHITE);
       while (!digitalRead(ENC_SWITCH)) {
         checkEncoderPress();
-        if (page != mainMenuPage) {
+        if (page != mainMenuPage && page != askSuccessPage) {
           back_mode();
         }
       }

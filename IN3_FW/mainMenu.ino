@@ -35,10 +35,9 @@ void mainMenu() {
   controlTemperature = 0;
   controlHumidity = 0;
   enableSet = 0;
-  while (!digitalRead(ENC_SWITCH)) {
-    updateData();
-  }
+  while (!digitalRead(ENC_SWITCH));
   delay(debounceTime);
+  updateData();
   barSelection();
 }
 
@@ -51,6 +50,7 @@ void askSuccess() {
     turnFansOff();
   }
   page = askSuccessPage;
+  bar_pos = 2;
   byte numWords = 3;
   print_text = 1;
   tft.setTextSize(1);
@@ -58,6 +58,8 @@ void askSuccess() {
   for (int i = 0; i < numWords; i++) {
     pos_text[i] = leftMargin;
   }
+  pos_text[afirmativeGraphicPosition] = centered;
+  pos_text[negativeGraphicPosition] = centered;
   words[successQuestionGraphicPosition] = "IS THE BABY ALIVE?";
   words[afirmativeGraphicPosition] = "YES";
   words[negativeGraphicPosition] = "NO";
@@ -71,4 +73,11 @@ void askSuccess() {
   }
   delay(debounceTime);
   barSelection();
+}
+
+bool checkAskSuccessPage() {
+  if (page == askSuccessPage) {
+    return true;
+  }
+  return false;
 }
