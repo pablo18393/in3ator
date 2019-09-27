@@ -29,7 +29,7 @@ word THERMISTOR_ROOM = PB1;   //This is not #define because can be swaped with T
 #define THERMISTOR_INBOARD_LEFT PC3 //PC3
 #define THERMISTOR_INBOARD_RIGHT PC2 //PC2
 #define PULSIOXIMETER 7
-
+#define GSMRXPIN PA10
 
 //Hardware
 #define DHTSensor 0

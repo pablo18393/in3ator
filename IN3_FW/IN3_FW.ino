@@ -336,10 +336,11 @@ Adafruit_BME280 bme(BME_CS); // hardware SPI, //BME280 (humidity, pressure and t
 int HeatermaxPWM = maxPWMvalue;      //max power for heater, full power is 50W
 
 // timers configuration
-#define sensorsRate 1000    // in microseconds; 
+#define sensorsISRRate 1000    // in microseconds; 
 #define NTCInterruptRate 20000    // in microseconds; 
 #define roomPIDRate 1000000    // in microseconds; 
 #define heaterPIDRate 200000   // times of roomPIDRate;
+#define GSMISRRate 1000    // in microseconds; 
 int roomPIDfactor = roomPIDRate / NTCInterruptRate;
 int heaterPIDfactor = heaterPIDRate / NTCInterruptRate;
 volatile long interruptcounter;
@@ -352,8 +353,11 @@ Timer Ch. 1 Ch. 2 Ch. 3 Ch. 4
 4     PB6   PB7   PB8    PB9
 8     PC6   PC7   PC8    PC9
  */
-HardwareTimer sensorsTimer(8);
+ 
+HardwareTimer GSMTimer(1);
 HardwareTimer roomPIDTimer(2);
+HardwareTimer humidifierTimer(3);
+HardwareTimer sensorsTimer(8);
 
 void setup() {
   initBoard();
