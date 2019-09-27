@@ -47,7 +47,7 @@ void updateSensors() {
   if (page == advancedModePage || (page == actuatorsProgressPage && controlTemperature)) {
     tft.drawFloat(previousTemperature[roomNTC], 1, temperatureX, temperatureY, textFontSize);
   }
-  if (page != actuatorsProgressPage || controlHumidity) {
+  if (page != actuatorsProgressPage && page != mainMenuPage || controlHumidity) {
     drawHumidity();
   }
   updateTemp(numNTC);
@@ -132,10 +132,10 @@ void checkSerialPort() {
         diffHumidity = humidity - readSerialData();
         humidity -= diffHumidity;
         break;
-      case 'P':      
+      case 'P':
         HeatermaxPWM = readSerialData();
         Serial.print("Heater max PWM is: ");
-        Serial.println(HeatermaxPWM);        
+        Serial.println(HeatermaxPWM);
         break;
       case 'R':
         nvic_sys_reset();
