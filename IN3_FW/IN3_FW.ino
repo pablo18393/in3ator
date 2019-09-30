@@ -124,21 +124,13 @@ const byte fanMaxSpeed = 100; //max fan speed (percentage) to be set
 #define NUMENCODERS 1 //number of encoders in circuit
 byte NTCpin[numNTC] = {THERMISTOR_HEATER, THERMISTOR_ROOM}; //variable that handles which pin number is heater/room NTC (could be swapped by user in mounting stage)
 bool swapTempSensors; //variable to swap room and heater pin map in case are swapped
-volatile int encstate[NUMENCODERS]; //encoder state
-volatile int encflag[NUMENCODERS]; //encoder movement flag
-boolean A_set[NUMENCODERS];
-boolean B_set[NUMENCODERS];
-volatile int16_t encoderpos[NUMENCODERS];
-volatile int  encodertimer = millis(); // acceleration measurement
-int encoderpinA[NUMENCODERS] = {ENC_A}; // pin array of all encoder A inputs
-int encoderpinB[NUMENCODERS] = {ENC_B}; // pin array of all encoder B inputs
-unsigned int lastEncoderPos[NUMENCODERS]; //last encoder position
-int EncOldPosition; //old encoder position
-int EncNewPosition; //new encoder position
+boolean A_set;
+boolean B_set;
+int encoderpinA = ENC_A; // pin  encoder A 
+int encoderpinB = ENC_B; // pin  encoder B 
 bool encPulsed, encPulsedBefore; //encoder switch status
 volatile int EncMove; //moved encoder
 long last_encPulsed; //last time encoder was pulsed
-int ENC_counter;
 
 //User Interface display constants
 #define introDelay    1000      //initial delay between intro and menu

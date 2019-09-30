@@ -1,19 +1,5 @@
 
 int updateData() {
-  //check rotary encoder position
-  EncNewPosition = myEncoderRead();
-  EncMove = EncOldPosition - EncNewPosition;
-  if (abs(EncMove) > 1) {
-    if (EncMove > 0) {
-      EncMove = 1;
-    }
-    else {
-      EncMove = -1;
-    }
-  }
-  lastEncoderPos[ENC_counter] = encoderpos[ENC_counter];
-  EncOldPosition = EncNewPosition;
-
   if (page == advancedModePage || page == actuatorsProgressPage) {
     if (millis() - last_temp_update > temp_update_rate) {
       updateSensors();

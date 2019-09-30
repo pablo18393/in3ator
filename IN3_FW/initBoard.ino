@@ -16,24 +16,18 @@ void initSensors() {
   if (BME280Sensor) {
     bme.begin();
   }
-  encodertimer = millis(); // acceleration measurement
-  for (byte counter = 0; counter < NUMENCODERS; counter++)
-  {
-    encstate[ENC_counter] = HIGH;
-    encflag[ENC_counter] = HIGH;
-    A_set[ENC_counter] = false;
-    B_set[ENC_counter] = false;
-    encoderpos[ENC_counter] = 0;
-    pinMode(encoderpinA[ENC_counter], INPUT_PULLUP);
-    pinMode(encoderpinB[ENC_counter], INPUT_PULLUP);
-    lastEncoderPos[ENC_counter] = 1;
-  }
+  A_set = false;
+  B_set = false;
+  pinMode(encoderpinA, INPUT_PULLUP);
+  pinMode(encoderpinB, INPUT_PULLUP);
+  attachInterrupt(ENC_A, encoderHandler, CHANGE);
+  attachInterrupt(ENC_B, encoderHandler, CHANGE);
   // timer setup for encoder
   initPulsioximeterVariables();
 }
 
 void initTFT() {
-  SPI.setModule(1);
+  SPI.setModule(SPI_SEL);
   tft.begin();
   tft.setRotation(1);
   //loadLogo();

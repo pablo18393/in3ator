@@ -1,18 +1,5 @@
 
-int myEncoderRead() {
-  if ((lastEncoderPos[ENC_counter] != encoderpos[ENC_counter])) {
-    encflag[ENC_counter] = LOW;
-    lastEncoderPos[ENC_counter] = encoderpos[ENC_counter];
-  }
-  return (encoderpos[ENC_counter]);
-}
-
 void sensorsISR() {
-  if (!encoderCount) {
-    encoderCount = encoderRate;
-    readEncoder();
-  }
-  encoderCount--;
   readPulsioximeter();
   if (!pulsioximeterCount) {
     pulsioximeterCount = pulsioximeterRate;
@@ -23,37 +10,6 @@ void sensorsISR() {
 
 void initPulsioximeterVariables() {
 
-}
-
-void readEncoder() {
-  for (byte counter = 0; counter < NUMENCODERS; counter++)
-  {
-    if ( (gpio_read_bit(PIN_MAP[encoderpinA[ENC_counter]].gpio_device, PIN_MAP[encoderpinA[ENC_counter]].gpio_bit) ? HIGH : LOW) != A_set[ENC_counter] )
-    {
-      A_set[ENC_counter] = !A_set[ENC_counter];
-      if ( A_set[ENC_counter] && !B_set[ENC_counter] )
-      {
-        if (millis() - encodertimer < -1)
-          encoderpos[ENC_counter] += 1;
-        else
-          encoderpos[ENC_counter] += 5;
-      }
-      encodertimer = millis();
-      last_something = millis();
-    }
-    if ( (gpio_read_bit(PIN_MAP[encoderpinB[ENC_counter]].gpio_device, PIN_MAP[encoderpinB[ENC_counter]].gpio_bit) ? HIGH : LOW) != B_set[ENC_counter] )
-    {
-      B_set[ENC_counter] = !B_set[ENC_counter];
-      if ( B_set[ENC_counter] && !A_set[ENC_counter] )
-        if (millis() - encodertimer < -1)
-          encoderpos[ENC_counter] -= 1;
-        else
-          encoderpos[ENC_counter] -= 5;
-      encodertimer = millis();
-      last_something = millis();
-    }
-  }
-  asleep();
 }
 
 void readPulsioximeter() {
@@ -170,6 +126,24 @@ bool updateHumidity() {
     humidity += diffHumidity;
   }
   return (DHTOK || BME280OK);
+}
+
+void encoderHandler() {
+  if ( (digitalRead(ENC_A))  != A_set )
+  {
+    A_set = !A_set;
+    if ( A_set && !B_set)
+    {
+      EncMove = 1;
+    }
+  }
+  if ( (digitalRead(ENC_B))  != B_set)
+  {
+    B_set = !B_set;
+    if ( B_set && !A_set )
+      EncMove = -1;
+    }
+  last_something = millis();
 }
 
 void asleep() {
