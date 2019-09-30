@@ -14,7 +14,7 @@ void barSelection() {
       if (!selected) {
         if (EncMove < 0) {
           EncMove++;
-          if (page == mainMenuPage) {
+          if (page == mainMenuPage || advancedModePage) {
             enableSetProcess = enableSet;
           }
           else {

@@ -3,7 +3,7 @@ void initBoard() {
   pinDirection();
   //hardwareVerification();
   initEEPROM();
-  //initGPRS();
+  initGPRS();
   initSensors();
   initTFT();
   initTimers();
