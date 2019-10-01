@@ -8,8 +8,10 @@ String server = "pub.scar.io";
 
 int GPRSPartialMessageLength;
 bool newData = 0;
-char uartBuffer[3000];
-int uartCounter = 0;
+int uartBufferSize = 3000;
+char GSMRXBuffer[3000];
+int bufferReadPos = 0;
+int newBufferPos = 0;
 
 //GPRS variables
 #define environmentalWords[] = "TimeOn","Temperature","Humidity","DesiredTemp","HeaterPower","PIDOutput","maxHeaterTemp";
@@ -33,19 +35,55 @@ void powerGSM() {
 }
 
 void connectToInternet() {
-  Serial2.write("AT\n");
+  Serial1.write("AT\n");
   checkSerial("OK", "ERROR");
-  Serial2.write("AT+CFUN=1\n");
+  Serial1.write("AT+CFUN=1\n");
   checkSerial("OK", "ERROR");
-  Serial2.write("AT+CPIN?\n");
+  Serial1.write("AT+CPIN?\n");
   checkSerial("OK", "ERROR");
-  Serial2.write("AT+CSTT=\"Terminal\",\"\",\"\"\n");
+  Serial1.write("AT+CSTT=\"Terminal\",\"\",\"\"\n");
   checkSerial("OK", "ERROR");
-  Serial2.write("AT+CIICR\n");
+  Serial1.write("AT+CIICR\n");
   checkSerial("OK", "ERROR");
-  Serial2.write("AT+CIFSR\n");
+  Serial1.write("AT+CIFSR\n");
   checkSerial("\n", "");
 }
+
+bool logIn() {
+  token.trim();
+  String req2[] = {
+    "POST /In3/public/api/v1/session?c=1 HTTP/1.1\n",
+    "Host: " + server + "\n",
+    "Content-Type: application/x-www-form-urlencoded\n",
+    "Authorization: Bearer \n",
+    "Content-Length: 46\n",
+    "Connection: close\n\n",
+    "\n",
+    "{\"temperature\":\"" + String(temp) + "\",\"humidity\":\"" + String(hum) + "\"}\n"
+  };
+  req2[3] = "Authorization: Bearer " + token + "\n";
+  req2[4] = "Content-Length: " + String(req2[6].length() - 1) + "\n";
+  int len = 0;
+  for (int i = 0; i < 8; i++) {
+    len += req2[i].length();
+    Serial.print(String(i) + String(req2[i].length()) + ":" + req2[i]);
+  }
+  Serial2.print("AT+CIPSTART=\"TCP\",\"" + server + "\",80\n");
+  checkSerial("CONNECT OK", "ERROR");
+  delay(1000);
+  Serial2.print("AT+CIPSEND=" + String(len - 1) + "\n");
+  checkSerial("ERROR", "");
+  delay(200);
+  for (int i = 0; i < 8; i++) {
+    Serial2.print(req2[i]);
+    if (i < 7) {
+      checkSerial("", "\n");
+    }
+  }
+  checkSerial("SEND OK", "\n\n");
+  String rec = checkSerial("CLOSED", "\n\n");
+}
+
 
 bool postGPRS(int variable) {
   String req[] = {
@@ -59,18 +97,18 @@ bool postGPRS(int variable) {
   };
   req[3] = "Content-Length: " + String(req[6].length() - 1) + "\n";
 
-  Serial2.print("AT+CIPSTART=\"TCP\",\"" + server + "\",80\n");
+  Serial1.print("AT+CIPSTART=\"TCP\",\"" + server + "\",80\n");
   checkSerial("CONNECT OK", "ERROR");
   delay(1000);
   int len = 0;
   for (int i = 0; i < 7; i++) {
     len += req[i].length();
   }
-  Serial2.print("AT+CIPSEND=" + String(len - 1) + "\n");
+  Serial1.print("AT+CIPSEND=" + String(len - 1) + "\n");
   checkSerial("ERROR", "");
   delay(200);
   for (int i = 0; i < 7; i++) {
-    Serial2.print(req[i]);
+    Serial1.print(req[i]);
     if (i < 6) {
       checkSerial("", "\n");
     }
@@ -94,18 +132,22 @@ bool postGPRS(int variable) {
   if (variable == environmental) {
 
   }
+}
 
+char readGSMbuffer() {
+
+  return(true);
 }
 
 void GSMISR() {
   while (Serial1.available()) {
-    newData = 1;
-    uartBuffer[uartCounter] = Serial1.read();
-    if (uartCounter < 999) {
-      uartCounter++;
+    newData = true;
+    GSMRXBuffer[newBufferPos] = Serial1.read();
+    if (newBufferPos < uartBufferSize) {
+      newBufferPos++;
     }
     else {
-      uartCounter = 0;
+      newBufferPos = 0;
     }
   }
 }
@@ -113,15 +155,15 @@ void GSMISR() {
 String checkSerial(String success, String error) {
   return checkSerial(success, error, "");
 }
+
 String checkSerial(String success, String error, String includeOnly) {
   String a = "";
   String line = "";
   String lastLine = "";
-  while (!Serial2.available());
-  //while (Serial2.available()) {
+  while (!Serial1.available());
   boolean discard = false;
   while (lastLine != success && lastLine != error) {
-    char c = Serial2.read();
+    char c = Serial1.read();
     if (c == '\n') {
       if (line.indexOf(includeOnly) >= 0) {
         Serial.println(line);
