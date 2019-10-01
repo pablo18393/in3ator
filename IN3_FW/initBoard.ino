@@ -3,7 +3,7 @@ void initBoard() {
   pinDirection();
   //hardwareVerification();
   initEEPROM();
-  initGPRS();
+  //initGPRS();
   initSensors();
   initTFT();
   initTimers();
@@ -20,8 +20,8 @@ void initSensors() {
   B_set = false;
   pinMode(encoderpinA, INPUT_PULLUP);
   pinMode(encoderpinB, INPUT_PULLUP);
-  attachInterrupt(ENC_A, encoderHandler, CHANGE);
-  attachInterrupt(ENC_B, encoderHandler, CHANGE);
+  attachInterrupt(ENC_A, encoderISR, CHANGE);
+  attachInterrupt(ENC_B, encoderISR, CHANGE);
   // timer setup for encoder
   initPulsioximeterVariables();
 }
@@ -49,7 +49,7 @@ void pinDirection() {
   digitalWrite(SCREENBACKLIGHT, HIGH);
   digitalWrite(JAUNDICE, LOW);
   digitalWrite(HEATER, LOW);
-  digitalWrite(POWER_EN, LOW);
+  digitalWrite(POWER_EN, HIGH);
   digitalWrite(FAN_HP, LOW);
   digitalWrite(FAN_LP, LOW);
   digitalWrite(STERILIZE, LOW);

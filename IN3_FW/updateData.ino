@@ -13,7 +13,6 @@ int updateData() {
   }
   checkSerialPort();
   checkNewPulsioximeterData();
-  return EncMove;
 }
 
 void checkNewPulsioximeterData() {

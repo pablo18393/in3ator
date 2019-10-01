@@ -31,7 +31,6 @@ void mainMenu() {
   goToProcessRow = numWords;
   graphics();
   drawHeading();
-  updateSensors();
   controlTemperature = 0;
   controlHumidity = 0;
   enableSet = 0;

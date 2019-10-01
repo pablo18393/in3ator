@@ -128,7 +128,7 @@ bool updateHumidity() {
   return (DHTOK || BME280OK);
 }
 
-void encoderHandler() {
+void encoderISR() {
   if ( (digitalRead(ENC_A))  != A_set )
   {
     A_set = !A_set;
