@@ -41,7 +41,7 @@ int language;
 #define CheckSensorRaiseTemp 3   //(in celsius degrees) Due to a probable missplacement issue, a Temperature difference threshold is set to distinguish between heater or room NTC at the beggining of a thermal control
 
 //number assignment of each enviromental sensor for later call in variable
-#define roomNTC 0                
+#define roomNTC 0
 #define heaterNTC 1
 #define inBoardLeftNTC 2
 #define inBoardRightNTC 3
@@ -126,10 +126,12 @@ byte NTCpin[numNTC] = {THERMISTOR_HEATER, THERMISTOR_ROOM}; //variable that hand
 bool swapTempSensors; //variable to swap room and heater pin map in case are swapped
 boolean A_set;
 boolean B_set;
-int encoderpinA = ENC_A; // pin  encoder A 
-int encoderpinB = ENC_B; // pin  encoder B 
+int encoderpinA = ENC_A; // pin  encoder A
+int encoderpinB = ENC_B; // pin  encoder B
 bool encPulsed, encPulsedBefore; //encoder switch status
 volatile int EncMove; //moved encoder
+long encoder_debounce_time = 1; //in milliseconds, debounce time in encoder to filter signal bounces
+long last_encoder_move;
 long last_encPulsed; //last time encoder was pulsed
 
 //User Interface display constants
@@ -241,7 +243,7 @@ byte goToProcessRow;
 #define afirmativeGraphicPosition 1
 #define negativeGraphicPosition 2
 
-//color options 
+//color options
 #define BLACK 0x0000
 #define BLUE 0x001F
 #define RED 0xF800
@@ -268,7 +270,7 @@ byte goToProcessRow;
 #define introTextColor BLACK
 #define transitionEffect BLACK
 
-//hardware verification variables 
+//hardware verification variables
 #define hardwareComponents 12
 byte errorHardwareCode[hardwareComponents];
 
@@ -337,15 +339,15 @@ int roomPIDfactor = roomPIDRate / NTCInterruptRate;
 int heaterPIDfactor = heaterPIDRate / NTCInterruptRate;
 volatile long interruptcounter;
 /*
-STM32F103RE Timers
-Timer Ch. 1 Ch. 2 Ch. 3 Ch. 4
-1     PA8   PA9   PA10  
-2     PA0   PA1   PA2    PA3
-3     PA6   PA7   PB0    PB1
-4     PB6   PB7   PB8    PB9
-8     PC6   PC7   PC8    PC9
- */
- 
+  STM32F103RE Timers
+  Timer Ch. 1 Ch. 2 Ch. 3 Ch. 4
+  1     PA8   PA9   PA10
+  2     PA0   PA1   PA2    PA3
+  3     PA6   PA7   PB0    PB1
+  4     PB6   PB7   PB8    PB9
+  8     PC6   PC7   PC8    PC9
+*/
+
 HardwareTimer GSMTimer(1);
 HardwareTimer roomPIDTimer(2);
 HardwareTimer humidifierTimer(3);

@@ -6,7 +6,7 @@ void initBoard() {
   //initGPRS();
   initSensors();
   initTFT();
-  initTimers();
+  //initTimers();
 }
 
 void initSensors() {
