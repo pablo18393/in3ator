@@ -129,19 +129,20 @@ bool updateHumidity() {
 }
 
 void encoderISR() {
+  if (millis() - last_encoder_move > encoder_debounce_time) {
     if ( (digitalRead(ENC_A))  != A_set )
     {
       A_set = !A_set;
       if ( A_set && !B_set)
       {
-        EncMove = -1;
+        EncMove = 1;
       }
     }
     if ( (digitalRead(ENC_B))  != B_set)
     {
       B_set = !B_set;
       if ( B_set && !A_set )
-        EncMove = 1;
+        EncMove = -1;
     }
   }
   last_encoder_move = millis();

@@ -14,7 +14,7 @@ void barSelection() {
       if (!selected) {
         if (EncMove < 0) {
           EncMove++;
-          if (page == mainMenuPage || advancedModePage) {
+          if (page == mainMenuPage || page == advancedModePage) {
             enableSetProcess = enableSet;
           }
           else {
@@ -61,13 +61,11 @@ void barSelection() {
             case gestationGraphicPosition:
               while (digitalRead(ENC_SWITCH)) {
                 updateData();
-                if (EncMove && -EncMove + desiredSkinTemp >= minGestation && -EncMove + desiredSkinTemp <= maxGestation) {
+                if (EncMove && -EncMove + gestationWeeks >= minGestation && -EncMove + gestationWeeks <= maxGestation) {
                   tft.setTextColor(COLOR_MENU);
-                  if (!controlTemperature || !controlHumidity) {
-                    controlTemperature = 1;
-                    controlHumidity = 1;
-                    tft.drawRightString(initialSensorsValue, gestationWeeksXPos, ypos, textFontSize);
-                  }
+                  controlTemperature = 1;
+                  controlHumidity = 1;
+                  tft.drawRightString(initialSensorsValue, gestationWeeksXPos, ypos, textFontSize);
                   drawRightNumber(gestationWeeks, gestationWeeksXPos, ypos);
                   gestationWeeks -= EncMove;
                   setPresetEnvironmentalValues();

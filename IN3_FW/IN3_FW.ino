@@ -107,7 +107,7 @@ double desiredHeaterTemp; //desired temperature in heater
 
 //preset environmental variables
 const byte standardmaxHeaterTemp = 85; //preset max heater temperature in celsious
-const byte standardFanSpeed = 100;
+const byte standardFanSpeed = 100; 
 
 //constants
 const byte heaterMaxTemp = 100; //maximum temperature in heater to be set
@@ -115,7 +115,7 @@ const byte minTemp = 15; //minimum allowed temperature to be set
 const byte maxTemp = 45; //maximum allowed temperature to be set
 const byte maxHum = 100; //maximum allowed humidity to be set
 const byte minHum = 20; //minimum allowed humidity to be set
-const byte maxGestation = 99; //maximum gestation weeks to be set
+const byte maxGestation = 50; //maximum gestation weeks to be set
 const byte minGestation = 1; //minimum gestation weeks to be set
 const byte LEDMaxIntensity = 100; //max LED intensity to be set
 const byte fanMaxSpeed = 100; //max fan speed (percentage) to be set
