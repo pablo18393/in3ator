@@ -145,7 +145,7 @@ void basictemperatureControl() {
     heatUp();
   }
   else {
-    analogWrite(HEATER, 0);
+    digitalWrite(HEATER, LOW);
   }
 }
 
@@ -161,26 +161,26 @@ void basicHumidityControl() {
 void heatUp() {
   if (temperature[heaterNTC] < maxHeaterTemp) {
     heaterPower = HeatermaxPWM;
-    analogWrite(HEATER, HeatermaxPWM);
+    digitalWrite(HEATER, HIGH);
   }
   else {
-    analogWrite(HEATER, 0);
+    digitalWrite(HEATER, LOW);
     heaterPower = 0;
   }
 }
 
 void turnActuatorsOff() {
   digitalWrite(HEATER, LOW);
-  analogWrite(HEATER, 0);
   digitalWrite(HUMIDIFIER, LOW);
 }
 
 void turnFansOn() {
-  analogWrite(FAN_HP, fanSpeed * 2.55);
+  digitalWrite(FAN_HP, HIGH);
+  digitalWrite(HEATER, HIGH);
   digitalWrite(FAN_LP, HIGH);
 }
 
 void turnFansOff() {
-  analogWrite(FAN_HP, LOW);
+  digitalWrite(FAN_HP, LOW);
   digitalWrite(FAN_LP, LOW);
 }

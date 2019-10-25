@@ -330,7 +330,7 @@ Adafruit_BME280 bme(BME_CS); // hardware SPI, //BME280 (humidity, pressure and t
 int HeatermaxPWM = maxPWMvalue;      //max power for heater, full power is 50W
 
 // timers configuration
-#define sensorsISRRate 1000    // in microseconds; 
+#define sensorsISRRate 500    // in microseconds, also for BUZZER optimal frequency; 
 #define NTCInterruptRate 20000    // in microseconds; 
 #define roomPIDRate 1000000    // in microseconds; 
 #define heaterPIDRate 200000   // times of roomPIDRate;

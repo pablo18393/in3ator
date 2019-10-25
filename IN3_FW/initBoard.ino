@@ -2,11 +2,12 @@
 void initBoard() {
   pinDirection();
   //hardwareVerification();
-  initEEPROM();
-  //initGPRS();
-  initSensors();
-  initTFT();
+  //initEEPROM();
+  initGPRS();
+  //initSensors();
+  //initTFT();
   //initTimers();
+  while(1);
 }
 
 void initSensors() {
