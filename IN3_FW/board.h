@@ -1,5 +1,5 @@
 // Use hardware SPI lines+
-
+/*
 #define DHTPIN PC10
 #define SCREENBACKLIGHT PB4
 word THERMISTOR_HEATER = PC1; //This is not #define because can be swaped with THERMISTOR_ROOM
@@ -35,7 +35,7 @@ word THERMISTOR_ROOM = PB1;   //This is not #define because can be swaped with T
 #define TFT_CS PC13
 #define TFT_DC PB8
 #define TFT_RST PD2
-
+*/
 //Hardware
 #define DHTSensor 1
 #define BME280Sensor 0
@@ -43,7 +43,7 @@ word THERMISTOR_ROOM = PB1;   //This is not #define because can be swaped with T
 
 //pin declaration
 //boardPWMPins: 3, 4, 5, 8, 9, 10, 11, 15, 16, 25, 26, 27
-/*
+
   #define DHTPIN 0
   #define SCREENBACKLIGHT 3
   int THERMISTOR_HEATER = 10;
@@ -62,7 +62,7 @@ word THERMISTOR_ROOM = PB1;   //This is not #define because can be swaped with T
   #define POWER_EN_FB 19
   #define FAN_HP_FB 20
   #define FAN_LP_FB 21
-  #define GSMRXPIN 22
+  #define GSMRXPIN 25
   #define JAUNDICE_FB 26
   #define STERILIZER_FB 29
   #define HUMIDIFIER_FB 30
@@ -74,7 +74,7 @@ word THERMISTOR_ROOM = PB1;   //This is not #define because can be swaped with T
   #define TFT_CS         7
   #define TFT_DC         31
   #define TFT_RST        2
-*/
+
 
 #define maxADCvalue 4095
 #define maxPWMvalue 255         //for STM32F103RE with arduino IDE

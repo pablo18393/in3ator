@@ -87,7 +87,7 @@ void initTimers() {
   GSMTimer.setPeriod(GSMISRRate); // in microseconds
   GSMTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
   GSMTimer.setCompare(TIMER_CH2, 1);  // Interrupt 1 count after each update
-  GSMTimer.attachCompare1Interrupt(GSMISR);
+  GSMTimer.attachCompare1Interrupt(GSMHandler);
   GSMTimer.refresh();
   GSMTimer.resume();
 }

@@ -107,7 +107,7 @@ double desiredHeaterTemp; //desired temperature in heater
 
 //preset environmental variables
 const byte standardmaxHeaterTemp = 85; //preset max heater temperature in celsious
-const byte standardFanSpeed = 100; 
+const byte standardFanSpeed = 100;
 
 //constants
 const byte heaterMaxTemp = 100; //maximum temperature in heater to be set
@@ -334,7 +334,7 @@ int HeatermaxPWM = maxPWMvalue;      //max power for heater, full power is 50W
 #define NTCInterruptRate 20000    // in microseconds; 
 #define roomPIDRate 1000000    // in microseconds; 
 #define heaterPIDRate 200000   // times of roomPIDRate;
-#define GSMISRRate 1000    // in microseconds; 
+#define GSMISRRate 1000    // in microseconds, able to read 115200 baud rate uart; 
 int roomPIDfactor = roomPIDRate / NTCInterruptRate;
 int heaterPIDfactor = heaterPIDRate / NTCInterruptRate;
 volatile long interruptcounter;
