@@ -2,7 +2,6 @@
 
 String user = "admin@admin.com";
 String password = "admin";
-String token = "";
 long temp = 12;
 long hum = 34;
 String server = "pub.scar.io";
@@ -34,31 +33,34 @@ struct GSMstruct {
   char buffer[1024];
   int charToRead;
   int bufferPos;
+  int bufferWritePos;
   String token;
   String line;
   String lastLine;
-  volatile bool enable;
-  volatile bool initVars;
-  volatile bool connect;
-  volatile byte GSMProcess;
-  volatile bool timeOut;
-  volatile long processTime;
-  volatile bool post;
-  volatile byte postProcess;
-  volatile bool SN;
-  volatile bool babyTemp;
-  volatile bool HeaterTemp;
-  volatile bool BoardTemp1;
-  volatile bool BoardTemp2;
-  volatile bool BoardTemp3;
-  volatile bool Humidity;
-  volatile bool Longitud;
-  volatile bool Latitud;
-  volatile bool JaundicePower;
-  volatile bool BPM;
-  volatile bool IBI;
-  volatile bool RPS;
-  volatile bool HeaterPower;
+  bool readToken;
+  bool enable;
+  bool initVars;
+  bool connect;
+  byte GSMProcess;
+  bool timeOut;
+  long processTime;
+  long packetSentenceTime;
+  bool post;
+  byte postProcess;
+  bool SN;
+  bool babyTemp;
+  bool HeaterTemp;
+  bool BoardTemp1;
+  bool BoardTemp2;
+  bool BoardTemp3;
+  bool Humidity;
+  bool Longitud;
+  bool Latitud;
+  bool JaundicePower;
+  bool BPM;
+  bool IBI;
+  bool RPS;
+  bool HeaterPower;
 };
 
 int GSMsequence = 0;
@@ -76,13 +78,13 @@ void initGPRS()
   GSMTimer.attachCompare1Interrupt(GSMHandler);
   GSMTimer.refresh();
   GSMTimer.resume();
-  attachInterrupt(GSMRXPIN, GSMreadSerial, CHANGE);
+  //attachInterrupt(GSMRXPIN, GSMreadSerial, CHANGE);
   while (!Serial.available());
   GSM.connect = 1;
   while (1) {
+    GSMreadSerial();
     if (Serial.available()) {
       GSM.GSMProcess = 0;
-      Serial.println("ping");
       while (Serial.available()) {
         Serial.read();
       }
@@ -157,32 +159,43 @@ void GSMHandler() {
         break;
       case 3:
         checkSerial("ERROR", "");
+        GSMsequence = 0;
         break;
       case 4:
-        Serial1.print(req[GSMsequence]);
-        GSMsequence++;
-        if (GSMsequence == 7) {
-          GSM.GSMProcess++;
-          Serial.println("sent");
-          GSMsequence = 0;
+        if (millis() - GSM.packetSentenceTime > 100) {
+          Serial1.print(req[GSMsequence]);
+          GSMsequence++;
+          if (GSMsequence == 7) {
+            GSM.GSMProcess++;
+            GSMsequence = 0;
+          }
+          GSM.packetSentenceTime = millis();
         }
         break;
       case 5:
         checkSerial("SEND OK", "\n\n");
         break;
       case 6:
-        token = checkSerial("CLOSED", "\n\n", "ey");
+        checkSerial("CLOSED", "\n\n", "ey");
         break;
       case 7:
-        token.trim();
-        req2[3] = "Authorization: Bearer " + token + "\n";
-        req2[4] = "Content-Length: " + String(req2[7].length()) + "\n";
-        len = 0;
-        for (int i = 0; i < 8; i++) {
-          len += req2[i].length();
+        if (millis() - GSM.packetSentenceTime > 100) {
+          if (GSMsequence == 0) {
+            GSM.token.trim();
+            req2[3] = "Authorization: Bearer " + GSM.token + "\n";
+            req2[4] = "Content-Length: " + String(req2[7].length()) + "\n";
+            len = 0;
+          }
+          len += req2[GSMsequence].length();
+          Serial.print(String(GSMsequence) + String(req2[GSMsequence].length()) + ":" + req2[GSMsequence]);
+          GSMsequence++;
+          if (GSMsequence == 8) {
+            Serial1.print("AT+CIPSTART=\"TCP\",\"" + server + "\",80\n");
+            GSM.GSMProcess++;
+            GSMsequence = 0;
+          }
+          GSM.packetSentenceTime = millis();
         }
-        Serial1.print("AT+CIPSTART=\"TCP\",\"" + server + "\",80\n");
-        GSM.GSMProcess++;
         break;
       case 8:
         checkSerial("CONNECT OK", "ERROR");
@@ -195,12 +208,21 @@ void GSMHandler() {
         checkSerial("ERROR", "");
         break;
       case 11:
-        Serial1.print(req2[GSMsequence]);
-        GSMsequence++;
-        if (GSMsequence == 8) {
-          GSM.GSMProcess++;
-          GSMsequence = 0;
-          Serial.println("transmitted");
+        if (millis() - GSM.packetSentenceTime > 100) {
+          GSMTimer.pause();
+          GSMTimer.setPeriod(300000); // in microseconds
+          GSMTimer.resume();
+          Serial1.print(req2[GSMsequence]);
+          GSMsequence++;
+          if (GSMsequence == 8) {
+            GSMTimer.pause();
+            GSMTimer.setPeriod(GSMISRRate); // in microseconds
+            GSMTimer.resume();
+            GSM.GSMProcess++;
+            GSMsequence = 0;
+            Serial.println("transmitted");
+          }
+          GSM.packetSentenceTime = millis();
         }
         break;
       case 12:
@@ -221,13 +243,31 @@ void GSMHandler() {
 
 void GSMreadSerial() {
   if (Serial1.available()) {
-    int bufferWritePos = GSM.bufferPos + GSM.charToRead;
-    if (bufferWritePos > 1023) {
-      bufferWritePos -= 1024;
-      //Serial.println("Buffer overflow");
+    if (GSM.bufferWritePos > 1023) {
+      GSM.bufferWritePos -= 1024;
+      Serial.println("Buffer overflow");
     }
-    GSM.buffer[bufferWritePos] = Serial1.read();
-    Serial.print(GSM.buffer[bufferWritePos]);
+    GSM.buffer[GSM.bufferWritePos] = Serial1.read();
+    Serial.print(GSM.buffer[GSM.bufferWritePos]);
+    if (!GSM.readToken) {
+      if (GSM.buffer[GSM.bufferWritePos] == char('y')) {
+        if (GSM.buffer[GSM.bufferWritePos - 1] == char('e')) {
+          GSM.readToken = 1;
+          GSM.token = "\n";
+          GSM.token += "ey";
+        }
+      }
+    }
+    else {
+      if (GSM.buffer[GSM.bufferWritePos] == '\n') {
+        GSM.readToken = 0;
+        Serial.println("Token is: " + GSM.token);
+      }
+      else {
+        GSM.token += GSM.buffer[GSM.bufferWritePos];
+      }
+    }
+    GSM.bufferWritePos++;
     GSM.charToRead++;
   }
 }
@@ -246,58 +286,57 @@ String checkSerial(String success, String error, String includeOnly) {
   if (!GSM.initVars) {
     GSM.initVars = 1;
     GSM.enable = 1;
-    GSM.token = "";
     GSM.line = "";
     GSM.lastLine = "";
     GSM.processTime = millis();
-    //clearGSMBuffer();
+    Serial.println("GSM variables reset");
   }
 
   if (millis() - GSM.processTime > GSMTimeOut * 1000) {
     GSM.timeOut = 1;
     Serial.println("timeOut");
+    GSM.processTime = millis();
   }
 
   if (GSM.lastLine != success && GSM.lastLine != error) {
     if (GSM.charToRead) {
-      detachInterrupt(GSMRXPIN);
       char c = GSM.buffer[GSM.bufferPos];
       GSM.charToRead--;
       GSM.bufferPos++;
       if (GSM.bufferPos > 1023) {
         GSM.bufferPos = 0;
       }
-      attachInterrupt(GSMRXPIN, GSMreadSerial, CHANGE);
       if (c == '\n') {
         if (GSM.line.indexOf(includeOnly) >= 0) {
-          GSM.token = GSM.token + "\n" + GSM.line;
+          Serial.println("<<" + GSM.line);
         }
         GSM.line = "";
       } else {
-        GSM.line = GSM.line + String(c);
         if (GSM.line != "") {
           GSM.lastLine = GSM.line;
         }
+        GSM.line = GSM.line + String(c);
       }
     }
   }
   else {
     if (GSM.line != "") {
       if (GSM.line.indexOf(includeOnly) >= 0) {
-        GSM.token = GSM.token + "\n" + GSM.line;
+        Serial.println(">>" + GSM.line);
       }
     }
     GSM.initVars = 0;
     GSM.GSMProcess++;
-    Serial.println("found" + String(GSM.GSMProcess));
+    clearGSMBuffer();
   }
-  return GSM.token;
+  return GSM.line;
 }
 
 void clearGSMBuffer() {
   while (Serial1.available()) {
-    Serial.write(Serial1.read());
+    Serial.println("Not reading" + Serial1.read());
   }
   GSM.charToRead = 0;
   GSM.bufferPos = 0;
+  GSM.bufferWritePos = 0;
 }

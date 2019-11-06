@@ -334,7 +334,7 @@ int HeatermaxPWM = maxPWMvalue;      //max power for heater, full power is 50W
 #define NTCInterruptRate 20000    // in microseconds; 
 #define roomPIDRate 1000000    // in microseconds; 
 #define heaterPIDRate 200000   // times of roomPIDRate;
-#define GSMISRRate 1000    // in microseconds, able to read 115200 baud rate uart; 
+#define GSMISRRate 10000    // in microseconds, able to read 115200 baud rate uart; 
 int roomPIDfactor = roomPIDRate / NTCInterruptRate;
 int heaterPIDfactor = heaterPIDRate / NTCInterruptRate;
 volatile long interruptcounter;
