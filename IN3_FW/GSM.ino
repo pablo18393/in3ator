@@ -103,6 +103,18 @@ void GSMHandler() {
   if (GSM.post) {
     GSMPost();
   }
+  readGSMData();
+  checkFirstPost();
+  GSMStatusHandler();
+}
+
+void GSMStatusHandler() {
+  if (GSM.timeOut) {
+    GSM.timeOut = 0;
+    GSM.GSMProcess = 0;
+    GSM.post = 0;
+    //GSM.powerUp = 1;
+  }
   if (!GSM.powerUp && !GSM.connect && !GSM.post) {
     if (!GSM.connectionStatus) {
       GSM.powerUp = 1;
@@ -111,10 +123,6 @@ void GSMHandler() {
       GSM.post = 1;
     }
   }
-  if (GSM.enable) {
-    GSMreadSerial();
-  }
-  checkFirstPost();
 }
 
 void checkFirstPost() {
@@ -317,33 +325,35 @@ void GSMStablishConnection() {
   }
 }
 
-void GSMreadSerial() {
-  while (Serial1.available()) {
-    if (GSM.bufferWritePos > 1023) {
-      GSM.bufferWritePos -= 1024;
-      Serial.println("Buffer overflow");
-    }
-    GSM.buffer[GSM.bufferWritePos] = Serial1.read();
-    Serial.print(GSM.buffer[GSM.bufferWritePos]);
-    if (!GSM.readToken) {
-      if (GSM.buffer[GSM.bufferWritePos] == char('y')) {
-        if (GSM.buffer[GSM.bufferWritePos - 1] == char('e')) {
-          GSM.readToken = 1;
-          GSM.token = "\n";
-          GSM.token += "ey";
+void readGSMData() {
+  if (GSM.enable) {
+    while (Serial1.available()) {
+      if (GSM.bufferWritePos > 1023) {
+        GSM.bufferWritePos -= 1024;
+        Serial.println("Buffer overflow");
+      }
+      GSM.buffer[GSM.bufferWritePos] = Serial1.read();
+      Serial.print(GSM.buffer[GSM.bufferWritePos]);
+      if (!GSM.readToken) {
+        if (GSM.buffer[GSM.bufferWritePos] == char('y')) {
+          if (GSM.buffer[GSM.bufferWritePos - 1] == char('e')) {
+            GSM.readToken = 1;
+            GSM.token = "\n";
+            GSM.token += "ey";
+          }
         }
       }
-    }
-    else {
-      if (GSM.buffer[GSM.bufferWritePos] == '\n') {
-        GSM.readToken = 0;
-      }
       else {
-        GSM.token += GSM.buffer[GSM.bufferWritePos];
+        if (GSM.buffer[GSM.bufferWritePos] == '\n') {
+          GSM.readToken = 0;
+        }
+        else {
+          GSM.token += GSM.buffer[GSM.bufferWritePos];
+        }
       }
+      GSM.bufferWritePos++;
+      GSM.charToRead++;
     }
-    GSM.bufferWritePos++;
-    GSM.charToRead++;
   }
 }
 
