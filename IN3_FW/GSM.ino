@@ -30,6 +30,7 @@ String req2[] = {
 int len = 0;
 long GSMTimeOut = 30; //in secs
 struct GSMstruct {
+  bool firstPost;
   int sendPeriod;
   long lastSent;
   char buffer[1024];
@@ -77,7 +78,7 @@ void initGPRS()
 {
   Serial.begin(115200);
   Serial1.begin(115200);
-  GSM.sendPeriod = 300; //in secs
+  GSM.sendPeriod = 600; //in secs
   GSMTimer.pause();
   GSMTimer.setPeriod(GSMISRRate); // in microseconds
   GSMTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
@@ -112,6 +113,14 @@ void GSMHandler() {
   }
   if (GSM.enable) {
     GSMreadSerial();
+  }
+  checkFirstPost();
+}
+
+void checkFirstPost() {
+  if (!GSM.firstPost && GSM.connectionStatus) {
+    GSM.firstPost = 1;
+    GSM.post = 1;
   }
 }
 
@@ -202,22 +211,20 @@ void GSMPost() {
       checkSerial("CLOSED", "\n\n", "ey");
       break;
     case 7:
-      if (millis() - GSM.packetSentenceTime > 100) {
-        if (GSMsequence == 0) {
-          GSM.token.trim();
-          req2[3] = "Authorization: Bearer " + GSM.token + "\n";
-          req2[4] = "Content-Length: " + String(req2[7].length()) + "\n";
-          len = 0;
-        }
-        len += req2[GSMsequence].length();
-        GSMsequence++;
-        if (GSMsequence == 8) {
-          Serial1.print("AT+CIPSTART=\"TCP\",\"" + server + "\",80\n");
-          GSM.GSMProcess++;
-          GSMsequence = 0;
-        }
-        GSM.packetSentenceTime = millis();
+      if (GSMsequence == 0) {
+        GSM.token.trim();
+        req2[3] = "Authorization: Bearer " + GSM.token + "\n";
+        req2[4] = "Content-Length: " + String(req2[7].length()) + "\n";
+        len = 0;
       }
+      len += req2[GSMsequence].length();
+      GSMsequence++;
+      if (GSMsequence == 8) {
+        Serial1.print("AT+CIPSTART=\"TCP\",\"" + server + "\",80\n");
+        GSM.GSMProcess++;
+        GSMsequence = 0;
+      }
+      GSM.packetSentenceTime = millis();
       break;
     case 8:
       checkSerial("CONNECT OK", "ERROR");
@@ -231,7 +238,14 @@ void GSMPost() {
       break;
     case 11:
       if (millis() - GSM.packetSentenceTime > 200) {
-        Serial1.print(req2[GSMsequence]);
+        if (GSMsequence == 3) {
+          for (int i = 0; i < req2[3].length(); i++) {
+            Serial1.print(req2[3][i]);
+          }
+        }
+        else {
+          Serial1.print(req2[GSMsequence]);
+        }
         GSMsequence++;
         if (GSMsequence == 8) {
           GSM.GSMProcess++;
@@ -304,7 +318,7 @@ void GSMStablishConnection() {
 }
 
 void GSMreadSerial() {
-  if (Serial1.available()) {
+  while (Serial1.available()) {
     if (GSM.bufferWritePos > 1023) {
       GSM.bufferWritePos -= 1024;
       Serial.println("Buffer overflow");
