@@ -27,33 +27,12 @@ String req2[] = {
   "\n",
   "{\"temperature\":\"" + String(temp) + "\",\"humidity\":\"" + String(hum) + "\"}\n"
 };
+
 int len = 0;
 long GSMTimeOut = 30; //in secs
 struct GSMstruct {
   bool firstPost;
-  int sendPeriod;
-  long lastSent;
-  char buffer[1024];
-  int charToRead;
-  int bufferPos;
-  int bufferWritePos;
-  bool processSuccess;
-  String token;
-  String line;
-  String lastLine;
-  long lastEvent;
-  bool readToken;
-  bool enable;
-  bool initVars;
-  bool powerUp;
-  bool connect;
-  bool connectionStatus;
-  byte GSMProcess;
-  bool timeOut;
-  long processTime;
-  long packetSentenceTime;
-  bool post;
-  byte postProcess;
+  bool error;
   bool SN;
   bool babyTemp;
   bool HeaterTemp;
@@ -68,6 +47,29 @@ struct GSMstruct {
   bool IBI;
   bool RPS;
   bool HeaterPower;
+  int sendPeriod;
+  long lastSent;
+  char buffer[1024];
+  int charToRead;
+  int bufferPos;
+  int bufferWritePos;
+  String token;
+  String line;
+  String lastLine;
+  long lastEvent;
+  bool processSuccess;
+  bool readToken;
+  bool enable;
+  bool initVars;
+  bool powerUp;
+  bool connect;
+  bool connectionStatus;
+  bool timeOut;
+  byte GSMProcess;
+  long processTime;
+  long packetSentenceTime;
+  bool post;
+  byte postProcess;
 };
 
 int GSMsequence = 0;
@@ -76,21 +78,10 @@ struct GSMstruct GSM;
 
 void initGPRS()
 {
-  Serial.begin(115200);
+  //Serial.end();
   Serial1.begin(115200);
   GSM.sendPeriod = 600; //in secs
-  GSMTimer.pause();
-  GSMTimer.setPeriod(GSMISRRate); // in microseconds
-  GSMTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
-  GSMTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
-  GSMTimer.attachCompare1Interrupt(GSMHandler);
-  nvic_irq_set_priority(NVIC_TIMER1_CC, 15);
-  nvic_irq_set_priority(NVIC_USART1 , 0);
-  GSMTimer.refresh();
-  GSMTimer.resume();
-  while (!Serial.available());
-  GSM.connect = 1;
-  while (1);
+  GSM.powerUp = 1;
 }
 
 void GSMHandler() {
@@ -113,7 +104,8 @@ void GSMStatusHandler() {
     GSM.timeOut = 0;
     GSM.GSMProcess = 0;
     GSM.post = 0;
-    //GSM.powerUp = 1;
+    GSM.connect = 0;
+    GSM.powerUp = 1;
   }
   if (!GSM.powerUp && !GSM.connect && !GSM.post) {
     if (!GSM.connectionStatus) {
@@ -125,10 +117,62 @@ void GSMStatusHandler() {
   }
 }
 
+void GSMLocation() {
+  switch (GSM.GSMProcess) {
+    case 0:
+      GSM.processSuccess = 1;
+      Serial1.print("AT+CGATT=1\n");
+      GSM.GSMProcess++;
+      break;
+    case 1:
+      checkSerial("OK", "ERROR");
+      break;
+    case 2:
+      Serial1.print("AT+SAPBR=3,1,\"CONTYPE\",\"GPRS\"\n");
+      GSM.GSMProcess++;
+      break;
+    case 3:
+      checkSerial("OK", "ERROR");
+      break;
+    case 4:
+      Serial1.print("AT+SAPBR=3,1,\"APN\",\"TM\"\n");
+      GSM.GSMProcess++;
+      break;
+    case 5:
+      checkSerial("OK", "ERROR");
+      break;
+    case 6:
+      Serial1.print("AT+SAPBR=1,1\n");
+      GSM.GSMProcess++;
+      break;
+    case 7:
+      checkSerial("OK", "ERROR");
+      break;
+    case 8:
+      Serial1.print("AT+SAPBR=2,1\n");
+      GSM.GSMProcess++;
+      break;
+    case 9:
+      checkSerial("OK", "ERROR");
+      break;
+    case 10:
+      Serial1.print("AT+CIPGSMLOC=1,1\n");
+      GSM.GSMProcess++;
+      break;
+    case 11:
+      if (!GSM.processSuccess) {
+        GSM.powerUp = 1;
+      }
+      GSM.GSMProcess = 0;
+      break;
+  }
+}
+
 void checkFirstPost() {
   if (!GSM.firstPost && GSM.connectionStatus) {
-    GSM.firstPost = 1;
-    GSM.post = 1;
+      //GSMLocation();
+      GSM.firstPost = 1;
+      GSM.post = 1;
   }
 }
 
@@ -157,22 +201,87 @@ void GSMPowerUp() {
       digitalWrite(GSM_PWRKEY, HIGH);
       GSM.processSuccess = 1;
       GSM.GSMProcess++;
+      GSM.packetSentenceTime = millis();
       break;
     case 1:
       if (millis() - GSM.packetSentenceTime > 2000) {
         digitalWrite(GSM_PWRKEY, LOW);
+        GSM.packetSentenceTime = millis();
+        GSM.GSMProcess++;
+        GSM.powerUp = 0;
+        GSM.connect = 1;
+        GSM.GSMProcess = 0;
+      }
+      break;
+    case 2:
+      if (millis() - GSM.packetSentenceTime > 2000) {
         Serial1.print("AT\n");
         GSM.GSMProcess++;
       }
       break;
-    case 2:
+    case 3:
       checkSerial("OK", "ERROR");
       break;
-    case 3:
+    case 4:
       if (GSM.processSuccess) {
         GSM.powerUp = 0;
         GSM.connect = 1;
       }
+      GSM.GSMProcess = 0;
+      break;
+  }
+}
+
+void GSMStablishConnection() {
+  switch (GSM.GSMProcess) {
+    case 0:
+      GSM.processSuccess = 1;
+      Serial1.write("AT+CFUN=1\n");
+      GSM.GSMProcess++;
+      break;
+    case 1:
+      checkSerial("OK", "ERROR");
+      break;
+    case 2:
+      Serial1.write("AT+CPIN?\n");
+      GSM.GSMProcess++;
+      break;
+    case 3:
+      checkSerial("OK", "ERROR");
+      break;
+    case 4:
+      Serial1.write("AT+CSTT=\"TM\",\"\",\"\"\n\n");
+      GSM.GSMProcess++;
+      break;
+    case 5:
+      checkSerial("OK", "ERROR");
+      break;
+    case 6:
+      Serial1.write("AT+CIICR\n");
+      GSM.GSMProcess++;
+      break;
+    case 7:
+      checkSerial("OK", "ERROR");
+      break;
+    case 8:
+      Serial1.write("AT+CIFSR\n");
+      GSM.GSMProcess++;
+      break;
+    case 9:
+      Serial1.write("AT\n");
+      GSM.GSMProcess++;
+      break;
+    case 10:
+      checkSerial("OK", "ERROR");
+      break;
+    case 11:
+      if (GSM.processSuccess) {
+        GSM.connectionStatus = 1;
+      }
+      else {
+        GSM.powerUp = 1;
+      }
+      GSM.connect = 0;
       GSM.GSMProcess = 0;
       break;
   }
@@ -266,60 +375,11 @@ void GSMPost() {
       checkSerial("SEND OK", "\n\n");
       break;
     case 13:
-      checkSerial("HTTP/1.1 200", "\n\n");
+      checkSerial("CLOSED", "\n\n");
       break;
     case 14:
+      Serial.println("GSM POST SUCCESS");
       GSM.post = 0;
-      GSM.GSMProcess = 0;
-      break;
-  }
-}
-
-void GSMStablishConnection() {
-  switch (GSM.GSMProcess) {
-    case 0:
-      GSM.processSuccess = 1;
-      Serial1.write("AT+CFUN=1\n");
-      GSM.GSMProcess++;
-      break;
-    case 1:
-      checkSerial("OK", "ERROR");
-      break;
-    case 2:
-      Serial1.write("AT+CPIN?\n");
-      GSM.GSMProcess++;
-      break;
-    case 3:
-      checkSerial("OK", "ERROR");
-      break;
-    case 4:
-      Serial1.write("AT+CSTT=\"TM\",\"\",\"\"\n\n");
-      GSM.GSMProcess++;
-      break;
-    case 5:
-      checkSerial("OK", "ERROR");
-      break;
-    case 6:
-      Serial1.write("AT+CIICR\n");
-      GSM.GSMProcess++;
-      break;
-    case 7:
-      checkSerial("OK", "ERROR");
-      break;
-    case 8:
-      Serial1.write("AT+CIFSR\n");
-      GSM.GSMProcess++;
-      break;
-    case 9:
-      if (checkSerial(".", "ERROR").indexOf(".")) {
-        GSM.GSMProcess++;
-      }
-      break;
-    case 10:
-      if (GSM.processSuccess) {
-        GSM.connectionStatus = 1;
-      }
-      GSM.connect = 0;
       GSM.GSMProcess = 0;
       break;
   }
@@ -373,6 +433,7 @@ String checkSerial(String success, String error, String includeOnly) {
   if (millis() - GSM.processTime > GSMTimeOut * 1000) {
     GSM.timeOut = 1;
     Serial.println("timeOut");
+    Serial.println(String(GSM.connect) + String(GSM.powerUp) + String(GSM.post) + String(GSM.GSMProcess));
     GSM.processTime = millis();
   }
 
@@ -398,7 +459,7 @@ String checkSerial(String success, String error, String includeOnly) {
   }
   else {
     if (GSM.lastLine == error) {
-
+      //GSM.error = 1;
     }
     if (GSM.line != "") {
       if (GSM.line.indexOf(includeOnly) >= 0) {
