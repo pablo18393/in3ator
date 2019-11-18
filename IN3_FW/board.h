@@ -1,5 +1,8 @@
-// Use hardware SPI lines+
+//#define v6Board
+#define protoBoard //comment
 
+
+#ifndef v6Board
 #define DHTPIN PC10
 #define SCREENBACKLIGHT PB4
 word THERMISTOR_HEATER = PC1; //This is not #define because can be swaped with THERMISTOR_ROOM
@@ -29,22 +32,21 @@ word THERMISTOR_ROOM = PB1;   //This is not #define because can be swaped with T
 #define PULSIOXIMETER 7
 #define GSMRXPIN PA10
 #define BUZZER PC7
-
 // Use hardware SPI lines+
 //Pins from 4-6 are SPI
 #define TFT_CS PC13
 #define TFT_DC PB8
 #define TFT_RST PD2
+#endif
 
 //Hardware
 #define DHTSensor 1
 #define BME280Sensor 0
 #define SPI_SEL 1
 
-/*
+#ifndef protoBoard 
 //pin declaration
 //boardPWMPins: 3, 4, 5, 8, 9, 10, 11, 15, 16, 25, 26, 27
-
   #define DHTPIN 0
   #define SCREENBACKLIGHT 3
   int THERMISTOR_HEATER = 10;
@@ -75,7 +77,7 @@ word THERMISTOR_ROOM = PB1;   //This is not #define because can be swaped with T
   #define TFT_CS         7
   #define TFT_DC         31
   #define TFT_RST        2
-*/
+#endif
 
 #define maxADCvalue 4095
 #define maxPWMvalue 255         //for STM32F103RE with arduino IDE

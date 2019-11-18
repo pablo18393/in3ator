@@ -60,6 +60,7 @@ void pinDirection() {
 
 void initTimers() {
   // PID setup
+  
   roomPIDTimer.pause();
   roomPIDTimer.setPeriod(NTCInterruptRate); // in microseconds
   roomPIDTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);

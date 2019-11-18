@@ -1,6 +1,3 @@
-
-
-
 void hardwareVerification() {
   numSensors = numNTC + DHTSensor;
   testOK = 1;
