@@ -384,14 +384,14 @@ void barSelection() {
                 updateData();
                 if (EncMove) {
                   tft.setTextColor(COLOR_MENU);
-                  tft.drawFloat(previousTemperature[roomNTC], 1, valuePosition, ypos, textFontSize);
+                  tft.drawFloat(previousTemperature[babyNTC], 1, valuePosition, ypos, textFontSize);
                   tft.setTextColor(COLOR_MENU_TEXT);
-                  diffTemperature[roomNTC] += EncMove * (0.1);
-                  temperature[roomNTC] += EncMove * (0.1);
-                  tft.drawFloat(temperature[roomNTC], 1, valuePosition, ypos, textFontSize);
-                  previousTemperature[roomNTC] = temperature[roomNTC];
+                  diffTemperature[babyNTC] += EncMove * (0.1);
+                  temperature[babyNTC] += EncMove * (0.1);
+                  tft.drawFloat(temperature[babyNTC], 1, valuePosition, ypos, textFontSize);
+                  previousTemperature[babyNTC] = temperature[babyNTC];
                   EncMove = 0;
-                  EEPROM.write(EEPROM_diffTemperature, int(diffTemperature[roomNTC] * 10));
+                  EEPROM.write(EEPROM_diffTemperature, int(diffTemperature[babyNTC] * 10));
                 }
               }
               break;
@@ -411,9 +411,9 @@ void barSelection() {
               }
               break;
             case restartCalibrationValuesTempGraphicPosition:
-              diffTemperature[roomNTC] = 0;
+              diffTemperature[babyNTC] = 0;
               diffHumidity = 0;
-              EEPROM.write(EEPROM_diffTemperature, diffTemperature[roomNTC]);
+              EEPROM.write(EEPROM_diffTemperature, diffTemperature[babyNTC]);
               EEPROM.write(EEPROM_diffHumidity, diffHumidity);
               updateHumidity();
               updateTemp(numNTC);

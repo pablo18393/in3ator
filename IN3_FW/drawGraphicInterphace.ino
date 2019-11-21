@@ -123,7 +123,7 @@ void graphics() {
         case calibrateSensorsPage:
           switch (i) {
             case temperatureCalibrationGraphicPosition:
-              tft.drawFloat(previousTemperature[roomNTC], 1, valuePosition, ypos, textFontSize);
+              tft.drawFloat(previousTemperature[babyNTC], 1, valuePosition, ypos, textFontSize);
               break;
             case humidityCalibrationGraphicPosition:
               tft.drawFloat(humidity, 0, valuePosition, ypos, textFontSize);

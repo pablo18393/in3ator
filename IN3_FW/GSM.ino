@@ -2,10 +2,10 @@
 
 String user = "admin@admin.com";
 String password = "admin";
-float temp = 25.56;
-float hum = 29.87;
 String server = "pub.scar.io";
 char GSMRXBuffer[1024];
+float temp = 25.56;
+float hum = 29.87;
 
 String req[] = {
   "POST /In3/public/api/v1/auth/login?c=1 HTTP/1.1\n",
@@ -34,7 +34,7 @@ struct GSMstruct {
   bool firstPost;
   bool error;
   bool postSN;
-  bool postbabyTemp;
+  bool postBabyTemp;
   bool postHeaterTemp;
   bool postBoardTemp1;
   bool postBoardTemp2;
@@ -42,11 +42,11 @@ struct GSMstruct {
   bool postHumidity;
   bool postLongitud;
   bool postLatitud;
-  bool JaundicePower;
-  bool BPM;
-  bool IBI;
-  bool RPS;
-  bool HeaterPower;
+  bool postJaundicePower;
+  bool postBPM;
+  bool postIBI;
+  bool postRPS;
+  bool postHeaterPower;
   int sendPeriod;
   long lastSent;
   char buffer[1024];
@@ -55,8 +55,12 @@ struct GSMstruct {
   int bufferWritePos;
   String latitud;
   String longitud;
+  String localDayTime;
+  String localHourTime;
   bool readLatitud;
   bool readLongitud;
+  bool readLocalDayTime;
+  bool readLocalHourTime;
   String token;
   String line;
   String lastLine;
@@ -69,7 +73,7 @@ struct GSMstruct {
   bool connect;
   bool connectionStatus;
   bool timeOut;
-  byte GSMProcess;
+  byte process;
   long processTime;
   long packetSentenceTime;
   bool post;
@@ -85,7 +89,9 @@ void initGPRS()
 {
   Serial.begin(115200);
   Serial1.begin(115200);
-  GSM.sendPeriod = 600; //in secs
+  GSM.sendPeriod = 60; //in secs
+  GSM.postBabyTemp = 1;
+  GSM.postHumidity = 1;
   GSM.powerUp = 1;
 }
 
@@ -110,7 +116,7 @@ void GSMHandler() {
 void GSMStatusHandler() {
   if (GSM.timeOut) {
     GSM.timeOut = 0;
-    GSM.GSMProcess = 0;
+    GSM.process = 0;
     GSM.post = 0;
     GSM.connect = 0;
     GSM.powerUp = 1;
@@ -126,48 +132,50 @@ void GSMStatusHandler() {
 }
 
 void GSMLocation() {
-  switch (GSM.GSMProcess) {
+  switch (GSM.process) {
     case 0:
       GSM.latitud = "";
       GSM.longitud = "";
+      GSM.localDayTime = "";
+      GSM.localHourTime = "";
       GSM.processSuccess = 1;
       Serial1.print("AT+CGATT=1\n");
-      GSM.GSMProcess++;
+      GSM.process++;
       break;
     case 1:
       checkSerial("OK", "ERROR");
       break;
     case 2:
       Serial1.print("AT+SAPBR=3,1,\"CONTYPE\",\"GPRS\"\n");
-      GSM.GSMProcess++;
+      GSM.process++;
       break;
     case 3:
       checkSerial("OK", "ERROR");
       break;
     case 4:
       Serial1.print("AT+SAPBR=3,1,\"APN\",\"TM\"\n");
-      GSM.GSMProcess++;
+      GSM.process++;
       break;
     case 5:
       checkSerial("OK", "ERROR");
       break;
     case 6:
       Serial1.print("AT+SAPBR=1,1\n");
-      GSM.GSMProcess++;
+      GSM.process++;
       break;
     case 7:
       checkSerial("OK", "ERROR");
       break;
     case 8:
       Serial1.print("AT+SAPBR=2,1\n");
-      GSM.GSMProcess++;
+      GSM.process++;
       break;
     case 9:
       checkSerial("OK", "ERROR");
       break;
     case 10:
       Serial1.print("AT+CIPGSMLOC=1,1\n");
-      GSM.GSMProcess++;
+      GSM.process++;
       break;
     case 11:
       checkSerial("OK", "ERROR");
@@ -180,7 +188,7 @@ void GSMLocation() {
         GSM.firstPost = 1;
         GSM.post = 1;
       }
-      GSM.GSMProcess = 0;
+      GSM.process = 0;
       GSM.location = 0;
       GSM.readLongitud = 0;
       GSM.readLatitud = 0;
@@ -195,11 +203,11 @@ void checkFirstPost() {
 }
 
 void checkGSMConnection() {
-  switch (GSM.GSMProcess) {
+  switch (GSM.process) {
     case 0:
       GSM.processSuccess = 1;
       Serial1.print("AT\n");
-      GSM.GSMProcess++;
+      GSM.process++;
       break;
     case 1:
       checkSerial("OK", "ERROR");
@@ -208,30 +216,33 @@ void checkGSMConnection() {
       if (!GSM.processSuccess) {
         GSM.powerUp = 1;
       }
-      GSM.GSMProcess = 0;
+      GSM.process = 0;
       break;
   }
 }
 
 void GSMPowerUp() {
-  switch (GSM.GSMProcess) {
+  switch (GSM.process) {
     case 0:
-      digitalWrite(GSM_PWRKEY, HIGH);
+      digitalWrite(GSM_PWRKEY, LOW);
       GSM.processSuccess = 1;
-      GSM.GSMProcess++;
+      GSM.process++;
       GSM.packetSentenceTime = millis();
+      logln("powering up GSM");
       break;
     case 1:
       if (millis() - GSM.packetSentenceTime > 2000) {
-        digitalWrite(GSM_PWRKEY, LOW);
+        digitalWrite(GSM_PWRKEY, HIGH);
         GSM.packetSentenceTime = millis();
-        GSM.GSMProcess++;
+        GSM.process++;
+        logln("GSM powered");
       }
       break;
     case 2:
       if (millis() - GSM.packetSentenceTime > 2000) {
         Serial1.print("AT\n");
-        GSM.GSMProcess++;
+        GSM.process++;
+        logln("Sending AT command");
       }
       break;
     case 3:
@@ -241,51 +252,52 @@ void GSMPowerUp() {
       if (GSM.processSuccess) {
         GSM.powerUp = 0;
         GSM.connect = 1;
+        logln("Power up success");
       }
       GSM.location = 0;
-      GSM.GSMProcess = 0;
+      GSM.process = 0;
       break;
   }
 }
 
 void GSMStablishConnection() {
-  switch (GSM.GSMProcess) {
+  switch (GSM.process) {
     case 0:
       GSM.processSuccess = 1;
       Serial1.write("AT+CFUN=1\n");
-      GSM.GSMProcess++;
+      GSM.process++;
       break;
     case 1:
       checkSerial("OK", "ERROR");
       break;
     case 2:
       Serial1.write("AT+CPIN?\n");
-      GSM.GSMProcess++;
+      GSM.process++;
       break;
     case 3:
       checkSerial("OK", "ERROR");
       break;
     case 4:
       Serial1.write("AT+CSTT=\"TM\",\"\",\"\"\n\n");
-      GSM.GSMProcess++;
+      GSM.process++;
       break;
     case 5:
       checkSerial("OK", "ERROR");
       break;
     case 6:
       Serial1.write("AT+CIICR\n");
-      GSM.GSMProcess++;
+      GSM.process++;
       break;
     case 7:
       checkSerial("OK", "ERROR");
       break;
     case 8:
       Serial1.write("AT+CIFSR\n");
-      GSM.GSMProcess++;
+      GSM.process++;
       break;
     case 9:
       Serial1.write("AT\n");
-      GSM.GSMProcess++;
+      GSM.process++;
       break;
     case 10:
       checkSerial("OK", "ERROR");
@@ -298,18 +310,19 @@ void GSMStablishConnection() {
         GSM.powerUp = 1;
       }
       GSM.connect = 0;
-      GSM.GSMProcess = 0;
+      GSM.process = 0;
       break;
   }
 }
 
 void GSMPost() {
-  switch (GSM.GSMProcess) {
+  switch (GSM.process) {
     case 0:
       GSM.processSuccess = 1;
       GSM.lastSent = millis();
       Serial1.print("AT+CIPSTART=\"TCP\",\"" + server + "\",80\n");
-      GSM.GSMProcess++;
+      GSM.process++;
+      SDlog(); //log GSM data in SD module
       break;
     case 1:
       checkSerial("CONNECT OK", "ERROR");
@@ -320,7 +333,7 @@ void GSMPost() {
         len += req[i].length();
       }
       Serial1.print("AT+CIPSEND=" + String(len - 1) + "\n");
-      GSM.GSMProcess++;
+      GSM.process++;
       break;
     case 3:
       checkSerial(">", "ERROR");
@@ -331,7 +344,7 @@ void GSMPost() {
         Serial1.print(req[GSMsequence]);
         GSMsequence++;
         if (GSMsequence == 7) {
-          GSM.GSMProcess++;
+          GSM.process++;
           GSMsequence = 0;
         }
         GSM.packetSentenceTime = millis();
@@ -348,13 +361,14 @@ void GSMPost() {
         GSM.token.trim();
         req2[3] = "Authorization: Bearer " + GSM.token + "\n";
         req2[4] = "Content-Length: " + String(req2[7].length()) + "\n";
+        postGSMVariables();
         len = 0;
       }
       len += req2[GSMsequence].length();
       GSMsequence++;
       if (GSMsequence == 8) {
         Serial1.print("AT+CIPSTART=\"TCP\",\"" + server + "\",80\n");
-        GSM.GSMProcess++;
+        GSM.process++;
         GSMsequence = 0;
       }
       GSM.packetSentenceTime = millis();
@@ -364,7 +378,7 @@ void GSMPost() {
       break;
     case 9:
       Serial1.print("AT+CIPSEND=" + String(len - 1) + "\n");
-      GSM.GSMProcess++;
+      GSM.process++;
       break;
     case 10:
       checkSerial(">", "ERROR");
@@ -381,7 +395,7 @@ void GSMPost() {
         }
         GSMsequence++;
         if (GSMsequence == 8) {
-          GSM.GSMProcess++;
+          GSM.process++;
           GSMsequence = 0;
         }
         GSM.packetSentenceTime = millis();
@@ -394,9 +408,9 @@ void GSMPost() {
       checkSerial("CLOSED", "\n\n");
       break;
     case 14:
-      Serial.println("GSM POST SUCCESS");
+      logln("GSM POST SUCCESS");
       GSM.post = 0;
-      GSM.GSMProcess = 0;
+      GSM.process = 0;
       break;
   }
 }
@@ -406,10 +420,12 @@ void readGSMData() {
     while (Serial1.available()) {
       if (GSM.bufferWritePos > 1023) {
         GSM.bufferWritePos -= 1024;
-        Serial.println("Buffer overflow");
+        logln("Buffer overflow");
       }
       GSM.buffer[GSM.bufferWritePos] = Serial1.read();
-      Serial.print(GSM.buffer[GSM.bufferWritePos]);
+      if (!GSM.post) {
+        log(String(GSM.buffer[GSM.bufferWritePos]));
+      }
       if (GSM.post) {
         if (!GSM.readToken) {
           if (GSM.buffer[GSM.bufferWritePos] == char('y')) {
@@ -430,7 +446,7 @@ void readGSMData() {
         }
       }
       else if (GSM.location) {
-        if (GSM.GSMProcess == 11) {
+        if (GSM.process == 11) {
           if (GSM.buffer[GSM.bufferWritePos] == char(',') ) {
             if (GSM.buffer[GSM.bufferWritePos - 2] != char('=')) {
               if (GSM.longitud == "") {
@@ -440,8 +456,13 @@ void readGSMData() {
                 GSM.readLongitud = 0;
                 GSM.readLatitud = 1;
               }
-              else {
+              else if (GSM.localDayTime == "") {
+                GSM.readLocalDayTime = 1;
                 GSM.readLatitud = 0;
+              }
+              else {
+                GSM.readLocalDayTime = 0;
+                GSM.readLocalHourTime = 1;
               }
             }
           }
@@ -451,6 +472,19 @@ void readGSMData() {
             }
             if (GSM.readLongitud) {
               GSM.longitud += GSM.buffer[GSM.bufferWritePos];
+            }
+            if (GSM.readLocalDayTime) {
+              GSM.localDayTime += GSM.buffer[GSM.bufferWritePos];
+            }
+            if (GSM.readLocalHourTime) {
+              log(GSM.buffer[GSM.bufferWritePos]);
+              if (GSM.buffer[GSM.bufferWritePos] == '\n') {
+                GSM.readLocalHourTime = 0;
+                log("Local time: " + GSM.localDayTime + "," + GSM.localHourTime);
+              }
+              else {
+                GSM.localHourTime += GSM.buffer[GSM.bufferWritePos];
+              }
             }
           }
         }
@@ -476,8 +510,11 @@ String checkSerial(String success, String error, String includeOnly) {
 
   if (millis() - GSM.processTime > GSMTimeOut * 1000) {
     GSM.timeOut = 1;
-    Serial.println("timeOut");
-    Serial.println(String(GSM.connect) + String(GSM.powerUp) + String(GSM.post) + String(GSM.location) + String(GSM.GSMProcess));
+    if (GSM.powerUp) {
+      Serial1.print("AT\n");
+    }
+    logln("timeOut");
+    logln(String(GSM.powerUp) + String(GSM.connect) + String(GSM.post) + String(GSM.location) + String(GSM.process));
     GSM.processTime = millis();
   }
 
@@ -510,7 +547,7 @@ String checkSerial(String success, String error, String includeOnly) {
       }
     }
     GSM.initVars = 0;
-    GSM.GSMProcess++;
+    GSM.process++;
     clearGSMBuffer();
   }
   return GSM.line;
@@ -518,9 +555,24 @@ String checkSerial(String success, String error, String includeOnly) {
 
 void clearGSMBuffer() {
   while (Serial1.available()) {
-    Serial.println("Not reading char: " + Serial1.read());
+    logln("Not reading char: " + Serial1.read());
   }
   GSM.charToRead = 0;
   GSM.bufferPos = 0;
   GSM.bufferWritePos = 0;
+}
+
+void postGSMVariables() {
+  req2[7] = "{";
+  if (GSM.postBabyTemp) {
+    req2[7] += "\"temperature\":\"" + String(temperature[babyNTC], 2) + "\"";
+  }
+  if (GSM.postHumidity) {
+    if (req2[7] != "{") {
+      req2[7] += ",";
+    }
+    req2[7] += "\"humidity\":\"" + String(humidity) + "\"";
+  }
+  req2[7] += "}\n";
+  log(req2[7]);
 }

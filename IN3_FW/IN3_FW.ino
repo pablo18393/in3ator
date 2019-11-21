@@ -10,6 +10,8 @@
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
+#include <SD.h>
+
 
 //Firmware version and head title of UI screen
 #define FWversion "v2.3"
@@ -41,7 +43,7 @@ int language;
 #define CheckSensorRaiseTemp 3   //(in celsius degrees) Due to a probable missplacement issue, a Temperature difference threshold is set to distinguish between heater or room NTC at the beggining of a thermal control
 
 //number assignment of each enviromental sensor for later call in variable
-#define roomNTC 0
+#define babyNTC 0
 #define heaterNTC 1
 #define inBoardLeftNTC 2
 #define inBoardRightNTC 3
@@ -115,7 +117,7 @@ const byte minTemp = 15; //minimum allowed temperature to be set
 const byte maxTemp = 45; //maximum allowed temperature to be set
 const byte maxHum = 100; //maximum allowed humidity to be set
 const byte minHum = 20; //minimum allowed humidity to be set
-const byte maxGestation = 50; //maximum gestation weeks to be set
+const byte maxGestation = 99; //maximum gestation weeks to be set
 const byte minGestation = 1; //minimum gestation weeks to be set
 const byte LEDMaxIntensity = 100; //max LED intensity to be set
 const byte fanMaxSpeed = 100; //max fan speed (percentage) to be set
@@ -351,7 +353,7 @@ volatile long interruptcounter;
 HardwareTimer GSMTimer(1);
 HardwareTimer roomPIDTimer(2);
 HardwareTimer humidifierTimer(3);
-HardwareTimer sensorsTimer(8);
+HardwareTimer sensorsTimer(3);
 
 void setup() {
   initBoard();

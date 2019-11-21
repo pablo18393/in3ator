@@ -2,11 +2,13 @@
 void initBoard() {
   pinDirection();
   //hardwareVerification();
-  initEEPROM();
-  initSensors();
+  //initEEPROM();
+  //initSensors();
+  initSD();
   initGPRS();
-  initTFT();
+  //initTFT();
   initTimers();
+  while(1);
 }
 
 void initSensors() {
@@ -54,13 +56,13 @@ void pinDirection() {
   digitalWrite(FAN_LP, LOW);
   digitalWrite(STERILIZE, LOW);
   digitalWrite(HUMIDIFIER, LOW);
-  digitalWrite(GSM_PWRKEY, LOW);
+  digitalWrite(GSM_PWRKEY, HIGH);
 }
 
 
 void initTimers() {
   // PID setup
-  
+/*
   roomPIDTimer.pause();
   roomPIDTimer.setPeriod(NTCInterruptRate); // in microseconds
   roomPIDTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
@@ -81,7 +83,7 @@ void initTimers() {
   sensorsTimer.attachCompare1Interrupt(sensorsISR);
   sensorsTimer.refresh();
   sensorsTimer.resume();
-
+*/
   GSMTimer.pause();
   GSMTimer.setPeriod(GSMISRRate); // in microseconds
   GSMTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);

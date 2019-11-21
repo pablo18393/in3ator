@@ -58,16 +58,16 @@ void updateTemp(byte sensor) {
   byte endSensor;
 
   switch (sensor) {
-    case roomNTC:
-      startSensor = roomNTC;
-      endSensor = roomNTC;
+    case babyNTC:
+      startSensor = babyNTC;
+      endSensor = babyNTC;
       break;
     case heaterNTC:
       startSensor = heaterNTC;
       endSensor = heaterNTC;
       break;
     case numNTC:
-      startSensor = roomNTC;
+      startSensor = babyNTC;
       endSensor = heaterNTC;
       break;
   }

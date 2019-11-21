@@ -12,7 +12,7 @@ void actuatorsProgress() {
   setSensorsGraphicPosition();
   drawActuatorsSeparators();
   if (controlTemperature) {
-    temperatureAtStart = temperature[roomNTC];
+    temperatureAtStart = temperature[babyNTC];
     printLoadingTemperatureBar();
     switch (language) {
       case spanish:
@@ -50,8 +50,8 @@ void actuatorsProgress() {
   }
   while (!digitalRead(ENC_SWITCH));
   turnFansOn();
-  if (temperatureAtStart > temperature[roomNTC]) {
-    temperatureAtStart = temperature[roomNTC];
+  if (temperatureAtStart > temperature[babyNTC]) {
+    temperatureAtStart = temperature[babyNTC];
   }
   if (controlTemperature) {
     if (temperaturePIDcontrol) {
@@ -78,11 +78,11 @@ void actuatorsProgress() {
 
 void checkTempSensorPin() {
   //pending: program timeout too
-  Serial.println("checking NTC pinout");
-  float prevroomTemp = temperature[roomNTC];
+  logln("checking NTC pinout");
+  float prevroomTemp = temperature[babyNTC];
   float prevHeaterTemp = temperature[heaterNTC];
-  Serial.println(prevroomTemp);
-  Serial.println(prevHeaterTemp);
+  logln(String(prevroomTemp));
+  logln(String(prevHeaterTemp));
   bool exitCheck = 0;
   long timeElapsedChecking = millis();
   turnFansOn();
@@ -93,7 +93,7 @@ void checkTempSensorPin() {
       updateData();
       back_mode();
     }
-    if (temperature[roomNTC] > temperature[heaterNTC] + CheckSensorRaiseTemp) {
+    if (temperature[babyNTC] > temperature[heaterNTC] + CheckSensorRaiseTemp) {
       swapTempSensors = 1;
       EEPROM.write(EEPROM_swapTempSensors, swapTempSensors);
       exitCheck = 1;
@@ -105,7 +105,7 @@ void checkTempSensorPin() {
       swapTempSensors = 0;
       exitCheck = 1;
     }
-    if ((temperature[roomNTC] - prevroomTemp) > CheckSensorRaiseTemp) {
+    if ((temperature[babyNTC] - prevroomTemp) > CheckSensorRaiseTemp) {
       swapTempSensors = 1;
       EEPROM.write(EEPROM_swapTempSensors, swapTempSensors);
       exitCheck = 1;
@@ -120,9 +120,9 @@ void asignCorrectTempSensorsPin() {
   int valueRetainer = THERMISTOR_HEATER;
   THERMISTOR_HEATER = THERMISTOR_ROOM;
   THERMISTOR_ROOM = valueRetainer;
-  NTCpin[roomNTC] = {THERMISTOR_ROOM};
+  NTCpin[babyNTC] = {THERMISTOR_ROOM};
   NTCpin[heaterNTC] = {THERMISTOR_HEATER};
-  Serial.println("NTC pins swapped");
+  logln("NTC pins swapped");
 }
 
 void blinkGoBackMessage() {
@@ -141,7 +141,7 @@ void blinkGoBackMessage() {
 }
 
 void basictemperatureControl() {
-  if (temperature[roomNTC] < desiredSkinTemp) {
+  if (temperature[babyNTC] < desiredSkinTemp) {
     heatUp();
   }
   else {
