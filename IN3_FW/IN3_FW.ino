@@ -194,7 +194,7 @@ const byte time_back_draw = 255;
 const byte time_back_wait = 255;
 long last_something; //last time there was a encoder movement or pulse
 long CheckTempSensorPinTimeout = 45000; //timeout for checking the thermistor pinout
-long temp_update_rate = 1000;
+long sensorsUpdateRate = 1000;
 int blinkTimeON = 1000; //displayed text ON time
 int blinkTimeOFF = 100; //displayed text OFF time
 bool selected;
@@ -204,7 +204,7 @@ char* helpMessage;
 byte bar_pos;
 byte rectangles;
 byte length;
-long last_temp_update;
+long lastSensorsUpdate;
 bool enableSetProcess;
 long blinking;
 bool state_blink;

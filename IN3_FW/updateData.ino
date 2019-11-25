@@ -1,11 +1,12 @@
 
 int updateData() {
   if (page == advancedModePage || page == actuatorsProgressPage) {
-    if (millis() - last_temp_update > temp_update_rate) {
+    if (millis() - lastSensorsUpdate > sensorsUpdateRate) {
       updateSensors();
       if (page == actuatorsProgressPage) {
         printStatus();
       }
+      lastSensorsUpdate = millis();
     }
   }
   if ((page == mainMenuPage || page == advancedModePage) && !enableSet) {
@@ -13,10 +14,12 @@ int updateData() {
   }
   checkSerialPort();
   checkNewPulsioximeterData();
-  if (!GSM.postRPS && millis()>20000) {
+  /*
+    if (!GSM.postRPS && millis()>20000) {
     GSM.postRPS = 1;
     postGSMVariables();
-  }
+    }
+  */
 }
 
 void checkNewPulsioximeterData() {
@@ -77,7 +80,6 @@ void updateSensors() {
       updateLoadingHumidityBar(int(previousHumidityPercentage), int(humidityPercentage));
     }
   }
-  last_temp_update = millis();
 }
 
 void checkSerialPort() {

@@ -28,14 +28,12 @@ void log(String dataString) {
   digitalWrite(SD_CS, LOW);
   digitalWrite(TFT_CS, HIGH);
   // if the file is available, write to it:
-  /*
   File dataFile = SD.open(logFile, FILE_WRITE);
   if (dataFile) {
     dataFile.print(dataString);
     dataFile.close();
     // print to the serial port too:
   }
-  */
   Serial.print(dataString);
   digitalWrite(SD_CS, HIGH);
   digitalWrite(TFT_CS, LOW);

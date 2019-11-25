@@ -125,6 +125,7 @@ bool updateHumidity() {
     humidity /= 2;
     humidity += diffHumidity;
   }
+  logln("Humidity update: " + String (humidity));
   return (DHTOK || BME280OK);
 }
 

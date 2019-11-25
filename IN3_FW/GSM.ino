@@ -239,13 +239,17 @@ void GSMPowerUp() {
       }
       break;
     case 2:
-      if (millis() - GSM.packetSentenceTime > 2000) {
+      if (millis() - GSM.packetSentenceTime > 8000) {
         Serial1.print("AT\n");
         GSM.process++;
         logln("Sending AT command");
       }
       break;
     case 3:
+      if (millis() - GSM.packetSentenceTime > 1000) {
+        Serial1.print("AT\n");
+        GSM.packetSentenceTime = millis();
+      }
       checkSerial("OK", "ERROR");
       break;
     case 4:
@@ -336,10 +340,6 @@ void GSMPost() {
       GSM.process++;
       break;
     case 3:
-      checkSerial(">", "ERROR");
-      GSMsequence = 0;
-      break;
-    case 4:
       if (millis() - GSM.packetSentenceTime > 200) {
         Serial1.print(req[GSMsequence]);
         GSMsequence++;
@@ -350,18 +350,18 @@ void GSMPost() {
         GSM.packetSentenceTime = millis();
       }
       break;
-    case 5:
+    case 4:
       checkSerial("SEND OK", "\n\n");
       break;
-    case 6:
+    case 5:
       checkSerial("CLOSED", "\n\n", "ey");
       break;
-    case 7:
+    case 6:
       if (GSMsequence == 0) {
         GSM.token.trim();
+        postGSMVariables();
         req2[3] = "Authorization: Bearer " + GSM.token + "\n";
         req2[4] = "Content-Length: " + String(req2[7].length()) + "\n";
-        postGSMVariables();
         len = 0;
       }
       len += req2[GSMsequence].length();
@@ -373,17 +373,14 @@ void GSMPost() {
       }
       GSM.packetSentenceTime = millis();
       break;
-    case 8:
+    case 7:
       checkSerial("CONNECT OK", "ERROR");
       break;
-    case 9:
+    case 8:
       Serial1.print("AT+CIPSEND=" + String(len - 1) + "\n");
       GSM.process++;
       break;
-    case 10:
-      checkSerial(">", "ERROR");
-      break;
-    case 11:
+    case 9:
       if (millis() - GSM.packetSentenceTime > 200) {
         if (GSMsequence == 3) {
           for (int i = 0; i < req2[3].length(); i++) {
@@ -401,13 +398,10 @@ void GSMPost() {
         GSM.packetSentenceTime = millis();
       }
       break;
-    case 12:
-      checkSerial("SEND OK", "\n\n");
-      break;
-    case 13:
+    case 10:
       checkSerial("CLOSED", "\n\n");
       break;
-    case 14:
+    case 11:
       logln("GSM POST SUCCESS");
       GSM.post = 0;
       GSM.process = 0;
@@ -480,7 +474,9 @@ void readGSMData() {
               log(GSM.buffer[GSM.bufferWritePos]);
               if (GSM.buffer[GSM.bufferWritePos] == '\n') {
                 GSM.readLocalHourTime = 0;
+                //setTime(hour_f_int[0] * 10 + hour_f_int[1], hour_f_int[3] * 10 + hour_f_int[4], 00, day_f_int[0] * 10 + day_f_int[1], day_f_int[3] * 10 + day_f_int[4], 2000 + day_f_int[6] * 10 + day_f_int[7]); // setTime(hr,min,sec,day,month,yr); // Another way to set
                 log("Local time: " + GSM.localDayTime + "," + GSM.localHourTime);
+                //Serial.println("Singles char: " + GSM.localDayTime[0]);
               }
               else {
                 GSM.localHourTime += GSM.buffer[GSM.bufferWritePos];
@@ -510,45 +506,34 @@ String checkSerial(String success, String error, String includeOnly) {
 
   if (millis() - GSM.processTime > GSMTimeOut * 1000) {
     GSM.timeOut = 1;
-    if (GSM.powerUp) {
-      Serial1.print("AT\n");
-    }
-    logln("timeOut");
-    logln(String(GSM.powerUp) + String(GSM.connect) + String(GSM.post) + String(GSM.location) + String(GSM.process));
+    logln("timeOut" + String(GSM.powerUp) + String(GSM.connect) + String(GSM.post) + String(GSM.location) + String(GSM.process));
     GSM.processTime = millis();
   }
 
-  if (GSM.lastLine != success && GSM.lastLine != error) {
-    if (GSM.charToRead) {
-      char c = GSM.buffer[GSM.bufferPos];
-      GSM.charToRead--;
-      GSM.bufferPos++;
-      if (GSM.bufferPos > 1023) {
-        GSM.bufferPos = 0;
+  if (GSM.charToRead) {
+    char c = GSM.buffer[GSM.bufferPos];
+    GSM.charToRead--;
+    GSM.bufferPos++;
+    if (GSM.bufferPos > 1023) {
+      GSM.bufferPos = 0;
+    }
+    if (c == '\r') {
+      GSM.lastLine = GSM.line;
+      GSM.line = "";
+      if (GSM.lastLine.equals(success) || GSM.lastLine.equals(error)) {
+        if (GSM.lastLine == error) {
+          //GSM.error = 1;
+        }
+        GSM.initVars = 0;
+        GSM.process++;
+        clearGSMBuffer();
       }
-      if (c == '\n') {
-        if (GSM.line.indexOf(includeOnly) >= 0) {
-        }
-        GSM.line = "";
-      } else {
-        if (GSM.line != "") {
-          GSM.lastLine = GSM.line;
-        }
+    }
+    else {
+      if (c != '\n') {
         GSM.line = GSM.line + String(c);
       }
     }
-  }
-  else {
-    if (GSM.lastLine == error) {
-      //GSM.error = 1;
-    }
-    if (GSM.line != "") {
-      if (GSM.line.indexOf(includeOnly) >= 0) {
-      }
-    }
-    GSM.initVars = 0;
-    GSM.process++;
-    clearGSMBuffer();
   }
   return GSM.line;
 }
@@ -574,5 +559,4 @@ void postGSMVariables() {
     req2[7] += "\"humidity\":\"" + String(humidity) + "\"";
   }
   req2[7] += "}\n";
-  log(req2[7]);
 }
