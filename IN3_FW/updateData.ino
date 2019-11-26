@@ -1,12 +1,15 @@
-
 int updateData() {
-  if (page == advancedModePage || page == actuatorsProgressPage) {
-    if (millis() - lastSensorsUpdate > sensorsUpdateRate) {
+  if (millis() - lastSensorsUpdate > sensorsUpdateRate) {
+    if (page == advancedModePage || page == actuatorsProgressPage) {
       updateSensors();
       if (page == actuatorsProgressPage) {
         printStatus();
       }
       lastSensorsUpdate = millis();
+    }
+    else {
+      updateHumidity();
+      updateTemp(numNTC);
     }
   }
   if ((page == mainMenuPage || page == advancedModePage) && !enableSet) {

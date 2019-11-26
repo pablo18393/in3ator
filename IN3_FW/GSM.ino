@@ -4,8 +4,6 @@ String user = "admin@admin.com";
 String password = "admin";
 String server = "pub.scar.io";
 char GSMRXBuffer[1024];
-float temp = 25.56;
-float hum = 29.87;
 
 String req[] = {
   "POST /In3/public/api/v1/auth/login?c=1 HTTP/1.1\n",
@@ -25,7 +23,7 @@ String req2[] = {
   "Content-Length: 46\n",
   "Connection: close\n\n",
   "\n",
-  "{\"temperature\":\"" + String(temp) + "\",\"humidity\":\"" + String(hum) + "\"}\n"
+  ""
 };
 
 int len = 0;
@@ -89,7 +87,7 @@ void initGPRS()
 {
   Serial.begin(115200);
   Serial1.begin(115200);
-  GSM.sendPeriod = 60; //in secs
+  GSM.sendPeriod = 180; //in secs
   GSM.postBabyTemp = 1;
   GSM.postHumidity = 1;
   GSM.powerUp = 1;
@@ -121,6 +119,14 @@ void GSMStatusHandler() {
     GSM.connect = 0;
     GSM.powerUp = 1;
   }
+  if (GSM.powerUp || GSM.connect || GSM.post || GSM.location) {
+    if (millis() - GSM.processTime > GSMTimeOut * 1000) {
+      GSM.timeOut = 1;
+      logln("timeOut" + String(GSM.powerUp) + String(GSM.connect) + String(GSM.post) + String(GSM.location) + String(GSM.process));
+      GSM.processTime = millis();
+    }
+  }
+
   if (!GSM.powerUp && !GSM.connect && !GSM.post) {
     if (!GSM.connectionStatus) {
       GSM.powerUp = 1;
@@ -134,6 +140,7 @@ void GSMStatusHandler() {
 void GSMLocation() {
   switch (GSM.process) {
     case 0:
+      GSM.processTime = millis();
       GSM.latitud = "";
       GSM.longitud = "";
       GSM.localDayTime = "";
@@ -224,6 +231,7 @@ void checkGSMConnection() {
 void GSMPowerUp() {
   switch (GSM.process) {
     case 0:
+      GSM.processTime = millis();
       digitalWrite(GSM_PWRKEY, LOW);
       GSM.processSuccess = 1;
       GSM.process++;
@@ -242,6 +250,7 @@ void GSMPowerUp() {
       if (millis() - GSM.packetSentenceTime > 8000) {
         Serial1.print("AT\n");
         GSM.process++;
+        GSM.packetSentenceTime = millis();
         logln("Sending AT command");
       }
       break;
@@ -267,6 +276,7 @@ void GSMPowerUp() {
 void GSMStablishConnection() {
   switch (GSM.process) {
     case 0:
+      GSM.processTime = millis();
       GSM.processSuccess = 1;
       Serial1.write("AT+CFUN=1\n");
       GSM.process++;
@@ -322,6 +332,7 @@ void GSMStablishConnection() {
 void GSMPost() {
   switch (GSM.process) {
     case 0:
+      GSM.processTime = millis();
       GSM.processSuccess = 1;
       GSM.lastSent = millis();
       Serial1.print("AT+CIPSTART=\"TCP\",\"" + server + "\",80\n");
@@ -474,9 +485,8 @@ void readGSMData() {
               log(GSM.buffer[GSM.bufferWritePos]);
               if (GSM.buffer[GSM.bufferWritePos] == '\n') {
                 GSM.readLocalHourTime = 0;
-                //setTime(hour_f_int[0] * 10 + hour_f_int[1], hour_f_int[3] * 10 + hour_f_int[4], 00, day_f_int[0] * 10 + day_f_int[1], day_f_int[3] * 10 + day_f_int[4], 2000 + day_f_int[6] * 10 + day_f_int[7]); // setTime(hr,min,sec,day,month,yr); // Another way to set
+                setTime((int(GSM.localHourTime.charAt(0))-48) * 10 + (int(GSM.localHourTime.charAt(1))-48), (int(GSM.localHourTime.charAt(3))-48) * 10 + (int(GSM.localHourTime.charAt(4))-48), (int(GSM.localHourTime.charAt(6))-48) * 10 + (int(GSM.localHourTime.charAt(7))-48), (int(GSM.localDayTime.charAt(8))-48) * 10 + (int(GSM.localDayTime.charAt(9))-48), (int(GSM.localDayTime.charAt(5))-48) * 10 + (int(GSM.localDayTime.charAt(6))-48), 2000 + (int(GSM.localDayTime.charAt(2))-48) * 10 + (int(GSM.localDayTime.charAt(3))-48)); // setTime(hr,min,sec,day,month,yr); // Another way to set
                 log("Local time: " + GSM.localDayTime + "," + GSM.localHourTime);
-                //Serial.println("Singles char: " + GSM.localDayTime[0]);
               }
               else {
                 GSM.localHourTime += GSM.buffer[GSM.bufferWritePos];
@@ -501,13 +511,6 @@ String checkSerial(String success, String error, String includeOnly) {
     GSM.enable = 1;
     GSM.line = "";
     GSM.lastLine = "";
-    GSM.processTime = millis();
-  }
-
-  if (millis() - GSM.processTime > GSMTimeOut * 1000) {
-    GSM.timeOut = 1;
-    logln("timeOut" + String(GSM.powerUp) + String(GSM.connect) + String(GSM.post) + String(GSM.location) + String(GSM.process));
-    GSM.processTime = millis();
   }
 
   if (GSM.charToRead) {

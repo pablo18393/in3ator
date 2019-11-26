@@ -30,6 +30,18 @@ void log(String dataString) {
   // if the file is available, write to it:
   File dataFile = SD.open(logFile, FILE_WRITE);
   if (dataFile) {
+    dataFile.print(day());
+    dataFile.print("/");
+    dataFile.print(month());
+    dataFile.print("/");
+    dataFile.print(year());
+    dataFile.print("-");
+    dataFile.print(hour());
+    dataFile.print(":");
+    dataFile.print(minute());
+    dataFile.print(":");
+    dataFile.print(second());
+    dataFile.print(" >> ");
     dataFile.print(dataString);
     dataFile.close();
     // print to the serial port too:
@@ -50,6 +62,18 @@ void SDlog() {
   // if the file is available, write to it:
   File dataFile = SD.open(GSMFile, FILE_WRITE);
   if (dataFile) {
+    dataFile.print(day());
+    dataFile.print("/");
+    dataFile.print(month());
+    dataFile.print("/");
+    dataFile.print(year());
+    dataFile.print("-");
+    dataFile.print(hour());
+    dataFile.print(":");
+    dataFile.print(minute());
+    dataFile.print(":");
+    dataFile.print(second());
+    dataFile.print(" >> ");
     dataFile.println(dataString);
     dataFile.close();
     // print to the serial port too:
@@ -59,6 +83,6 @@ void SDlog() {
   digitalWrite(TFT_CS, LOW);
 }
 
-void updatedTimeStamp(){
-  
+void updatedTimeStamp() {
+
 }

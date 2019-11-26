@@ -11,6 +11,7 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 #include <SD.h>
+#include <TimeLib.h>
 
 
 //Firmware version and head title of UI screen
@@ -194,7 +195,7 @@ const byte time_back_draw = 255;
 const byte time_back_wait = 255;
 long last_something; //last time there was a encoder movement or pulse
 long CheckTempSensorPinTimeout = 45000; //timeout for checking the thermistor pinout
-long sensorsUpdateRate = 1000;
+long sensorsUpdateRate = 2000;
 int blinkTimeON = 1000; //displayed text ON time
 int blinkTimeOFF = 100; //displayed text OFF time
 bool selected;
@@ -353,7 +354,7 @@ volatile long interruptcounter;
 HardwareTimer GSMTimer(1);
 HardwareTimer roomPIDTimer(2);
 HardwareTimer humidifierTimer(3);
-HardwareTimer sensorsTimer(3);
+HardwareTimer sensorsTimer(8);
 
 void setup() {
   initBoard();
