@@ -17,6 +17,7 @@
 //Firmware version and head title of UI screen
 #define FWversion "v2.3"
 #define headingTitle "in3ator"
+String serialNumber = "bqTest000001";
 
 //configuration variables
 #define debounceTime 100         //encoder debouncing time
@@ -333,11 +334,11 @@ Adafruit_BME280 bme(BME_CS); // hardware SPI, //BME280 (humidity, pressure and t
 int HeatermaxPWM = maxPWMvalue;      //max power for heater, full power is 50W
 
 // timers configuration
-#define sensorsISRRate 500    // in microseconds, also for BUZZER optimal frequency; 
+#define sensorsISRRate 5000    // in microseconds, also for BUZZER optimal frequency; 
 #define NTCInterruptRate 20000    // in microseconds; 
 #define roomPIDRate 1000000    // in microseconds; 
 #define heaterPIDRate 200000   // times of roomPIDRate;
-#define GSMISRRate 4000    // in microseconds, able to read 115200 baud rate uart; 
+#define GPRSISRRate 4000    // in microseconds, able to read 115200 baud rate uart; 
 int roomPIDfactor = roomPIDRate / NTCInterruptRate;
 int heaterPIDfactor = heaterPIDRate / NTCInterruptRate;
 volatile long interruptcounter;
@@ -351,12 +352,16 @@ volatile long interruptcounter;
   8     PC6   PC7   PC8    PC9
 */
 
-HardwareTimer GSMTimer(1);
+HardwareTimer GPRSTimer(1);
 HardwareTimer roomPIDTimer(2);
 HardwareTimer humidifierTimer(3);
 HardwareTimer sensorsTimer(8);
 
 void setup() {
   initBoard();
-  mainMenu();
+  //mainMenu();
+}
+
+void loop(){
+  
 }

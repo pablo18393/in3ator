@@ -9,7 +9,6 @@ int updateData() {
     }
     else {
       updateHumidity();
-      updateTemp(numNTC);
     }
   }
   if ((page == mainMenuPage || page == advancedModePage) && !enableSet) {
@@ -17,12 +16,6 @@ int updateData() {
   }
   checkSerialPort();
   checkNewPulsioximeterData();
-  /*
-    if (!GSM.postRPS && millis()>20000) {
-    GSM.postRPS = 1;
-    postGSMVariables();
-    }
-  */
 }
 
 void checkNewPulsioximeterData() {
@@ -41,15 +34,16 @@ void updateSensors() {
   tft.setTextColor(COLOR_MENU);
   if (page == advancedModePage || (page == actuatorsProgressPage && controlTemperature)) {
     tft.drawFloat(previousTemperature[babyNTC], 1, temperatureX, temperatureY, textFontSize);
+    logln("Prev temp: " + String(previousTemperature[babyNTC], 2));
   }
   if (page != actuatorsProgressPage && page != mainMenuPage || controlHumidity) {
     drawHumidity();
   }
-  updateTemp(numNTC);
   tft.setTextColor(COLOR_MENU_TEXT);
   if (page == advancedModePage || (page == actuatorsProgressPage && controlTemperature)) {
     tft.drawFloat(temperature[babyNTC], 1, temperatureX, temperatureY, textFontSize);
     previousTemperature[babyNTC] = temperature[babyNTC];
+    logln("Prev temp: " + String(previousTemperature[babyNTC], 2));
   }
   if (page == actuatorsProgressPage) {
     if (controlTemperature) {

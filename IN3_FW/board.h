@@ -26,12 +26,12 @@ word THERMISTOR_ROOM = PB1;   //This is not #define because can be swaped with T
 #define STERILIZER_FB PC5
 #define HUMIDIFIER_FB PB13
 #define ENC_SWITCH PC6
-#define GSM_PWRKEY PC14
+#define GPRS_PWRKEY PC14
 #define BME_CS PA2
 #define THERMISTOR_INBOARD_LEFT PC3 //PC3
 #define THERMISTOR_INBOARD_RIGHT PC2 //PC2
 #define PULSIOXIMETER 7
-#define GSMRXPIN PA10
+#define GPRSRXPIN PA10
 #define BUZZER PC7
 // Use hardware SPI lines+
 //Pins from 4-6 are SPI
@@ -67,12 +67,12 @@ int THERMISTOR_ROOM = 11;
 #define POWER_EN_FB 19
 #define FAN_HP_FB 20
 #define FAN_LP_FB 21
-#define GSMRXPIN 25
+#define GPRSRXPIN 25
 #define JAUNDICE_FB 26
 #define STERILIZER_FB 29
 #define HUMIDIFIER_FB 30
 #define ENC_SWITCH 14
-#define GSM_PWRKEY 1
+#define GPRS_PWRKEY 1
 #define PULSIOXIMETER 1
 // Use hardware SPI lines+
 //Pins from 4-6 are SPI

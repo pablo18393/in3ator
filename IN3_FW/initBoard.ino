@@ -6,7 +6,7 @@ void initBoard() {
   initSensors();
   initSD();
   initGPRS();
-  initTFT();
+  //initTFT();
   initTimers();
 }
 
@@ -45,7 +45,7 @@ void pinDirection() {
   pinMode(HUMIDIFIER, OUTPUT);
   pinMode(HEATER, OUTPUT);
   pinMode(HEATER, OUTPUT);
-  pinMode(GSM_PWRKEY, OUTPUT);
+  pinMode(GPRS_PWRKEY, OUTPUT);
 
   digitalWrite(SCREENBACKLIGHT, HIGH);
   digitalWrite(JAUNDICE, LOW);
@@ -55,7 +55,7 @@ void pinDirection() {
   digitalWrite(FAN_LP, LOW);
   digitalWrite(STERILIZE, LOW);
   digitalWrite(HUMIDIFIER, LOW);
-  digitalWrite(GSM_PWRKEY, HIGH);
+  digitalWrite(GPRS_PWRKEY, HIGH);
 }
 
 
@@ -83,13 +83,13 @@ void initTimers() {
   sensorsTimer.refresh();
   sensorsTimer.resume();
 
-  GSMTimer.pause();
-  GSMTimer.setPeriod(GSMISRRate); // in microseconds
-  GSMTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
-  GSMTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
-  GSMTimer.attachCompare1Interrupt(GSMHandler);
+  GPRSTimer.pause();
+  GPRSTimer.setPeriod(GPRSISRRate); // in microseconds
+  GPRSTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
+  GPRSTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
+  GPRSTimer.attachCompare1Interrupt(GPRSHandler);
   nvic_irq_set_priority(NVIC_TIMER1_CC, 1);
   nvic_irq_set_priority(NVIC_USART1 , 0);
-  GSMTimer.refresh();
-  GSMTimer.resume();
+  GPRSTimer.refresh();
+  GPRSTimer.resume();
 }

@@ -1,11 +1,12 @@
 String logFile = "datalog.txt";
-String GSMFile = "GSM.txt";
+String GPRSFile = "GPRS.txt";
 
 void initSD() {
+  SPI.setModule(SPI_SEL);
   SD.begin(SD_CS);
-  if (!SD.exists(GSMFile)) {
+  if (!SD.exists(GPRSFile)) {
     logln("Creating log file");
-    File dataFile = SD.open(GSMFile, FILE_WRITE);
+    File dataFile = SD.open(GPRSFile, FILE_WRITE);
     //String dataString = "SN, babyTemp,Humidity, HeaterTemp, BoardTemp1, BoardTemp2, BoardTemp3, Longitud, Latitud, JaudicePower, BPM, IBI, RPS, HeaterPower";
     String dataString = "babyTemp,Humidity";
     // if the file is available, write to it:
@@ -41,7 +42,7 @@ void log(String dataString) {
     dataFile.print(minute());
     dataFile.print(":");
     dataFile.print(second());
-    dataFile.print(" >> ");
+    dataFile.print(";");
     dataFile.print(dataString);
     dataFile.close();
     // print to the serial port too:
@@ -60,7 +61,7 @@ void SDlog() {
   dataString += humidity;
   dataString += ",";
   // if the file is available, write to it:
-  File dataFile = SD.open(GSMFile, FILE_WRITE);
+  File dataFile = SD.open(GPRSFile, FILE_WRITE);
   if (dataFile) {
     dataFile.print(day());
     dataFile.print("/");
