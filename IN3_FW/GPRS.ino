@@ -30,7 +30,7 @@ int len = 0;
 long GPRSTimeOut = 50000; //in millisecs
 struct GPRSstruct {
   bool firstPost;
-  bool error;
+  bool correctPostValue;
   bool postSN;
   bool postBabyTemp;
   bool postHeaterTemp;
@@ -335,13 +335,17 @@ void GPRSStablishConnection() {
 void GPRSPost() {
   switch (GPRS.process) {
     case 0:
-      GPRS.processTime = millis();
       GPRS.processSuccess = 1;
       GPRS.lastSent = millis();
-      Serial1.print("AT+CIPSTART=\"TCP\",\"" + server + "\",80\n");
-      GPRS.process++;
-      postGPRSVariables();
-      GPRSLocalLog(); //log GPRS data in SD module
+      GPRSLoadVariables();
+      if (GPRS.correctPostValue) {
+        Serial1.print("AT+CIPSTART=\"TCP\",\"" + server + "\",80\n");
+        GPRS.process++;
+        GPRSLocalLog(); //log GPRS data in SD module
+      }
+      else {
+        logln("Wrong post value");
+      }
       break;
     case 1:
       checkSerial("CONNECT OK", "ERROR");
@@ -552,13 +556,20 @@ void clearGPRSBuffer() {
   GPRS.bufferWritePos = 0;
 }
 
-void postGPRSVariables() {
+void GPRSLoadVariables() {
+  GPRS.correctPostValue = 1;
   req2[7] = "{";
   req2[7] += "\"origin\":\"" + serialNumber + "\"";
   if (GPRS.postBabyTemp) {
+    if (!temperature[babyNTC]) {
+      GPRS.correctPostValue = 0;
+    }
     req2[7] += ",\"temperature\":\"" + String(temperature[babyNTC], 2) + "\"";
   }
   if (GPRS.postHumidity) {
+    if (!temperature[babyNTC]) {
+      GPRS.correctPostValue = 0;
+    }
     req2[7] += ",\"humidity\":\"" + String(humidity) + "\"";
   }
   req2[7] += "}\n";
