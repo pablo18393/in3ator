@@ -36,11 +36,11 @@ void initEEPROM() {
       EEPROM.write(i, 0);
     }
     loadStandardValues();
-    logln("first turn on");
+    //logln("first turn on");
     //firstTurnOn();
   }
   else {
-    logln("Recap all variables");
+    //logln("Recap all variables");
     recapVariables();
   }
   if (!language) {

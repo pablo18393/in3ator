@@ -13,23 +13,23 @@ void hardwareVerification() {
   for (int i = 0; i < hardwareComponents; i++) {
     if (errorHardwareCode[i]) {
       testOK = 0;
-      log("hardware error code: ");
-      log(errorComponent[i]);
+      //log("hardware error code: ");
+      //log(errorComponent[i]);
       if (hardwareCritical[i] && errorHardwareCode[i] == shortcircuit) {
-        log(", critical");
+        //log(", critical");
       }
-      logln("");
+      //logln("");
     }
   }
   if (testOK) {
-    logln("HARDWARE TEST OK");
+    //logln("HARDWARE TEST OK");
   }
   else {
     for (int i = 0; i < hardwareComponents; i++) {
-      log(errorHardwareCode[i]);
+      //log(errorHardwareCode[i]);
     }
-    logln("");
-    logln("HARDWARE TEST FAIL");
+    //logln("");
+    //logln("HARDWARE TEST FAIL");
     drawHardwareErrorMessage();
   }
 }
@@ -59,7 +59,7 @@ void sensorsTest() {
   if ((analogRead(THERMISTOR_ROOM) > 3200 || analogRead(THERMISTOR_ROOM) < 1200) && HWNTCRoom) {
     errorHardwareCode[HW_NUM_NTCRoom] = opencircuit;
   }
-  logln(String(updateHumidity()));
+  //logln(String(updateHumidity()));
   if (HWHUMSensor && !updateHumidity()) {
     errorHardwareCode[HW_NUM_HUMSensor] = opencircuit;
   }

@@ -78,11 +78,11 @@ void actuatorsProgress() {
 
 void checkTempSensorPin() {
   //pending: program timeout too
-  logln("checking NTC pinout");
+  //logln("checking NTC pinout");
   float prevroomTemp = temperature[babyNTC];
   float prevHeaterTemp = temperature[heaterNTC];
-  logln(String(prevroomTemp));
-  logln(String(prevHeaterTemp));
+  //logln(String(prevroomTemp));
+  //logln(String(prevHeaterTemp));
   bool exitCheck = 0;
   long timeElapsedChecking = millis();
   turnFansOn();
@@ -122,7 +122,7 @@ void asignCorrectTempSensorsPin() {
   THERMISTOR_ROOM = valueRetainer;
   NTCpin[babyNTC] = {THERMISTOR_ROOM};
   NTCpin[heaterNTC] = {THERMISTOR_HEATER};
-  logln("NTC pins swapped");
+  //logln("NTC pins swapped");
 }
 
 void blinkGoBackMessage() {

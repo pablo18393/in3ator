@@ -31,7 +31,7 @@ void initTFT() {
   SPI.setModule(SPI_SEL);
   tft.begin();
   tft.setRotation(1);
-  //loadLogo();
+  //loadlogo();
 }
 
 void pinDirection() {
@@ -61,7 +61,7 @@ void pinDirection() {
 
 void initTimers() {
   // PID setup
-
+/*
   roomPIDTimer.pause();
   roomPIDTimer.setPeriod(NTCInterruptRate); // in microseconds
   roomPIDTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
@@ -72,7 +72,7 @@ void initTimers() {
   heaterPID.SetOutputLimits(0, HeatermaxPWM);
   roomPIDTimer.refresh();
   roomPIDTimer.resume();
-
+*/
 
   //sensors handling ISR configuration
   sensorsTimer.pause();
@@ -80,6 +80,7 @@ void initTimers() {
   sensorsTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
   sensorsTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
   sensorsTimer.attachCompare1Interrupt(sensorsISR);
+  nvic_irq_set_priority(NVIC_TIMER8_CC, 1);
   sensorsTimer.refresh();
   sensorsTimer.resume();
 
@@ -88,7 +89,7 @@ void initTimers() {
   GPRSTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
   GPRSTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
   GPRSTimer.attachCompare1Interrupt(GPRSHandler);
-  nvic_irq_set_priority(NVIC_TIMER1_CC, 1);
+  nvic_irq_set_priority(NVIC_TIMER1_CC, 2);
   nvic_irq_set_priority(NVIC_USART1 , 0);
   GPRSTimer.refresh();
   GPRSTimer.resume();

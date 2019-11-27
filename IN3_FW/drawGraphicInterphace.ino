@@ -209,7 +209,7 @@ void drawRightNumber(int n, int x, int i) {
   tft.drawNumber(n, x - length * 14, i, textFontSize);
 }
 
-void loadLogo() {
+void loadlogo() {
   tft.setTextSize(1);
   tft.fillScreen(introBackColor);
   tft.setTextColor(introTextColor);

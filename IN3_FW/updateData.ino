@@ -34,7 +34,7 @@ void updateSensors() {
   tft.setTextColor(COLOR_MENU);
   if (page == advancedModePage || (page == actuatorsProgressPage && controlTemperature)) {
     tft.drawFloat(previousTemperature[babyNTC], 1, temperatureX, temperatureY, textFontSize);
-    logln("Prev temp: " + String(previousTemperature[babyNTC], 2));
+    //logln("Prev temp: " + String(previousTemperature[babyNTC], 2));
   }
   if (page != actuatorsProgressPage && page != mainMenuPage || controlHumidity) {
     drawHumidity();
@@ -43,7 +43,7 @@ void updateSensors() {
   if (page == advancedModePage || (page == actuatorsProgressPage && controlTemperature)) {
     tft.drawFloat(temperature[babyNTC], 1, temperatureX, temperatureY, textFontSize);
     previousTemperature[babyNTC] = temperature[babyNTC];
-    logln("Prev temp: " + String(previousTemperature[babyNTC], 2));
+    //logln("Prev temp: " + String(previousTemperature[babyNTC], 2));
   }
   if (page == actuatorsProgressPage) {
     if (controlTemperature) {
@@ -122,18 +122,18 @@ void checkSerialPort() {
         break;
       case 'P':
         HeatermaxPWM = readSerialData();
-        log("Heater max PWM is: ");
-        logln(String(HeatermaxPWM));
+        //log("Heater max PWM is: ");
+        //logln(String(HeatermaxPWM));
         break;
       case 'R':
         nvic_sys_reset();
         break;
       case 'W':
         byte humidifierPWM;
-        log("Humidifier working PWM is: ");
+        //log("Humidifier working PWM is: ");
         humidifierPWM = readSerialData();
         analogWrite(HUMIDIFIER, humidifierPWM);
-        logln(String(humidifierPWM));
+        //logln(String(humidifierPWM));
         break;
     }
   }
@@ -150,23 +150,23 @@ int readSerialData() {
 }
 
 void printStatus() {
-  log(millis() / 1000);
-  log(";");
-  log(desiredSkinTemp);
-  log(";");
-  log(maxHeaterTemp);
-  log(";");
+  //log(millis() / 1000);
+  //log(";");
+  //log(desiredSkinTemp);
+  //log(";");
+  //log(maxHeaterTemp);
+  //log(";");
   for (int i = 0; i < numTempSensors; i++) {
-    log(temperature[i]);
-    log(";");
+    //log(temperature[i]);
+    //log(";");
   }
-  log(desiredHeaterTemp);
-  log(";");
-  log(humidity);
-  log(";");
-  log(desiredRoomHum);
-  log(";");
-  log(heaterPower);
-  log(";");
-  logln(String(PIDOutput[heaterNTC]));
+  //log(desiredHeaterTemp);
+  //log(";");
+  //log(humidity);
+  //log(";");
+  //log(desiredRoomHum);
+  //log(";");
+  //log(heaterPower);
+  //log(";");
+  //logln(String(PIDOutput[heaterNTC]));
 }

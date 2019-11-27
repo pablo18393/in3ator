@@ -181,7 +181,7 @@ void GPRSLocation() {
       checkSerial("OK", "ERROR");
       break;
     case 10:
-      Serial1.print("AT+CIPGPRSLOC=1,1\n");
+      Serial1.print("AT+CIPGSMLOC=1,1\n");
       GPRS.process++;
       break;
     case 11:
@@ -340,7 +340,8 @@ void GPRSPost() {
       GPRS.lastSent = millis();
       Serial1.print("AT+CIPSTART=\"TCP\",\"" + server + "\",80\n");
       GPRS.process++;
-      SDlog(); //log GPRS data in SD module
+      postGPRSVariables();
+      GPRSLocalLog(); //log GPRS data in SD module
       break;
     case 1:
       checkSerial("CONNECT OK", "ERROR");
@@ -352,6 +353,7 @@ void GPRSPost() {
       }
       Serial1.print("AT+CIPSEND=" + String(len - 1) + "\n");
       GPRS.process++;
+      GPRS.packetSentenceTime = millis();
       break;
     case 3:
       if (millis() - GPRS.packetSentenceTime > 200) {
@@ -373,7 +375,6 @@ void GPRSPost() {
     case 6:
       if (GPRSsequence == 0) {
         GPRS.token.trim();
-        postGPRSVariables();
         req2[3] = "Authorization: Bearer " + GPRS.token + "\n";
         req2[4] = "Content-Length: " + String(req2[7].length()) + "\n";
         len = 0;
@@ -392,6 +393,7 @@ void GPRSPost() {
       break;
     case 8:
       Serial1.print("AT+CIPSEND=" + String(len - 1) + "\n");
+      GPRS.packetSentenceTime = millis();
       GPRS.process++;
       break;
     case 9:
@@ -520,12 +522,12 @@ String checkSerial(String success, String error, String includeOnly) {
       GPRS.bufferPos = 0;
     }
     if (c == '\r') {
-      log(GPRS.line + '\r');
+      //log(GPRS.line + '\r');
       GPRS.lastLine = GPRS.line;
       GPRS.line = "";
       if (GPRS.lastLine.equals(success) || GPRS.lastLine.equals(error)) {
         if (GPRS.lastLine == error) {
-          //GPRS.error = 1;
+          GPRS.processSuccess = 0;
         }
         GPRS.initVars = 0;
         GPRS.process++;
