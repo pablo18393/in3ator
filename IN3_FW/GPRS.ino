@@ -27,10 +27,9 @@ String req2[] = {
 };
 
 int len = 0;
-long GPRSTimeOut = 50000; //in millisecs
+long GPRSTimeOut = 60000; //in millisecs
 struct GPRSstruct {
   bool firstPost;
-  bool correctPostValue;
   bool postSN;
   bool postBabyTemp;
   bool postHeaterTemp;
@@ -87,7 +86,7 @@ void initGPRS()
 {
   Serial.begin(115200);
   Serial1.begin(115200);
-  GPRS.sendPeriod = 180; //in secs
+  GPRS.sendPeriod = 120; //in secs
   GPRS.postBabyTemp = 1;
   GPRS.postHumidity = 1;
   GPRS.powerUp = 1;
@@ -112,16 +111,17 @@ void GPRSHandler() {
 }
 
 void GPRSStatusHandler() {
-  if (GPRS.timeOut) {
-    GPRS.timeOut = 0;
-    GPRS.process = 0;
-    GPRS.post = 0;
-    GPRS.connect = 0;
-    GPRS.powerUp = 1;
-  }
   if (GPRS.powerUp || GPRS.connect || GPRS.post || GPRS.location) {
     if (millis() - GPRS.processTime > GPRSTimeOut) {
-      GPRS.timeOut = 1;
+      GPRS.timeOut = 0;
+      GPRS.process = 0;
+      GPRS.post = 0;
+      GPRS.connect = 0;
+      GPRS.location = 0;
+      GPRS.powerUp = 1;
+      logln("powering module down...");
+      Serial1.print("AT+CPOWD=1\n");
+      GPRS.packetSentenceTime = millis();
       logln("timeOut" + String(GPRS.powerUp) + String(GPRS.connect) + String(GPRS.post) + String(GPRS.location) + String(GPRS.process));
       GPRS.processTime = millis();
     }
@@ -231,12 +231,14 @@ void checkGPRSConnection() {
 void GPRSPowerUp() {
   switch (GPRS.process) {
     case 0:
-      GPRS.processTime = millis();
-      digitalWrite(GPRS_PWRKEY, LOW);
-      GPRS.processSuccess = 1;
-      GPRS.process++;
-      GPRS.packetSentenceTime = millis();
-      logln("powering up GPRS");
+      if (millis() - GPRS.packetSentenceTime > 2000) {
+        GPRS.processTime = millis();
+        digitalWrite(GPRS_PWRKEY, LOW);
+        GPRS.processSuccess = 1;
+        GPRS.process++;
+        GPRS.packetSentenceTime = millis();
+        logln("powering up GPRS");
+      }
       break;
     case 1:
       if (millis() - GPRS.packetSentenceTime > 2000) {
@@ -279,15 +281,18 @@ void GPRSStablishConnection() {
       GPRS.processTime = millis();
       GPRS.processSuccess = 1;
       Serial1.write("AT+CFUN=1\n");
+      GPRS.packetSentenceTime = millis();
       GPRS.process++;
       break;
     case 1:
       checkSerial("OK", "ERROR");
       break;
     case 2:
-      Serial1.write("AT+CPIN?\n");
-      GPRS.packetSentenceTime = millis();
-      GPRS.process++;
+      if (millis() - GPRS.packetSentenceTime > 4000) {
+        Serial1.write("AT+CPIN?\n");
+        GPRS.packetSentenceTime = millis();
+        GPRS.process++;
+      }
       break;
     case 3:
       checkSerial("OK", "ERROR");
@@ -337,8 +342,9 @@ void GPRSPost() {
     case 0:
       GPRS.processSuccess = 1;
       GPRS.lastSent = millis();
-      GPRSLoadVariables();
-      if (GPRS.correctPostValue) {
+      GPRS.processTime = millis();
+      if (GPRSLoadVariables()) {
+        logln("Starting POST process");
         Serial1.print("AT+CIPSTART=\"TCP\",\"" + server + "\",80\n");
         GPRS.process++;
         GPRSLocalLog(); //log GPRS data in SD module
@@ -374,7 +380,7 @@ void GPRSPost() {
       checkSerial("SEND OK", "\n\n");
       break;
     case 5:
-      checkSerial("CLOSED", "\n\n", "ey");
+      checkSerial("CLOSED", "\n\n");
       break;
     case 6:
       if (GPRSsequence == 0) {
@@ -507,10 +513,6 @@ void readGPRSData() {
 }
 
 String checkSerial(String success, String error) {
-  return (checkSerial(success, error, ""));
-}
-
-String checkSerial(String success, String error, String includeOnly) {
   if (!GPRS.initVars) {
     GPRS.initVars = 1;
     GPRS.enable = 1;
@@ -526,7 +528,9 @@ String checkSerial(String success, String error, String includeOnly) {
       GPRS.bufferPos = 0;
     }
     if (c == '\r') {
-      //log(GPRS.line + '\r');
+      if (!GPRS.post || GPRS.process != 5) {
+        log(GPRS.line + '\r');
+      }
       GPRS.lastLine = GPRS.line;
       GPRS.line = "";
       if (GPRS.lastLine.equals(success) || GPRS.lastLine.equals(error)) {
@@ -556,21 +560,22 @@ void clearGPRSBuffer() {
   GPRS.bufferWritePos = 0;
 }
 
-void GPRSLoadVariables() {
-  GPRS.correctPostValue = 1;
+bool GPRSLoadVariables() {
   req2[7] = "{";
   req2[7] += "\"origin\":\"" + serialNumber + "\"";
   if (GPRS.postBabyTemp) {
-    if (!temperature[babyNTC]) {
-      GPRS.correctPostValue = 0;
-    }
     req2[7] += ",\"temperature\":\"" + String(temperature[babyNTC], 2) + "\"";
   }
   if (GPRS.postHumidity) {
-    if (!temperature[babyNTC]) {
-      GPRS.correctPostValue = 0;
-    }
     req2[7] += ",\"humidity\":\"" + String(humidity) + "\"";
   }
   req2[7] += "}\n";
+  logln("Posting: " + req2[7]);
+  if (req2[7].indexOf("nan") >= 0) {
+    logln("Detected zero");
+    return false;
+  }
+  else {
+    return true;
+  }
 }

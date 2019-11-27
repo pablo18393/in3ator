@@ -58,9 +58,9 @@ void GPRSLocalLog() {
   digitalWrite(TFT_CS, HIGH);
   String dataString;
   dataString += temperature[babyNTC];
-  dataString += ",";
+  dataString += ";";
   dataString += humidity;
-  dataString += ",";
+  dataString += ";";
   // if the file is available, write to it:
   File dataFile = SD.open(GPRSFile, FILE_WRITE);
   if (dataFile) {
@@ -75,7 +75,7 @@ void GPRSLocalLog() {
     dataFile.print(minute());
     dataFile.print(":");
     dataFile.print(second());
-    dataFile.print(" >> ");
+    dataFile.print(";");
     dataFile.println(dataString);
     dataFile.close();
     // print to the serial port too:
