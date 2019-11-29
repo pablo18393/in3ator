@@ -1,17 +1,6 @@
-int myEncoderRead() {
-  if ((lastEncoderPos[counter] != encoderpos[counter])) {
-    encflag[counter] = LOW;
-    lastEncoderPos[counter] = encoderpos[counter];
-  }
-  return (encoderpos[counter]);
-}
 
 void sensorsISR() {
-  if (!encoderCount) {
-    encoderCount = encoderRate;
-    readEncoder();
-  }
-  encoderCount--;
+  measurenumNTC();
   readPulsioximeter();
   if (!pulsioximeterCount) {
     pulsioximeterCount = pulsioximeterRate;
@@ -22,37 +11,6 @@ void sensorsISR() {
 
 void initPulsioximeterVariables() {
 
-}
-
-void readEncoder() {
-  for (byte counter = 0; counter < NUMENCODERS; counter++)
-  {
-    if ( (gpio_read_bit(PIN_MAP[encoderpinA[counter]].gpio_device, PIN_MAP[encoderpinA[counter]].gpio_bit) ? HIGH : LOW) != A_set[counter] )
-    {
-      A_set[counter] = !A_set[counter];
-      if ( A_set[counter] && !B_set[counter] )
-      {
-        if (millis() - encodertimer < -1)
-          encoderpos[counter] += 1;
-        else
-          encoderpos[counter] += 5;
-      }
-      encodertimer = millis();
-      last_something = millis();
-    }
-    if ( (gpio_read_bit(PIN_MAP[encoderpinB[counter]].gpio_device, PIN_MAP[encoderpinB[counter]].gpio_bit) ? HIGH : LOW) != B_set[counter] )
-    {
-      B_set[counter] = !B_set[counter];
-      if ( B_set[counter] && !A_set[counter] )
-        if (millis() - encodertimer < -1)
-          encoderpos[counter] -= 1;
-        else
-          encoderpos[counter] -= 5;
-      encodertimer = millis();
-      last_something = millis();
-    }
-  }
-  asleep();
 }
 
 void readPulsioximeter() {
@@ -85,7 +43,12 @@ void measurenumNTC() {
   }
   temperature_measured++;
   if (temperature_measured == temperature_fraction) {
+    updateTemp(numNTC);
     temperature_measured = 0;
+  }
+  if (millis() - lastSensorsUpdate > sensorsUpdateRate) {
+    updateHumidity();
+    lastSensorsUpdate = millis();
   }
 }
 
@@ -101,16 +64,16 @@ void updateTemp(byte sensor) {
   byte endSensor;
 
   switch (sensor) {
-    case roomNTC:
-      startSensor = roomNTC;
-      endSensor = roomNTC;
+    case babyNTC:
+      startSensor = babyNTC;
+      endSensor = babyNTC;
       break;
     case heaterNTC:
       startSensor = heaterNTC;
       endSensor = heaterNTC;
       break;
     case numNTC:
-      startSensor = roomNTC;
+      startSensor = babyNTC;
       endSensor = heaterNTC;
       break;
   }
@@ -132,23 +95,68 @@ void updateTemp(byte sensor) {
   }
 }
 
-bool readHumSensor() {
-  sensorsTimer.pause();
-  int newTemp = dht.getTemperature();
-  int newHumidity = dht.getHumidity();
-  sensorsTimer.refresh();
-  sensorsTimer.resume();
-  if (newHumidity && newTemp) {
-    //    temperature[numNTC + dhtSensor] = newTemp;
-    humidity = newHumidity;
-    humidity += diffHumidity;
-    return (1);
+bool updateHumidity() {
+  bool DHTOK = 0;
+  bool BME280OK = 0;
+  int DHTTemperature;
+  int DHTHumidity;
+  int BME280Temperature;
+  int BME280Humidity;
+  if (DHTSensor) {
+    sensorsTimer.pause();
+    DHTTemperature = dht.getTemperature();
+    DHTHumidity = dht.getHumidity();
+    sensorsTimer.resume();
+    if (DHTHumidity && DHTTemperature) {
+      //    temperature[numNTC + DHTSensor] = DHTTemperature; //Add here measurement to temp array
+      DHTOK = 1;
+    }
   }
-  return (0);
+  if (BME280Sensor) {
+    BME280Temperature = bme.readTemperature();
+    BME280Humidity = bme.readHumidity();
+    if (DHTHumidity && DHTTemperature) {
+      //    temperature[numNTC + DHTSensor] = DHTTemperature; //Add here measurement to temp array
+      BME280OK = 1;
+    }
+  }
+  if (DHTOK || BME280OK) {
+    humidity = 0;
+    humidity += DHTHumidity;
+    humidity += BME280Humidity;
+    humidity += diffHumidity;
+  }
+  if (DHTOK && BME280OK) {
+    humidity -= diffHumidity;
+    humidity /= 2;
+    humidity += diffHumidity;
+  }
+  return (DHTOK || BME280OK);
+}
+
+void encoderISR() {
+  if (millis() - last_encoder_move > encoder_debounce_time) {
+    if ( (digitalRead(ENC_A))  != A_set )
+    {
+      A_set = !A_set;
+      if ( A_set && !B_set)
+      {
+        EncMove = 1;
+      }
+    }
+    if ( (digitalRead(ENC_B))  != B_set)
+    {
+      B_set = !B_set;
+      if ( B_set && !A_set )
+        EncMove = -1;
+    }
+  }
+  last_encoder_move = millis();
+  last_something = millis();
 }
 
 void asleep() {
-  encPulsed = digitalRead(ENC_PULSE);
+  encPulsed = digitalRead(ENC_SWITCH);
   if (encPulsed != encPulsedBefore) {
     last_something = millis();
   }
@@ -159,6 +167,6 @@ void asleep() {
     }
   }
   else {
-    analogWrite(SCREENBACKLIGHT, backlight_intensity);
+    analogWrite(SCREENBACKLIGHT, TFT_LED);
   }
 }

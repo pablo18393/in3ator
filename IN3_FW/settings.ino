@@ -1,3 +1,4 @@
+
 void settings() {
   byte numWords = 6;
   page = settingsPage;
@@ -38,7 +39,7 @@ void settings() {
   rectangles = numWords;
   graphics();
   drawHeading();
-  while (!digitalRead(ENC_PULSE)) {
+  while (!digitalRead(ENC_SWITCH)) {
     updateData();
   }
   delay(debounceTime);

@@ -1,3 +1,4 @@
+
 void mainMenu() {
   page = mainMenuPage;
   byte numWords = 4;
@@ -30,14 +31,12 @@ void mainMenu() {
   goToProcessRow = numWords;
   graphics();
   drawHeading();
-  updateSensors();
   controlTemperature = 0;
   controlHumidity = 0;
   enableSet = 0;
-  while (!digitalRead(ENC_PULSE)) {
-    updateData();
-  }
+  while (!digitalRead(ENC_SWITCH));
   delay(debounceTime);
+  updateData();
   barSelection();
 }
 
@@ -50,6 +49,7 @@ void askSuccess() {
     turnFansOff();
   }
   page = askSuccessPage;
+  bar_pos = 2;
   byte numWords = 3;
   print_text = 1;
   tft.setTextSize(1);
@@ -57,6 +57,8 @@ void askSuccess() {
   for (int i = 0; i < numWords; i++) {
     pos_text[i] = leftMargin;
   }
+  pos_text[afirmativeGraphicPosition] = centered;
+  pos_text[negativeGraphicPosition] = centered;
   words[successQuestionGraphicPosition] = "IS THE BABY ALIVE?";
   words[afirmativeGraphicPosition] = "YES";
   words[negativeGraphicPosition] = "NO";
@@ -65,9 +67,16 @@ void askSuccess() {
   goToProcessRow = numWords;
   graphics();
   drawHeading();
-  while (!digitalRead(ENC_PULSE)) {
+  while (!digitalRead(ENC_SWITCH)) {
     updateData();
   }
   delay(debounceTime);
   barSelection();
+}
+
+bool checkAskSuccessPage() {
+  if (page == askSuccessPage) {
+    return true;
+  }
+  return false;
 }

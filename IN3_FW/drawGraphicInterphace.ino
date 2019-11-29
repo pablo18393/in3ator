@@ -1,3 +1,4 @@
+
 void graphics() {
   if (!page) {
     tft.fillRect(width_select, height_heading, tft.width() - width_select, tft.height() - height_heading, COLOR_MENU);
@@ -31,8 +32,8 @@ void graphics() {
               tft.drawRightString(initialSensorsValue, gestationWeeksXPos, ypos, textFontSize);
               break;
             case LEDGraphicPosition:
-              if (LEDIntensity) {
-                drawRightNumber(LEDIntensity, LEDXPos, ypos);
+              if (jaundice_LED_intensity) {
+                drawRightNumber(jaundice_LED_intensity, LEDXPos, ypos);
                 tft.drawRightString("%", unitPosition, ypos, textFontSize);
               }
               else {
@@ -49,8 +50,8 @@ void graphics() {
               tft.drawRightString(initialSensorsValue, initialSensorPosition, temperatureY, textFontSize);
               break;
             case LEDGraphicPosition:
-              if (LEDIntensity) {
-                drawRightNumber(LEDIntensity, LEDXPos, ypos);
+              if (jaundice_LED_intensity) {
+                drawRightNumber(jaundice_LED_intensity, LEDXPos, ypos);
                 tft.drawRightString("%", unitPosition, ypos, textFontSize);
               }
               else {
@@ -110,7 +111,7 @@ void graphics() {
               tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
               break;
             case heaterTempGraphicPosition:
-              drawRightNumber(heaterTempLimit, 280, ypos);
+              drawRightNumber(maxHeaterTemp, 280, ypos);
               tft.drawRightString("C", unitPosition, ypos, textFontSize);
               break;
             case fanGraphicPosition:
@@ -122,7 +123,7 @@ void graphics() {
         case calibrateSensorsPage:
           switch (i) {
             case temperatureCalibrationGraphicPosition:
-              tft.drawFloat(previousTemperature[roomNTC], 1, valuePosition, ypos, textFontSize);
+              tft.drawFloat(previousTemperature[babyNTC], 1, valuePosition, ypos, textFontSize);
               break;
             case humidityCalibrationGraphicPosition:
               tft.drawFloat(humidity, 0, valuePosition, ypos, textFontSize);
@@ -169,7 +170,7 @@ void setSensorsGraphicPosition() {
 
 void drawHeading() {
   tft.fillRect(0, 0, tft.width(), height_heading, COLOR_HEADING);
-  if (page) {
+  if (page != mainMenuPage && page != askSuccessPage) {
     drawBack();
   }
   tft.setTextColor(COLOR_MENU);
@@ -208,12 +209,12 @@ void drawRightNumber(int n, int x, int i) {
   tft.drawNumber(n, x - length * 14, i, textFontSize);
 }
 
-void loadLogo() {
+void loadlogo() {
   tft.setTextSize(1);
   tft.fillScreen(introBackColor);
   tft.setTextColor(introTextColor);
   drawIntroMessage();
-  for (int i = maxPWMvalue; i >= backlight_intensity; i--) {
+  for (int i = maxPWMvalue; i >= TFT_LED; i--) {
     analogWrite(SCREENBACKLIGHT, i);
     delay(brightenRate);
   }
@@ -269,7 +270,7 @@ void drawHardwareErrorMessage() {
     yErrorPos += letter_height;
     tft.drawCentreString("temperature, jaundice LED", tft.width() / 2, yErrorPos , textFontSize);
     yErrorPos += letter_height;
-    tft.drawCentreString("ENC_PULSE to continue", tft.width() / 2, yErrorPos , textFontSize);
+    tft.drawCentreString("ENC_SWITCH to continue", tft.width() / 2, yErrorPos , textFontSize);
   }
 }
 
@@ -318,7 +319,7 @@ int graphicHeight(int position) {
 }
 
 void drawHumidity() {
-  if (readHumSensor()) {
+  if (updateHumidity()) {
     tft.setTextColor(COLOR_MENU);
     drawCentreNumber(previousHumidity, humidityX, humidityY);
     tft.setTextColor(COLOR_MENU_TEXT);

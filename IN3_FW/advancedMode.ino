@@ -1,3 +1,4 @@
+
 void advancedMode() {
   page = advancedModePage;
   byte numWords = 4;
@@ -33,7 +34,7 @@ void advancedMode() {
   controlTemperature = 0;
   controlHumidity = 0;
   enableSet = 0;
-  while (!digitalRead(ENC_PULSE)) {
+  while (!digitalRead(ENC_SWITCH)) {
     updateData();
   }
   delay(debounceTime);

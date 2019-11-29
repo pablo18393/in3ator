@@ -1,7 +1,5 @@
-
-
 void hardwareVerification() {
-  numSensors = numNTC + dhtSensor;
+  numSensors = numNTC + DHTSensor;
   testOK = 1;
   testCritical = 0;
   for (int i = 0; i < hardwareComponents; i++) {
@@ -15,23 +13,23 @@ void hardwareVerification() {
   for (int i = 0; i < hardwareComponents; i++) {
     if (errorHardwareCode[i]) {
       testOK = 0;
-      Serial.print("hardware error code: ");
-      Serial.print(errorComponent[i]);
+      //log("hardware error code: ");
+      //log(errorComponent[i]);
       if (hardwareCritical[i] && errorHardwareCode[i] == shortcircuit) {
-        Serial.print(", critical");
+        //log(", critical");
       }
-      Serial.println();
+      //logln("");
     }
   }
   if (testOK) {
-    Serial.println("HARDWARE TEST OK");
+    //logln("HARDWARE TEST OK");
   }
   else {
     for (int i = 0; i < hardwareComponents; i++) {
-      Serial.print(errorHardwareCode[i]);
+      //log(errorHardwareCode[i]);
     }
-    Serial.println();
-    Serial.println("HARDWARE TEST FAIL");
+    //logln("");
+    //logln("HARDWARE TEST FAIL");
     drawHardwareErrorMessage();
   }
 }
@@ -55,14 +53,14 @@ void shortcircuitTest() {
 void sensorsTest() {
   //sensors verification
 
-  if ((analogRead(THERMISTOR_HEATER) > 3200 || analogRead(THERMISTOR_HEATER) < 1200) && HWNTCHeater) {
+  if (((THERMISTOR_HEATER) > 3200 || analogRead(THERMISTOR_HEATER) < 1200) && HWNTCHeater) {
     errorHardwareCode[HW_NUM_NTCHeater] = opencircuit;
   }
   if ((analogRead(THERMISTOR_ROOM) > 3200 || analogRead(THERMISTOR_ROOM) < 1200) && HWNTCRoom) {
     errorHardwareCode[HW_NUM_NTCRoom] = opencircuit;
   }
-  Serial.println(readHumSensor());
-  if (HWHUMSensor && !readHumSensor()) {
+  //logln(String(updateHumidity()));
+  if (HWHUMSensor && !updateHumidity()) {
     errorHardwareCode[HW_NUM_HUMSensor] = opencircuit;
   }
 }
