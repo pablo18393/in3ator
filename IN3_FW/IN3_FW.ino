@@ -134,7 +134,7 @@ int encoderpinA = ENC_A; // pin  encoder A
 int encoderpinB = ENC_B; // pin  encoder B
 bool encPulsed, encPulsedBefore; //encoder switch status
 int EncMove, EncCount; //moved encoder
-long encoder_debounce_time = 500; //in microseconds, debounce time in encoder to filter signal bounces
+long encoder_debounce_time = 300; //in microseconds, debounce time in encoder to filter signal bounces
 long last_encoder_move;
 long last_encPulsed; //last time encoder was pulsed
 
