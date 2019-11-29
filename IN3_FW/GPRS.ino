@@ -86,7 +86,7 @@ void initGPRS()
 {
   Serial.begin(115200);
   Serial1.begin(115200);
-  GPRS.sendPeriod = 120; //in secs
+  GPRS.sendPeriod = 10800; //in secs
   GPRS.postBabyTemp = 1;
   GPRS.postHumidity = 1;
   GPRS.powerUp = 1;
@@ -96,44 +96,47 @@ void GPRSHandler() {
   if (GPRS.powerUp) {
     GPRSPowerUp();
   }
-  if (GPRS.connect) {
-    GPRSStablishConnection();
-  }
   if (GPRS.location) {
     GPRSLocation();
+  }
+  if (GPRS.connect) {
+    GPRSStablishConnection();
   }
   if (GPRS.post) {
     GPRSPost();
   }
   readGPRSData();
-  checkFirstPost();
   GPRSStatusHandler();
 }
 
 void GPRSStatusHandler() {
-  if (GPRS.powerUp || GPRS.connect || GPRS.post || GPRS.location) {
-    if (millis() - GPRS.processTime > GPRSTimeOut) {
-      GPRS.timeOut = 0;
-      GPRS.process = 0;
-      GPRS.post = 0;
-      GPRS.connect = 0;
-      GPRS.location = 0;
-      GPRS.powerUp = 1;
-      logln("powering module down...");
-      Serial1.print("AT+CPOWD=1\n");
-      GPRS.packetSentenceTime = millis();
-      logln("timeOut" + String(GPRS.powerUp) + String(GPRS.connect) + String(GPRS.post) + String(GPRS.location) + String(GPRS.process));
-      GPRS.processTime = millis();
+  if (GPRS.process) {
+    if (GPRS.powerUp || GPRS.connect || GPRS.post || GPRS.location) {
+      if (millis() - GPRS.processTime > GPRSTimeOut) {
+        logln("timeOut" + String(GPRS.powerUp) + String(GPRS.connect) + String(GPRS.post) + String(GPRS.location) + String(GPRS.process));
+        GPRS.timeOut = 0;
+        GPRS.process = 0;
+        GPRS.post = 0;
+        GPRS.connect = 0;
+        GPRS.location = 0;
+        GPRS.powerUp = 1;
+        logln("powering module down...");
+        Serial1.print("AT+CPOWD=1\n");
+        GPRS.packetSentenceTime = millis();
+        GPRS.processTime = millis();
+      }
     }
   }
-
   if (!GPRS.powerUp && !GPRS.connect && !GPRS.post) {
     if (!GPRS.connectionStatus) {
       GPRS.powerUp = 1;
     }
     if (millis() - GPRS.lastSent > GPRS.sendPeriod * 1000) {
-      GPRS.post = 1;
+      GPRS.connect = 1;
     }
+  }
+  if (!GPRS.firstPost && GPRS.connectionStatus) {
+    GPRS.location = 1;
   }
 }
 
@@ -203,31 +206,6 @@ void GPRSLocation() {
   }
 }
 
-void checkFirstPost() {
-  if (!GPRS.firstPost && GPRS.connectionStatus) {
-    GPRS.location = 1;
-  }
-}
-
-void checkGPRSConnection() {
-  switch (GPRS.process) {
-    case 0:
-      GPRS.processSuccess = 1;
-      Serial1.print("AT\n");
-      GPRS.process++;
-      break;
-    case 1:
-      checkSerial("OK", "ERROR");
-      break;
-    case 2:
-      if (!GPRS.processSuccess) {
-        GPRS.powerUp = 1;
-      }
-      GPRS.process = 0;
-      break;
-  }
-}
-
 void GPRSPowerUp() {
   switch (GPRS.process) {
     case 0:
@@ -269,7 +247,6 @@ void GPRSPowerUp() {
         GPRS.connect = 1;
         logln("Power up success");
       }
-      GPRS.location = 0;
       GPRS.process = 0;
       break;
   }
@@ -333,6 +310,9 @@ void GPRSStablishConnection() {
       }
       GPRS.connect = 0;
       GPRS.process = 0;
+      if (GPRS.firstPost) {
+        GPRS.post = 1;
+      }
       break;
   }
 }
@@ -428,6 +408,13 @@ void GPRSPost() {
       checkSerial("CLOSED", "\n\n");
       break;
     case 11:
+      Serial1.print("AT+CIPSHUT\n");
+      GPRS.process++;
+      break;
+    case 12:
+      checkSerial("SHUT OK", "ERROR");
+      break;
+    case 13:
       logln("GPRS POST SUCCESS");
       GPRS.post = 0;
       GPRS.process = 0;
