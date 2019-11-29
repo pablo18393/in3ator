@@ -6,7 +6,7 @@ void initBoard() {
   initSensors();
   initSD();
   initGPRS();
-  //initTFT();
+  initTFT();
   initTimers();
 }
 
@@ -19,8 +19,6 @@ void initSensors() {
   }
   A_set = false;
   B_set = false;
-  pinMode(encoderpinA, INPUT_PULLUP);
-  pinMode(encoderpinB, INPUT_PULLUP);
   attachInterrupt(ENC_A, encoderISR, CHANGE);
   attachInterrupt(ENC_B, encoderISR, CHANGE);
   // timer setup for encoder
@@ -46,6 +44,8 @@ void pinDirection() {
   pinMode(HEATER, OUTPUT);
   pinMode(HEATER, OUTPUT);
   pinMode(GPRS_PWRKEY, OUTPUT);
+  pinMode(encoderpinA, INPUT_PULLUP);
+  pinMode(encoderpinB, INPUT_PULLUP);
 
   digitalWrite(SCREENBACKLIGHT, HIGH);
   digitalWrite(JAUNDICE, LOW);
@@ -61,18 +61,18 @@ void pinDirection() {
 
 void initTimers() {
   // PID setup
-/*
-  roomPIDTimer.pause();
-  roomPIDTimer.setPeriod(NTCInterruptRate); // in microseconds
-  roomPIDTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
-  roomPIDTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
-  roomPIDTimer.attachCompare1Interrupt(roomPIDInterrupt);
-  roomPID.SetSampleTime(roomPIDRate / 1000);       //in milliseconds
-  heaterPID.SetSampleTime(heaterPIDRate / 1000); //in milliseconds
-  heaterPID.SetOutputLimits(0, HeatermaxPWM);
-  roomPIDTimer.refresh();
-  roomPIDTimer.resume();
-*/
+  /*
+    roomPIDTimer.pause();
+    roomPIDTimer.setPeriod(NTCInterruptRate); // in microseconds
+    roomPIDTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
+    roomPIDTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
+    roomPIDTimer.attachCompare1Interrupt(roomPIDInterrupt);
+    roomPID.SetSampleTime(roomPIDRate / 1000);       //in milliseconds
+    heaterPID.SetSampleTime(heaterPIDRate / 1000); //in milliseconds
+    heaterPID.SetOutputLimits(0, HeatermaxPWM);
+    roomPIDTimer.refresh();
+    roomPIDTimer.resume();
+  */
 
   //sensors handling ISR configuration
   sensorsTimer.pause();

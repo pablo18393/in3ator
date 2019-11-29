@@ -45,6 +45,8 @@ word THERMISTOR_ROOM = PB1;   //This is not #define because can be swaped with T
 #define DHTSensor 1
 #define BME280Sensor 0
 #define SPI_SEL 1
+#define enableSD 0 //set to 1 if using SD card
+
 
 #ifdef maplemini
 //pin declaration
