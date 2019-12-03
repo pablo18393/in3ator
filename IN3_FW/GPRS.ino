@@ -1,4 +1,3 @@
-// buffer de 768 para el serial
 
 String user = "admin@admin.com";
 String password = "admin";
@@ -28,6 +27,14 @@ String req2[] = {
 
 int len = 0;
 long GPRSTimeOut = 60000; //in millisecs
+
+//post content variables
+#define firstPost 0
+#define jaundiceLEDMode 1
+#define actuatorsMode 2
+#define pulseFound 3
+#define standByMode 4
+
 struct GPRSstruct {
   bool firstPost;
   bool postSN;
@@ -42,7 +49,9 @@ struct GPRSstruct {
   bool postJaundicePower;
   bool postBPM;
   bool postIBI;
-  bool postRPS;
+  bool postRPD;
+  bool postRSSI;
+  bool postCurrentConsumption;
   bool postHeaterPower;
   int sendPeriod;
   long lastSent;
@@ -54,6 +63,7 @@ struct GPRSstruct {
   String longitud;
   String localDayTime;
   String localHourTime;
+  int RSSI;
   bool readLatitud;
   bool readLongitud;
   bool readLocalDayTime;
@@ -547,14 +557,60 @@ void clearGPRSBuffer() {
   GPRS.bufferWritePos = 0;
 }
 
+void setPostVariables(byte postContent) {
+  switch (postContent) {
+    case firstPost:
+      break;
+  }
+}
+
 bool GPRSLoadVariables() {
   req2[7] = "{";
   req2[7] += "\"origin\":\"" + serialNumber + "\"";
   if (GPRS.postBabyTemp) {
-    req2[7] += ",\"temperature\":\"" + String(temperature[babyNTC], 2) + "\"";
+    req2[7] += ",\"BabyTemp\":\"" + String(temperature[babyNTC], 2) + "\"";
+  }
+  if (GPRS.postHeaterTemp) {
+    req2[7] += ",\"BabyTemp\":\"" + String(temperature[babyNTC], 2) + "\"";
+  }
+  if (GPRS.postBoardTemp1) {
+    req2[7] += ",\"BoardTemp1\":\"" + String(temperature[babyNTC], 2) + "\"";
+  }
+  if (GPRS.postBoardTemp2) {
+    req2[7] += ",\"BoardTemp2\":\"" + String(temperature[babyNTC], 2) + "\"";
+  }
+  if (GPRS.postBoardTemp3) {
+    req2[7] += ",\"BoardTemp3\":\"" + String(temperature[babyNTC], 2) + "\"";
   }
   if (GPRS.postHumidity) {
     req2[7] += ",\"humidity\":\"" + String(humidity) + "\"";
+  }
+  if (GPRS.postLongitud) {
+    req2[7] += ",\"Longitud\":\"" + GPRS.longitud + "\"";
+  }
+  if (GPRS.postLatitud ) {
+    req2[7] += ",\"Latitud\":\"" + GPRS.latitud + "\"";
+  }
+  if (GPRS.RSSI) {
+    req2[7] += ",\"RSSI\":\"" + String(GPRS.RSSI) + "\"";
+  }
+  if (GPRS.postJaundicePower) {
+    req2[7] += ",\"JaundicePower\":\"" + String(jaundiceLEDIntensity) + "\"";
+  }
+  if (GPRS.postHeaterPower) {
+    req2[7] += ",\"HeaterPower\":\"" + String(heaterPower) + "\"";
+  }
+  if (GPRS.postBPM) {
+    req2[7] += ",\"BPM\":\"" + String(BPM) + "\"";
+  }
+  if (GPRS.postIBI) {
+    req2[7] += ",\"IBI\":\"" + String(IBI) + "\"";
+  }
+  if (GPRS.postRPD) {
+    //add RPD logic, ensure maximum data packet size
+  }
+  if (GPRS.postCurrentConsumption) {
+    //add current consumption logic
   }
   req2[7] += "}\n";
   logln("Posting: " + req2[7]);
@@ -562,7 +618,9 @@ bool GPRSLoadVariables() {
     logln("Detected zero");
     return false;
   }
-  else {
-    return true;
+  if (req2[7].length > 1200) {
+    logln("posting packet size oversized");
+    return false;
   }
+  return true;
 }
