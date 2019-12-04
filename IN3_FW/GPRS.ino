@@ -1,4 +1,16 @@
 
+//post content variables
+#define defaultPost 0
+#define jaundiceLEDON 1
+#define jaundiceLEDOFF 2
+#define actuatorsModeON 3
+#define actuatorsModeOFF 4
+#define pulseFound 5
+#define pulseLost 6
+#define standByMode 7
+#define addLocation 7
+#define removeLocation 8
+
 String user = "admin@admin.com";
 String password = "admin";
 String server = "pub.scar.io";
@@ -28,13 +40,6 @@ String req2[] = {
 int len = 0;
 long GPRSTimeOut = 60000; //in millisecs
 
-//post content variables
-#define firstPost 0
-#define jaundiceLEDMode 1
-#define actuatorsMode 2
-#define pulseFound 3
-#define standByMode 4
-
 struct GPRSstruct {
   bool firstPost;
   bool postSN;
@@ -53,6 +58,7 @@ struct GPRSstruct {
   bool postRSSI;
   bool postCurrentConsumption;
   bool postHeaterPower;
+  bool postComment;
   int sendPeriod;
   long lastSent;
   char buffer[1024];
@@ -63,14 +69,14 @@ struct GPRSstruct {
   String longitud;
   String localDayTime;
   String localHourTime;
-  int RSSI;
+  String comment;
+  String RSSI;
   bool readLatitud;
   bool readLongitud;
   bool readLocalDayTime;
   bool readLocalHourTime;
   String token;
-  String line;
-  String lastLine;
+  String reply;
   long lastEvent;
   bool processSuccess;
   bool readToken;
@@ -96,6 +102,7 @@ void initGPRS()
 {
   Serial.begin(115200);
   Serial1.begin(115200);
+  setPostVariables(defaultPost, "First Post");
   GPRS.sendPeriod = 10800; //in secs
   GPRS.postBabyTemp = 1;
   GPRS.postHumidity = 1;
@@ -107,7 +114,7 @@ void GPRSHandler() {
     GPRSPowerUp();
   }
   if (GPRS.location) {
-    GPRSLocation();
+    getLocation();
   }
   if (GPRS.connect) {
     GPRSStablishConnection();
@@ -150,7 +157,7 @@ void GPRSStatusHandler() {
   }
 }
 
-void GPRSLocation() {
+void getLocation() {
   switch (GPRS.process) {
     case 0:
       GPRS.processTime = millis();
@@ -205,6 +212,7 @@ void GPRSLocation() {
         GPRS.powerUp = 1;
       }
       else {
+        setPostVariables(addLocation, "");
         GPRS.firstPost = 1;
         GPRS.post = 1;
       }
@@ -312,6 +320,21 @@ void GPRSStablishConnection() {
       checkSerial("OK", "ERROR");
       break;
     case 11:
+      Serial1.write("AT+CSQ\n");
+      GPRS.process++;
+      break;
+    case 12:
+      GPRS.RSSI = checkSerial(",", "ERROR");
+      if (GPRS.RSSI.length()) {
+        if (GPRS.RSSI.length() == 10) {
+          GPRS.RSSI = String(GPRS.RSSI.charAt(7)) + String(GPRS.RSSI.charAt(8));
+        }
+        else {
+          GPRS.RSSI = String(GPRS.RSSI.charAt(7));
+        }
+      }
+      break;
+    case 13:
       if (GPRS.processSuccess) {
         GPRS.connectionStatus = 1;
       }
@@ -428,6 +451,7 @@ void GPRSPost() {
       logln("GPRS POST SUCCESS");
       GPRS.post = 0;
       GPRS.process = 0;
+      setPostVariables(removeLocation, "");
       break;
   }
 }
@@ -513,39 +537,52 @@ String checkSerial(String success, String error) {
   if (!GPRS.initVars) {
     GPRS.initVars = 1;
     GPRS.enable = 1;
-    GPRS.line = "";
-    GPRS.lastLine = "";
+    GPRS.reply = "";
   }
 
   if (GPRS.charToRead) {
-    char c = GPRS.buffer[GPRS.bufferPos];
-    GPRS.charToRead--;
-    GPRS.bufferPos++;
+    GPRS.reply += String(GPRS.buffer[GPRS.bufferPos]);
     if (GPRS.bufferPos > 1023) {
       GPRS.bufferPos = 0;
     }
-    if (c == '\r') {
-      if (!GPRS.post || GPRS.process != 5) {
-        log(GPRS.line + '\r');
-      }
-      GPRS.lastLine = GPRS.line;
-      GPRS.line = "";
-      if (GPRS.lastLine.equals(success) || GPRS.lastLine.equals(error)) {
-        if (GPRS.lastLine == error) {
-          GPRS.processSuccess = 0;
+    if (GPRS.buffer[GPRS.bufferPos] == '\r') {
+      log(GPRS.reply);
+      GPRS.reply = "";
+    }
+    if (GPRS.buffer[GPRS.bufferPos] == success.charAt(success.length() - 1)) {
+      bool foundSuccessString = 1;
+      for (int i = 0; i < success.length(); i++) {
+        if (GPRS.buffer[GPRS.bufferPos - success.length() + i + 1] != success.charAt(i)) {
+          foundSuccessString = 0;
         }
+      }
+      if (foundSuccessString) {
+        log(GPRS.reply);
+        GPRS.initVars = 0;
+        GPRS.process++;
+        clearGPRSBuffer();
+        return (GPRS.reply);
+      }
+    }
+    if (GPRS.buffer[GPRS.bufferPos] == success.charAt(error.length() - 1)) {
+      bool foundErrorString = 1;
+      for (int i = 0; i < error.length(); i++) {
+        if (GPRS.buffer[GPRS.bufferPos - error.length() + i + 1] != error.charAt(i)) {
+          foundErrorString = 0;
+        }
+      }
+      if (foundErrorString) {
+        log(GPRS.reply);
+        GPRS.processSuccess = 0;
         GPRS.initVars = 0;
         GPRS.process++;
         clearGPRSBuffer();
       }
     }
-    else {
-      if (c != '\n') {
-        GPRS.line = GPRS.line + String(c);
-      }
-    }
+    GPRS.charToRead--;
+    GPRS.bufferPos++;
   }
-  return GPRS.line;
+  return "";
 }
 
 void clearGPRSBuffer() {
@@ -557,9 +594,56 @@ void clearGPRSBuffer() {
   GPRS.bufferWritePos = 0;
 }
 
-void setPostVariables(byte postContent) {
+void setPostVariables(byte postContent, String postComment) {
+  if (postComment.length()) {
+    GPRS.postComment = 1;
+    GPRS.comment += postComment;
+  }
+  else {
+    GPRS.comment = "";
+  }
   switch (postContent) {
-    case firstPost:
+    case defaultPost:
+      GPRS.postBabyTemp = 1;
+      GPRS.postHeaterTemp = 1;
+      GPRS.postBoardTemp1 = 1;
+      GPRS.postBoardTemp2 = 1;
+      GPRS.postBoardTemp3 = 1;
+      GPRS.postHumidity = 1;
+      GPRS.RSSI = 1;
+      GPRS.postCurrentConsumption = 1;
+      break;
+    case addLocation:
+      GPRS.postLatitud = 1;
+      GPRS.postLongitud = 1;
+      break;
+    case removeLocation:
+      GPRS.postLatitud = 0;
+      GPRS.postLongitud = 0;
+      break;
+    case jaundiceLEDON:
+      GPRS.postJaundicePower = 1;
+      break;
+    case jaundiceLEDOFF:
+      GPRS.postJaundicePower = 0;
+      break;
+    case actuatorsModeON:
+      GPRS.postJaundicePower = 1;
+      GPRS.postHeaterPower = 1;
+      break;
+    case actuatorsModeOFF:
+      GPRS.postJaundicePower = 0;
+      GPRS.postHeaterPower = 0;
+      break;
+    case pulseFound:
+      GPRS.postBPM = 1;
+      GPRS.postIBI = 1;
+      GPRS.postRPD = 1;
+      break;
+    case pulseLost:
+      GPRS.postBPM = 0;
+      GPRS.postIBI = 0;
+      GPRS.postRPD = 0;
       break;
   }
 }
@@ -588,11 +672,11 @@ bool GPRSLoadVariables() {
   if (GPRS.postLongitud) {
     req2[7] += ",\"Longitud\":\"" + GPRS.longitud + "\"";
   }
-  if (GPRS.postLatitud ) {
+  if (GPRS.postLatitud) {
     req2[7] += ",\"Latitud\":\"" + GPRS.latitud + "\"";
   }
   if (GPRS.RSSI) {
-    req2[7] += ",\"RSSI\":\"" + String(GPRS.RSSI) + "\"";
+    req2[7] += ",\"RSSI\":\"" + GPRS.RSSI + "\"";
   }
   if (GPRS.postJaundicePower) {
     req2[7] += ",\"JaundicePower\":\"" + String(jaundiceLEDIntensity) + "\"";
@@ -612,13 +696,16 @@ bool GPRSLoadVariables() {
   if (GPRS.postCurrentConsumption) {
     //add current consumption logic
   }
+  if (GPRS.postComment) {
+    req2[7] += ",\"Comment\":\"" + GPRS.comment + "\"";
+  }
   req2[7] += "}\n";
   logln("Posting: " + req2[7]);
   if (req2[7].indexOf("nan") >= 0) {
     logln("Detected zero");
     return false;
   }
-  if (req2[7].length > 1200) {
+  if (req2[7].length() > 1200) {
     logln("posting packet size oversized");
     return false;
   }

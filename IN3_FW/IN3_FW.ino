@@ -100,7 +100,7 @@ int pulsioximeterMultiplierFilterFactor = 1000;
 int pulsioximeterRestFilterFactor = 1;
 int pulsioximeterAmplitud;
 int pulsioximeterCounter[2];
-int IBI,BPM;
+int IBI, BPM;
 
 //current sensor variables
 float currentConsumption;
@@ -366,6 +366,6 @@ void setup() {
   mainMenu();
 }
 
-void loop(){
-  
+void loop() {
+
 }

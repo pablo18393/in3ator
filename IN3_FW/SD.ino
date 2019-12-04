@@ -48,13 +48,11 @@ void log(String dataString) {
       dataFile.print(";");
       dataFile.print(dataString);
       dataFile.close();
-      // print to the serial port too:
-      Serial.println(dataString);
     }
     digitalWrite(SD_CS, HIGH);
     digitalWrite(TFT_CS, LOW);
   }
-  Serial.print(dataString);
+  Serial.println(dataString);
 }
 
 void GPRSLocalLog() {
