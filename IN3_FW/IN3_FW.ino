@@ -342,7 +342,8 @@ int HeatermaxPWM = maxPWMvalue;      //max power for heater, full power is 50W
 #define NTCInterruptRate 20000    // in microseconds; 
 #define roomPIDRate 1000000    // in microseconds; 
 #define heaterPIDRate 200000   // times of roomPIDRate;
-#define GPRSISRRate 1000    // in microseconds, able to read 115200 baud rate uart; 
+#define GPRSISRRate 1000    // in microseconds, able to read 115200 baud rate uart;
+#define humidifierSignalPeriod 9  // in microseconds, signal to generate 110khz PWM signal
 int roomPIDfactor = roomPIDRate / NTCInterruptRate;
 int heaterPIDfactor = heaterPIDRate / NTCInterruptRate;
 volatile long interruptcounter;

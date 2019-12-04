@@ -74,6 +74,12 @@ void initTimers() {
     roomPIDTimer.resume();
   */
 
+  //setup humidifier Timer to generate 110khz PWM signal
+  humidifierTimer.pause();
+  humidifierTimer.setPeriod(humidifierSignalPeriod); // in microseconds
+  humidifierTimer.refresh();
+  humidifierTimer.resume();
+
   //sensors handling ISR configuration
   sensorsTimer.pause();
   sensorsTimer.setPeriod(sensorsISRRate); // in microseconds
