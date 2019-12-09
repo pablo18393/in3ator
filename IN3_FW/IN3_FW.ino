@@ -350,8 +350,8 @@ volatile long interruptcounter;
 
 HardwareTimer GSMTimer(1);
 HardwareTimer roomPIDTimer(2);
-HardwareTimer humidifierTimer(3);
-HardwareTimer sensorsTimer(8);
+HardwareTimer humidifierTimer(8);
+HardwareTimer sensorsTimer(3);
 
 void setup() {
   initBoard();

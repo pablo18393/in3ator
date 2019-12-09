@@ -6,7 +6,7 @@ void initBoard() {
   //initGPRS();
   initSensors();
   initTFT();
-  //initTimers();
+  initTimers();
 }
 
 void initSensors() {
@@ -80,6 +80,13 @@ void initTimers() {
   sensorsTimer.attachCompare1Interrupt(sensorsISR);
   sensorsTimer.refresh();
   sensorsTimer.resume();
+
+  //sensors handling ISR configuration
+  humidifierTimer.pause();
+  humidifierTimer.setPeriod(500); // in microseconds
+  humidifierTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
+  humidifierTimer.refresh();
+  humidifierTimer.resume();
 
   //GSM handling ISR configuration
   GSMTimer.pause();

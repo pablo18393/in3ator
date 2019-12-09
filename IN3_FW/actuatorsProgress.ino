@@ -176,7 +176,7 @@ void turnActuatorsOff() {
 }
 
 void turnFansOn() {
-  analogWrite(FAN_HP, fanSpeed * 2.55);
+  digitalWrite(FAN_HP, HIGH);
   digitalWrite(FAN_LP, HIGH);
 }
 

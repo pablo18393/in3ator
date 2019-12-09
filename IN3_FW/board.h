@@ -28,6 +28,7 @@
   #define THERMISTOR_INBOARD_RIGHT PC2 //PC2
   #define PULSIOXIMETER 7
   #define GSMRXPIN PA10
+  #define BUZZER PC7
 
   // Use hardware SPI lines+
   //Pins from 4-6 are SPI
