@@ -5,8 +5,6 @@ void initSensors() {
   if (BME280Sensor) {
     bme.begin();
   }
-  A_set = true;
-  B_set = false;
   // timer setup for encoder
   initPulsioximeterVariables();
 }
