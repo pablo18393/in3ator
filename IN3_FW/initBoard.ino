@@ -10,23 +10,6 @@ void initBoard() {
   initTimers();
 }
 
-void initSensors() {
-  if (DHTSensor) {
-    dht.setup(DHTPIN);
-  }
-  if (BME280Sensor) {
-    bme.begin();
-  }
-  A_set = false;
-  B_set = false;
-  pinMode(encoderpinA, INPUT_PULLUP);
-  pinMode(encoderpinB, INPUT_PULLUP);
-  attachInterrupt(ENC_A, encoderISR, CHANGE);
-  attachInterrupt(ENC_B, encoderISR, CHANGE);
-  // timer setup for encoder
-  initPulsioximeterVariables();
-}
-
 void initTFT() {
   SPI.setModule(SPI_SEL);
   tft.begin();
@@ -46,6 +29,8 @@ void pinDirection() {
   pinMode(HEATER, OUTPUT);
   pinMode(HEATER, OUTPUT);
   pinMode(GPRS_PWRKEY, OUTPUT);
+  pinMode(encoderpinA, INPUT_PULLUP);
+  pinMode(encoderpinB, INPUT_PULLUP);
 
   digitalWrite(SCREENBACKLIGHT, HIGH);
   digitalWrite(JAUNDICE, LOW);
@@ -60,8 +45,6 @@ void pinDirection() {
 
 
 void initTimers() {
-  // PID setup
-/*
   roomPIDTimer.pause();
   roomPIDTimer.setPeriod(NTCInterruptRate); // in microseconds
   roomPIDTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
@@ -72,7 +55,6 @@ void initTimers() {
   heaterPID.SetOutputLimits(0, HeatermaxPWM);
   roomPIDTimer.refresh();
   roomPIDTimer.resume();
-*/
 
   //sensors handling ISR configuration
   sensorsTimer.pause();
@@ -84,6 +66,21 @@ void initTimers() {
   sensorsTimer.refresh();
   sensorsTimer.resume();
 
+  encoderTimer.pause();
+  encoderTimer.setPeriod(encoderISRRate); // in microseconds
+  encoderTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
+  encoderTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
+  encoderTimer.attachCompare1Interrupt(encoderISR);
+  encoderTimer.refresh();
+  encoderTimer.resume();
+
+  //humidifier timer configuration
+  humidifierTimer.pause();
+  humidifierTimer.setPeriod(humidifierTimerRate); // in microseconds
+  humidifierTimer.refresh();
+  humidifierTimer.resume();
+
+  //GPRS timer configuration
   GPRSTimer.pause();
   GPRSTimer.setPeriod(GPRSISRRate); // in microseconds
   GPRSTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);

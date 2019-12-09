@@ -1,5 +1,18 @@
+void initSensors() {
+  if (DHTSensor) {
+    dht.setup(DHTPIN);
+  }
+  if (BME280Sensor) {
+    bme.begin();
+  }
+  A_set = true;
+  B_set = false;
+  // timer setup for encoder
+  initPulsioximeterVariables();
+}
 
 void sensorsISR() {
+  encoderISR();
   measurenumNTC();
   readPulsioximeter();
   if (!pulsioximeterCount) {
@@ -135,24 +148,22 @@ bool updateHumidity() {
 }
 
 void encoderISR() {
-  if (millis() - last_encoder_move > encoder_debounce_time) {
-    if ( (digitalRead(ENC_A))  != A_set )
+  if ( (digitalRead(ENC_A))  != A_set )
+  {
+    A_set = !A_set;
+    if ( A_set && !B_set)
     {
-      A_set = !A_set;
-      if ( A_set && !B_set)
-      {
-        EncMove = 1;
-      }
-    }
-    if ( (digitalRead(ENC_B))  != B_set)
-    {
-      B_set = !B_set;
-      if ( B_set && !A_set )
-        EncMove = -1;
+      last_something=millis();
+      EncMove = 1;
     }
   }
-  last_encoder_move = millis();
-  last_something = millis();
+  if ( (digitalRead(ENC_B))  != B_set)
+  {
+    B_set = !B_set;
+    if ( B_set && !A_set )
+      EncMove = -1;
+      last_something=millis();
+  }
 }
 
 void asleep() {

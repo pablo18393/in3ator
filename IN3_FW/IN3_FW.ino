@@ -342,6 +342,8 @@ int HeatermaxPWM = maxPWMvalue;      //max power for heater, full power is 50W
 #define roomPIDRate 1000000    // in microseconds; 
 #define heaterPIDRate 200000   // times of roomPIDRate;
 #define GPRSISRRate 1000    // in microseconds, able to read 115200 baud rate uart; 
+#define encoderISRRate 1000    // in microseconds; 
+#define humidifierTimerRate 9 //in microseconds, to generate a 110Khz PWM for ultra sonic humidifier
 int roomPIDfactor = roomPIDRate / NTCInterruptRate;
 int heaterPIDfactor = heaterPIDRate / NTCInterruptRate;
 volatile long interruptcounter;
@@ -358,6 +360,7 @@ volatile long interruptcounter;
 HardwareTimer GPRSTimer(1);
 HardwareTimer roomPIDTimer(2);
 HardwareTimer humidifierTimer(3);
+HardwareTimer encoderTimer(4);
 HardwareTimer sensorsTimer(8);
 
 void setup() {
