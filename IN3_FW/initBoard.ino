@@ -3,8 +3,9 @@ void initBoard() {
   pinDirection();
   //hardwareVerification();
   initEEPROM();
-  //initGPRS();
   initSensors();
+  initSD();
+  initGPRS();
   initTFT();
   initTimers();
 }
@@ -30,7 +31,7 @@ void initTFT() {
   SPI.setModule(SPI_SEL);
   tft.begin();
   tft.setRotation(1);
-  //loadLogo();
+  //loadlogo();
 }
 
 void pinDirection() {
@@ -40,11 +41,11 @@ void pinDirection() {
   pinMode(POWER_EN, OUTPUT);
   pinMode(FAN_HP, OUTPUT);
   pinMode(FAN_LP, OUTPUT);
-  pinMode(STERILIZE, OUTPUT);
+  pinMode(STERILIZE_CTL, OUTPUT);
   pinMode(HUMIDIFIER, OUTPUT);
   pinMode(HEATER, OUTPUT);
   pinMode(HEATER, OUTPUT);
-  pinMode(GSM_PWRKEY, OUTPUT);
+  pinMode(GPRS_PWRKEY, OUTPUT);
 
   digitalWrite(SCREENBACKLIGHT, HIGH);
   digitalWrite(JAUNDICE, LOW);
@@ -52,14 +53,15 @@ void pinDirection() {
   digitalWrite(POWER_EN, HIGH);
   digitalWrite(FAN_HP, LOW);
   digitalWrite(FAN_LP, LOW);
-  digitalWrite(STERILIZE, LOW);
+  digitalWrite(STERILIZE_CTL, LOW);
   digitalWrite(HUMIDIFIER, LOW);
-  digitalWrite(GSM_PWRKEY, LOW);
+  digitalWrite(GPRS_PWRKEY, HIGH);
 }
 
 
 void initTimers() {
   // PID setup
+/*
   roomPIDTimer.pause();
   roomPIDTimer.setPeriod(NTCInterruptRate); // in microseconds
   roomPIDTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
@@ -70,7 +72,7 @@ void initTimers() {
   heaterPID.SetOutputLimits(0, HeatermaxPWM);
   roomPIDTimer.refresh();
   roomPIDTimer.resume();
-
+*/
 
   //sensors handling ISR configuration
   sensorsTimer.pause();
@@ -78,22 +80,17 @@ void initTimers() {
   sensorsTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
   sensorsTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
   sensorsTimer.attachCompare1Interrupt(sensorsISR);
+  nvic_irq_set_priority(NVIC_TIMER8_CC, 1);
   sensorsTimer.refresh();
   sensorsTimer.resume();
 
-  //sensors handling ISR configuration
-  humidifierTimer.pause();
-  humidifierTimer.setPeriod(500); // in microseconds
-  humidifierTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
-  humidifierTimer.refresh();
-  humidifierTimer.resume();
-
-  //GSM handling ISR configuration
-  GSMTimer.pause();
-  GSMTimer.setPeriod(GSMISRRate); // in microseconds
-  GSMTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
-  GSMTimer.setCompare(TIMER_CH2, 1);  // Interrupt 1 count after each update
-  GSMTimer.attachCompare1Interrupt(GSMISR);
-  GSMTimer.refresh();
-  GSMTimer.resume();
+  GPRSTimer.pause();
+  GPRSTimer.setPeriod(GPRSISRRate); // in microseconds
+  GPRSTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
+  GPRSTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
+  GPRSTimer.attachCompare1Interrupt(GPRSHandler);
+  nvic_irq_set_priority(NVIC_TIMER1_CC, 2);
+  nvic_irq_set_priority(NVIC_USART1 , 0);
+  GPRSTimer.refresh();
+  GPRSTimer.resume();
 }

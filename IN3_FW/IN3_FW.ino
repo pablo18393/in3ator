@@ -10,10 +10,14 @@
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
+#include <SD.h>
+#include <TimeLib.h>
+
 
 //Firmware version and head title of UI screen
 #define FWversion "v2.3"
 #define headingTitle "in3ator"
+String serialNumber = "bqTest000001";
 
 //configuration variables
 #define debounceTime 100         //encoder debouncing time
@@ -41,7 +45,7 @@ int language;
 #define CheckSensorRaiseTemp 3   //(in celsius degrees) Due to a probable missplacement issue, a Temperature difference threshold is set to distinguish between heater or room NTC at the beggining of a thermal control
 
 //number assignment of each enviromental sensor for later call in variable
-#define roomNTC 0
+#define babyNTC 0
 #define heaterNTC 1
 #define inBoardLeftNTC 2
 #define inBoardRightNTC 3
@@ -107,7 +111,7 @@ double desiredHeaterTemp; //desired temperature in heater
 
 //preset environmental variables
 const byte standardmaxHeaterTemp = 85; //preset max heater temperature in celsious
-const byte standardFanSpeed = 100; 
+const byte standardFanSpeed = 100;
 
 //constants
 const byte heaterMaxTemp = 100; //maximum temperature in heater to be set
@@ -115,7 +119,7 @@ const byte minTemp = 15; //minimum allowed temperature to be set
 const byte maxTemp = 45; //maximum allowed temperature to be set
 const byte maxHum = 100; //maximum allowed humidity to be set
 const byte minHum = 20; //minimum allowed humidity to be set
-const byte maxGestation = 50; //maximum gestation weeks to be set
+const byte maxGestation = 99; //maximum gestation weeks to be set
 const byte minGestation = 1; //minimum gestation weeks to be set
 const byte LEDMaxIntensity = 100; //max LED intensity to be set
 const byte fanMaxSpeed = 100; //max fan speed (percentage) to be set
@@ -192,7 +196,7 @@ const byte time_back_draw = 255;
 const byte time_back_wait = 255;
 long last_something; //last time there was a encoder movement or pulse
 long CheckTempSensorPinTimeout = 45000; //timeout for checking the thermistor pinout
-long temp_update_rate = 1000;
+long sensorsUpdateRate = 2000;
 int blinkTimeON = 1000; //displayed text ON time
 int blinkTimeOFF = 100; //displayed text OFF time
 bool selected;
@@ -202,7 +206,7 @@ char* helpMessage;
 byte bar_pos;
 byte rectangles;
 byte length;
-long last_temp_update;
+long lastSensorsUpdate;
 bool enableSetProcess;
 long blinking;
 bool state_blink;
@@ -280,7 +284,7 @@ byte errorHardwareCode[hardwareComponents];
 #define HWFAN_HP 1
 #define HWFAN_LP 1
 #define HWJAUNDICE 1
-#define HWSterilize 1
+#define HWSTERILIZE_CTL 1
 #define HWHumidifier 1
 #define HWNTCHeater 1
 #define HWNTCRoom 1
@@ -292,7 +296,7 @@ byte errorHardwareCode[hardwareComponents];
 #define HW_NUM_FAN_HP 3            //hardware 4
 #define HW_NUM_FAN_LP 4            //hardware 5
 #define HW_NUM_JAUNDICE 6             //hardware 7
-#define HW_NUM_Sterilize 7       //hardware 8
+#define HW_NUM_STERILIZE_CTL 7       //hardware 8
 #define HW_NUM_Humidifier 8      //hardware 9
 #define HW_NUM_NTCHeater 9       //hardware 10
 #define HW_NUM_NTCRoom 10         //hardware 11
@@ -305,7 +309,7 @@ byte errorHardwareCode[hardwareComponents];
 #define HW_CRIT_FAN_HP 0
 #define HW_CRIT_FAN_LP 0
 #define HW_CRIT_JAUNDICE 1
-#define HW_CRIT_Sterilize 1
+#define HW_CRIT_STERILIZE_CTL 1
 #define HW_CRIT_Humidifier 1
 #define HW_CRIT_NTCHeater 2
 #define HW_CRIT_NTCRoom 2
@@ -314,11 +318,14 @@ byte errorHardwareCode[hardwareComponents];
 #define shortcircuit 2
 #define opencircuit 1
 
-bool hardwareMounted[] = {HWPowerEn, HWHeater, HWFAN_HP, HWFAN_LP, HWJAUNDICE, HWSterilize, HWHumidifier, HWNTCHeater, HWNTCRoom, HWHUMSensor};
-bool hardwareCritical[] = {HW_CRIT_PowerEn, HW_CRIT_Heater, HW_CRIT_FAN_HP, HW_CRIT_FAN_LP, HW_CRIT_JAUNDICE, HW_CRIT_Sterilize, HW_CRIT_Humidifier, HW_CRIT_NTCHeater, HW_CRIT_NTCRoom, HW_CRIT_HUMSENSOR};
-byte hardwareVerificationPin[] = {POWER_EN, HEATER, FAN_HP, FAN_LP, JAUNDICE, STERILIZE, HUMIDIFIER};
-byte hardwareVerificationPin_FB[] = {POWER_EN_FB, HEATER_FB, FAN_HP_FB, FAN_LP_FB, JAUNDICE_FB, STERILIZER_FB, HUMIDIFIER_FB};
-char* errorComponent[] = {"Power enable MOSFET", "Heater", "FAN_HP", "FAN_LP", "Jaundice LED", "Sterilizer", "Humidifier", "Temperature sensor", "Temperature sensor", "Humidity sensor"};
+#define ON true
+#define OFF false
+
+bool hardwareMounted[] = {HWPowerEn, HWHeater, HWFAN_HP, HWFAN_LP, HWJAUNDICE, HWSTERILIZE_CTL, HWHumidifier, HWNTCHeater, HWNTCRoom, HWHUMSensor};
+bool hardwareCritical[] = {HW_CRIT_PowerEn, HW_CRIT_Heater, HW_CRIT_FAN_HP, HW_CRIT_FAN_LP, HW_CRIT_JAUNDICE, HW_CRIT_STERILIZE_CTL, HW_CRIT_Humidifier, HW_CRIT_NTCHeater, HW_CRIT_NTCRoom, HW_CRIT_HUMSENSOR};
+byte hardwareVerificationPin[] = {POWER_EN, HEATER, FAN_HP, FAN_LP, JAUNDICE, STERILIZE_CTL, HUMIDIFIER};
+byte hardwareVerificationPin_FB[] = {POWER_EN_FB, HEATER_FB, FAN_HP_FB, FAN_LP_FB, JAUNDICE_FB, STERILIZE_FB, HUMIDIFIER_FB};
+char* errorComponent[] = {"Power enable MOSFET", "Heater", "FAN_HP", "FAN_LP", "Jaundice LED", "STERILIZE_CTLr", "Humidifier", "Temperature sensor", "Temperature sensor", "Humidity sensor"};
 bool testOK;
 bool testCritical;
 bool criticalError;
@@ -330,11 +337,11 @@ Adafruit_BME280 bme(BME_CS); // hardware SPI, //BME280 (humidity, pressure and t
 int HeatermaxPWM = maxPWMvalue;      //max power for heater, full power is 50W
 
 // timers configuration
-#define sensorsISRRate 1000    // in microseconds; 
+#define sensorsISRRate 5000    // in microseconds, also for BUZZER optimal frequency (2khz); 
 #define NTCInterruptRate 20000    // in microseconds; 
 #define roomPIDRate 1000000    // in microseconds; 
 #define heaterPIDRate 200000   // times of roomPIDRate;
-#define GSMISRRate 1000    // in microseconds; 
+#define GPRSISRRate 1000    // in microseconds, able to read 115200 baud rate uart; 
 int roomPIDfactor = roomPIDRate / NTCInterruptRate;
 int heaterPIDfactor = heaterPIDRate / NTCInterruptRate;
 volatile long interruptcounter;
@@ -348,12 +355,16 @@ volatile long interruptcounter;
   8     PC6   PC7   PC8    PC9
 */
 
-HardwareTimer GSMTimer(1);
+HardwareTimer GPRSTimer(1);
 HardwareTimer roomPIDTimer(2);
-HardwareTimer humidifierTimer(8);
-HardwareTimer sensorsTimer(3);
+HardwareTimer humidifierTimer(3);
+HardwareTimer sensorsTimer(8);
 
 void setup() {
   initBoard();
   mainMenu();
+}
+
+void loop(){
+  
 }

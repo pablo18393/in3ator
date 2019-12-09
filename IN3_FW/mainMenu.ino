@@ -45,8 +45,9 @@ void askSuccess() {
     if (temperaturePIDcontrol) {
       stopPID();
     }
-    turnActuatorsOff();
-    turnFansOff();
+    turnActuators(OFF);
+    turnSterilizeLED(OFF);
+    turnFans(OFF);
   }
   page = askSuccessPage;
   bar_pos = 2;

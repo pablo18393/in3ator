@@ -1,11 +1,14 @@
-
 int updateData() {
-  if (page == advancedModePage || page == actuatorsProgressPage) {
-    if (millis() - last_temp_update > temp_update_rate) {
+  if (millis() - lastSensorsUpdate > sensorsUpdateRate) {
+    if (page == advancedModePage || page == actuatorsProgressPage) {
       updateSensors();
       if (page == actuatorsProgressPage) {
         printStatus();
       }
+      lastSensorsUpdate = millis();
+    }
+    else {
+      updateHumidity();
     }
   }
   if ((page == mainMenuPage || page == advancedModePage) && !enableSet) {
@@ -30,16 +33,17 @@ void checkNewPulsioximeterData() {
 void updateSensors() {
   tft.setTextColor(COLOR_MENU);
   if (page == advancedModePage || (page == actuatorsProgressPage && controlTemperature)) {
-    tft.drawFloat(previousTemperature[roomNTC], 1, temperatureX, temperatureY, textFontSize);
+    tft.drawFloat(previousTemperature[babyNTC], 1, temperatureX, temperatureY, textFontSize);
+    //logln("Prev temp: " + String(previousTemperature[babyNTC], 2));
   }
   if (page != actuatorsProgressPage && page != mainMenuPage || controlHumidity) {
     drawHumidity();
   }
-  updateTemp(numNTC);
   tft.setTextColor(COLOR_MENU_TEXT);
   if (page == advancedModePage || (page == actuatorsProgressPage && controlTemperature)) {
-    tft.drawFloat(temperature[roomNTC], 1, temperatureX, temperatureY, textFontSize);
-    previousTemperature[roomNTC] = temperature[roomNTC];
+    tft.drawFloat(temperature[babyNTC], 1, temperatureX, temperatureY, textFontSize);
+    previousTemperature[babyNTC] = temperature[babyNTC];
+    //logln("Prev temp: " + String(previousTemperature[babyNTC], 2));
   }
   if (page == actuatorsProgressPage) {
     if (controlTemperature) {
@@ -47,7 +51,7 @@ void updateSensors() {
       if (displayProcessPercentage) {
         drawRightNumber(temperaturePercentage, tft.width() / 2, temperatureY);
       }
-      temperaturePercentage = 100 - ((desiredSkinTemp - temperature[roomNTC]) * 100 / (desiredSkinTemp - temperatureAtStart));
+      temperaturePercentage = 100 - ((desiredSkinTemp - temperature[babyNTC]) * 100 / (desiredSkinTemp - temperatureAtStart));
       if (temperaturePercentage > 99) {
         temperaturePercentage = 100;
       }
@@ -73,26 +77,25 @@ void updateSensors() {
       updateLoadingHumidityBar(int(previousHumidityPercentage), int(humidityPercentage));
     }
   }
-  last_temp_update = millis();
 }
 
 void checkSerialPort() {
-  if (Serial1.available()) {
-    switch (Serial1.read()) {
+  if (Serial.available()) {
+    switch (Serial.read()) {
       case 'T':
-        Serial1.println(temperature[0]);
+        Serial.println(temperature[0]);
         break;
       case 'P':
-        Serial1.println("PING");
+        Serial.println("PING");
         break;
       case 'I':
         pinMode(PB1, INPUT_PULLUP);
-        Serial1.println("INPUT");
+        Serial.println("INPUT");
         break;
       case 'A':
-        Serial1.println(analogRead(PB1));
+        Serial.println(analogRead(PB1));
         /*        while (1) {
-                  Serial1.println(analogRead(PB1));
+                  Serial.println(analogRead(PB1));
                   delay(15);
                   }
         */
@@ -104,8 +107,8 @@ void checkSerialPort() {
       case 'T':
         switch (Serial.read()) {
           case 'C':
-            diffTemperature[roomNTC] = temperature[roomNTC] - readSerialData();
-            temperature[roomNTC] -= diffTemperature[roomNTC];
+            diffTemperature[babyNTC] = temperature[babyNTC] - readSerialData();
+            temperature[babyNTC] -= diffTemperature[babyNTC];
             break;
           case 'H':
             diffTemperature[heaterNTC] = temperature[heaterNTC] - readSerialData();
@@ -119,18 +122,18 @@ void checkSerialPort() {
         break;
       case 'P':
         HeatermaxPWM = readSerialData();
-        Serial.print("Heater max PWM is: ");
-        Serial.println(HeatermaxPWM);
+        //log("Heater max PWM is: ");
+        //logln(String(HeatermaxPWM));
         break;
       case 'R':
         nvic_sys_reset();
         break;
       case 'W':
         byte humidifierPWM;
-        Serial.print("Humidifier working PWM is: ");
+        //log("Humidifier working PWM is: ");
         humidifierPWM = readSerialData();
         analogWrite(HUMIDIFIER, humidifierPWM);
-        Serial.println(humidifierPWM);
+        //logln(String(humidifierPWM));
         break;
     }
   }
@@ -147,23 +150,23 @@ int readSerialData() {
 }
 
 void printStatus() {
-  Serial.print(millis() / 1000);
-  Serial.print(";");
-  Serial.print(desiredSkinTemp);
-  Serial.print(";");
-  Serial.print(maxHeaterTemp);
-  Serial.print(";");
+  //log(millis() / 1000);
+  //log(";");
+  //log(desiredSkinTemp);
+  //log(";");
+  //log(maxHeaterTemp);
+  //log(";");
   for (int i = 0; i < numTempSensors; i++) {
-    Serial.print(temperature[i]);
-    Serial.print(";");
+    //log(temperature[i]);
+    //log(";");
   }
-  Serial.print(desiredHeaterTemp);
-  Serial.print(";");
-  Serial.print(humidity);
-  Serial.print(";");
-  Serial.print(desiredRoomHum);
-  Serial.print(";");
-  Serial.print(heaterPower);
-  Serial.print(";");
-  Serial.println(PIDOutput[heaterNTC]);
+  //log(desiredHeaterTemp);
+  //log(";");
+  //log(humidity);
+  //log(";");
+  //log(desiredRoomHum);
+  //log(";");
+  //log(heaterPower);
+  //log(";");
+  //logln(String(PIDOutput[heaterNTC]));
 }

@@ -1,5 +1,6 @@
 
 void sensorsISR() {
+  measurenumNTC();
   readPulsioximeter();
   if (!pulsioximeterCount) {
     pulsioximeterCount = pulsioximeterRate;
@@ -42,7 +43,12 @@ void measurenumNTC() {
   }
   temperature_measured++;
   if (temperature_measured == temperature_fraction) {
+    updateTemp(numNTC);
     temperature_measured = 0;
+  }
+  if (millis() - lastSensorsUpdate > sensorsUpdateRate) {
+    updateHumidity();
+    lastSensorsUpdate = millis();
   }
 }
 
@@ -58,16 +64,16 @@ void updateTemp(byte sensor) {
   byte endSensor;
 
   switch (sensor) {
-    case roomNTC:
-      startSensor = roomNTC;
-      endSensor = roomNTC;
+    case babyNTC:
+      startSensor = babyNTC;
+      endSensor = babyNTC;
       break;
     case heaterNTC:
       startSensor = heaterNTC;
       endSensor = heaterNTC;
       break;
     case numNTC:
-      startSensor = roomNTC;
+      startSensor = babyNTC;
       endSensor = heaterNTC;
       break;
   }

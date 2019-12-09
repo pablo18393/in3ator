@@ -36,11 +36,11 @@ void initEEPROM() {
       EEPROM.write(i, 0);
     }
     loadStandardValues();
-    Serial.println("first turn on");
+    //logln("first turn on");
     //firstTurnOn();
   }
   else {
-    Serial.println("Recap all variables");
+    //logln("Recap all variables");
     recapVariables();
   }
   if (!language) {
@@ -68,11 +68,11 @@ void loadStandardValues() {
 void recapVariables() {
   auto_lock = EEPROM.read(EEPROM_autoLock);
   language = EEPROM.read(EEPROM_language);
-  diffTemperature[roomNTC] = EEPROM.read(EEPROM_diffTemperature);
-  if (diffTemperature[roomNTC] > 1000) {
-    diffTemperature[roomNTC] -= 65535;
+  diffTemperature[babyNTC] = EEPROM.read(EEPROM_diffTemperature);
+  if (diffTemperature[babyNTC] > 1000) {
+    diffTemperature[babyNTC] -= 65535;
   }
-  diffTemperature[roomNTC] /= 10;
+  diffTemperature[babyNTC] /= 10;
   diffHumidity = EEPROM.read(EEPROM_diffHumidity);
   if (diffHumidity > 1000) {
     diffHumidity -= 65535;

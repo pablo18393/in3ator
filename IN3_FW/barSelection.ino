@@ -193,10 +193,10 @@ void barSelection() {
         case askSuccessPage:
           switch (bar_pos - graphicTextOffset ) {
             case afirmativeGraphicPosition:
-              //add here affirmative message to GSM transmit
+              //add here affirmative message to GPRS transmit
               break;
             case negativeGraphicPosition:
-              //add here affirmative message to GSM transmit
+              //add here affirmative message to GPRS transmit
               break;
           }
           mainMenu();
@@ -342,7 +342,7 @@ void barSelection() {
             case fanGraphicPosition:
               while (digitalRead(ENC_SWITCH)) {
                 updateData();
-                turnFansOn();
+                turnFans(ON);
                 if (EncMove && -EncMove + fanSpeed >= 0 && -EncMove + fanSpeed <= fanMaxSpeed) {
                   tft.setTextColor(COLOR_MENU);
                   drawRightNumber(fanSpeed, 280, ypos);
@@ -366,7 +366,7 @@ void barSelection() {
                 }
                 EncMove = 0;
               }
-              turnFansOff();
+              turnFans(OFF);
               break;
             case setStandardValuesGraphicPosition:
               loadStandardValues();
@@ -384,14 +384,14 @@ void barSelection() {
                 updateData();
                 if (EncMove) {
                   tft.setTextColor(COLOR_MENU);
-                  tft.drawFloat(previousTemperature[roomNTC], 1, valuePosition, ypos, textFontSize);
+                  tft.drawFloat(previousTemperature[babyNTC], 1, valuePosition, ypos, textFontSize);
                   tft.setTextColor(COLOR_MENU_TEXT);
-                  diffTemperature[roomNTC] += EncMove * (0.1);
-                  temperature[roomNTC] += EncMove * (0.1);
-                  tft.drawFloat(temperature[roomNTC], 1, valuePosition, ypos, textFontSize);
-                  previousTemperature[roomNTC] = temperature[roomNTC];
+                  diffTemperature[babyNTC] += EncMove * (0.1);
+                  temperature[babyNTC] += EncMove * (0.1);
+                  tft.drawFloat(temperature[babyNTC], 1, valuePosition, ypos, textFontSize);
+                  previousTemperature[babyNTC] = temperature[babyNTC];
                   EncMove = 0;
-                  EEPROM.write(EEPROM_diffTemperature, int(diffTemperature[roomNTC] * 10));
+                  EEPROM.write(EEPROM_diffTemperature, int(diffTemperature[babyNTC] * 10));
                 }
               }
               break;
@@ -411,9 +411,9 @@ void barSelection() {
               }
               break;
             case restartCalibrationValuesTempGraphicPosition:
-              diffTemperature[roomNTC] = 0;
+              diffTemperature[babyNTC] = 0;
               diffHumidity = 0;
-              EEPROM.write(EEPROM_diffTemperature, diffTemperature[roomNTC]);
+              EEPROM.write(EEPROM_diffTemperature, diffTemperature[babyNTC]);
               EEPROM.write(EEPROM_diffHumidity, diffHumidity);
               updateHumidity();
               updateTemp(numNTC);
