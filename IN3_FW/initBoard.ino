@@ -31,6 +31,7 @@ void pinDirection() {
   pinMode(GPRS_PWRKEY, OUTPUT);
   pinMode(encoderpinA, INPUT_PULLUP);
   pinMode(encoderpinB, INPUT_PULLUP);
+  pinMode(SYSTEM_SHUNT, INPUT);
 
   digitalWrite(SCREENBACKLIGHT, HIGH);
   digitalWrite(JAUNDICE, LOW);
