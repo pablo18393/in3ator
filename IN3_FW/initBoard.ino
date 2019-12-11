@@ -63,14 +63,14 @@ void initTimers() {
   sensorsTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
   sensorsTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
   sensorsTimer.attachCompare1Interrupt(sensorsISR);
-  nvic_irq_set_priority(NVIC_TIMER8_CC, 1);
+  nvic_irq_set_priority(NVIC_TIMER8_CC, 15);
   sensorsTimer.refresh();
   sensorsTimer.resume();
 
   encoderTimer.pause();
   encoderTimer.setPeriod(encoderISRRate); // in microseconds
   encoderTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
-  encoderTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
+  encoderTimer.setCompare(TIMER_CH4, 1);  // Interrupt 1 count after each update
   encoderTimer.attachCompare1Interrupt(encoderISR);
   encoderTimer.refresh();
   encoderTimer.resume();
@@ -85,10 +85,10 @@ void initTimers() {
   GPRSTimer.pause();
   GPRSTimer.setPeriod(GPRSISRRate); // in microseconds
   GPRSTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
-  GPRSTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
+  GPRSTimer.setCompare(TIMER_CH3, 1);  // Interrupt 1 count after each update
   GPRSTimer.attachCompare1Interrupt(GPRSHandler);
-  nvic_irq_set_priority(NVIC_TIMER1_CC, 2);
-  nvic_irq_set_priority(NVIC_USART1 , 0);
+  nvic_irq_set_priority(NVIC_TIMER1_CC, 14);
+  nvic_irq_set_priority(NVIC_USART1 , 13);
   GPRSTimer.refresh();
   GPRSTimer.resume();
 }

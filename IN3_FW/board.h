@@ -6,8 +6,10 @@
 #ifdef v4Board
 #define DHTPIN PC10
 #define SCREENBACKLIGHT PB4
-word THERMISTOR_HEATER = PC1; //This is not #define because can be swaped with THERMISTOR_ROOM
-word THERMISTOR_ROOM = PB1;   //This is not #define because can be swaped with THERMISTOR_HEATER
+word HEATER_NTC_PIN = PC1; //This is not #define because can be swaped with BABY_NTC_PIN
+word BABY_NTC_PIN = PB1;   //This is not #define because can be swaped with HEATER_NTC_PIN
+#define INBOARD_LEFT_NTC_PIN PC2
+#define INBOARD_RIGHT_NTC_PIN PC3
 #define ENC_A PC8
 #define ENC_B PC9
 #define ENC_ENC_SWITCH PC6
@@ -52,8 +54,8 @@ word THERMISTOR_ROOM = PB1;   //This is not #define because can be swaped with T
 //boardPWMPins: 3, 4, 5, 8, 9, 10, 11, 15, 16, 25, 26, 27
 #define DHTPIN 0
 #define SCREENBACKLIGHT 3
-int THERMISTOR_HEATER = 10;
-int THERMISTOR_ROOM = 11;
+int HEATER_NTC_PIN = 10;
+int BABY_NTC_PIN = 11;
 #define ENC_A 12
 #define ENC_B 13
 #define POWER_EN 18

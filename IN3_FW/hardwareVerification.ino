@@ -53,10 +53,10 @@ void shortcircuitTest() {
 void sensorsTest() {
   //sensors verification
 
-  if (((THERMISTOR_HEATER) > 3200 || analogRead(THERMISTOR_HEATER) < 1200) && HWNTCHeater) {
+  if (((HEATER_NTC_PIN) > 3200 || analogRead(HEATER_NTC_PIN) < 1200) && HWNTCHeater) {
     errorHardwareCode[HW_NUM_NTCHeater] = opencircuit;
   }
-  if ((analogRead(THERMISTOR_ROOM) > 3200 || analogRead(THERMISTOR_ROOM) < 1200) && HWNTCRoom) {
+  if ((analogRead(BABY_NTC_PIN) > 3200 || analogRead(BABY_NTC_PIN) < 1200) && HWNTCRoom) {
     errorHardwareCode[HW_NUM_NTCRoom] = opencircuit;
   }
   //logln(String(updateHumidity()));

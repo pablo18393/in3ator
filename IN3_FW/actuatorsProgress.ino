@@ -118,11 +118,9 @@ void checkTempSensorPin() {
 
 
 void asignCorrectTempSensorsPin() {
-  int valueRetainer = THERMISTOR_HEATER;
-  THERMISTOR_HEATER = THERMISTOR_ROOM;
-  THERMISTOR_ROOM = valueRetainer;
-  NTCpin[babyNTC] = {THERMISTOR_ROOM};
-  NTCpin[heaterNTC] = {THERMISTOR_HEATER};
+  int valueRetainer = HEATER_NTC_PIN;
+  HEATER_NTC_PIN = BABY_NTC_PIN;
+  BABY_NTC_PIN = valueRetainer;
   //logln("NTC pins swapped");
 }
 

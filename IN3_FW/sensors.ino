@@ -119,7 +119,7 @@ bool updateHumidity() {
     DHTHumidity = dht.getHumidity();
     sensorsTimer.resume();
     if (DHTHumidity && DHTTemperature) {
-      //    temperature[numNTC + DHTSensor] = DHTTemperature; //Add here measurement to temp array
+      temperature[digitalTempSensor] = DHTTemperature; //Add here measurement to temp array
       DHTOK = 1;
     }
   }
@@ -127,7 +127,7 @@ bool updateHumidity() {
     BME280Temperature = bme.readTemperature();
     BME280Humidity = bme.readHumidity();
     if (DHTHumidity && DHTTemperature) {
-      //    temperature[numNTC + DHTSensor] = DHTTemperature; //Add here measurement to temp array
+      temperature[digitalTempSensor] = BME280Temperature; //Add here measurement to temp array
       BME280OK = 1;
     }
   }
@@ -136,6 +136,7 @@ bool updateHumidity() {
     humidity += DHTHumidity;
     humidity += BME280Humidity;
     humidity += diffHumidity;
+    
   }
   if (DHTOK && BME280OK) {
     humidity -= diffHumidity;

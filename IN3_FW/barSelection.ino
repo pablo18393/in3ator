@@ -83,25 +83,25 @@ void barSelection() {
             case LEDGraphicPosition:
               while (digitalRead(ENC_SWITCH) ) {
                 updateData();
-                if (EncMove && -EncMove + jaundice_LED_intensity >= 0 && -EncMove + jaundice_LED_intensity <= LEDMaxIntensity) {
+                if (EncMove && -EncMove + jaundiceLEDIntensity >= 0 && -EncMove + jaundiceLEDIntensity <= LEDMaxIntensity) {
                   tft.setTextColor(COLOR_MENU);
-                  drawRightNumber(jaundice_LED_intensity, LEDXPos, ypos);
-                  if (!jaundice_LED_intensity && EncMove) {
+                  drawRightNumber(jaundiceLEDIntensity, LEDXPos, ypos);
+                  if (!jaundiceLEDIntensity && EncMove) {
                     tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
                     tft.drawRightString("%", unitPosition, ypos, textFontSize);
                   }
-                  jaundice_LED_intensity -= 10 * EncMove;
-                  analogWrite(JAUNDICE, jaundice_LED_intensity);
+                  jaundiceLEDIntensity -= 10 * EncMove;
+                  analogWrite(JAUNDICE, jaundiceLEDIntensity);
                   tft.setTextColor(COLOR_MENU_TEXT);
-                  if (!jaundice_LED_intensity && EncMove) {
+                  if (!jaundiceLEDIntensity && EncMove) {
                     tft.setTextColor(COLOR_MENU);
                     tft.drawRightString("%", unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
                     tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
                   }
                   else {
-                    drawRightNumber(jaundice_LED_intensity, LEDXPos, ypos);
+                    drawRightNumber(jaundiceLEDIntensity, LEDXPos, ypos);
                   }
                 }
                 EncMove = 0;
@@ -158,25 +158,25 @@ void barSelection() {
             case LEDGraphicPosition:
               while (digitalRead(ENC_SWITCH) ) {
                 updateData();
-                if (EncMove && -EncMove + jaundice_LED_intensity >= 0 && -EncMove + jaundice_LED_intensity <= LEDMaxIntensity) {
+                if (EncMove && -EncMove + jaundiceLEDIntensity >= 0 && -EncMove + jaundiceLEDIntensity <= LEDMaxIntensity) {
                   tft.setTextColor(COLOR_MENU);
-                  drawRightNumber(jaundice_LED_intensity, LEDXPos, ypos);
-                  if (!jaundice_LED_intensity && EncMove) {
+                  drawRightNumber(jaundiceLEDIntensity, LEDXPos, ypos);
+                  if (!jaundiceLEDIntensity && EncMove) {
                     tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
                     tft.drawRightString("%", unitPosition, ypos, textFontSize);
                   }
-                  jaundice_LED_intensity -= 10 * EncMove;
-                  analogWrite(JAUNDICE, jaundice_LED_intensity);
+                  jaundiceLEDIntensity -= 10 * EncMove;
+                  analogWrite(JAUNDICE, jaundiceLEDIntensity);
                   tft.setTextColor(COLOR_MENU_TEXT);
-                  if (!jaundice_LED_intensity && EncMove) {
+                  if (!jaundiceLEDIntensity && EncMove) {
                     tft.setTextColor(COLOR_MENU);
                     tft.drawRightString("%", unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
                     tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
                   }
                   else {
-                    drawRightNumber(jaundice_LED_intensity, LEDXPos, ypos);
+                    drawRightNumber(jaundiceLEDIntensity, LEDXPos, ypos);
                   }
                 }
                 EncMove = 0;

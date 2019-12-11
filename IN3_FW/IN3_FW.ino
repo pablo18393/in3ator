@@ -51,7 +51,7 @@ int language;
 #define inBoardRightNTC 3
 #define digitalTempSensor 4
 
-#define numNTC 2 //number of out of board NTC
+#define numNTC 4 //number of out of board NTC
 #define numTempSensors 5 //number of total temperature sensors in system
 #define temperature_fraction 20 //amount of temperature samples to filter
 double temperature[numTempSensors];
@@ -100,12 +100,13 @@ int pulsioximeterMultiplierFilterFactor = 1000;
 int pulsioximeterRestFilterFactor = 1;
 int pulsioximeterAmplitud;
 int pulsioximeterCounter[2];
+int BPM, IBI;
 
 //environmental variables
 double desiredSkinTemp = 36.5; //preset baby skin temperature
 int desiredRoomHum = 80; //preset enviromental humidity
 int fanSpeed; //PWM that controls fan speed
-int Jaundice_LED_intensity; //PWM that controls jaundice LED intensity
+int jaundiceLEDIntensity; //PWM that controls jaundice LED intensity
 double maxHeaterTemp; //maximum heater temperature
 double desiredHeaterTemp; //desired temperature in heater
 
@@ -126,7 +127,7 @@ const byte fanMaxSpeed = 100; //max fan speed (percentage) to be set
 
 //Encoder variables
 #define NUMENCODERS 1 //number of encoders in circuit
-byte NTCpin[numNTC] = {THERMISTOR_HEATER, THERMISTOR_ROOM}; //variable that handles which pin number is heater/room NTC (could be swapped by user in mounting stage)
+byte NTCpin[numNTC] = {HEATER_NTC_PIN, BABY_NTC_PIN, INBOARD_LEFT_NTC_PIN, INBOARD_RIGHT_NTC_PIN}; //variable that handles which pin number is heater/room NTC (could be swapped by user in mounting stage)
 bool swapTempSensors; //variable to swap room and heater pin map in case are swapped
 boolean A_set;
 boolean B_set;
@@ -191,7 +192,6 @@ byte barThickness;
 bool auto_lock; //setting that enables backlight switch OFF after a given time of no user actions
 int time_lock = 16000; //time to lock screen if no user actions
 int TFT_LED = 50; //PWM that will be supplied to backlight LEDs
-int jaundice_LED_intensity = 0; //PWM that will be supplied to jaundice LEDs
 const byte time_back_draw = 255;
 const byte time_back_wait = 255;
 long last_something; //last time there was a encoder movement or pulse
