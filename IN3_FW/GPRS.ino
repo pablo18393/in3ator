@@ -153,7 +153,6 @@ void GPRSStatusHandler() {
   }
   if (!GPRS.firstPost && GPRS.connectionStatus) {
     GPRS.location = 1;
-    setPostVariables(addLocation, "first post");
   }
 }
 
@@ -212,7 +211,13 @@ void getLocation() {
         GPRS.powerUp = 1;
       }
       else {
-        GPRS.firstPost = 1;
+        if (!GPRS.firstPost) {
+          GPRS.firstPost = 1;
+          setPostVariables(addLocation, "first post");
+        }
+        else {
+          setPostVariables(addLocation, "");
+        }
         GPRS.post = 1;
       }
       GPRS.process = 0;

@@ -48,6 +48,7 @@ word BABY_NTC_PIN = PB1;   //This is not #define because can be swaped with HEAT
 #define DHTSensor 1
 #define BME280Sensor 0
 #define SPI_SEL 1
+#define SDCard 0
 
 #ifdef maplemini
 //pin declaration
@@ -56,6 +57,8 @@ word BABY_NTC_PIN = PB1;   //This is not #define because can be swaped with HEAT
 #define SCREENBACKLIGHT 3
 int HEATER_NTC_PIN = 10;
 int BABY_NTC_PIN = 11;
+#define INBOARD_LEFT_NTC_PIN 11
+#define INBOARD_RIGHT_NTC_PIN 11
 #define ENC_A 12
 #define ENC_B 13
 #define POWER_EN 18
@@ -63,6 +66,7 @@ int BABY_NTC_PIN = 11;
 #define FAN_LP 8
 #define BME_CS 15
 #define HEATER 16
+#define SYSTEM_SHUNT PA4
 #define JAUNDICE 25
 #define STERILIZE_CTL 28
 #define HUMIDIFIER 27

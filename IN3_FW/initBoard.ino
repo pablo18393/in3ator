@@ -46,31 +46,32 @@ void pinDirection() {
 
 
 void initTimers() {
-  roomPIDTimer.pause();
-  roomPIDTimer.setPeriod(NTCInterruptRate); // in microseconds
-  roomPIDTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
-  roomPIDTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
-  roomPIDTimer.attachCompare1Interrupt(roomPIDInterrupt);
-  roomPID.SetSampleTime(roomPIDRate / 1000);       //in milliseconds
-  heaterPID.SetSampleTime(heaterPIDRate / 1000); //in milliseconds
-  heaterPID.SetOutputLimits(0, HeatermaxPWM);
-  roomPIDTimer.refresh();
-  roomPIDTimer.resume();
-
+  /*
+    roomPIDTimer.pause();
+    roomPIDTimer.setPeriod(NTCInterruptRate); // in microseconds
+    roomPIDTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
+    roomPIDTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
+    roomPIDTimer.attachCompare1Interrupt(roomPIDInterrupt);
+    roomPID.SetSampleTime(roomPIDRate / 1000);       //in milliseconds
+    heaterPID.SetSampleTime(heaterPIDRate / 1000); //in milliseconds
+    heaterPID.SetOutputLimits(0, HeatermaxPWM);
+    roomPIDTimer.refresh();
+    roomPIDTimer.resume();
+  */
   //sensors handling ISR configuration
   sensorsTimer.pause();
   sensorsTimer.setPeriod(sensorsISRRate); // in microseconds
   sensorsTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
   sensorsTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
   sensorsTimer.attachCompare1Interrupt(sensorsISR);
-  nvic_irq_set_priority(NVIC_TIMER8_CC, 15);
+  nvic_irq_set_priority(NVIC_TIMER8_CC, 1);
   sensorsTimer.refresh();
   sensorsTimer.resume();
 
   encoderTimer.pause();
   encoderTimer.setPeriod(encoderISRRate); // in microseconds
   encoderTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
-  encoderTimer.setCompare(TIMER_CH4, 1);  // Interrupt 1 count after each update
+  encoderTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
   encoderTimer.attachCompare1Interrupt(encoderISR);
   encoderTimer.refresh();
   encoderTimer.resume();
@@ -80,15 +81,14 @@ void initTimers() {
   humidifierTimer.setPeriod(humidifierTimerRate); // in microseconds
   humidifierTimer.refresh();
   humidifierTimer.resume();
-
   //GPRS timer configuration
   GPRSTimer.pause();
   GPRSTimer.setPeriod(GPRSISRRate); // in microseconds
   GPRSTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
-  GPRSTimer.setCompare(TIMER_CH3, 1);  // Interrupt 1 count after each update
+  GPRSTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
   GPRSTimer.attachCompare1Interrupt(GPRSHandler);
-  nvic_irq_set_priority(NVIC_TIMER1_CC, 14);
-  nvic_irq_set_priority(NVIC_USART1 , 13);
+  nvic_irq_set_priority(NVIC_TIMER1_CC, 2);
+  nvic_irq_set_priority(NVIC_USART1 , 0);
   GPRSTimer.refresh();
   GPRSTimer.resume();
 }

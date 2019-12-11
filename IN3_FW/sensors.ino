@@ -85,7 +85,7 @@ void updateTemp(byte sensor) {
       break;
     case numNTC:
       startSensor = babyNTC;
-      endSensor = heaterNTC;
+      endSensor = INBOARD_RIGHT_NTC_PIN;
       break;
   }
 
