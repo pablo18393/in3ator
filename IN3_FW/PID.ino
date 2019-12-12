@@ -9,16 +9,13 @@ PID roomPID(&temperature[babyNTC], &PIDOutput[babyNTC], &desiredSkinTemp, Kp_roo
 
 #define temperaturePIDcontrol 0         //0 to disable, 1 to enable
 void roomPIDInterrupt() {
-  measurenumNTC();
   if (temperaturePIDcontrolStart) {
     if (interruptcounter == roomPIDfactor) {
       interruptcounter = 0;
-      updateTemp(babyNTC);
       roomPID.Compute();
       desiredHeaterTemp = PIDOutput[babyNTC] * (maxHeaterTemp - desiredSkinTemp) / (maxPWMvalue) + desiredSkinTemp;  //map function: min value is
     }
     if (!(interruptcounter % heaterPIDfactor)) {
-      updateTemp(heaterNTC);
       heaterPID.Compute();
       heaterPower = PIDOutput[heaterNTC];
       analogWrite(HEATER, heaterPower);

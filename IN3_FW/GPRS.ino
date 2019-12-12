@@ -101,8 +101,8 @@ void initGPRS()
 {
   Serial.begin(115200);
   Serial1.begin(115200);
-  setPostVariables(defaultPost, "");
-  GPRS.sendPeriod = 10800; //in secs
+  GPRSSetPostVariables(defaultPost, "");
+  GPRS.sendPeriod = 120; //in secs
   GPRS.postBabyTemp = 1;
   GPRS.postHumidity = 1;
   GPRS.powerUp = 1;
@@ -213,10 +213,10 @@ void getLocation() {
       else {
         if (!GPRS.firstPost) {
           GPRS.firstPost = 1;
-          setPostVariables(addLocation, "first post");
+          GPRSSetPostVariables(addLocation, "first post");
         }
         else {
-          setPostVariables(addLocation, "");
+          GPRSSetPostVariables(addLocation, "");
         }
         GPRS.post = 1;
       }
@@ -425,9 +425,9 @@ void GPRSPost() {
       break;
     case 9:
       if (millis() - GPRS.packetSentenceTime > 200) {
-        if (GPRSsequence == 3) {
-          for (int i = 0; i < req2[3].length(); i++) {
-            Serial1.print(req2[3][i]);
+        if (GPRSsequence == 3 || GPRSsequence == 7) {
+          for (int i = 0; i < req2[GPRSsequence].length(); i++) {
+            Serial1.print(req2[GPRSsequence][i]);
           }
         }
         else {
@@ -455,7 +455,7 @@ void GPRSPost() {
       logln("GPRS POST SUCCESS");
       GPRS.post = 0;
       GPRS.process = 0;
-      setPostVariables(removeLocation, "");
+      GPRSSetPostVariables(removeLocation, "");
       break;
   }
 }
@@ -598,7 +598,7 @@ void clearGPRSBuffer() {
   GPRS.bufferWritePos = 0;
 }
 
-void setPostVariables(byte postContent, String postComment) {
+void GPRSSetPostVariables(byte postContent, String postComment) {
   if (postComment.length()) {
     GPRS.postComment = 1;
     GPRS.comment += postComment;
@@ -632,11 +632,9 @@ void setPostVariables(byte postContent, String postComment) {
       GPRS.postJaundicePower = 0;
       break;
     case actuatorsModeON:
-      GPRS.postJaundicePower = 1;
       GPRS.postHeaterPower = 1;
       break;
     case actuatorsModeOFF:
-      GPRS.postJaundicePower = 0;
       GPRS.postHeaterPower = 0;
       break;
     case pulseFound:
@@ -689,16 +687,16 @@ bool GPRSLoadVariables() {
     req2[7] += ",\"heater_power\":\"" + String(heaterPower) + "\"";
   }
   if (GPRS.postBPM) {
-    req2[7] += ",\"BPM\":\"" + String(BPM) + "\"";
+    req2[7] += ",\"bpm\":\"" + String(BPM) + "\"";
   }
   if (GPRS.postIBI) {
-    req2[7] += ",\"IBI\":\"" + String(IBI) + "\"";
+    req2[7] += ",\"ibi\":\"" + String(IBI) + "\"";
   }
   if (GPRS.postRPD) {
-    //add RPD logic, ensure maximum data packet size
+    req2[7] += ",\"rpd\":\"" + String(IBI) + "\"";
   }
   if (GPRS.postCurrentConsumption) {
-    //add current consumption logic
+    req2[7] += ",\"power\":\"" + String(RPD) + "\"";
   }
   if (GPRS.postComment) {
     req2[7] += ",\"comments\":\"" + GPRS.comment + "\"";

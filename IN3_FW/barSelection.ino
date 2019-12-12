@@ -90,6 +90,7 @@ void barSelection() {
                     tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
                     tft.drawRightString("%", unitPosition, ypos, textFontSize);
+                    GPRSSetPostVariables(jaundiceLEDON, "");
                   }
                   jaundiceLEDIntensity -= 10 * EncMove;
                   analogWrite(JAUNDICE, jaundiceLEDIntensity);
@@ -99,6 +100,7 @@ void barSelection() {
                     tft.drawRightString("%", unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
                     tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
+                    GPRSSetPostVariables(jaundiceLEDOFF, "");
                   }
                   else {
                     drawRightNumber(jaundiceLEDIntensity, LEDXPos, ypos);
@@ -287,11 +289,11 @@ void barSelection() {
                   }
                   tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
                   language -= EncMove;
-                  if (language < firstLanguage) {
-                    language = numLanguages;
+                  if (language < 0) {
+                    language = numLanguages - 1;
                   }
-                  if (language > numLanguages) {
-                    language = firstLanguage;
+                  if (language >= numLanguages) {
+                    language = 0;
                   }
                   tft.setTextColor(COLOR_MENU_TEXT);
                   switch (language) {
@@ -415,8 +417,6 @@ void barSelection() {
               diffHumidity = 0;
               EEPROM.write(EEPROM_diffTemperature, diffTemperature[babyNTC]);
               EEPROM.write(EEPROM_diffHumidity, diffHumidity);
-              updateHumidity();
-              updateTemp(numNTC);
               calibrateSensors();
               break;
           }

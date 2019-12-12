@@ -58,15 +58,33 @@ void initTimers() {
     roomPIDTimer.refresh();
     roomPIDTimer.resume();
   */
+  
   //sensors handling ISR configuration
   sensorsTimer.pause();
   sensorsTimer.setPeriod(sensorsISRRate); // in microseconds
   sensorsTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
   sensorsTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
   sensorsTimer.attachCompare1Interrupt(sensorsISR);
-  nvic_irq_set_priority(NVIC_TIMER8_CC, 1);
+  nvic_irq_set_priority(NVIC_TIMER8_CC, 14);
   sensorsTimer.refresh();
   sensorsTimer.resume();
+
+  //humidifier timer configuration
+  humidifierTimer.pause();
+  humidifierTimer.setPeriod(humidifierTimerRate); // in microseconds
+  humidifierTimer.refresh();
+  humidifierTimer.resume();
+
+  //GPRS timer configuration
+  GPRSTimer.pause();
+  GPRSTimer.setPeriod(GPRSISRRate); // in microseconds
+  GPRSTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
+  GPRSTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
+  GPRSTimer.attachCompare1Interrupt(GPRSHandler);
+  nvic_irq_set_priority(NVIC_TIMER1_CC, 15);
+  nvic_irq_set_priority(NVIC_USART1 , 13);
+  GPRSTimer.refresh();
+  GPRSTimer.resume();
 
   encoderTimer.pause();
   encoderTimer.setPeriod(encoderISRRate); // in microseconds
@@ -75,20 +93,4 @@ void initTimers() {
   encoderTimer.attachCompare1Interrupt(encoderISR);
   encoderTimer.refresh();
   encoderTimer.resume();
-
-  //humidifier timer configuration
-  humidifierTimer.pause();
-  humidifierTimer.setPeriod(humidifierTimerRate); // in microseconds
-  humidifierTimer.refresh();
-  humidifierTimer.resume();
-  //GPRS timer configuration
-  GPRSTimer.pause();
-  GPRSTimer.setPeriod(GPRSISRRate); // in microseconds
-  GPRSTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
-  GPRSTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
-  GPRSTimer.attachCompare1Interrupt(GPRSHandler);
-  nvic_irq_set_priority(NVIC_TIMER1_CC, 2);
-  nvic_irq_set_priority(NVIC_USART1 , 0);
-  GPRSTimer.refresh();
-  GPRSTimer.resume();
 }

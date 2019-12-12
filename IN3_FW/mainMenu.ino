@@ -48,6 +48,7 @@ void askSuccess() {
     turnActuators(OFF);
     turnSterilizeLED(OFF);
     turnFans(OFF);
+    GPRSSetPostVariables(actuatorsModeOFF, "");
   }
   page = askSuccessPage;
   bar_pos = 2;

@@ -69,7 +69,7 @@ void helpingmainMenu() {
   goToProcessRow = numWords;
   graphics();
   drawHeading();
-  updateSensors();
+  updateDisplaySensors();
   while (!digitalRead(ENC_SWITCH));
   delay(debounceTime);
 }

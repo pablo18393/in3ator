@@ -30,7 +30,7 @@ void advancedMode() {
   goToProcessRow = numWords;
   graphics();
   drawHeading();
-  updateSensors();
+  updateDisplaySensors();
   controlTemperature = 0;
   controlHumidity = 0;
   enableSet = 0;

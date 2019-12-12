@@ -34,10 +34,10 @@ int page;
 #define askSuccessPage 5
 
 //languages numbers that will be called in language variable
-#define firstLanguage 2 //Preset number configuration when booting for first time
-#define spanish 1
-#define english 2
-#define french 3
+#define defaultLanguage 1 //Preset number configuration when booting for first time
+#define spanish 0
+#define english 1
+#define french 2
 #define numLanguages 3
 int language;
 
@@ -101,6 +101,7 @@ int pulsioximeterRestFilterFactor = 1;
 int pulsioximeterAmplitud;
 int pulsioximeterCounter[2];
 int BPM, IBI;
+String RPD; //(Raw Pulsioximeter Data)
 
 //environmental variables
 double desiredSkinTemp = 36.5; //preset baby skin temperature
@@ -368,6 +369,6 @@ void setup() {
   mainMenu();
 }
 
-void loop(){
-  
+void loop() {
+
 }

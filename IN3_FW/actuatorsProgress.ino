@@ -11,6 +11,7 @@ void actuatorsProgress() {
   tft.setTextColor(COLOR_MENU_TEXT);
   setSensorsGraphicPosition();
   drawActuatorsSeparators();
+  GPRSSetPostVariables(actuatorsModeON, "");
   if (controlTemperature) {
     temperatureAtStart = temperature[babyNTC];
     printLoadingTemperatureBar();

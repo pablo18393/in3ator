@@ -10,14 +10,19 @@ void initSensors() {
 }
 
 void sensorsISR() {
-  encoderISR();
   measurenumNTC();
-  readPulsioximeter();
-  if (!pulsioximeterCount) {
+  if (millis() - lastSensorsUpdate > sensorsUpdateRate) {
+    updateHumidity();
+    lastSensorsUpdate = millis();
+  }
+  /*
+    readPulsioximeter();
+    if (!pulsioximeterCount) {
     pulsioximeterCount = pulsioximeterRate;
     calculatePulsioximeterValues();
-  }
-  pulsioximeterCount--;
+    }
+    pulsioximeterCount--;
+  */
 }
 
 void initPulsioximeterVariables() {
@@ -49,17 +54,13 @@ void calculatePulsioximeterValues() {
 
 
 void measurenumNTC() {
-  for (int ntc = 0; ntc < numNTC; ntc++) {
-    temperatureArray[ntc][temperature_measured] = analogRead(NTCpin[ntc]);
+  for (int i = 0; i < numNTC; i++) {
+    temperatureArray[i][temperature_measured] = analogRead(NTCpin[i]);
   }
   temperature_measured++;
   if (temperature_measured == temperature_fraction) {
     updateTemp(numNTC);
     temperature_measured = 0;
-  }
-  if (millis() - lastSensorsUpdate > sensorsUpdateRate) {
-    updateHumidity();
-    lastSensorsUpdate = millis();
   }
 }
 
@@ -85,24 +86,24 @@ void updateTemp(byte sensor) {
       break;
     case numNTC:
       startSensor = babyNTC;
-      endSensor = INBOARD_RIGHT_NTC_PIN;
+      endSensor = inBoardRightNTC;
       break;
   }
 
   //Bloque de cálculo
-  for (int ntc = startSensor; ntc <= endSensor; ntc++) {
+  for (int i = startSensor; i <= endSensor; i++) {
     //Variables used in calculus
     float vm = 0.0;
     float rntc = 0.0;
     temperatureMean = 0;
-    for (int i = 0; i < temperature_fraction; i++) {
-      temperatureMean += temperatureArray[ntc][i];
+    for (int j = 0; j < temperature_fraction; j++) {
+      temperatureMean += temperatureArray[i][j];
     }
     temperatureMean /= temperature_fraction;
     vm = (vcc) * ( temperatureMean / maxADCvalue );          //Calcular tensión en la entrada
     rntc = rAux / ((vcc / vm) - 1);                   //Calcular la resistencia de la NTC
-    temperature[ntc] = beta / (log(rntc / r0) + (beta / temp0)) - 273; //Calcular la temperatura en Celsius
-    temperature[ntc] += diffTemperature[ntc];
+    temperature[i] = beta / (log(rntc / r0) + (beta / temp0)) - 273; //Calcular la temperatura en Celsius
+    temperature[i] += diffTemperature[i];
   }
 }
 
@@ -118,7 +119,7 @@ bool updateHumidity() {
     DHTTemperature = dht.getTemperature();
     DHTHumidity = dht.getHumidity();
     sensorsTimer.resume();
-    if (DHTHumidity && DHTTemperature) {
+    if (DHTHumidity && DHTTemperature && abs(DHTHumidity) <= 100) {
       temperature[digitalTempSensor] = DHTTemperature; //Add here measurement to temp array
       DHTOK = 1;
     }
@@ -136,7 +137,7 @@ bool updateHumidity() {
     humidity += DHTHumidity;
     humidity += BME280Humidity;
     humidity += diffHumidity;
-    
+
   }
   if (DHTOK && BME280OK) {
     humidity -= diffHumidity;
@@ -152,7 +153,7 @@ void encoderISR() {
     A_set = !A_set;
     if ( A_set && !B_set)
     {
-      last_something=millis();
+      last_something = millis();
       EncMove = 1;
     }
   }
@@ -161,7 +162,7 @@ void encoderISR() {
     B_set = !B_set;
     if ( B_set && !A_set )
       EncMove = -1;
-      last_something=millis();
+    last_something = millis();
   }
 }
 

@@ -1,14 +1,11 @@
 int updateData() {
   if (millis() - lastSensorsUpdate > sensorsUpdateRate) {
     if (page == advancedModePage || page == actuatorsProgressPage) {
-      updateSensors();
+      updateDisplaySensors();
       if (page == actuatorsProgressPage) {
         printStatus();
       }
       lastSensorsUpdate = millis();
-    }
-    else {
-      updateHumidity();
     }
   }
   if ((page == mainMenuPage || page == advancedModePage) && !enableSet) {
@@ -30,22 +27,13 @@ void checkNewPulsioximeterData() {
   }
 }
 
-void updateSensors() {
-  tft.setTextColor(COLOR_MENU);
+void updateDisplaySensors() {
   if (page == advancedModePage || (page == actuatorsProgressPage && controlTemperature)) {
-    tft.drawFloat(previousTemperature[babyNTC], 1, temperatureX, temperatureY, textFontSize);
-    //logln("Prev temp: " + String(previousTemperature[babyNTC], 2));
-  }
-  if (page != actuatorsProgressPage && page != mainMenuPage || controlHumidity) {
+    drawBabyTemperature();
     drawHumidity();
   }
-  tft.setTextColor(COLOR_MENU_TEXT);
-  if (page == advancedModePage || (page == actuatorsProgressPage && controlTemperature)) {
-    tft.drawFloat(temperature[babyNTC], 1, temperatureX, temperatureY, textFontSize);
-    previousTemperature[babyNTC] = temperature[babyNTC];
-    //logln("Prev temp: " + String(previousTemperature[babyNTC], 2));
-  }
   if (page == actuatorsProgressPage) {
+    tft.setTextColor(COLOR_MENU_TEXT);
     if (controlTemperature) {
       float previousTemperaturePercentage = temperaturePercentage;
       if (displayProcessPercentage) {
@@ -58,7 +46,6 @@ void updateSensors() {
       if (temperaturePercentage < 0) {
         temperaturePercentage = 0;
       }
-
       updateLoadingTemperatureBar(int(previousTemperaturePercentage), int(temperaturePercentage));
     }
     if (controlHumidity) {
@@ -73,7 +60,6 @@ void updateSensors() {
       if (humidityPercentage < 0) {
         humidityPercentage = 0;
       }
-
       updateLoadingHumidityBar(int(previousHumidityPercentage), int(humidityPercentage));
     }
   }

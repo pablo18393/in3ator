@@ -1,5 +1,5 @@
-
 void graphics() {
+  tft.setTextColor(COLOR_MENU_TEXT);
   if (!page) {
     tft.fillRect(width_select, height_heading, tft.width() - width_select, tft.height() - height_heading, COLOR_MENU);
   }
@@ -46,7 +46,6 @@ void graphics() {
           switch (i) {
             case temperatureGraphicPosition:
               drawTemperatureUnits();
-              updateSensors();
               tft.drawRightString(initialSensorsValue, initialSensorPosition, temperatureY, textFontSize);
               break;
             case LEDGraphicPosition:
@@ -61,7 +60,6 @@ void graphics() {
             case humidityGraphicPosition:
               drawHumidityUnits();
               tft.drawRightString(initialSensorsValue, initialSensorPosition, humidityY, textFontSize);
-              updateSensors();
               break;
           }
           break;
@@ -318,14 +316,20 @@ int graphicHeight(int position) {
   return ((tft.height() - height_heading) / (2 * rectangles) + position * (tft.height() - height_heading) / (rectangles) + letter_height);
 }
 
+void drawBabyTemperature() {
+  tft.setTextColor(COLOR_MENU);
+  tft.drawFloat(previousTemperature[babyNTC], 1, temperatureX, temperatureY, textFontSize);
+  tft.setTextColor(COLOR_MENU_TEXT);
+  previousTemperature[babyNTC] = temperature[babyNTC];
+  tft.drawFloat(previousTemperature[babyNTC], 1, temperatureX, temperatureY, textFontSize);
+}
+
 void drawHumidity() {
-  if (updateHumidity()) {
-    tft.setTextColor(COLOR_MENU);
-    drawCentreNumber(previousHumidity, humidityX, humidityY);
-    tft.setTextColor(COLOR_MENU_TEXT);
-    drawCentreNumber(humidity, humidityX, humidityY);
-    previousHumidity = humidity;
-  }
+  tft.setTextColor(COLOR_MENU);
+  drawCentreNumber(previousHumidity, humidityX, humidityY);
+  tft.setTextColor(COLOR_MENU_TEXT);
+  previousHumidity = humidity;
+  drawCentreNumber(previousHumidity, humidityX, humidityY);
 }
 
 void drawStartMessage() {

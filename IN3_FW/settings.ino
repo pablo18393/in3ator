@@ -39,6 +39,8 @@ void settings() {
   rectangles = numWords;
   graphics();
   drawHeading();
+  tft.drawNumber(rectangles, 0, 0, textFontSize);
+  tft.drawString(words[0], 0, 20, textFontSize);
   while (!digitalRead(ENC_SWITCH)) {
     updateData();
   }
