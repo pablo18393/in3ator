@@ -10,7 +10,7 @@ void actuatorsProgress() {
   tft.setTextColor(COLOR_MENU_TEXT);
   setSensorsGraphicPosition();
   drawActuatorsSeparators();
-  GPRSSetPostVariables(actuatorsModeON, "");
+  GPRSSetPostVariables(actuatorsModeON, "Actuators ON:" + String (desiredSkinTemp, 1) + "," + String (desiredRoomHum));
   setGPRSPostPeriod(actuatingGPRSPostPeriod);
   if (controlTemperature) {
     temperatureAtStart = temperature[babyNTC];

@@ -197,10 +197,10 @@ void barSelection() {
         case askSuccessPage:
           switch (bar_pos - graphicTextOffset ) {
             case afirmativeGraphicPosition:
-              //add here affirmative message to GPRS transmit
+              GPRSSetPostVariables(actuatorsModeOFF, "Baby survived");
               break;
             case negativeGraphicPosition:
-              //add here affirmative message to GPRS transmit
+              GPRSSetPostVariables(actuatorsModeOFF, "Baby didn't survive");
               break;
           }
           mainMenu();
