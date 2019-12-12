@@ -49,6 +49,7 @@ void askSuccess() {
     turnSterilizeLED(OFF);
     turnFans(OFF);
     GPRSSetPostVariables(actuatorsModeOFF, "");
+    setGPRSPostPeriod(standByGPRSPostPeriod);
   }
   page = askSuccessPage;
   bar_pos = 2;

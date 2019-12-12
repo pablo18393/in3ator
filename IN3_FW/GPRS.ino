@@ -10,6 +10,10 @@
 #define addLocation 7
 #define removeLocation 8
 
+#define standByGPRSPostPeriod 3600
+#define actuatingGPRSPostPeriod 300
+#define jaundiceGPRSPostPeriod 300
+
 String user = "admin@admin.com";
 String password = "admin";
 String server = "pub.scar.io";
@@ -102,10 +106,10 @@ void initGPRS()
   Serial.begin(115200);
   Serial1.begin(115200);
   GPRSSetPostVariables(defaultPost, "");
-  GPRS.sendPeriod = 120; //in secs
   GPRS.postBabyTemp = 1;
   GPRS.postHumidity = 1;
   GPRS.powerUp = 1;
+  setGPRSPostPeriod(standByGPRSPostPeriod);
 }
 
 void GPRSHandler() {
@@ -648,6 +652,10 @@ void GPRSSetPostVariables(byte postContent, String postComment) {
       GPRS.postRPD = 0;
       break;
   }
+}
+
+void setGPRSPostPeriod (long seconds) {
+  GPRS.sendPeriod = seconds;
 }
 
 bool GPRSLoadVariables() {

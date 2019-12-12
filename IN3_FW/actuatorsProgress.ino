@@ -1,4 +1,3 @@
-
 void actuatorsProgress() {
   byte  numWords = 0;
   temperaturePercentage = 0;
@@ -12,6 +11,7 @@ void actuatorsProgress() {
   setSensorsGraphicPosition();
   drawActuatorsSeparators();
   GPRSSetPostVariables(actuatorsModeON, "");
+  setGPRSPostPeriod(actuatingGPRSPostPeriod);
   if (controlTemperature) {
     temperatureAtStart = temperature[babyNTC];
     printLoadingTemperatureBar();

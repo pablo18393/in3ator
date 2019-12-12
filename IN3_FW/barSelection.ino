@@ -91,6 +91,7 @@ void barSelection() {
                     tft.setTextColor(COLOR_MENU_TEXT);
                     tft.drawRightString("%", unitPosition, ypos, textFontSize);
                     GPRSSetPostVariables(jaundiceLEDON, "");
+                    setGPRSPostPeriod(standByGPRSPostPeriod);
                   }
                   jaundiceLEDIntensity -= 10 * EncMove;
                   analogWrite(JAUNDICE, jaundiceLEDIntensity);
@@ -101,6 +102,7 @@ void barSelection() {
                     tft.setTextColor(COLOR_MENU_TEXT);
                     tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
                     GPRSSetPostVariables(jaundiceLEDOFF, "");
+                    setGPRSPostPeriod(jaundiceGPRSPostPeriod);
                   }
                   else {
                     drawRightNumber(jaundiceLEDIntensity, LEDXPos, ypos);
