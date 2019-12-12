@@ -79,12 +79,8 @@ void actuatorsProgress() {
 }
 
 void checkTempSensorPin() {
-  //pending: program timeout too
-  //logln("checking NTC pinout");
   float prevroomTemp = temperature[babyNTC];
   float prevHeaterTemp = temperature[heaterNTC];
-  //logln(String(prevroomTemp));
-  //logln(String(prevHeaterTemp));
   bool exitCheck = 0;
   long timeElapsedChecking = millis();
   turnFans(ON);
@@ -100,9 +96,6 @@ void checkTempSensorPin() {
       EEPROM.write(EEPROM_swapTempSensors, swapTempSensors);
       exitCheck = 1;
     }
-    if (millis() - timeElapsedChecking > CheckTempSensorPinTimeout) {
-      //error
-    }
     if ((temperature[heaterNTC] - prevHeaterTemp) > CheckSensorRaiseTemp) {
       swapTempSensors = 0;
       exitCheck = 1;
@@ -110,6 +103,9 @@ void checkTempSensorPin() {
     if ((temperature[babyNTC] - prevroomTemp) > CheckSensorRaiseTemp) {
       swapTempSensors = 1;
       EEPROM.write(EEPROM_swapTempSensors, swapTempSensors);
+      exitCheck = 1;
+    }
+    if (millis() - timeElapsedChecking > CheckTempSensorPinTimeout) {
       exitCheck = 1;
     }
     delay(500);

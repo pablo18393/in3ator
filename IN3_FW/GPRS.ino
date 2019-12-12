@@ -459,6 +459,8 @@ void GPRSPost() {
       logln("GPRS POST SUCCESS");
       GPRS.post = 0;
       GPRS.process = 0;
+      GPRS.postComment = 0;
+      GPRS.comment = "";
       GPRSSetPostVariables(removeLocation, "");
       break;
   }
@@ -606,9 +608,6 @@ void GPRSSetPostVariables(byte postContent, String postComment) {
   if (postComment.length()) {
     GPRS.postComment = 1;
     GPRS.comment += postComment;
-  }
-  else {
-    GPRS.comment = "";
   }
   switch (postContent) {
     case defaultPost:
