@@ -57,7 +57,7 @@ void initTimers() {
     heaterPID.SetOutputLimits(0, HeatermaxPWM);
     roomPIDTimer.refresh();
     roomPIDTimer.resume();
-  */
+
   
   //sensors handling ISR configuration
   sensorsTimer.pause();
@@ -75,6 +75,14 @@ void initTimers() {
   humidifierTimer.refresh();
   humidifierTimer.resume();
 
+    encoderTimer.pause();
+  encoderTimer.setPeriod(encoderISRRate); // in microseconds
+  encoderTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
+  encoderTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
+  encoderTimer.attachCompare1Interrupt(encoderISR);
+  encoderTimer.refresh();
+  encoderTimer.resume();
+  */
   //GPRS timer configuration
   GPRSTimer.pause();
   GPRSTimer.setPeriod(GPRSISRRate); // in microseconds
@@ -86,11 +94,5 @@ void initTimers() {
   GPRSTimer.refresh();
   GPRSTimer.resume();
 
-  encoderTimer.pause();
-  encoderTimer.setPeriod(encoderISRRate); // in microseconds
-  encoderTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
-  encoderTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
-  encoderTimer.attachCompare1Interrupt(encoderISR);
-  encoderTimer.refresh();
-  encoderTimer.resume();
+
 }

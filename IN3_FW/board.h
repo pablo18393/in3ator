@@ -1,6 +1,6 @@
 //Select board
-#define v4Board
-//#define maplemini
+//#define v4Board
+#define maplemini
 
 
 #ifdef v4Board

@@ -7,19 +7,19 @@
 #define pulseFound 5
 #define pulseLost 6
 #define standByMode 7
-#define addLocation 7
-#define removeLocation 8
+#define addLocation 8
+#define removeLocation 9
 
-#define standByGPRSPostPeriod 3600
-#define actuatingGPRSPostPeriod 300
-#define jaundiceGPRSPostPeriod 300
+#define standByGPRSPostPeriod 120
+#define actuatingGPRSPostPeriod 120
+#define jaundiceGPRSPostPeriod 120
 
 String user = "admin@admin.com";
 String password = "admin";
 String server = "pub.scar.io";
 char GPRSRXBuffer[1024];
 
-String req[] = {
+String databaseLogin[] = {
   "POST /In3/public/api/v1/auth/login?c=1 HTTP/1.1\n",
   "Host: " + server + "\n",
   "Content-Type: application/x-www-form-urlencoded\n",
@@ -29,7 +29,7 @@ String req[] = {
   "{\"email\":\"" + user + "\",\"password\":\"" + password + "\"}\n"
 };
 
-String req2[] = {
+String databasePost[] = {
   "POST /In3/public/api/v1/session?c=1 HTTP/1.1\n",
   "Host: " + server + "\n",
   "Content-Type: application/x-www-form-urlencoded\n",
@@ -95,6 +95,7 @@ struct GPRSstruct {
   bool post;
   bool location;
   byte postProcess;
+  bool validToken;
 };
 
 int GPRSsequence = 0;
@@ -123,7 +124,12 @@ void GPRSHandler() {
     GPRSStablishConnection();
   }
   if (GPRS.post) {
-    GPRSPost();
+    if (GPRS.validToken) {
+      GPRSPost();
+    }
+    else {
+      GPRSLogin();
+    }
   }
   readGPRSData();
   GPRSStatusHandler();
@@ -140,6 +146,7 @@ void GPRSStatusHandler() {
         GPRS.connect = 0;
         GPRS.location = 0;
         GPRS.powerUp = 1;
+        GPRS.validToken = 0;
         logln("powering module down...");
         Serial1.print("AT+CPOWD=1\n");
         GPRS.packetSentenceTime = millis();
@@ -358,7 +365,7 @@ void GPRSStablishConnection() {
   }
 }
 
-void GPRSPost() {
+void GPRSLogin() {
   switch (GPRS.process) {
     case 0:
       GPRS.processSuccess = 1;
@@ -380,7 +387,7 @@ void GPRSPost() {
     case 2:
       len = 0;
       for (int i = 0; i < 7; i++) {
-        len += req[i].length();
+        len += databaseLogin[i].length();
       }
       Serial1.print("AT+CIPSEND=" + String(len - 1) + "\n");
       GPRS.process++;
@@ -388,7 +395,7 @@ void GPRSPost() {
       break;
     case 3:
       if (millis() - GPRS.packetSentenceTime > 200) {
-        Serial1.print(req[GPRSsequence]);
+        Serial1.print(databaseLogin[GPRSsequence]);
         GPRSsequence++;
         if (GPRSsequence == 7) {
           GPRS.process++;
@@ -401,16 +408,31 @@ void GPRSPost() {
       checkSerial("SEND OK", "\n\n");
       break;
     case 5:
-      checkSerial("CLOSED", "\n\n");
+      checkSerial("HTTP/1.1 200 OK", "\n\n");
       break;
     case 6:
+      checkSerial("CLOSED", "\n\n");
+      break;
+    case 7:
+      GPRS.validToken = 1;
+      GPRS.process = 0;
+      break;
+  }
+}
+
+void GPRSPost() {
+  switch (GPRS.process) {
+    case 0:
       if (GPRSsequence == 0) {
+        GPRS.processSuccess = 1;
+        GPRS.lastSent = millis();
+        GPRS.processTime = millis();
         GPRS.token.trim();
-        req2[3] = "Authorization: Bearer " + GPRS.token + "\n";
-        req2[4] = "Content-Length: " + String(req2[7].length()) + "\n";
+        databasePost[3] = "Authorization: Bearer " + GPRS.token + "\n";
+        databasePost[4] = "Content-Length: " + String(databasePost[7].length()) + "\n";
         len = 0;
       }
-      len += req2[GPRSsequence].length();
+      len += databasePost[GPRSsequence].length();
       GPRSsequence++;
       if (GPRSsequence == 8) {
         Serial1.print("AT+CIPSTART=\"TCP\",\"" + server + "\",80\n");
@@ -419,23 +441,23 @@ void GPRSPost() {
       }
       GPRS.packetSentenceTime = millis();
       break;
-    case 7:
+    case 1:
       checkSerial("CONNECT OK", "ERROR");
       break;
-    case 8:
+    case 2:
       Serial1.print("AT+CIPSEND=" + String(len - 1) + "\n");
       GPRS.packetSentenceTime = millis();
       GPRS.process++;
       break;
-    case 9:
+    case 3:
       if (millis() - GPRS.packetSentenceTime > 200) {
         if (GPRSsequence == 3 || GPRSsequence == 7) {
-          for (int i = 0; i < req2[GPRSsequence].length(); i++) {
-            Serial1.print(req2[GPRSsequence][i]);
+          for (int i = 0; i < databasePost[GPRSsequence].length(); i++) {
+            Serial1.print(databasePost[GPRSsequence][i]);
           }
         }
         else {
-          Serial1.print(req2[GPRSsequence]);
+          Serial1.print(databasePost[GPRSsequence]);
         }
         GPRSsequence++;
         if (GPRSsequence == 8) {
@@ -445,17 +467,17 @@ void GPRSPost() {
         GPRS.packetSentenceTime = millis();
       }
       break;
-    case 10:
+    case 4:
       checkSerial("CLOSED", "\n\n");
       break;
-    case 11:
+    case 5:
       Serial1.print("AT+CIPSHUT\n");
       GPRS.process++;
       break;
-    case 12:
+    case 6:
       checkSerial("SHUT OK", "ERROR");
       break;
-    case 13:
+    case 7:
       logln("GPRS POST SUCCESS");
       GPRS.post = 0;
       GPRS.process = 0;
@@ -658,63 +680,63 @@ void setGPRSPostPeriod (long seconds) {
 }
 
 bool GPRSLoadVariables() {
-  req2[7] = "{";
-  req2[7] += "\"sn\":\"" + serialNumber + "\"";
+  databasePost[7] = "{";
+  databasePost[7] += "\"sn\":\"" + serialNumber + "\"";
   if (GPRS.postBabyTemp) {
-    req2[7] += ",\"baby_temp\":\"" + String(temperature[babyNTC], 2) + "\"";
+    databasePost[7] += ",\"baby_temp\":\"" + String(temperature[babyNTC], 2) + "\"";
   }
   if (GPRS.postHeaterTemp) {
-    req2[7] += ",\"heater_temp\":\"" + String(temperature[heaterNTC], 2) + "\"";
+    databasePost[7] += ",\"heater_temp\":\"" + String(temperature[heaterNTC], 2) + "\"";
   }
   if (GPRS.postBoardTemp1) {
-    req2[7] += ",\"board_temp1\":\"" + String(temperature[inBoardLeftNTC], 2) + "\"";
+    databasePost[7] += ",\"board_temp1\":\"" + String(temperature[inBoardLeftNTC], 2) + "\"";
   }
   if (GPRS.postBoardTemp2) {
-    req2[7] += ",\"board_temp2\":\"" + String(temperature[inBoardRightNTC], 2) + "\"";
+    databasePost[7] += ",\"board_temp2\":\"" + String(temperature[inBoardRightNTC], 2) + "\"";
   }
   if (GPRS.postBoardTemp3) {
-    req2[7] += ",\"board_temp3\":\"" + String(temperature[digitalTempSensor], 2) + "\"";
+    databasePost[7] += ",\"board_temp3\":\"" + String(temperature[digitalTempSensor], 2) + "\"";
   }
   if (GPRS.postHumidity) {
-    req2[7] += ",\"humidity\":\"" + String(humidity) + "\"";
+    databasePost[7] += ",\"humidity\":\"" + String(humidity) + "\"";
   }
   if (GPRS.postLongitud) {
-    req2[7] += ",\"long\":\"" + GPRS.longitud + "\"";
+    databasePost[7] += ",\"long\":\"" + GPRS.longitud + "\"";
   }
   if (GPRS.postLatitud) {
-    req2[7] += ",\"lat\":\"" + GPRS.latitud + "\"";
+    databasePost[7] += ",\"lat\":\"" + GPRS.latitud + "\"";
   }
   if (GPRS.RSSI) {
-    req2[7] += ",\"rssi\":\"" + GPRS.RSSI + "\"";
+    databasePost[7] += ",\"rssi\":\"" + GPRS.RSSI + "\"";
   }
   if (GPRS.postJaundicePower) {
-    req2[7] += ",\"jaundice_power\":\"" + String(jaundiceLEDIntensity) + "\"";
+    databasePost[7] += ",\"jaundice_power\":\"" + String(jaundiceLEDIntensity) + "\"";
   }
   if (GPRS.postHeaterPower) {
-    req2[7] += ",\"heater_power\":\"" + String(heaterPower) + "\"";
+    databasePost[7] += ",\"heater_power\":\"" + String(heaterPower) + "\"";
   }
   if (GPRS.postBPM) {
-    req2[7] += ",\"bpm\":\"" + String(BPM) + "\"";
+    databasePost[7] += ",\"bpm\":\"" + String(BPM) + "\"";
   }
   if (GPRS.postIBI) {
-    req2[7] += ",\"ibi\":\"" + String(IBI) + "\"";
+    databasePost[7] += ",\"ibi\":\"" + String(IBI) + "\"";
   }
   if (GPRS.postRPD) {
-    req2[7] += ",\"rpd\":\"" + String(IBI) + "\"";
+    databasePost[7] += ",\"rpd\":\"" + String(IBI) + "\"";
   }
   if (GPRS.postCurrentConsumption) {
-    req2[7] += ",\"power\":\"" + String(RPD) + "\"";
+    databasePost[7] += ",\"power\":\"" + String(RPD) + "\"";
   }
   if (GPRS.postComment) {
-    req2[7] += ",\"comments\":\"" + GPRS.comment + "\"";
+    databasePost[7] += ",\"comments\":\"" + GPRS.comment + "\"";
   }
-  req2[7] += "}\n";
-  logln("Posting: " + req2[7]);
-  if (req2[7].indexOf("nan") >= 0) {
+  databasePost[7] += "}\n";
+  logln("Posting: " + databasePost[7]);
+  if (databasePost[7].indexOf("nan") >= 0) {
     logln("Detected zero");
     return false;
   }
-  if (req2[7].length() > 1200) {
+  if (databasePost[7].length() > 1200) {
     logln("posting packet size oversized");
     return false;
   }
