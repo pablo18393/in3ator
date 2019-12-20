@@ -52,7 +52,6 @@ void shortcircuitTest() {
 
 void sensorsTest() {
   //sensors verification
-
   if (((HEATER_NTC_PIN) > 3200 || analogRead(HEATER_NTC_PIN) < 1200) && HWNTCHeater) {
     errorHardwareCode[HW_NUM_NTCHeater] = opencircuit;
   }

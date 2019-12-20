@@ -174,10 +174,10 @@ void asleep() {
   encPulsedBefore = encPulsed;
   if (auto_lock) {
     if (millis() - last_something > time_lock) {
-      analogWrite(SCREENBACKLIGHT, 0);
+      analogWrite(SCREENBACKLIGHT, 255);
     }
   }
   else {
-    analogWrite(SCREENBACKLIGHT, TFT_LED);
+    analogWrite(SCREENBACKLIGHT, TFT_LED_PWR);
   }
 }

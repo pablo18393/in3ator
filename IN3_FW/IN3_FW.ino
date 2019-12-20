@@ -1,3 +1,4 @@
+
 //include libraries
 #include <Adafruit_GFX_AS.h>
 #include <EEPROM.h>
@@ -192,7 +193,7 @@ byte barThickness;
 //User Interface display variables
 bool auto_lock; //setting that enables backlight switch OFF after a given time of no user actions
 int time_lock = 16000; //time to lock screen if no user actions
-int TFT_LED = 50; //PWM that will be supplied to backlight LEDs
+int TFT_LED_PWR = 210; //PWM that will be supplied to backlight LEDs
 const byte time_back_draw = 255;
 const byte time_back_wait = 255;
 long last_something; //last time there was a encoder movement or pulse

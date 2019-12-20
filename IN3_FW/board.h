@@ -1,7 +1,61 @@
 //Select board
+#define v6Board
 //#define v4Board
-#define maplemini
+//#define maplemini
 
+//Hardware
+#define DHTSensor 0
+#define BME280Sensor 0
+#define SPI_SEL 2
+#define SDCard 0
+#define SerialDebug 0
+
+#ifdef v6Board
+#define HUMIDIFIER_FB PA0
+#define PULSIOXIMETER PA1
+#define BME_CS PA2
+#define SYSTEM_SHUNT PA3
+#define PULSIOXIMETER_OFFSET PA4
+#define FAN_LP PA5
+#define HUMIDIFIER PA6
+#define HEATER PA7
+#define FAN_HP PA8
+#define ENC_SWITCH PA12
+#define SD_CS PA13
+#define STERILIZE_CTL PA15
+
+#define JAUNDICE PB0
+word BABY_NTC_PIN = PB1;   //This is not #define because can be swaped with HEATER_NTC_PIN
+#define FAN_LP_FB PB2
+#define HX711_DATA PB3
+#define PULSIOXIMETER_EN PB5
+#define TFT_DC PB8
+#define TOUCH_CS PB9
+#define HX711_CLK PB12
+
+#define CO2 PC0
+word HEATER_NTC_PIN = PC1; //This is not #define because can be swaped with BABY_NTC_PIN
+#define INBOARD_LEFT_NTC_PIN PC2
+#define INBOARD_RIGHT_NTC_PIN PC3
+#define JAUNDICE_FB PC4
+#define STERILIZE_FB PC5
+#define SCREENBACKLIGHT PC7
+#define BUZZER PC6
+#define ENC_A PC8
+#define ENC_B PC9
+#define DHTPIN PC10
+#define POWER_EN PC11
+#define POWER_EN_FB PC12
+#define TFT_CS PC13
+#define GPRS_PWRKEY PC14
+#define TOUCH_IRQ PC15
+
+#define TFT_RST PD2
+
+//Pending to erase
+#define HEATER_FB PA11
+#define FAN_HP_FB PA11
+#endif
 
 #ifdef v4Board
 #define DHTPIN PC10
@@ -12,7 +66,7 @@ word BABY_NTC_PIN = PB1;   //This is not #define because can be swaped with HEAT
 #define INBOARD_RIGHT_NTC_PIN PC3
 #define ENC_A PC8
 #define ENC_B PC9
-#define ENC_ENC_SWITCH PC6
+#define ENC_SWITCH PC6
 #define POWER_EN PC11
 #define FAN_HP PA8
 #define FAN_LP PB11
@@ -43,12 +97,6 @@ word BABY_NTC_PIN = PB1;   //This is not #define because can be swaped with HEAT
 #define TFT_RST PD2
 #define SD_CS PB15
 #endif
-
-//Hardware
-#define DHTSensor 1
-#define BME280Sensor 0
-#define SPI_SEL 1
-#define SDCard 0
 
 #ifdef maplemini
 //pin declaration

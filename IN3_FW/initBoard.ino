@@ -1,4 +1,3 @@
-
 void initBoard() {
   pinDirection();
   //hardwareVerification();
@@ -8,12 +7,19 @@ void initBoard() {
   initGPRS();
   initTFT();
   initTimers();
+  if (SerialDebug) {
+    Serial.begin(115200);
+  }
+  else {
+    Serial.end();
+  }
 }
 
 void initTFT() {
   SPI.setModule(SPI_SEL);
   tft.begin();
   tft.setRotation(1);
+  analogWrite(SCREENBACKLIGHT, TFT_LED_PWR);
   //loadlogo();
 }
 
@@ -33,7 +39,6 @@ void pinDirection() {
   pinMode(encoderpinB, INPUT_PULLUP);
   pinMode(SYSTEM_SHUNT, INPUT);
 
-  digitalWrite(SCREENBACKLIGHT, HIGH);
   digitalWrite(JAUNDICE, LOW);
   digitalWrite(HEATER, LOW);
   digitalWrite(POWER_EN, HIGH);
@@ -57,8 +62,8 @@ void initTimers() {
     heaterPID.SetOutputLimits(0, HeatermaxPWM);
     roomPIDTimer.refresh();
     roomPIDTimer.resume();
+  */
 
-  
   //sensors handling ISR configuration
   sensorsTimer.pause();
   sensorsTimer.setPeriod(sensorsISRRate); // in microseconds
@@ -75,14 +80,14 @@ void initTimers() {
   humidifierTimer.refresh();
   humidifierTimer.resume();
 
-    encoderTimer.pause();
+  encoderTimer.pause();
   encoderTimer.setPeriod(encoderISRRate); // in microseconds
   encoderTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
   encoderTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
   encoderTimer.attachCompare1Interrupt(encoderISR);
   encoderTimer.refresh();
   encoderTimer.resume();
-  */
+
   //GPRS timer configuration
   GPRSTimer.pause();
   GPRSTimer.setPeriod(GPRSISRRate); // in microseconds

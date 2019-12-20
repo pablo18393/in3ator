@@ -11,7 +11,6 @@ int updateData() {
   if ((page == mainMenuPage || page == advancedModePage) && !enableSet) {
     checkSetMessage();
   }
-  checkSerialPort();
   checkNewPulsioximeterData();
 }
 
@@ -61,66 +60,6 @@ void updateDisplaySensors() {
         humidityPercentage = 0;
       }
       updateLoadingHumidityBar(int(previousHumidityPercentage), int(humidityPercentage));
-    }
-  }
-}
-
-void checkSerialPort() {
-  if (Serial.available()) {
-    switch (Serial.read()) {
-      case 'T':
-        Serial.println(temperature[0]);
-        break;
-      case 'P':
-        Serial.println("PING");
-        break;
-      case 'I':
-        pinMode(PB1, INPUT_PULLUP);
-        Serial.println("INPUT");
-        break;
-      case 'A':
-        Serial.println(analogRead(PB1));
-        /*        while (1) {
-                  Serial.println(analogRead(PB1));
-                  delay(15);
-                  }
-        */
-        break;
-    }
-  }
-  if (Serial.available()) {
-    switch (Serial.read()) {
-      case 'T':
-        switch (Serial.read()) {
-          case 'C':
-            diffTemperature[babyNTC] = temperature[babyNTC] - readSerialData();
-            temperature[babyNTC] -= diffTemperature[babyNTC];
-            break;
-          case 'H':
-            diffTemperature[heaterNTC] = temperature[heaterNTC] - readSerialData();
-            temperature[heaterNTC] -= diffTemperature[heaterNTC];
-            break;
-        }
-        break;
-      case 'H':
-        diffHumidity = humidity - readSerialData();
-        humidity -= diffHumidity;
-        break;
-      case 'P':
-        HeatermaxPWM = readSerialData();
-        //log("Heater max PWM is: ");
-        //logln(String(HeatermaxPWM));
-        break;
-      case 'R':
-        nvic_sys_reset();
-        break;
-      case 'W':
-        byte humidifierPWM;
-        //log("Humidifier working PWM is: ");
-        humidifierPWM = readSerialData();
-        analogWrite(HUMIDIFIER, humidifierPWM);
-        //logln(String(humidifierPWM));
-        break;
     }
   }
 }
