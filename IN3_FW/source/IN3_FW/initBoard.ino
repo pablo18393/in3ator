@@ -39,6 +39,7 @@ void pinDirection() {
   pinMode(encoderpinB, INPUT_PULLUP);
   pinMode(SYSTEM_SHUNT, INPUT);
 
+  digitalWrite(SCREENBACKLIGHT, HIGH);
   digitalWrite(JAUNDICE, LOW);
   digitalWrite(HEATER, LOW);
   digitalWrite(POWER_EN, HIGH);

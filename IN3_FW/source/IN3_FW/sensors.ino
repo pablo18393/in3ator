@@ -12,7 +12,6 @@ void initSensors() {
 void sensorsISR() {
   measurenumNTC();
   if (millis() - lastSensorsUpdate > sensorsUpdateRate) {
-    updateHumidity();
     lastSensorsUpdate = millis();
   }
   /*
@@ -125,9 +124,15 @@ bool updateHumidity() {
     }
   }
   if (BME280Sensor) {
+    digitalWrite(BME_CS, LOW);
+    digitalWrite(TFT_CS, HIGH);
+    bme.begin();
     BME280Temperature = bme.readTemperature();
     BME280Humidity = bme.readHumidity();
-    if (DHTHumidity && DHTTemperature) {
+    SPI.beginTransaction(SPISettings(48000000, MSBFIRST, SPI_MODE0, DATA_SIZE_16BIT));
+    digitalWrite(BME_CS, HIGH);
+    digitalWrite(TFT_CS, LOW);
+    if (BME280Temperature && BME280Humidity) {
       temperature[digitalTempSensor] = BME280Temperature; //Add here measurement to temp array
       BME280OK = 1;
     }

@@ -334,7 +334,7 @@ bool criticalError;
 
 Adafruit_ILI9341_STM tft = Adafruit_ILI9341_STM(TFT_CS, TFT_DC, TFT_RST); // Use hardware SPI, tft class definition
 DHT dht; //dht sensor class definition
-Adafruit_BME280 bme(BME_CS); // hardware SPI, //BME280 (humidity, pressure and temperature sensor) configuration variables
+Adafruit_BME280 bme(BME_CS, PB15, PB14, PB13); // software SPI, //BME280 (humidity, pressure and temperature sensor) configuration variables
 
 int HeatermaxPWM = maxPWMvalue;      //max power for heater, full power is 50W
 
@@ -367,7 +367,7 @@ HardwareTimer sensorsTimer(8);
 
 void setup() {
   initBoard();
-  mainMenu();
+  advancedMode();
 }
 
 void loop() {

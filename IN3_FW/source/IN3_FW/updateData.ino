@@ -1,6 +1,7 @@
 int updateData() {
   if (millis() - lastSensorsUpdate > sensorsUpdateRate) {
     if (page == advancedModePage || page == actuatorsProgressPage) {
+      updateHumidity();
       updateDisplaySensors();
       if (page == actuatorsProgressPage) {
         printStatus();

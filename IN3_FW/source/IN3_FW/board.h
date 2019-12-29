@@ -5,7 +5,7 @@
 
 //Hardware
 #define DHTSensor 0
-#define BME280Sensor 0
+#define BME280Sensor 1
 #define SPI_SEL 2
 #define SDCard 0
 #define SerialDebug 0
