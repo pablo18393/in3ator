@@ -11,9 +11,6 @@ void initSensors() {
 
 void sensorsISR() {
   measurenumNTC();
-  if (millis() - lastSensorsUpdate > sensorsUpdateRate) {
-    lastSensorsUpdate = millis();
-  }
   /*
     readPulsioximeter();
     if (!pulsioximeterCount) {
@@ -21,11 +18,24 @@ void sensorsISR() {
     calculatePulsioximeterValues();
     }
     pulsioximeterCount--;
+      checkNewPulsioximeterData();
   */
 }
 
 void initPulsioximeterVariables() {
 
+}
+
+void checkNewPulsioximeterData() {
+  if (pulsioximeterCounter[pulsioximeterDrawn] = !pulsioximeterCounter[pulsioximeterSampled]) {
+    drawPulsioximeter();
+    if (pulsioximeterCounter[pulsioximeterDrawn] == maxPulsioximeterSamples) {
+      pulsioximeterCounter[pulsioximeterDrawn] = 0;
+    }
+    else {
+      pulsioximeterCounter[pulsioximeterDrawn]++;
+    }
+  }
 }
 
 void readPulsioximeter() {
@@ -114,10 +124,8 @@ bool updateHumidity() {
   int BME280Temperature;
   int BME280Humidity;
   if (DHTSensor) {
-    sensorsTimer.pause();
     DHTTemperature = dht.getTemperature();
     DHTHumidity = dht.getHumidity();
-    sensorsTimer.resume();
     if (DHTHumidity && DHTTemperature && abs(DHTHumidity) <= 100) {
       temperature[digitalTempSensor] = DHTTemperature; //Add here measurement to temp array
       DHTOK = 1;
@@ -126,8 +134,10 @@ bool updateHumidity() {
   if (BME280Sensor) {
     digitalWrite(BME_CS, LOW);
     digitalWrite(TFT_CS, HIGH);
-    bme.begin();
-    BME280Temperature = bme.readTemperature();
+    pinMode(PB15, OUTPUT);
+    pinMode(PB14, INPUT);
+    pinMode(PB13, OUTPUT);
+    BME280Temperature = bme.readTemperature(); //just to read faster
     BME280Humidity = bme.readHumidity();
     SPI.beginTransaction(SPISettings(48000000, MSBFIRST, SPI_MODE0, DATA_SIZE_16BIT));
     digitalWrite(BME_CS, HIGH);

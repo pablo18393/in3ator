@@ -1,29 +1,16 @@
 int updateData() {
-  if (millis() - lastSensorsUpdate > sensorsUpdateRate) {
+  if (millis() - lastGraphicSensorsUpdate > sensorsUpdateRate) {
+    updateHumidity();
     if (page == advancedModePage || page == actuatorsProgressPage) {
-      updateHumidity();
       updateDisplaySensors();
       if (page == actuatorsProgressPage) {
         printStatus();
       }
-      lastSensorsUpdate = millis();
+      lastGraphicSensorsUpdate = millis();
     }
   }
   if ((page == mainMenuPage || page == advancedModePage) && !enableSet) {
     checkSetMessage();
-  }
-  checkNewPulsioximeterData();
-}
-
-void checkNewPulsioximeterData() {
-  if (pulsioximeterCounter[pulsioximeterDrawn] = !pulsioximeterCounter[pulsioximeterSampled]) {
-    drawPulsioximeter();
-    if (pulsioximeterCounter[pulsioximeterDrawn] == maxPulsioximeterSamples) {
-      pulsioximeterCounter[pulsioximeterDrawn] = 0;
-    }
-    else {
-      pulsioximeterCounter[pulsioximeterDrawn]++;
-    }
   }
 }
 
@@ -65,15 +52,7 @@ void updateDisplaySensors() {
   }
 }
 
-int readSerialData() {
-  int serialData = 0;
-  delay(15);
-  while (Serial.available()) {
-    serialData *= 10;
-    serialData += Serial.read() - 48;
-  }
-  return (serialData);
-}
+
 
 void printStatus() {
   //log(millis() / 1000);

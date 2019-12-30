@@ -104,7 +104,6 @@ struct GPRSstruct GPRS;
 
 void initGPRS()
 {
-  Serial.begin(115200);
   Serial1.begin(115200);
   GPRSSetPostVariables(defaultPost, "");
   GPRS.postBabyTemp = 1;

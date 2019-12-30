@@ -142,8 +142,8 @@ long last_encoder_move;
 long last_encPulsed; //last time encoder was pulsed
 
 //User Interface display constants
-#define introDelay    1000      //initial delay between intro and menu
-#define brightenRate  30        //intro brighten speed (Higher value, slower)
+#define introDelay    1500      //initial delay between intro and menu
+#define brightenRate  50        //intro brighten speed (Higher value, slower)
 #define valuePosition 245
 #define separatorPosition 240
 #define unitPosition 315
@@ -208,6 +208,7 @@ char* helpMessage;
 byte bar_pos;
 byte rectangles;
 byte length;
+long lastGraphicSensorsUpdate;
 long lastSensorsUpdate;
 bool enableSetProcess;
 long blinking;
@@ -367,7 +368,7 @@ HardwareTimer sensorsTimer(8);
 
 void setup() {
   initBoard();
-  advancedMode();
+  mainMenu();
 }
 
 void loop() {

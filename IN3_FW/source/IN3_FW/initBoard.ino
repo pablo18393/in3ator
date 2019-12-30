@@ -7,23 +7,22 @@ void initBoard() {
   initGPRS();
   initTFT();
   initTimers();
-  if (SerialDebug) {
-    Serial.begin(115200);
-  }
-  else {
-    Serial.end();
-  }
 }
 
 void initTFT() {
   SPI.setModule(SPI_SEL);
   tft.begin();
   tft.setRotation(1);
-  analogWrite(SCREENBACKLIGHT, TFT_LED_PWR);
-  //loadlogo();
+  loadlogo();
 }
 
 void pinDirection() {
+  if (SerialDebug) {
+    Serial.begin(115200);
+  }
+  else {
+    Serial.end();
+  }
   pinMode(SCREENBACKLIGHT, OUTPUT);
   pinMode(ENC_SWITCH, INPUT_PULLUP);
   pinMode(JAUNDICE, OUTPUT);
