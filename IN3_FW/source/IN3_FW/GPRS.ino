@@ -112,7 +112,7 @@ void initGPRS()
   setGPRSPostPeriod(standByGPRSPostPeriod);
 }
 
-void GPRSHandler() {
+void GPRSISR() {
   if (GPRS.powerUp) {
     GPRSPowerUp();
   }

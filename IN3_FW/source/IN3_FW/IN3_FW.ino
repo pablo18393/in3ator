@@ -16,9 +16,9 @@
 
 
 //Firmware version and head title of UI screen
-#define FWversion "v2.3"
+#define FWversion "v3.1"
 #define headingTitle "in3ator"
-String serialNumber = "bqTest000001";
+String serialNumber = "in3000001";
 
 //configuration variables
 #define debounceTime 100         //encoder debouncing time
@@ -143,7 +143,7 @@ long last_encPulsed; //last time encoder was pulsed
 
 //User Interface display constants
 #define introDelay    1500      //initial delay between intro and menu
-#define brightenRate  50        //intro brighten speed (Higher value, slower)
+#define brightenRate  100        //intro brighten speed (Higher value, slower)
 #define valuePosition 245
 #define separatorPosition 240
 #define unitPosition 315
@@ -193,7 +193,7 @@ byte barThickness;
 //User Interface display variables
 bool auto_lock; //setting that enables backlight switch OFF after a given time of no user actions
 int time_lock = 16000; //time to lock screen if no user actions
-int TFT_LED_PWR = 210; //PWM that will be supplied to backlight LEDs
+int TFT_LED_PWR = 59000; //PWM that will be supplied to backlight LEDs
 const byte time_back_draw = 255;
 const byte time_back_wait = 255;
 long last_something; //last time there was a encoder movement or pulse
@@ -337,16 +337,16 @@ Adafruit_ILI9341_STM tft = Adafruit_ILI9341_STM(TFT_CS, TFT_DC, TFT_RST); // Use
 DHT dht; //dht sensor class definition
 Adafruit_BME280 bme(BME_CS, PB15, PB14, PB13); // software SPI, //BME280 (humidity, pressure and temperature sensor) configuration variables
 
-int HeatermaxPWM = maxPWMvalue;      //max power for heater, full power is 50W
+int HeatermaxPWM = heaterMaxPWM;      //max power for heater, full power is 50W
 
 // timers configuration
-#define sensorsISRRate 5000    // in microseconds, also for BUZZER optimal frequency (2khz); 
 #define NTCInterruptRate 20000    // in microseconds; 
-#define roomPIDRate 1000000    // in microseconds; 
 #define heaterPIDRate 200000   // times of roomPIDRate;
 #define GPRSISRRate 1000    // in microseconds, able to read 115200 baud rate uart; 
-#define encoderISRRate 1000    // in microseconds; 
-#define humidifierTimerRate 9 //in microseconds, to generate a 110Khz PWM for ultra sonic humidifier
+#define sensorsISRRate 5000    // in microseconds, also for BUZZER optimal frequency (2khz); Prescale factor 6, Overflow 60000
+#define roomPIDRate 1000000    // in microseconds. Prescale factor 2, Overflow 65535
+#define peripheralsISRRate 1000    // in microseconds. Prescale factor 2, Overflow 36000
+#define humidifierTimerRate 9 //in microseconds, to generate a 110Khz PWM for ultra sonic humidifier. Prescale factor 1, Overflow 648
 int roomPIDfactor = roomPIDRate / NTCInterruptRate;
 int heaterPIDfactor = heaterPIDRate / NTCInterruptRate;
 volatile long interruptcounter;

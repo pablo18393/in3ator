@@ -137,12 +137,12 @@ bool updateHumidity() {
     pinMode(PB15, OUTPUT);
     pinMode(PB14, INPUT);
     pinMode(PB13, OUTPUT);
-    BME280Temperature = bme.readTemperature(); //just to read faster
+    BME280Temperature = bme.readTemperature();
     BME280Humidity = bme.readHumidity();
     SPI.beginTransaction(SPISettings(48000000, MSBFIRST, SPI_MODE0, DATA_SIZE_16BIT));
     digitalWrite(BME_CS, HIGH);
     digitalWrite(TFT_CS, LOW);
-    if (BME280Temperature && BME280Humidity) {
+    if (BME280Temperature && BME280Humidity && abs(BME280Humidity) <= 100 && abs(BME280Temperature) <= 100) {
       temperature[digitalTempSensor] = BME280Temperature; //Add here measurement to temp array
       BME280OK = 1;
     }
@@ -162,7 +162,13 @@ bool updateHumidity() {
   return (DHTOK || BME280OK);
 }
 
-void encoderISR() {
+void peripheralsISR() {
+  readEncoder();
+  sensorsISR();
+  GPRSISR();
+}
+
+void readEncoder() {
   if ( (digitalRead(ENC_A))  != A_set )
   {
     A_set = !A_set;
@@ -189,10 +195,10 @@ void asleep() {
   encPulsedBefore = encPulsed;
   if (auto_lock) {
     if (millis() - last_something > time_lock) {
-      analogWrite(SCREENBACKLIGHT, 255);
+      pwmWrite(SCREENBACKLIGHT, screenBackLightMaxPWM);
     }
   }
   else {
-    analogWrite(SCREENBACKLIGHT, TFT_LED_PWR);
+    pwmWrite(SCREENBACKLIGHT, TFT_LED_PWR);
   }
 }

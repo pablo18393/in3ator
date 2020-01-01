@@ -94,7 +94,7 @@ void barSelection() {
                     setGPRSPostPeriod(standByGPRSPostPeriod);
                   }
                   jaundiceLEDIntensity -= 10 * EncMove;
-                  analogWrite(JAUNDICE, jaundiceLEDIntensity * 2.55);
+                  pwmWrite(JAUNDICE, jaundiceMaxPWM * jaundiceLEDIntensity / LEDMaxIntensity);
                   tft.setTextColor(COLOR_MENU_TEXT);
                   if (!jaundiceLEDIntensity && EncMove) {
                     tft.setTextColor(COLOR_MENU);
@@ -171,7 +171,7 @@ void barSelection() {
                     tft.drawRightString("%", unitPosition, ypos, textFontSize);
                   }
                   jaundiceLEDIntensity -= 10 * EncMove;
-                  analogWrite(JAUNDICE, jaundiceLEDIntensity * 2.55);
+                  pwmWrite(JAUNDICE, jaundiceMaxPWM * jaundiceLEDIntensity / LEDMaxIntensity);
                   tft.setTextColor(COLOR_MENU_TEXT);
                   if (!jaundiceLEDIntensity && EncMove) {
                     tft.setTextColor(COLOR_MENU);

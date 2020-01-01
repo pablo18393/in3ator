@@ -1,12 +1,12 @@
 void initBoard() {
-  pinDirection();
-  //hardwareVerification();
   initEEPROM();
   initSensors();
   initSD();
   initGPRS();
-  initTFT();
   initTimers();
+  pinDirection();
+  initTFT();
+  //hardwareVerification();
 }
 
 void initTFT() {
@@ -23,22 +23,27 @@ void pinDirection() {
   else {
     Serial.end();
   }
-  pinMode(SCREENBACKLIGHT, OUTPUT);
-  pinMode(ENC_SWITCH, INPUT_PULLUP);
-  pinMode(JAUNDICE, OUTPUT);
-  pinMode(POWER_EN, OUTPUT);
-  pinMode(FAN_HP, OUTPUT);
+  pinMode(JAUNDICE, PWM);
+  pinMode(HEATER, PWM);
+  pinMode(FAN_HP, PWM);
+  pinMode(HUMIDIFIER, PWM);
+  pinMode(BUZZER, PWM);
+  pinMode(SCREENBACKLIGHT, PWM);
   pinMode(FAN_LP, OUTPUT);
   pinMode(STERILIZE_CTL, OUTPUT);
-  pinMode(HUMIDIFIER, OUTPUT);
-  pinMode(HEATER, OUTPUT);
-  pinMode(HEATER, OUTPUT);
+  pinMode(ENC_SWITCH, INPUT_PULLUP);
+  pinMode(POWER_EN, OUTPUT);
   pinMode(GPRS_PWRKEY, OUTPUT);
   pinMode(encoderpinA, INPUT_PULLUP);
   pinMode(encoderpinB, INPUT_PULLUP);
   pinMode(SYSTEM_SHUNT, INPUT);
 
-  digitalWrite(SCREENBACKLIGHT, HIGH);
+  pwmWrite(SCREENBACKLIGHT, screenBackLightMaxPWM);
+  pwmWrite(JAUNDICE, 0);
+  pwmWrite(HEATER, 0);
+  pwmWrite(FAN_HP, 0);
+  pwmWrite(HUMIDIFIER, 0);
+  pwmWrite(BUZZER, 0);
   digitalWrite(JAUNDICE, LOW);
   digitalWrite(HEATER, LOW);
   digitalWrite(POWER_EN, HIGH);
@@ -64,40 +69,38 @@ void initTimers() {
     roomPIDTimer.resume();
   */
 
-  //sensors handling ISR configuration
-  sensorsTimer.pause();
-  sensorsTimer.setPeriod(sensorsISRRate); // in microseconds
-  sensorsTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
-  sensorsTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
-  sensorsTimer.attachCompare1Interrupt(sensorsISR);
-  nvic_irq_set_priority(NVIC_TIMER8_CC, 14);
-  sensorsTimer.refresh();
-  sensorsTimer.resume();
-
-  //humidifier timer configuration
+  //humidifier timer configuration:
   humidifierTimer.pause();
   humidifierTimer.setPeriod(humidifierTimerRate); // in microseconds
   humidifierTimer.refresh();
   humidifierTimer.resume();
 
   encoderTimer.pause();
-  encoderTimer.setPeriod(encoderISRRate); // in microseconds
+  encoderTimer.setPeriod(peripheralsISRRate); // in microseconds
   encoderTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
   encoderTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
-  encoderTimer.attachCompare1Interrupt(encoderISR);
+  encoderTimer.attachCompare1Interrupt(peripheralsISR);
+  nvic_irq_set_priority(NVIC_TIMER8_CC, 15);
+  nvic_irq_set_priority(NVIC_USART1 , 13);
   encoderTimer.refresh();
   encoderTimer.resume();
+
+  //sensors handling ISR configuration
+  sensorsTimer.pause();
+  sensorsTimer.setPeriod(sensorsISRRate); // in microseconds
+  sensorsTimer.refresh();
+  sensorsTimer.resume();
 
   //GPRS timer configuration
   GPRSTimer.pause();
   GPRSTimer.setPeriod(GPRSISRRate); // in microseconds
-  GPRSTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
-  GPRSTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
-  GPRSTimer.attachCompare1Interrupt(GPRSHandler);
-  nvic_irq_set_priority(NVIC_TIMER1_CC, 15);
-  nvic_irq_set_priority(NVIC_USART1 , 13);
   GPRSTimer.refresh();
   GPRSTimer.resume();
 
-
+  heaterMaxPWM = humidifierTimer.getOverflow();
+  jaundiceMaxPWM = humidifierTimer.getOverflow();
+  humidifierMaxPWM = humidifierTimer.getOverflow();
+  fanHPMaxPWM = GPRSTimer.getOverflow();
+  buzzerMaxPWM = sensorsTimer.getOverflow();
+  screenBackLightMaxPWM = sensorsTimer.getOverflow();
 }

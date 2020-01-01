@@ -138,5 +138,10 @@ int BABY_NTC_PIN = 11;
 #endif
 
 #define maxADCvalue 4095
-#define maxPWMvalue 255         //for STM32F103RE with arduino IDE
 #define maxDACvalue 4095         //for STM32F103RE with arduino IDE
+int heaterMaxPWM;
+int screenBackLightMaxPWM;
+int jaundiceMaxPWM;
+int fanHPMaxPWM;
+int humidifierMaxPWM;
+int buzzerMaxPWM;

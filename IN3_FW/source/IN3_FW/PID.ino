@@ -13,12 +13,12 @@ void roomPIDInterrupt() {
     if (interruptcounter == roomPIDfactor) {
       interruptcounter = 0;
       roomPID.Compute();
-      desiredHeaterTemp = PIDOutput[babyNTC] * (maxHeaterTemp - desiredSkinTemp) / (maxPWMvalue) + desiredSkinTemp;  //map function: min value is
+      desiredHeaterTemp = PIDOutput[babyNTC] * (maxHeaterTemp - desiredSkinTemp) / (heaterMaxPWM) + desiredSkinTemp;  //map function: min value is
     }
     if (!(interruptcounter % heaterPIDfactor)) {
       heaterPID.Compute();
       heaterPower = PIDOutput[heaterNTC];
-      analogWrite(HEATER, heaterPower);
+      pwmWrite(HEATER, heaterPower);
     }
     interruptcounter++;
   }
@@ -35,5 +35,5 @@ void stopPID() {
   roomPID.SetMode(MANUAL);
   heaterPID.SetMode(MANUAL);
   temperaturePIDcontrolStart = 0;
-  analogWrite(HEATER, 0);
+  pwmWrite(HEATER, 0);
 }
