@@ -17,6 +17,7 @@ void initTFT() {
 }
 
 void pinDirection() {
+  afio_cfg_debug_ports(AFIO_DEBUG_SW_ONLY); //release PA15 pin for GPIO purpose
   if (SerialDebug) {
     Serial.begin(115200);
   }

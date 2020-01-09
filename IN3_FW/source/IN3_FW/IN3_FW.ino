@@ -343,7 +343,7 @@ int HeatermaxPWM = heaterMaxPWM;      //max power for heater, full power is 50W
 #define NTCInterruptRate 20000    // in microseconds; 
 #define heaterPIDRate 200000   // times of roomPIDRate;
 #define GPRSISRRate 1000    // in microseconds, able to read 115200 baud rate uart; 
-#define sensorsISRRate 5000    // in microseconds, also for BUZZER optimal frequency (2khz); Prescale factor 6, Overflow 60000
+#define sensorsISRRate 500    // in microseconds, also for BUZZER optimal frequency (2khz); Prescale factor 6, Overflow 6000
 #define roomPIDRate 1000000    // in microseconds. Prescale factor 2, Overflow 65535
 #define peripheralsISRRate 1000    // in microseconds. Prescale factor 2, Overflow 36000
 #define humidifierTimerRate 9 //in microseconds, to generate a 110Khz PWM for ultra sonic humidifier. Prescale factor 1, Overflow 648
