@@ -1,67 +1,41 @@
 void hardwareVerification() {
-  numSensors = numNTC + DHTSensor;
-  testOK = 1;
-  testCritical = 0;
   for (int i = 0; i < hardwareComponents; i++) {
     errorHardwareCode[i] = 0;
   }
-  shortcircuitTest();
-  sensorsTest();
-  if (!testCritical) {
-    openCircuitTest();
-  }
-  for (int i = 0; i < hardwareComponents; i++) {
-    if (errorHardwareCode[i]) {
-      testOK = 0;
-      //log("hardware error code: ");
-      //log(errorComponent[i]);
-      if (hardwareCritical[i] && errorHardwareCode[i] == shortcircuit) {
-        //log(", critical");
-      }
-      //logln("");
+  if (sensorsTest() && shortcircuitTest()) {
+    if (openCircuitTest()) {
+      logln("HARDWARE TEST OK");
     }
   }
-  if (testOK) {
-    //logln("HARDWARE TEST OK");
-  }
-  else {
-    for (int i = 0; i < hardwareComponents; i++) {
-      //log(errorHardwareCode[i]);
-    }
-    //logln("");
-    //logln("HARDWARE TEST FAIL");
-    drawHardwareErrorMessage();
-  }
+  logln("HARDWARE TEST FAIL");
+  drawHardwareErrorMessage();
+  while (digitalRead(ENC_SWITCH));
 }
 
 void shortcircuitTest() {
   for (int i = 0; i < hardwareComponents - numSensors; i++) {
     if (i) {
       digitalWrite(POWER_EN, HIGH);
+      delay(300); //wait for relay to switch
     }
-    errorHardwareCode[i] = 0;
-    if (!digitalRead(hardwareVerificationPin[i]) && hardwareMounted[i]) {
-      errorHardwareCode[i] = shortcircuit;
-      if (hardwareCritical[i]) {
-        testCritical = 1;
-      }
-    }
+
   }
   digitalWrite(POWER_EN, LOW);
 }
 
-void sensorsTest() {
+bool sensorsTest() {
   //sensors verification
   if (((HEATER_NTC_PIN) > 3200 || analogRead(HEATER_NTC_PIN) < 1200) && HWNTCHeater) {
-    errorHardwareCode[HW_NUM_NTCHeater] = opencircuit;
+    return (false);
   }
   if ((analogRead(BABY_NTC_PIN) > 3200 || analogRead(BABY_NTC_PIN) < 1200) && HWNTCRoom) {
-    errorHardwareCode[HW_NUM_NTCRoom] = opencircuit;
+    return (false);
   }
   //logln(String(updateHumidity()));
   if (HWHUMSensor && !updateHumidity()) {
-    errorHardwareCode[HW_NUM_HUMSensor] = opencircuit;
+    return (false);
   }
+  return (true);
 }
 
 void openCircuitTest() {

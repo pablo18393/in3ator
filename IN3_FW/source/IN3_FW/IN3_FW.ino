@@ -87,7 +87,7 @@ byte encoderCount = 0;
 int pulsioximeterMean;
 const int maxPulsioximeterSamples = 320; //(tft width).
 float currentConsumption;
-float currentConsumptionFactor = 333.33; //factor to translate current consumtion in mA
+float currentConsumptionFactor = 2.685; //factor to translate current consumtion in mA
 int pulsioximeterSample[maxPulsioximeterSamples][2]; //0 is previous data, 1 is actual data
 int pulsioximeterPeakThreshold;
 int pulsioximeterMaxPeak;
@@ -279,61 +279,8 @@ byte goToProcessRow;
 #define introTextColor BLACK
 #define transitionEffect BLACK
 
-//hardware verification variables
-#define hardwareComponents 12
-byte errorHardwareCode[hardwareComponents];
-
-//hardware verification. 1 is a mounted hardware, 0 a not mounted.
-#define HWPowerEn 1
-#define HWHeater 1
-#define HWFAN_HP 1
-#define HWFAN_LP 1
-#define HWJAUNDICE 1
-#define HWSTERILIZE_CTL 1
-#define HWHumidifier 1
-#define HWNTCHeater 1
-#define HWNTCRoom 1
-#define HWHUMSensor 1
-
-//number assigned to hardware
-#define HW_NUM_PowerEn 0         //hardware 1
-#define HW_NUM_Heater 1          //hardware 2
-#define HW_NUM_FAN_HP 3            //hardware 4
-#define HW_NUM_FAN_LP 4            //hardware 5
-#define HW_NUM_JAUNDICE 6             //hardware 7
-#define HW_NUM_STERILIZE_CTL 7       //hardware 8
-#define HW_NUM_Humidifier 8      //hardware 9
-#define HW_NUM_NTCHeater 9       //hardware 10
-#define HW_NUM_NTCRoom 10         //hardware 11
-#define HW_NUM_HUMSensor 11       //hardware 12
-
-
-//hardware critical check. 2 is a critical non interchangable hardware, 1 is a critical interchangable hardware, 0 a not critical and interchangable hardware.
-#define HW_CRIT_PowerEn 2
-#define HW_CRIT_Heater 1
-#define HW_CRIT_FAN_HP 0
-#define HW_CRIT_FAN_LP 0
-#define HW_CRIT_JAUNDICE 1
-#define HW_CRIT_STERILIZE_CTL 1
-#define HW_CRIT_Humidifier 1
-#define HW_CRIT_NTCHeater 2
-#define HW_CRIT_NTCRoom 2
-#define HW_CRIT_HUMSENSOR 2
-
-#define shortcircuit 2
-#define opencircuit 1
-
 #define ON true
 #define OFF false
-
-bool hardwareMounted[] = {HWPowerEn, HWHeater, HWFAN_HP, HWFAN_LP, HWJAUNDICE, HWSTERILIZE_CTL, HWHumidifier, HWNTCHeater, HWNTCRoom, HWHUMSensor};
-bool hardwareCritical[] = {HW_CRIT_PowerEn, HW_CRIT_Heater, HW_CRIT_FAN_HP, HW_CRIT_FAN_LP, HW_CRIT_JAUNDICE, HW_CRIT_STERILIZE_CTL, HW_CRIT_Humidifier, HW_CRIT_NTCHeater, HW_CRIT_NTCRoom, HW_CRIT_HUMSENSOR};
-byte hardwareVerificationPin[] = {POWER_EN, HEATER, FAN_HP, FAN_LP, JAUNDICE, STERILIZE_CTL, HUMIDIFIER};
-byte hardwareVerificationPin_FB[] = {POWER_EN_FB, HEATER_FB, FAN_HP_FB, FAN_LP_FB, JAUNDICE_FB, STERILIZE_FB, HUMIDIFIER_FB};
-char* errorComponent[] = {"Power enable MOSFET", "Heater", "FAN_HP", "FAN_LP", "Jaundice LED", "STERILIZE_CTLr", "Humidifier", "Temperature sensor", "Temperature sensor", "Humidity sensor"};
-bool testOK;
-bool testCritical;
-bool criticalError;
 
 Adafruit_ILI9341_STM tft = Adafruit_ILI9341_STM(TFT_CS, TFT_DC, TFT_RST); // Use hardware SPI, tft class definition
 DHT dht; //dht sensor class definition

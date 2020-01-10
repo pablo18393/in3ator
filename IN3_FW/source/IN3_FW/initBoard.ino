@@ -1,12 +1,17 @@
+#define testMode false
+#define operativeMode true
+
 void initBoard() {
-  initEEPROM();
   initSensors();
   initSD();
-  initGPRS();
   initTimers();
-  pinDirection();
+  pinDirection(testMode);
   initTFT();
-  //hardwareVerification();
+  hardwareVerification();
+  initGPRS();
+  pinDirection(operativeMode);
+  pwmWrite(SCREENBACKLIGHT, TFT_LED_PWR);
+  initEEPROM();
 }
 
 void initTFT() {
@@ -14,42 +19,77 @@ void initTFT() {
   tft.begin();
   tft.setRotation(1);
   loadlogo();
-  pwmWrite(SCREENBACKLIGHT, TFT_LED_PWR);
 }
 
-void pinDirection() {
-  afio_cfg_debug_ports(AFIO_DEBUG_SW_ONLY); //release PA15 pin for GPIO purpose
-  if (SerialDebug) {
-    Serial.begin(115200);
-  }
-  else {
-    Serial.end();
-  }
-  pinMode(JAUNDICE, PWM);
-  pinMode(HEATER, PWM);
-  pinMode(FAN_HP, PWM);
-  pinMode(HUMIDIFIER, PWM);
-  pinMode(BUZZER, PWM);
-  pinMode(SCREENBACKLIGHT, PWM);
-  pinMode(FAN_LP, OUTPUT);
-  pinMode(STERILIZE_CTL, OUTPUT);
-  pinMode(ENC_SWITCH, INPUT_PULLUP);
-  pinMode(POWER_EN, OUTPUT);
-  pinMode(GPRS_PWRKEY, OUTPUT);
-  pinMode(encoderpinA, INPUT_PULLUP);
-  pinMode(encoderpinB, INPUT_PULLUP);
-  pinMode(SYSTEM_SHUNT, INPUT);
+void pinDirection(bool mode) {
+  switch (mode) {
+    case testMode:
+      afio_cfg_debug_ports(AFIO_DEBUG_SW_ONLY); //release PA15 pin for GPIO purpose
+      if (SerialDebug) {
+        Serial.begin(115200);
+      }
+      else {
+        Serial.end();
+      }
+      pinMode(HUMIDIFIER, PWM);
+      pinMode(SCREENBACKLIGHT, PWM);
+      pinMode(JAUNDICE, OUTPUT);
+      pinMode(HEATER, OUTPUT);
+      pinMode(FAN_HP, OUTPUT);
+      pinMode(BUZZER, OUTPUT);
+      pinMode(FAN_LP, OUTPUT);
+      pinMode(STERILIZE_CTL, OUTPUT);
+      pinMode(ENC_SWITCH, INPUT_PULLUP);
+      pinMode(POWER_EN, OUTPUT);
+      pinMode(GPRS_PWRKEY, OUTPUT);
+      pinMode(encoderpinA, INPUT_PULLUP);
+      pinMode(encoderpinB, INPUT_PULLUP);
+      pinMode(SYSTEM_SHUNT, INPUT);
+      pwmWrite(HUMIDIFIER, 0);
+      pwmWrite(SCREENBACKLIGHT, screenBackLightMaxPWM);
+      digitalWrite(POWER_EN, LOW);
+      digitalWrite(JAUNDICE, LOW);
+      digitalWrite(HEATER, LOW);
+      digitalWrite(FAN_HP, LOW);
+      digitalWrite(BUZZER, LOW);
+      digitalWrite(FAN_LP, LOW);
+      digitalWrite(STERILIZE_CTL, LOW);
+      digitalWrite(GPRS_PWRKEY, HIGH);
+      break;
 
-  pwmWrite(SCREENBACKLIGHT, screenBackLightMaxPWM);
-  pwmWrite(JAUNDICE, 0);
-  pwmWrite(HEATER, 0);
-  pwmWrite(FAN_HP, 0);
-  pwmWrite(HUMIDIFIER, 0);
-  pwmWrite(BUZZER, 0);
-  digitalWrite(POWER_EN, HIGH);
-  digitalWrite(FAN_LP, LOW);
-  digitalWrite(STERILIZE_CTL, LOW);
-  digitalWrite(GPRS_PWRKEY, HIGH);
+    case operativeMode:
+      afio_cfg_debug_ports(AFIO_DEBUG_SW_ONLY); //release PA15 pin for GPIO purpose
+      if (SerialDebug) {
+        Serial.begin(115200);
+      }
+      else {
+        Serial.end();
+      }
+      pinMode(JAUNDICE, PWM);
+      pinMode(HEATER, PWM);
+      pinMode(FAN_HP, PWM);
+      pinMode(HUMIDIFIER, PWM);
+      pinMode(BUZZER, PWM);
+      pinMode(SCREENBACKLIGHT, PWM);
+      pinMode(FAN_LP, OUTPUT);
+      pinMode(STERILIZE_CTL, OUTPUT);
+      pinMode(ENC_SWITCH, INPUT_PULLUP);
+      pinMode(POWER_EN, OUTPUT);
+      pinMode(GPRS_PWRKEY, OUTPUT);
+      pinMode(encoderpinA, INPUT_PULLUP);
+      pinMode(encoderpinB, INPUT_PULLUP);
+      pinMode(SYSTEM_SHUNT, INPUT);
+      pwmWrite(SCREENBACKLIGHT, screenBackLightMaxPWM);
+      pwmWrite(JAUNDICE, 0);
+      pwmWrite(HEATER, 0);
+      pwmWrite(FAN_HP, 0);
+      pwmWrite(HUMIDIFIER, 0);
+      pwmWrite(BUZZER, 0);
+      digitalWrite(FAN_LP, LOW);
+      digitalWrite(STERILIZE_CTL, LOW);
+      digitalWrite(GPRS_PWRKEY, HIGH);
+      break;
+  }
 }
 
 
@@ -82,6 +122,7 @@ void initTimers() {
   nvic_irq_set_priority(NVIC_USART1 , 13);
   encoderTimer.refresh();
   encoderTimer.resume();
+
 
   //sensors handling ISR configuration
   sensorsTimer.pause();

@@ -246,6 +246,8 @@ void drawHardwareErrorMessage() {
   byte numErrors = 0;
   byte j;
   int yErrorPos = letter_height;
+  tft.fillScreen(introBackColor);
+  tft.setTextColor(introTextColor);
   tft.drawCentreString("Hardware errors:", tft.width() / 2, yErrorPos , textFontSize);
   yErrorPos += letter_height;
   for (int i = 0; i < hardwareComponents; i++) {

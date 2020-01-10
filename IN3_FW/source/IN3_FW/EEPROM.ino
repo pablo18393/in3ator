@@ -36,8 +36,7 @@ void initEEPROM() {
       EEPROM.write(i, 0);
     }
     loadStandardValues();
-    //logln("first turn on");
-    //firstTurnOn();
+    logln("first turn on");
   }
   else {
     //logln("Recap all variables");

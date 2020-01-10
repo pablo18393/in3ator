@@ -729,7 +729,7 @@ bool GPRSLoadVariables() {
     databasePost[7] += ",\"rpd\":\"" + String(IBI) + "\"";
   }
   if (GPRS.postCurrentConsumption) {
-    databasePost[7] += ",\"power\":\"" + String(currentConsumption * currentConsumptionFactor) + "\"";
+    databasePost[7] += ",\"power\":\"" + String(currentConsumption * currentConsumptionFactor , 0) + "\"";
   }
   if (GPRS.postComment) {
     databasePost[7] += ",\"comments\":\"" + GPRS.comment + "\"";

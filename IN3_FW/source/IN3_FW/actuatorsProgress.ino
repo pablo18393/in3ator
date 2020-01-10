@@ -87,10 +87,6 @@ void checkTempSensorPin() {
   heatUp();
   while (!exitCheck) {
     updateData();
-    while (!digitalRead(ENC_SWITCH)) {
-      updateData();
-      back_mode();
-    }
     if (temperature[babyNTC] > temperature[heaterNTC] + CheckSensorRaiseTemp) {
       swapTempSensors = 1;
       EEPROM.write(EEPROM_swapTempSensors, swapTempSensors);
@@ -110,6 +106,9 @@ void checkTempSensorPin() {
     }
     delay(500);
     printStatus();
+    while (!digitalRead(ENC_SWITCH)) {
+      back_mode();
+    }
   }
 }
 
@@ -118,7 +117,7 @@ void asignCorrectTempSensorsPin() {
   int valueRetainer = HEATER_NTC_PIN;
   HEATER_NTC_PIN = BABY_NTC_PIN;
   BABY_NTC_PIN = valueRetainer;
-  //logln("NTC pins swapped");
+  logln("NTC pins swapped");
 }
 
 void blinkGoBackMessage() {
