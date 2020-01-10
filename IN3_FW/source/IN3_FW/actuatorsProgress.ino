@@ -141,37 +141,41 @@ void basictemperatureControl() {
     heatUp();
   }
   else {
-    digitalWrite(HEATER, LOW);
+    pwmWrite(HEATER, 0);
   }
 }
 
 void basicHumidityControl() {
   if (humidity < desiredRoomHum) {
-    digitalWrite(HUMIDIFIER, HIGH);
+    pwmWrite(HUMIDIFIER, humidifierMaxPWM / 2);
   }
   else {
-    digitalWrite(HUMIDIFIER, LOW);
+    pwmWrite(HUMIDIFIER, 0);
   }
 }
 
 void heatUp() {
   if (temperature[heaterNTC] < maxHeaterTemp) {
-    heaterPower = HeatermaxPWM;
-    digitalWrite(HEATER, HIGH);
+    heaterPower = heaterMaxPWM;
   }
   else {
-    digitalWrite(HEATER, LOW);
     heaterPower = 0;
   }
+  pwmWrite(HEATER, heaterPower);
 }
 
 void turnActuators(bool mode) {
-  digitalWrite(HEATER, mode);
-  digitalWrite(HUMIDIFIER, mode);
+  pwmWrite(HEATER, mode * heaterMaxPWM);
+  if (mode) {
+    pwmWrite(HUMIDIFIER, humidifierMaxPWM / 2);
+  }
+  else {
+    pwmWrite(HUMIDIFIER, 0);
+  }
 }
 
 void turnFans(bool mode) {
-  digitalWrite(FAN_HP, mode);
+  pwmWrite(FAN_HP, mode * fanHPMaxPWM);
   digitalWrite(FAN_LP, mode);
 }
 

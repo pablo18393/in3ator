@@ -11,6 +11,7 @@ void initSensors() {
 
 void sensorsISR() {
   measurenumNTC();
+  measureConsumption();
   /*
     readPulsioximeter();
     if (!pulsioximeterCount) {
@@ -20,6 +21,11 @@ void sensorsISR() {
     pulsioximeterCount--;
       checkNewPulsioximeterData();
   */
+}
+
+void measureConsumption() {
+  currentConsumption *= 0.999;
+  currentConsumption += analogRead(SYSTEM_SHUNT) * 0.001;
 }
 
 void initPulsioximeterVariables() {

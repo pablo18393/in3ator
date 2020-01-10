@@ -422,6 +422,11 @@ void GPRSLogin() {
 void GPRSPost() {
   switch (GPRS.process) {
     case 0:
+      if (GPRSLoadVariables()) {
+        GPRS.process++;
+      }
+      break;
+    case 1:
       if (GPRSsequence == 0) {
         GPRS.processSuccess = 1;
         GPRS.lastSent = millis();
@@ -440,15 +445,15 @@ void GPRSPost() {
       }
       GPRS.packetSentenceTime = millis();
       break;
-    case 1:
+    case 2:
       checkSerial("CONNECT OK", "ERROR");
       break;
-    case 2:
+    case 3:
       Serial1.print("AT+CIPSEND=" + String(len - 1) + "\n");
       GPRS.packetSentenceTime = millis();
       GPRS.process++;
       break;
-    case 3:
+    case 4:
       if (millis() - GPRS.packetSentenceTime > 200) {
         if (GPRSsequence == 3 || GPRSsequence == 7) {
           for (int i = 0; i < databasePost[GPRSsequence].length(); i++) {
@@ -466,17 +471,17 @@ void GPRSPost() {
         GPRS.packetSentenceTime = millis();
       }
       break;
-    case 4:
+    case 5:
       checkSerial("CLOSED", "\n\n");
       break;
-    case 5:
+    case 6:
       Serial1.print("AT+CIPSHUT\n");
       GPRS.process++;
       break;
-    case 6:
+    case 7:
       checkSerial("SHUT OK", "ERROR");
       break;
-    case 7:
+    case 8:
       logln("GPRS POST SUCCESS");
       GPRS.post = 0;
       GPRS.process = 0;
@@ -724,7 +729,7 @@ bool GPRSLoadVariables() {
     databasePost[7] += ",\"rpd\":\"" + String(IBI) + "\"";
   }
   if (GPRS.postCurrentConsumption) {
-    databasePost[7] += ",\"power\":\"" + String(RPD) + "\"";
+    databasePost[7] += ",\"power\":\"" + String(currentConsumption * currentConsumptionFactor) + "\"";
   }
   if (GPRS.postComment) {
     databasePost[7] += ",\"comments\":\"" + GPRS.comment + "\"";

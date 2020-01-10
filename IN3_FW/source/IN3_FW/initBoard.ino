@@ -14,6 +14,7 @@ void initTFT() {
   tft.begin();
   tft.setRotation(1);
   loadlogo();
+  pwmWrite(SCREENBACKLIGHT, TFT_LED_PWR);
 }
 
 void pinDirection() {
@@ -45,13 +46,9 @@ void pinDirection() {
   pwmWrite(FAN_HP, 0);
   pwmWrite(HUMIDIFIER, 0);
   pwmWrite(BUZZER, 0);
-  digitalWrite(JAUNDICE, LOW);
-  digitalWrite(HEATER, LOW);
   digitalWrite(POWER_EN, HIGH);
-  digitalWrite(FAN_HP, LOW);
   digitalWrite(FAN_LP, LOW);
   digitalWrite(STERILIZE_CTL, LOW);
-  digitalWrite(HUMIDIFIER, LOW);
   digitalWrite(GPRS_PWRKEY, HIGH);
 }
 
@@ -65,7 +62,7 @@ void initTimers() {
     roomPIDTimer.attachCompare1Interrupt(roomPIDInterrupt);
     roomPID.SetSampleTime(roomPIDRate / 1000);       //in milliseconds
     heaterPID.SetSampleTime(heaterPIDRate / 1000); //in milliseconds
-    heaterPID.SetOutputLimits(0, HeatermaxPWM);
+    heaterPID.SetOutputLimits(0, heaterMaxPWM);
     roomPIDTimer.refresh();
     roomPIDTimer.resume();
   */
