@@ -1,51 +1,42 @@
 void hardwareVerification() {
-  for (int i = 0; i < hardwareComponents; i++) {
-    errorHardwareCode[i] = 0;
-  }
+  bool testOK = 1;
   if (sensorsTest() && shortcircuitTest()) {
     if (openCircuitTest()) {
       logln("HARDWARE TEST OK");
     }
+    else {
+      testOK = 0;
+    }
   }
-  logln("HARDWARE TEST FAIL");
-  drawHardwareErrorMessage();
-  while (digitalRead(ENC_SWITCH));
+  else {
+    testOK = 0;
+  }
+  if (!testOK) {
+    logln("HARDWARE TEST FAIL");
+    drawHardwareErrorMessage();
+    while (digitalRead(ENC_SWITCH));
+  }
 }
 
-void shortcircuitTest() {
-  for (int i = 0; i < hardwareComponents - numSensors; i++) {
-    if (i) {
-      digitalWrite(POWER_EN, HIGH);
-      delay(300); //wait for relay to switch
-    }
-
-  }
-  digitalWrite(POWER_EN, LOW);
+bool shortcircuitTest() {
+  return true;
 }
 
 bool sensorsTest() {
   //sensors verification
-  if (((HEATER_NTC_PIN) > 3200 || analogRead(HEATER_NTC_PIN) < 1200) && HWNTCHeater) {
+  if ((HEATER_NTC_PIN) > 3200 || analogRead(HEATER_NTC_PIN) < 1200) {
     return (false);
   }
-  if ((analogRead(BABY_NTC_PIN) > 3200 || analogRead(BABY_NTC_PIN) < 1200) && HWNTCRoom) {
+  if (analogRead(BABY_NTC_PIN) > 3200 || analogRead(BABY_NTC_PIN) < 1200) {
     return (false);
   }
   //logln(String(updateHumidity()));
-  if (HWHUMSensor && !updateHumidity()) {
+  if (!updateHumidity()) {
     return (false);
   }
   return (true);
 }
 
-void openCircuitTest() {
-  //power verification
-  for (int i = 0; i < hardwareComponents - numSensors; i++) {
-    digitalWrite(hardwareVerificationPin[i], HIGH);
-    delayMicroseconds(mosfet_switch_time);
-    if (digitalRead(hardwareVerificationPin_FB[i]) && hardwareMounted[i]) {
-      errorHardwareCode[i] += opencircuit;
-    }
-    digitalWrite(hardwareVerificationPin[i], LOW);
-  }
+bool openCircuitTest() {
+  return true;
 }

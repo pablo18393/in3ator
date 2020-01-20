@@ -44,6 +44,7 @@ int len = 0;
 long GPRSTimeOut = 60000; //in millisecs
 
 struct GPRSstruct {
+  bool enable;
   bool firstPost;
   bool postSN;
   bool postBabyTemp;
@@ -83,7 +84,6 @@ struct GPRSstruct {
   long lastEvent;
   bool processSuccess;
   bool readToken;
-  bool enable;
   bool initVars;
   bool powerUp;
   bool connect;
@@ -105,6 +105,7 @@ struct GPRSstruct GPRS;
 void initGPRS()
 {
   Serial1.begin(115200);
+  GPRS.enable = 1;
   GPRSSetPostVariables(defaultPost, "");
   GPRS.postBabyTemp = 1;
   GPRS.postHumidity = 1;
@@ -113,25 +114,27 @@ void initGPRS()
 }
 
 void GPRSISR() {
-  if (GPRS.powerUp) {
-    GPRSPowerUp();
-  }
-  if (GPRS.location) {
-    getLocation();
-  }
-  if (GPRS.connect) {
-    GPRSStablishConnection();
-  }
-  if (GPRS.post) {
-    if (GPRS.validToken) {
-      GPRSPost();
+  if (GPRS.enable) {
+    if (GPRS.powerUp) {
+      GPRSPowerUp();
     }
-    else {
-      GPRSLogin();
+    if (GPRS.location) {
+      getLocation();
     }
+    if (GPRS.connect) {
+      GPRSStablishConnection();
+    }
+    if (GPRS.post) {
+      if (GPRS.validToken) {
+        GPRSPost();
+      }
+      else {
+        GPRSLogin();
+      }
+    }
+    readGPRSData();
+    GPRSStatusHandler();
   }
-  readGPRSData();
-  GPRSStatusHandler();
 }
 
 void GPRSStatusHandler() {
@@ -493,86 +496,83 @@ void GPRSPost() {
 }
 
 void readGPRSData() {
-  if (GPRS.enable) {
-    while (Serial1.available()) {
-      if (GPRS.bufferWritePos > 1023) {
-        GPRS.bufferWritePos -= 1024;
-        logln("Buffer overflow");
+  while (Serial1.available()) {
+    if (GPRS.bufferWritePos > 1023) {
+      GPRS.bufferWritePos -= 1024;
+      logln("Buffer overflow");
+    }
+    GPRS.buffer[GPRS.bufferWritePos] = Serial1.read();
+    if (GPRS.post) {
+      if (!GPRS.readToken) {
+        if (GPRS.buffer[GPRS.bufferWritePos] == char('y')) {
+          if (GPRS.buffer[GPRS.bufferWritePos - 1] == char('e')) {
+            GPRS.readToken = 1;
+            GPRS.token = "\n";
+            GPRS.token += "ey";
+          }
+        }
       }
-      GPRS.buffer[GPRS.bufferWritePos] = Serial1.read();
-      if (GPRS.post) {
-        if (!GPRS.readToken) {
-          if (GPRS.buffer[GPRS.bufferWritePos] == char('y')) {
-            if (GPRS.buffer[GPRS.bufferWritePos - 1] == char('e')) {
-              GPRS.readToken = 1;
-              GPRS.token = "\n";
-              GPRS.token += "ey";
+      else {
+        if (GPRS.buffer[GPRS.bufferWritePos] == '\n') {
+          GPRS.readToken = 0;
+        }
+        else {
+          GPRS.token += GPRS.buffer[GPRS.bufferWritePos];
+        }
+      }
+    }
+    else if (GPRS.location) {
+      if (GPRS.process == 11) {
+        if (GPRS.buffer[GPRS.bufferWritePos] == char(',') ) {
+          if (GPRS.buffer[GPRS.bufferWritePos - 2] != char('=')) {
+            if (GPRS.longitud == "") {
+              GPRS.readLongitud = 1;
+            }
+            else if (GPRS.latitud == "") {
+              GPRS.readLongitud = 0;
+              GPRS.readLatitud = 1;
+            }
+            else if (GPRS.localDayTime == "") {
+              GPRS.readLocalDayTime = 1;
+              GPRS.readLatitud = 0;
+            }
+            else {
+              GPRS.readLocalDayTime = 0;
+              GPRS.readLocalHourTime = 1;
             }
           }
         }
         else {
-          if (GPRS.buffer[GPRS.bufferWritePos] == '\n') {
-            GPRS.readToken = 0;
+          if (GPRS.readLatitud) {
+            GPRS.latitud += GPRS.buffer[GPRS.bufferWritePos];
           }
-          else {
-            GPRS.token += GPRS.buffer[GPRS.bufferWritePos];
+          if (GPRS.readLongitud) {
+            GPRS.longitud += GPRS.buffer[GPRS.bufferWritePos];
           }
-        }
-      }
-      else if (GPRS.location) {
-        if (GPRS.process == 11) {
-          if (GPRS.buffer[GPRS.bufferWritePos] == char(',') ) {
-            if (GPRS.buffer[GPRS.bufferWritePos - 2] != char('=')) {
-              if (GPRS.longitud == "") {
-                GPRS.readLongitud = 1;
-              }
-              else if (GPRS.latitud == "") {
-                GPRS.readLongitud = 0;
-                GPRS.readLatitud = 1;
-              }
-              else if (GPRS.localDayTime == "") {
-                GPRS.readLocalDayTime = 1;
-                GPRS.readLatitud = 0;
-              }
-              else {
-                GPRS.readLocalDayTime = 0;
-                GPRS.readLocalHourTime = 1;
-              }
-            }
+          if (GPRS.readLocalDayTime) {
+            GPRS.localDayTime += GPRS.buffer[GPRS.bufferWritePos];
           }
-          else {
-            if (GPRS.readLatitud) {
-              GPRS.latitud += GPRS.buffer[GPRS.bufferWritePos];
+          if (GPRS.readLocalHourTime) {
+            if (GPRS.buffer[GPRS.bufferWritePos] == '\n') {
+              GPRS.readLocalHourTime = 0;
+              setTime((int(GPRS.localHourTime.charAt(0)) - 48) * 10 + (int(GPRS.localHourTime.charAt(1)) - 48), (int(GPRS.localHourTime.charAt(3)) - 48) * 10 + (int(GPRS.localHourTime.charAt(4)) - 48), (int(GPRS.localHourTime.charAt(6)) - 48) * 10 + (int(GPRS.localHourTime.charAt(7)) - 48), (int(GPRS.localDayTime.charAt(8)) - 48) * 10 + (int(GPRS.localDayTime.charAt(9)) - 48), (int(GPRS.localDayTime.charAt(5)) - 48) * 10 + (int(GPRS.localDayTime.charAt(6)) - 48), 2000 + (int(GPRS.localDayTime.charAt(2)) - 48) * 10 + (int(GPRS.localDayTime.charAt(3)) - 48)); // setTime(hr,min,sec,day,month,yr); // Another way to set
+              logln("Local time: " + GPRS.localDayTime + "," + GPRS.localHourTime);
             }
-            if (GPRS.readLongitud) {
-              GPRS.longitud += GPRS.buffer[GPRS.bufferWritePos];
-            }
-            if (GPRS.readLocalDayTime) {
-              GPRS.localDayTime += GPRS.buffer[GPRS.bufferWritePos];
-            }
-            if (GPRS.readLocalHourTime) {
-              if (GPRS.buffer[GPRS.bufferWritePos] == '\n') {
-                GPRS.readLocalHourTime = 0;
-                setTime((int(GPRS.localHourTime.charAt(0)) - 48) * 10 + (int(GPRS.localHourTime.charAt(1)) - 48), (int(GPRS.localHourTime.charAt(3)) - 48) * 10 + (int(GPRS.localHourTime.charAt(4)) - 48), (int(GPRS.localHourTime.charAt(6)) - 48) * 10 + (int(GPRS.localHourTime.charAt(7)) - 48), (int(GPRS.localDayTime.charAt(8)) - 48) * 10 + (int(GPRS.localDayTime.charAt(9)) - 48), (int(GPRS.localDayTime.charAt(5)) - 48) * 10 + (int(GPRS.localDayTime.charAt(6)) - 48), 2000 + (int(GPRS.localDayTime.charAt(2)) - 48) * 10 + (int(GPRS.localDayTime.charAt(3)) - 48)); // setTime(hr,min,sec,day,month,yr); // Another way to set
-                logln("Local time: " + GPRS.localDayTime + "," + GPRS.localHourTime);
-              }
-              else {
-                GPRS.localHourTime += GPRS.buffer[GPRS.bufferWritePos];
-              }
+            else {
+              GPRS.localHourTime += GPRS.buffer[GPRS.bufferWritePos];
             }
           }
         }
       }
-      GPRS.bufferWritePos++;
-      GPRS.charToRead++;
     }
+    GPRS.bufferWritePos++;
+    GPRS.charToRead++;
   }
 }
 
 String checkSerial(String success, String error) {
   if (!GPRS.initVars) {
     GPRS.initVars = 1;
-    GPRS.enable = 1;
     GPRS.reply = "";
   }
 
@@ -729,7 +729,7 @@ bool GPRSLoadVariables() {
     databasePost[7] += ",\"rpd\":\"" + String(IBI) + "\"";
   }
   if (GPRS.postCurrentConsumption) {
-    databasePost[7] += ",\"power\":\"" + String(currentConsumption * currentConsumptionFactor , 0) + "\"";
+    databasePost[7] += ",\"power\":\"" + String(currentConsumption) + "\"";
   }
   if (GPRS.postComment) {
     databasePost[7] += ",\"comments\":\"" + GPRS.comment + "\"";

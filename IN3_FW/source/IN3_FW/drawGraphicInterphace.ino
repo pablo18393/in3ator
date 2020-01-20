@@ -242,22 +242,26 @@ void drawIntroMessage() {
   }
 }
 
+/*
+ * Function pending to complete
+ */
 void drawHardwareErrorMessage() {
   byte numErrors = 0;
   byte j;
   int yErrorPos = letter_height;
+  bool testCritical;
   tft.fillScreen(introBackColor);
   tft.setTextColor(introTextColor);
   tft.drawCentreString("Hardware errors:", tft.width() / 2, yErrorPos , textFontSize);
   yErrorPos += letter_height;
   for (int i = 0; i < hardwareComponents; i++) {
-    if (errorHardwareCode[i]) {
+    if (numErrors) {
       numErrors++;
       if (yErrorPos > (tft.height() - 4 * letter_height)) {
         i = hardwareComponents;
       }
       else {
-        tft.drawCentreString(errorComponent[i], tft.width() / 2, yErrorPos , textFontSize);
+        tft.drawCentreString("complete", tft.width() / 2, yErrorPos , textFontSize);
         yErrorPos += letter_height;
       }
     }

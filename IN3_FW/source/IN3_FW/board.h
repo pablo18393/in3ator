@@ -8,7 +8,7 @@
 #define BME280Sensor 1
 #define SPI_SEL 2
 #define SDCard 0
-#define SerialDebug 0
+#define SerialDebug 1
 
 #ifdef v6Board
 #define HUMIDIFIER_FB PA0

@@ -45,10 +45,6 @@ void actuatorsProgress() {
   tft.setTextColor(COLOR_WARNING_TEXT);
   drawStop();
   state_blink = 1;
-  checkTempSensorPin();
-  if (swapTempSensors) {
-    asignCorrectTempSensorsPin();
-  }
   while (!digitalRead(ENC_SWITCH));
   turnFans(ON);
   turnSterilizeLED (ON);
@@ -71,7 +67,6 @@ void actuatorsProgress() {
       basicHumidityControl();
     }
     while (!digitalRead(ENC_SWITCH)) {
-      updateData();
       back_mode();
     }
     blinkGoBackMessage();

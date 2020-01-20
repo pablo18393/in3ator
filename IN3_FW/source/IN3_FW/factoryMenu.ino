@@ -1,5 +1,4 @@
-
-void firstTurnOn() {
+void factoryMenu() {
   byte numWords = 2;
   print_text = 1;
   tft.setTextSize(1);
@@ -27,7 +26,6 @@ void firstTurnOn() {
   displayTemperatureHelp();
   displaySettingsHelp();
   displayStartHelp();
-  while (1);
 }
 
 void helpingmainMenu() {

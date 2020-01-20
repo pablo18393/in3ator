@@ -2,16 +2,22 @@
 #define operativeMode true
 
 void initBoard() {
+  initEEPROM();
   initSensors();
   initSD();
   initTimers();
   pinDirection(testMode);
   initTFT();
-  hardwareVerification();
-  initGPRS();
+  //hardwareVerification();
   pinDirection(operativeMode);
   pwmWrite(SCREENBACKLIGHT, TFT_LED_PWR);
-  initEEPROM();
+  //digitalWrite(POWER_EN, HIGH);
+  initGPRS();
+  /*
+    if (!firstTurnOn) {
+    factoryMenu();
+    }
+  */
 }
 
 void initTFT() {

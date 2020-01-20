@@ -30,7 +30,8 @@ void initEEPROM() {
       EEPROM.format();
     }
   }
-  if (EEPROM.read(EEPROM_firstTurnOn)) { //firstTimePowerOn
+  firstTurnOn=EEPROM.read(EEPROM_firstTurnOn);
+  if (firstTurnOn) { //firstTimePowerOn
     EEPROM.format();
     for (int i = 0; i <= 253; i++) {
       EEPROM.write(i, 0);
@@ -42,13 +43,10 @@ void initEEPROM() {
     //logln("Recap all variables");
     recapVariables();
   }
-  if (!language) {
-    loadStandardValues();
-  }
 }
 
 void loadStandardValues() {
-  auto_lock = 0;
+  auto_lock = 1;
   EEPROM.write(EEPROM_autoLock, auto_lock);
   language = defaultLanguage;
   EEPROM.write(EEPROM_language, language);

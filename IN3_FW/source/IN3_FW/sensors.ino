@@ -24,8 +24,13 @@ void sensorsISR() {
 }
 
 void measureConsumption() {
-  currentConsumption *= 0.999;
-  currentConsumption += analogRead(SYSTEM_SHUNT) * 0.001;
+  currentConsumption += analogRead(SYSTEM_SHUNT);
+  currentConsumptionPos++;
+  if (currentConsumptionPos == 1000) {
+    currentConsumptionPos = 0;
+    currentConsumption /= 1000;
+    Serial.println(currentConsumption);
+  }
 }
 
 void initPulsioximeterVariables() {
@@ -172,6 +177,7 @@ void peripheralsISR() {
   readEncoder();
   sensorsISR();
   GPRSISR();
+  asleep();
 }
 
 void readEncoder() {
@@ -191,20 +197,18 @@ void readEncoder() {
       EncMove = -1;
     last_something = millis();
   }
+  if (!digitalRead(ENC_SWITCH)) {
+    last_something = millis();
+  }
 }
 
 void asleep() {
-  encPulsed = digitalRead(ENC_SWITCH);
-  if (encPulsed != encPulsedBefore) {
-    last_something = millis();
-  }
-  encPulsedBefore = encPulsed;
   if (auto_lock) {
     if (millis() - last_something > time_lock) {
       pwmWrite(SCREENBACKLIGHT, screenBackLightMaxPWM);
     }
-  }
-  else {
-    pwmWrite(SCREENBACKLIGHT, TFT_LED_PWR);
+    else {
+      pwmWrite(SCREENBACKLIGHT, TFT_LED_PWR);
+    }
   }
 }

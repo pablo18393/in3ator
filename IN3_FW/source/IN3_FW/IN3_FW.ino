@@ -19,6 +19,7 @@
 #define FWversion "v3.1"
 #define headingTitle "in3ator"
 String serialNumber = "in3000001";
+bool firstTurnOn;
 
 //configuration variables
 #define debounceTime 100         //encoder debouncing time
@@ -84,9 +85,11 @@ byte encoderCount = 0;
 
 
 //sensor variables
+bool swapTempSensors; //variable to swap room and heater pin map in case are swapped
 int pulsioximeterMean;
 const int maxPulsioximeterSamples = 320; //(tft width).
 float currentConsumption;
+int currentConsumptionPos;
 float currentConsumptionFactor = 2.685; //factor to translate current consumtion in mA
 int pulsioximeterSample[maxPulsioximeterSamples][2]; //0 is previous data, 1 is actual data
 int pulsioximeterPeakThreshold;
@@ -132,7 +135,6 @@ const byte fanMaxSpeed = 100; //max fan speed (percentage) to be set
 //Encoder variables
 #define NUMENCODERS 1 //number of encoders in circuit
 byte NTCpin[numNTC] = {HEATER_NTC_PIN, BABY_NTC_PIN, INBOARD_LEFT_NTC_PIN, INBOARD_RIGHT_NTC_PIN}; //variable that handles which pin number is heater/room NTC (could be swapped by user in mounting stage)
-bool swapTempSensors; //variable to swap room and heater pin map in case are swapped
 boolean A_set;
 boolean B_set;
 int encoderpinA = ENC_A; // pin  encoder A
@@ -195,7 +197,7 @@ byte barThickness;
 //User Interface display variables
 bool auto_lock; //setting that enables backlight switch OFF after a given time of no user actions
 int time_lock = 16000; //time to lock screen if no user actions
-int TFT_LED_PWR = 30000; //PWM that will be supplied to backlight LEDs
+int TFT_LED_PWR = 25000; //PWM that will be supplied to backlight LEDs
 const byte time_back_draw = 255;
 const byte time_back_wait = 255;
 long last_something; //last time there was a encoder movement or pulse
@@ -312,6 +314,8 @@ HardwareTimer roomPIDTimer(2);
 HardwareTimer humidifierTimer(3);
 HardwareTimer encoderTimer(4);
 HardwareTimer sensorsTimer(8);
+
+int hardwareComponents;
 
 void setup() {
   initBoard();
