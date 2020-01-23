@@ -12,6 +12,7 @@ void initSensors() {
 void sensorsISR() {
   measurenumNTC();
   measureConsumption();
+
   /*
     readPulsioximeter();
     if (!pulsioximeterCount) {
