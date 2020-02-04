@@ -1,9 +1,6 @@
 int updateData() {
   if (millis() - lastGraphicSensorsUpdate > sensorsUpdateRate) {
-    delay(10); //to let finish all the SPI bus communications
-    if (!updateHumidity()) {
-      updateHumidity(); //retry if no success
-    }
+    updateHumidity();
     if (page == advancedModePage || page == actuatorsProgressPage) {
       updateDisplaySensors();
       if (page == actuatorsProgressPage) {
