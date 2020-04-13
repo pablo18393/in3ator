@@ -32,9 +32,8 @@ void graphics() {
               tft.drawRightString(initialSensorsValue, gestationWeeksXPos, ypos, textFontSize);
               break;
             case LEDGraphicPosition:
-              if (jaundiceLEDIntensity) {
-                drawRightNumber(jaundiceLEDIntensity, LEDXPos, ypos);
-                tft.drawRightString("%", unitPosition, ypos, textFontSize);
+              if (jaundiceEnable) {
+                tft.drawRightString("ON", unitPosition, ypos, textFontSize);
               }
               else {
                 tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
@@ -49,9 +48,8 @@ void graphics() {
               tft.drawRightString(initialSensorsValue, initialSensorPosition, temperatureY, textFontSize);
               break;
             case LEDGraphicPosition:
-              if (jaundiceLEDIntensity) {
-                drawRightNumber(jaundiceLEDIntensity, LEDXPos, ypos);
-                tft.drawRightString("%", unitPosition, ypos, textFontSize);
+              if (jaundiceEnable) {
+                tft.drawRightString("ON", unitPosition, ypos, textFontSize);
               }
               else {
                 tft.drawRightString("OFF", unitPosition, ypos, textFontSize);

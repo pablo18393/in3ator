@@ -10,9 +10,9 @@
 #define addLocation 8
 #define removeLocation 9
 
-#define standByGPRSPostPeriod 120
+#define standByGPRSPostPeriod 3600
 #define actuatingGPRSPostPeriod 120
-#define jaundiceGPRSPostPeriod 120
+#define jaundiceGPRSPostPeriod 600
 
 String user = "admin@admin.com";
 String password = "admin";
@@ -226,7 +226,7 @@ void getLocation() {
       else {
         if (!GPRS.firstPost) {
           GPRS.firstPost = 1;
-          GPRSSetPostVariables(addLocation, "first post");
+          GPRSSetPostVariables(addLocation, "first post, FW version: " + String (FWversion));
         }
         else {
           GPRSSetPostVariables(addLocation, "");
@@ -714,7 +714,7 @@ bool GPRSLoadVariables() {
     databasePost[7] += ",\"rssi\":\"" + GPRS.RSSI + "\"";
   }
   if (GPRS.postJaundicePower) {
-    databasePost[7] += ",\"jaundice_power\":\"" + String(jaundiceLEDIntensity) + "\"";
+    databasePost[7] += ",\"jaundice_power\":\"" + String(jaundiceEnable) + "\"";
   }
   if (GPRS.postHeaterPower) {
     databasePost[7] += ",\"heater_power\":\"" + String(heaterPower) + "\"";

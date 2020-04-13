@@ -71,7 +71,6 @@ void pinDirection(bool mode) {
       else {
         Serial.end();
       }
-      pinMode(JAUNDICE, PWM);
       pinMode(HEATER, PWM);
       pinMode(FAN_HP, PWM);
       pinMode(HUMIDIFIER, PWM);
@@ -85,8 +84,8 @@ void pinDirection(bool mode) {
       pinMode(encoderpinA, INPUT_PULLUP);
       pinMode(encoderpinB, INPUT_PULLUP);
       pinMode(SYSTEM_SHUNT, INPUT);
+      pinMode(JAUNDICE, OUTPUT);
       pwmWrite(SCREENBACKLIGHT, screenBackLightMaxPWM);
-      pwmWrite(JAUNDICE, 0);
       pwmWrite(HEATER, 0);
       pwmWrite(FAN_HP, 0);
       pwmWrite(HUMIDIFIER, 0);

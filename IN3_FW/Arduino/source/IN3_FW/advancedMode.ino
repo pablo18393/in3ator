@@ -16,7 +16,7 @@ void advancedMode() {
       break;
     case english:
       words[temperatureGraphicPosition]  = "Temperature";
-      words[humidityGraphicPosition] = "Humedad";
+      words[humidityGraphicPosition] = "Humidity";
       break;
     case french:
       words[temperatureGraphicPosition]  = "Temperature";

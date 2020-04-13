@@ -16,9 +16,9 @@
 
 
 //Firmware version and head title of UI screen
-#define FWversion "v3.1"
+#define FWversion "v3.2"
 #define headingTitle "in3ator"
-String serialNumber = "in3000001";
+String serialNumber = "in3000002";
 bool firstTurnOn;
 
 //configuration variables
@@ -55,7 +55,7 @@ int language;
 
 #define numNTC 4 //number of out of board NTC
 #define numTempSensors 5 //number of total temperature sensors in system
-#define temperature_fraction 20 //amount of temperature samples to filter
+#define temperature_fraction 50 //amount of temperature samples to filter
 double temperature[numTempSensors];
 double previousTemperature[numTempSensors];
 int temperatureArray [numNTC][temperature_fraction]; //variable to handle each NTC with the array of last samples (only for NTC)
@@ -88,7 +88,7 @@ byte encoderCount = 0;
 bool swapTempSensors; //variable to swap room and heater pin map in case are swapped
 int pulsioximeterMean;
 const int maxPulsioximeterSamples = 320; //(tft width).
-float currentConsumption;
+float currentConsumption, currentConsumtionStacker;
 int currentConsumptionPos;
 float currentConsumptionFactor = 2.685; //factor to translate current consumtion in mA
 int pulsioximeterSample[maxPulsioximeterSamples][2]; //0 is previous data, 1 is actual data
@@ -113,7 +113,7 @@ String RPD; //(Raw Pulsioximeter Data)
 double desiredSkinTemp = 36.5; //preset baby skin temperature
 int desiredRoomHum = 80; //preset enviromental humidity
 int fanSpeed; //PWM that controls fan speed
-int jaundiceLEDIntensity; //PWM that controls jaundice LED intensity
+bool jaundiceEnable; //PWM that controls jaundice LED intensity
 double maxHeaterTemp; //maximum heater temperature
 double desiredHeaterTemp; //desired temperature in heater
 
@@ -202,7 +202,7 @@ const byte time_back_draw = 255;
 const byte time_back_wait = 255;
 long last_something; //last time there was a encoder movement or pulse
 long CheckTempSensorPinTimeout = 45000; //timeout for checking the thermistor pinout
-long sensorsUpdateRate = 2000;
+long sensorsUpdateRate = 4000;
 int blinkTimeON = 1000; //displayed text ON time
 int blinkTimeOFF = 100; //displayed text OFF time
 bool selected;

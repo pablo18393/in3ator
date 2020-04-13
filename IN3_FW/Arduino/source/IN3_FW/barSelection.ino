@@ -81,34 +81,31 @@ void barSelection() {
               advancedMode();
               break;
             case LEDGraphicPosition:
-              while (digitalRead(ENC_SWITCH) ) {
-                updateData();
-                if (EncMove && -EncMove + jaundiceLEDIntensity >= 0 && -EncMove + jaundiceLEDIntensity <= LEDMaxIntensity) {
+              while (digitalRead(ENC_SWITCH)) {
+                if (EncMove) {
+                  jaundiceEnable = !jaundiceEnable;
                   tft.setTextColor(COLOR_MENU);
-                  drawRightNumber(jaundiceLEDIntensity, LEDXPos, ypos);
-                  if (!jaundiceLEDIntensity && EncMove) {
+                  if (jaundiceEnable) {
                     tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
-                    tft.setTextColor(COLOR_MENU_TEXT);
-                    tft.drawRightString("%", unitPosition, ypos, textFontSize);
-                    GPRSSetPostVariables(jaundiceLEDON, "");
-                    setGPRSPostPeriod(standByGPRSPostPeriod);
                   }
-                  jaundiceLEDIntensity -= 10 * EncMove;
-                  pwmWrite(JAUNDICE, jaundiceMaxPWM * jaundiceLEDIntensity / LEDMaxIntensity);
+                  else {
+                    tft.drawRightString("ON", unitPosition, ypos, textFontSize);
+                  }
                   tft.setTextColor(COLOR_MENU_TEXT);
-                  if (!jaundiceLEDIntensity && EncMove) {
-                    tft.setTextColor(COLOR_MENU);
-                    tft.drawRightString("%", unitPosition, ypos, textFontSize);
-                    tft.setTextColor(COLOR_MENU_TEXT);
-                    tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
-                    GPRSSetPostVariables(jaundiceLEDOFF, "");
+                  if (jaundiceEnable) {
+                    tft.drawRightString("ON", unitPosition, ypos, textFontSize);
+                    GPRSSetPostVariables(jaundiceLEDON, "");
                     setGPRSPostPeriod(jaundiceGPRSPostPeriod);
                   }
                   else {
-                    drawRightNumber(jaundiceLEDIntensity, LEDXPos, ypos);
+                    tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
+                    GPRSSetPostVariables(jaundiceLEDOFF, "");
+                    GPRSSetPostVariables(jaundiceLEDOFF, "");
+                    setGPRSPostPeriod(standByGPRSPostPeriod);
                   }
+                  digitalWrite(JAUNDICE, jaundiceEnable);
+                  EncMove = 0;
                 }
-                EncMove = 0;
               }
               break;
             case settingsGraphicPosition:
@@ -160,30 +157,31 @@ void barSelection() {
               drawStartMessage();
               break;
             case LEDGraphicPosition:
-              while (digitalRead(ENC_SWITCH) ) {
-                updateData();
-                if (EncMove && -EncMove + jaundiceLEDIntensity >= 0 && -EncMove + jaundiceLEDIntensity <= LEDMaxIntensity) {
+              while (digitalRead(ENC_SWITCH)) {
+                if (EncMove) {
+                  jaundiceEnable = !jaundiceEnable;
                   tft.setTextColor(COLOR_MENU);
-                  drawRightNumber(jaundiceLEDIntensity, LEDXPos, ypos);
-                  if (!jaundiceLEDIntensity && EncMove) {
-                    tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
-                    tft.setTextColor(COLOR_MENU_TEXT);
-                    tft.drawRightString("%", unitPosition, ypos, textFontSize);
-                  }
-                  jaundiceLEDIntensity -= 10 * EncMove;
-                  pwmWrite(JAUNDICE, jaundiceMaxPWM * jaundiceLEDIntensity / LEDMaxIntensity);
-                  tft.setTextColor(COLOR_MENU_TEXT);
-                  if (!jaundiceLEDIntensity && EncMove) {
-                    tft.setTextColor(COLOR_MENU);
-                    tft.drawRightString("%", unitPosition, ypos, textFontSize);
-                    tft.setTextColor(COLOR_MENU_TEXT);
+                  if (jaundiceEnable) {
                     tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
                   }
                   else {
-                    drawRightNumber(jaundiceLEDIntensity, LEDXPos, ypos);
+                    tft.drawRightString("ON", unitPosition, ypos, textFontSize);
                   }
+                  tft.setTextColor(COLOR_MENU_TEXT);
+                  if (jaundiceEnable) {
+                    tft.drawRightString("ON", unitPosition, ypos, textFontSize);
+                    GPRSSetPostVariables(jaundiceLEDON, "");
+                    setGPRSPostPeriod(jaundiceGPRSPostPeriod);
+                  }
+                  else {
+                    tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
+                    GPRSSetPostVariables(jaundiceLEDOFF, "");
+                    GPRSSetPostVariables(jaundiceLEDOFF, "");
+                    setGPRSPostPeriod(standByGPRSPostPeriod);
+                  }
+                  digitalWrite(JAUNDICE, jaundiceEnable);
+                  EncMove = 0;
                 }
-                EncMove = 0;
               }
               break;
             case settingsGraphicPosition:
@@ -505,13 +503,13 @@ void checkSetMessage() {
 
 void setPresetEnvironmentalValues() {
   if (gestationWeeks <= 29) {
-    desiredSkinTemp = 36.8;
+    desiredSkinTemp = 36;
   }
   else {
-    desiredSkinTemp = 36.8;
+    desiredSkinTemp = 36.5;
   }
   if (gestationWeeks <= 28) {
-    desiredRoomHum = 100;
+    desiredRoomHum = 80;
   }
   else if (gestationWeeks <= 32) {
     desiredRoomHum = 75;

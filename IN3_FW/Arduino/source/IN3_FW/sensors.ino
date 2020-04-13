@@ -25,12 +25,11 @@ void sensorsISR() {
 }
 
 void measureConsumption() {
-  currentConsumption += analogRead(SYSTEM_SHUNT);
+  currentConsumtionStacker += analogRead(SYSTEM_SHUNT);
   currentConsumptionPos++;
   if (currentConsumptionPos == 1000) {
     currentConsumptionPos = 0;
-    currentConsumption /= 1000;
-    Serial.println(currentConsumption);
+    currentConsumption = currentConsumtionStacker / 1000;
   }
 }
 
@@ -136,28 +135,40 @@ bool updateHumidity() {
   int BME280Temperature;
   int BME280Humidity;
   if (DHTSensor) {
-    DHTTemperature = dht.getTemperature();
+    encoderTimer.pause();
     DHTHumidity = dht.getHumidity();
-    if (DHTHumidity && DHTTemperature && abs(DHTHumidity) <= 100) {
+    DHTTemperature = dht.getTemperature();
+    encoderTimer.resume();
+    if (DHTHumidity > 10 && DHTTemperature && abs(DHTHumidity + diffHumidity) <= 100) {
       temperature[digitalTempSensor] = DHTTemperature; //Add here measurement to temp array
       DHTOK = 1;
     }
+    else {
+      dht.setup(DHTPIN);
+    }
   }
   if (BME280Sensor) {
+    delay(50); //let the dma transfer to TFT display finish
     digitalWrite(BME_CS, LOW);
     digitalWrite(TFT_CS, HIGH);
     pinMode(PB15, OUTPUT);
     pinMode(PB14, INPUT);
     pinMode(PB13, OUTPUT);
-    BME280Temperature = bme.readTemperature();
-    BME280Humidity = bme.readHumidity();
+    for (int i = 0; i < 5; i++) {
+      BME280Temperature = bme.readTemperature();
+      BME280Humidity = bme.readHumidity();
+      if (BME280Temperature && BME280Humidity && abs(BME280Humidity) <= 100 && abs(BME280Temperature) <= 100) {
+        temperature[digitalTempSensor] = BME280Temperature; //Add here measurement to temp array
+        BME280OK = 1;
+        break;
+      }
+      else if (i == 3) {
+        bme.begin();
+      }
+    }
     SPI.beginTransaction(SPISettings(48000000, MSBFIRST, SPI_MODE0, DATA_SIZE_16BIT));
     digitalWrite(BME_CS, HIGH);
     digitalWrite(TFT_CS, LOW);
-    if (BME280Temperature && BME280Humidity && abs(BME280Humidity) <= 100 && abs(BME280Temperature) <= 100) {
-      temperature[digitalTempSensor] = BME280Temperature; //Add here measurement to temp array
-      BME280OK = 1;
-    }
   }
   if (DHTOK || BME280OK) {
     humidity = 0;
