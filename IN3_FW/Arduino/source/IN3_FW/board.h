@@ -4,8 +4,8 @@
 //#define maplemini
 
 //Hardware
-#define DHTSensor 0
-#define BME280Sensor 1
+#define DHTSensor 1
+#define BME280Sensor 0
 #define SPI_SEL 2
 #define SDCard 0
 #define SerialDebug 0
@@ -22,9 +22,9 @@
 #define FAN_HP PA8
 #define ENC_SWITCH PA12
 #define SD_CS PA13
-#define STERILIZE_CTL PA15
+#define STERILIZE_CTL PB0
 
-#define JAUNDICE PB0
+#define JAUNDICE PA15
 word BABY_NTC_PIN = PB1;   //This is not #define because can be swaped with HEATER_NTC_PIN
 #define FAN_LP_FB PB2
 #define HX711_DATA PB3
