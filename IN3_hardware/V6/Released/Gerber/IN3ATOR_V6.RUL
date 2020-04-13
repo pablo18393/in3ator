@@ -1,0 +1,8 @@
+DRC Rules Export File for PCB: C:\Users\pabsanber\AppData\Local\Temp\Releases\Snapshot\1\IN3ATOR_V6.CMPcbDoc
+RuleKind=Width|RuleName=Width_GSM_ANTENNA_2|Scope=Board|Minimum=7.87
+RuleKind=Clearance|RuleName=Out board|Scope=Board|Minimum=13.78
+RuleKind=ShortCircuit|RuleName=ShortCircuit|Scope=Board|Allowed=0
+RuleKind=Clearance|RuleName=Clearance|Scope=Board|Minimum=7.87
+RuleKind=Width|RuleName=Width|Scope=Board|Minimum=7.87
+RuleKind=SolderMaskExpansion|RuleName=SolderMaskExpansion|Scope=Board|Minimum=4.00
+RuleKind=Width|RuleName=Width_GSM_ANTENNA_1|Scope=Board|Minimum=7.87
