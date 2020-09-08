@@ -1,0 +1,3 @@
+Layer Pairs Export File for PCB: C:\Users\pablo\AppData\Local\Temp\Releases\Snapshot\2\IN3ATOR.CMPcbDoc
+LayersSetName=Top_Bot_Thru_Holes|DrillFile=in3ator-roundholes.txt|LayerPairs=gtl,gbl
+LayersSetName=Top_Bot_Slot_Holes|DrillFile=in3ator-slotholes.txt|LayerPairs=gtl,gbl
