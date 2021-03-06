@@ -53,8 +53,8 @@ void log(String dataString) {
     digitalWrite(SD_CS, HIGH);
     digitalWrite(TFT_CS, LOW);
   }
-  if(SerialDebug){
-  Serial.println(dataString);
+  if (SerialDebug) {
+    Serial4.println(dataString);
   }
 }
 

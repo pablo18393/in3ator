@@ -213,7 +213,7 @@ void loadlogo() {
   int  timeOut = 4000;
   long processTime = millis();
   for (int i = screenBackLightMaxPWM; i >= TFT_LED_PWR; i--) {
-    pwmWrite(SCREENBACKLIGHT, i);
+    digitalWrite(SCREENBACKLIGHT, LOW);
     delayMicroseconds(brightenRate);
     if (millis() - processTime > timeOut) {
       i = 0;
@@ -241,8 +241,8 @@ void drawIntroMessage() {
 }
 
 /*
- * Function pending to complete
- */
+   Function pending to complete
+*/
 void drawHardwareErrorMessage() {
   byte numErrors = 0;
   byte j;

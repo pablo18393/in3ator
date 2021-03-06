@@ -27,6 +27,8 @@
 #include "ILI9341_STM32_Driver.h"
 #include "ILI9341_GFX.h"
 #include <stdio.h>
+#include "string.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -50,10 +52,15 @@
 ADC_HandleTypeDef hadc1;
 DMA_HandleTypeDef hdma_adc1;
 
+I2C_HandleTypeDef hi2c2;
+
 SPI_HandleTypeDef hspi2;
 
-TIM_HandleTypeDef htim3;
+TIM_HandleTypeDef htim4;
 TIM_HandleTypeDef htim8;
+
+UART_HandleTypeDef huart4;
+UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
 uint16_t adc_buf[ADC_BUF_LEN];
@@ -66,14 +73,20 @@ static void MX_DMA_Init(void);
 static void MX_SPI2_Init(void);
 static void MX_TIM8_Init(void);
 static void MX_ADC1_Init(void);
-static void MX_TIM3_Init(void);
+static void MX_I2C2_Init(void);
+static void MX_TIM4_Init(void);
+static void MX_UART4_Init(void);
+static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+static const uint8_t SHTC3_ADDR= 0x70 << 1;
+static const uint16_t reg_sleep = 0xB098;
+static const uint16_t reg_wakeUp = 0x3517;
+static const uint16_t reg_normalModeTemp = 0x7CA2;
 /* USER CODE END 0 */
 
 /**
@@ -83,6 +96,8 @@ static void MX_TIM3_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+uint8_t buf[24];
+HAL_StatusTypeDef ret;
 
   /* USER CODE END 1 */
 
@@ -108,31 +123,86 @@ int main(void)
   MX_SPI2_Init();
   MX_TIM8_Init();
   MX_ADC1_Init();
-  MX_TIM3_Init();
+  MX_I2C2_Init();
+  MX_TIM4_Init();
+  MX_UART4_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
+
 	//ILI9341_Init(); //initial driver setup to drive ili9341
-	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
+
+	//HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
 	//HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1);
-	//HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_2);
+	HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_2); //humidifier
     //HAL_ADC_Start(&hadc1);
     //HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_buf, ADC_BUF_LEN);
-	HAL_GPIO_WritePin(TFT_LED_GPIO_Port, TFT_LED_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOB, TFT_LED_CTL_Pin, GPIO_PIN_SET);
 	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET);
 	//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_SET);
-
+	HAL_GPIO_WritePin(POWER_EN_GPIO_Port, POWER_EN_Pin, GPIO_PIN_SET);
+while(1);
 	//char Temp_Buffer_text[40];
 	//static uint16_t x = 0;
 	//static uint16_t y = 0;
+  HAL_GPIO_WritePin(GSM_PWRKEY_GPIO_Port, GSM_PWRKEY_Pin, GPIO_PIN_SET);
+  HAL_Delay(2000);
+HAL_GPIO_WritePin(GSM_PWRKEY_GPIO_Port, GSM_PWRKEY_Pin, GPIO_PIN_RESET);
+  HAL_Delay(2000);
+  HAL_GPIO_WritePin(GSM_PWRKEY_GPIO_Port, GSM_PWRKEY_Pin, GPIO_PIN_SET);
+  HAL_Delay(2000);
+	strcpy((char*)buf, "AT+CFUN=1\r\n");
+	HAL_UART_Transmit(&huart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
+	  HAL_Delay(100);
+	  char in[24];
+/*
+	   HAL_UART_Receive(&huart1, (uint8_t *)in, 8, 1000);
+	   HAL_UART_Transmit(&huart4, (uint8_t *)in, strlen((char*)in), 1000);
+*/
+  while(1){
 
 
+  }
 
+while (1){
+	buf[0] = SHTC3_ADDR;
+	buf[1] = reg_wakeUp;
+	ret = HAL_I2C_Master_Transmit(&hi2c2, SHTC3_ADDR, buf, 1, HAL_MAX_DELAY);
+	if (ret != HAL_OK){
+		strcpy((char*)buf, "Error Address and wake up!\r\n");
+	}
+	else{
+		strcpy((char*)buf, "Wake up OK!\r\n");
+		HAL_UART_Transmit(&huart4, buf, strlen((char*)buf), HAL_MAX_DELAY);
+		buf[0] = SHTC3_ADDR;
+		buf[1] = reg_normalModeTemp;
+		ret = HAL_I2C_Master_Transmit(&hi2c2, reg_wakeUp, buf, 2, HAL_MAX_DELAY);
+		HAL_Delay(300);
+		if (ret != HAL_OK){
+			strcpy((char*)buf, "Error wakeUp!\r\n");
+		}
+		else{
+			ret = HAL_I2C_Master_Transmit(&hi2c2, reg_normalModeTemp, buf, 2, HAL_MAX_DELAY);
+			if (ret != HAL_OK){
+				strcpy((char*)buf, "Error Transmission!\r\n");
+			}
+			else{
+				strcpy((char*)buf, "OK!\r\n");
+			}
+		}
+	}
+HAL_UART_Transmit(&huart4, buf, strlen((char*)buf), HAL_MAX_DELAY);
+HAL_Delay(500);
+}
+	HAL_GPIO_WritePin(POWER_EN_GPIO_Port, POWER_EN_Pin, GPIO_PIN_SET);
 
+  // initalize sensor module with the i2c address 0x70
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 	while (1) {
+
 		/*
 		ILI9341_Fill_Screen(WHITE);
 		printf("White\n");
@@ -140,11 +210,16 @@ int main(void)
 		printf("Blue\n");
 		ILI9341_Fill_Screen(RED);
 		printf("Red\n");
-		*/
+
+		HAL_GPIO_WritePin(PULSIOXIMETER_EN_GPIO_Port, PULSIOXIMETER_EN_Pin, GPIO_PIN_SET);
+		HAL_Delay(1000);
+		HAL_GPIO_WritePin(PULSIOXIMETER_EN_GPIO_Port, PULSIOXIMETER_EN_Pin, GPIO_PIN_SET);
+		HAL_Delay(1000);
+
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_SET);
 		HAL_Delay(10000);
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_RESET);
-		HAL_Delay(10000);
+		//HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_RESET);
+		//HAL_Delay(10000);
 
     /* USER CODE END WHILE */
 
@@ -243,6 +318,40 @@ static void MX_ADC1_Init(void)
 }
 
 /**
+  * @brief I2C2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_I2C2_Init(void)
+{
+
+  /* USER CODE BEGIN I2C2_Init 0 */
+
+  /* USER CODE END I2C2_Init 0 */
+
+  /* USER CODE BEGIN I2C2_Init 1 */
+
+  /* USER CODE END I2C2_Init 1 */
+  hi2c2.Instance = I2C2;
+  hi2c2.Init.ClockSpeed = 100000;
+  hi2c2.Init.DutyCycle = I2C_DUTYCYCLE_2;
+  hi2c2.Init.OwnAddress1 = 0;
+  hi2c2.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c2.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c2.Init.OwnAddress2 = 0;
+  hi2c2.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c2.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN I2C2_Init 2 */
+
+  /* USER CODE END I2C2_Init 2 */
+
+}
+
+/**
   * @brief SPI2 Initialization Function
   * @param None
   * @retval None
@@ -281,56 +390,51 @@ static void MX_SPI2_Init(void)
 }
 
 /**
-  * @brief TIM3 Initialization Function
+  * @brief TIM4 Initialization Function
   * @param None
   * @retval None
   */
-static void MX_TIM3_Init(void)
+static void MX_TIM4_Init(void)
 {
 
-  /* USER CODE BEGIN TIM3_Init 0 */
+  /* USER CODE BEGIN TIM4_Init 0 */
 
-  /* USER CODE END TIM3_Init 0 */
+  /* USER CODE END TIM4_Init 0 */
 
   TIM_MasterConfigTypeDef sMasterConfig = {0};
   TIM_OC_InitTypeDef sConfigOC = {0};
 
-  /* USER CODE BEGIN TIM3_Init 1 */
+  /* USER CODE BEGIN TIM4_Init 1 */
 
-  /* USER CODE END TIM3_Init 1 */
-  htim3.Instance = TIM3;
-  htim3.Init.Prescaler = 1;
-  htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 324;
-  htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  if (HAL_TIM_PWM_Init(&htim3) != HAL_OK)
+  /* USER CODE END TIM4_Init 1 */
+  htim4.Instance = TIM4;
+  htim4.Init.Prescaler = 1;
+  htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim4.Init.Period = 328;
+  htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_PWM_Init(&htim4) != HAL_OK)
   {
     Error_Handler();
   }
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-  if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim4, &sMasterConfig) != HAL_OK)
   {
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 162;
+  sConfigOC.Pulse = 164;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-  sConfigOC.OCFastMode = TIM_OCFAST_ENABLE;
-  if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
   {
     Error_Handler();
   }
-  sConfigOC.Pulse = 324;
-  if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN TIM3_Init 2 */
+  /* USER CODE BEGIN TIM4_Init 2 */
 
-  /* USER CODE END TIM3_Init 2 */
-  HAL_TIM_MspPostInit(&htim3);
+  /* USER CODE END TIM4_Init 2 */
+  HAL_TIM_MspPostInit(&htim4);
 
 }
 
@@ -399,6 +503,72 @@ static void MX_TIM8_Init(void)
 
 }
 
+/**
+  * @brief UART4 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_UART4_Init(void)
+{
+
+  /* USER CODE BEGIN UART4_Init 0 */
+
+  /* USER CODE END UART4_Init 0 */
+
+  /* USER CODE BEGIN UART4_Init 1 */
+
+  /* USER CODE END UART4_Init 1 */
+  huart4.Instance = UART4;
+  huart4.Init.BaudRate = 115200;
+  huart4.Init.WordLength = UART_WORDLENGTH_8B;
+  huart4.Init.StopBits = UART_STOPBITS_1;
+  huart4.Init.Parity = UART_PARITY_NONE;
+  huart4.Init.Mode = UART_MODE_TX_RX;
+  huart4.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart4.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN UART4_Init 2 */
+
+  /* USER CODE END UART4_Init 2 */
+
+}
+
+/**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 115200;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
+
+}
+
 /** 
   * Enable DMA controller clock
   */
@@ -431,33 +601,58 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, CS_Pin|TFT_LED_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, CS_Pin|GSM_PWRKEY_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, JAUNDICE_CTL_Pin|BACKUP_MOSFET_Pin|POWER_EN_Pin|PULSIOXIMETER_EN_Pin 
+                          |TFT_LED_CTL_Pin|DC_Pin|TOUCH_CS_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(FAN_CTL_GPIO_Port, FAN_CTL_Pin, GPIO_PIN_SET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOA, HEATER_CTL_Pin|SD_CS_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(RST_GPIO_Port, RST_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(DC_GPIO_Port, DC_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin : CS_Pin */
-  GPIO_InitStruct.Pin = CS_Pin;
+  /*Configure GPIO pins : CS_Pin FAN_CTL_Pin */
+  GPIO_InitStruct.Pin = CS_Pin|FAN_CTL_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(CS_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : TFT_LED_Pin */
-  GPIO_InitStruct.Pin = TFT_LED_Pin;
+  /*Configure GPIO pin : GSM_PWRKEY_Pin */
+  GPIO_InitStruct.Pin = GSM_PWRKEY_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(TFT_LED_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GSM_PWRKEY_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : PA15 */
-  GPIO_InitStruct.Pin = GPIO_PIN_15;
+  /*Configure GPIO pins : TOUCH_IRQ_Pin ENCODER_PULSE_Pin ENCODER_A_Pin ENCODER_B_Pin */
+  GPIO_InitStruct.Pin = TOUCH_IRQ_Pin|ENCODER_PULSE_Pin|ENCODER_A_Pin|ENCODER_B_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PA5 PA6 PA7 */
+  GPIO_InitStruct.Pin = GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : JAUNDICE_CTL_Pin BACKUP_MOSFET_Pin POWER_EN_Pin PULSIOXIMETER_EN_Pin 
+                           TFT_LED_CTL_Pin TOUCH_CS_Pin */
+  GPIO_InitStruct.Pin = JAUNDICE_CTL_Pin|BACKUP_MOSFET_Pin|POWER_EN_Pin|PULSIOXIMETER_EN_Pin 
+                          |TFT_LED_CTL_Pin|TOUCH_CS_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : HEATER_CTL_Pin SD_CS_Pin */
+  GPIO_InitStruct.Pin = HEATER_CTL_Pin|SD_CS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -469,6 +664,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(RST_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PWR_ALERT_Pin */
+  GPIO_InitStruct.Pin = PWR_ALERT_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(PWR_ALERT_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : DC_Pin */
   GPIO_InitStruct.Pin = DC_Pin;
@@ -488,6 +689,17 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
 	adc_mean /= ADC_BUF_LEN;
 	printf("%lu\n", adc_mean);
 }
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  HAL_Delay(100);
+}
+
+void debugPrint(UART_HandleTypeDef *huart, char _out[]){
+ HAL_UART_Transmit(huart, (uint8_t *) _out, strlen(_out), 10);
+}
+
+
 /* USER CODE END 4 */
 
 /**

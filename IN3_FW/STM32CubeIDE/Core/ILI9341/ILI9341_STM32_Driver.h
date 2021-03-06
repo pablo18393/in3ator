@@ -91,7 +91,7 @@
 #define ILI9341_SCREEN_WIDTH 	320
 
 //SPI INSTANCE
-#define HSPI_INSTANCE							&hspi2
+#define HSPI_INSTANCE							&hspi2      //choose the SPI port 1
 
 //CHIP SELECT PIN AND PORT, STANDARD GPIO
 #define LCD_CS_PORT								GPIOC

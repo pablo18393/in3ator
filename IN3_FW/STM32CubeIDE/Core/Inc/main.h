@@ -63,12 +63,42 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define CS_Pin GPIO_PIN_13
 #define CS_GPIO_Port GPIOC
-#define TFT_LED_Pin GPIO_PIN_7
-#define TFT_LED_GPIO_Port GPIOC
+#define GSM_PWRKEY_Pin GPIO_PIN_14
+#define GSM_PWRKEY_GPIO_Port GPIOC
+#define TOUCH_IRQ_Pin GPIO_PIN_15
+#define TOUCH_IRQ_GPIO_Port GPIOC
+#define ENCODER_PULSE_Pin GPIO_PIN_5
+#define ENCODER_PULSE_GPIO_Port GPIOC
+#define JAUNDICE_CTL_Pin GPIO_PIN_0
+#define JAUNDICE_CTL_GPIO_Port GPIOB
+#define BACKUP_MOSFET_Pin GPIO_PIN_1
+#define BACKUP_MOSFET_GPIO_Port GPIOB
+#define POWER_EN_Pin GPIO_PIN_12
+#define POWER_EN_GPIO_Port GPIOB
+#define FAN_CTL_Pin GPIO_PIN_7
+#define FAN_CTL_GPIO_Port GPIOC
+#define ENCODER_A_Pin GPIO_PIN_8
+#define ENCODER_A_GPIO_Port GPIOC
+#define ENCODER_B_Pin GPIO_PIN_9
+#define ENCODER_B_GPIO_Port GPIOC
+#define HEATER_CTL_Pin GPIO_PIN_8
+#define HEATER_CTL_GPIO_Port GPIOA
+#define SD_CS_Pin GPIO_PIN_11
+#define SD_CS_GPIO_Port GPIOA
 #define RST_Pin GPIO_PIN_2
 #define RST_GPIO_Port GPIOD
+#define PWR_ALERT_Pin GPIO_PIN_4
+#define PWR_ALERT_GPIO_Port GPIOB
+#define PULSIOXIMETER_EN_Pin GPIO_PIN_5
+#define PULSIOXIMETER_EN_GPIO_Port GPIOB
+#define TFT_LED_CTL_Pin GPIO_PIN_6
+#define TFT_LED_CTL_GPIO_Port GPIOB
+#define HUMIDIFIER_CTL_Pin GPIO_PIN_7
+#define HUMIDIFIER_CTL_GPIO_Port GPIOB
 #define DC_Pin GPIO_PIN_8
 #define DC_GPIO_Port GPIOB
+#define TOUCH_CS_Pin GPIO_PIN_9
+#define TOUCH_CS_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

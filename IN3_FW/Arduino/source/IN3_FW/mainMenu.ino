@@ -46,7 +46,6 @@ void askSuccess() {
       stopPID();
     }
     turnActuators(OFF);
-    turnSterilizeLED(OFF);
     turnFans(OFF);
     GPRSSetPostVariables(actuatorsModeOFF, "");
     setGPRSPostPeriod(standByGPRSPostPeriod);

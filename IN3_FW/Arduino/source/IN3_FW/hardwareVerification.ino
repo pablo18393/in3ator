@@ -24,9 +24,6 @@ bool shortcircuitTest() {
 
 bool sensorsTest() {
   //sensors verification
-  if ((HEATER_NTC_PIN) > 3200 || analogRead(HEATER_NTC_PIN) < 1200) {
-    return (false);
-  }
   if (analogRead(BABY_NTC_PIN) > 3200 || analogRead(BABY_NTC_PIN) < 1200) {
     return (false);
   }

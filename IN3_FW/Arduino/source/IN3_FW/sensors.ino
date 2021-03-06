@@ -1,11 +1,7 @@
 void initSensors() {
-  if (DHTSensor) {
-    dht.setup(DHTPIN);
-  }
-  if (BME280Sensor) {
-    bme.begin();
-  }
   // timer setup for encoder
+  Wire.begin();
+  mySHTC3.begin(Wire);
   initPulsioximeterVariables();
 }
 
@@ -27,9 +23,10 @@ void sensorsISR() {
 void measureConsumption() {
   currentConsumtionStacker += analogRead(SYSTEM_SHUNT);
   currentConsumptionPos++;
-  if (currentConsumptionPos == 1000) {
+  if (currentConsumptionPos == 999) {
     currentConsumptionPos = 0;
-    currentConsumption = currentConsumtionStacker / 1000;
+    currentConsumption = (currentConsumtionStacker / 1000 - currentOffset) / ADCtoCurrent;
+    currentConsumtionStacker = 0;
   }
 }
 
@@ -75,11 +72,11 @@ void calculatePulsioximeterValues() {
 
 void measurenumNTC() {
   for (int i = 0; i < numNTC; i++) {
-    temperatureArray[i][temperature_measured] = analogRead(NTCpin[i]);
+    temperatureArray[i][temperature_measured] = analogRead(BABY_NTC_PIN);
   }
   temperature_measured++;
   if (temperature_measured == temperature_fraction) {
-    updateTemp(numNTC);
+    updateTemp(babyNTC);
     temperature_measured = 0;
   }
 }
@@ -128,61 +125,10 @@ void updateTemp(byte sensor) {
 }
 
 bool updateHumidity() {
-  bool DHTOK = 0;
-  bool BME280OK = 0;
-  int DHTTemperature;
-  int DHTHumidity;
-  int BME280Temperature;
-  int BME280Humidity;
-  if (DHTSensor) {
-    encoderTimer.pause();
-    DHTHumidity = dht.getHumidity();
-    DHTTemperature = dht.getTemperature();
-    encoderTimer.resume();
-    if (DHTHumidity > 10 && DHTTemperature && abs(DHTHumidity + diffHumidity) <= 100) {
-      temperature[digitalTempSensor] = DHTTemperature; //Add here measurement to temp array
-      DHTOK = 1;
-    }
-    else {
-      dht.setup(DHTPIN);
-    }
-  }
-  if (BME280Sensor) {
-    delay(50); //let the dma transfer to TFT display finish
-    digitalWrite(BME_CS, LOW);
-    digitalWrite(TFT_CS, HIGH);
-    pinMode(PB15, OUTPUT);
-    pinMode(PB14, INPUT);
-    pinMode(PB13, OUTPUT);
-    for (int i = 0; i < 5; i++) {
-      BME280Temperature = bme.readTemperature();
-      BME280Humidity = bme.readHumidity();
-      if (BME280Temperature && BME280Humidity && abs(BME280Humidity) <= 100 && abs(BME280Temperature) <= 100) {
-        temperature[digitalTempSensor] = BME280Temperature; //Add here measurement to temp array
-        BME280OK = 1;
-        break;
-      }
-      else if (i == 3) {
-        bme.begin();
-      }
-    }
-    SPI.beginTransaction(SPISettings(48000000, MSBFIRST, SPI_MODE0, DATA_SIZE_16BIT));
-    digitalWrite(BME_CS, HIGH);
-    digitalWrite(TFT_CS, LOW);
-  }
-  if (DHTOK || BME280OK) {
-    humidity = 0;
-    humidity += DHTHumidity;
-    humidity += BME280Humidity;
-    humidity += diffHumidity;
-
-  }
-  if (DHTOK && BME280OK) {
-    humidity -= diffHumidity;
-    humidity /= 2;
-    humidity += diffHumidity;
-  }
-  return (DHTOK || BME280OK);
+  delay(190);                                                 // Delay for the data rate you want - note that measurements take ~10 ms so the fastest data rate is 100 Hz (when no delay is used)
+  mySHTC3.update();
+  temperature[digitalTempSensor] = mySHTC3.toDegC(); //Add here measurement to temp array
+  humidity = int(mySHTC3.toPercent()) + diffHumidity;
 }
 
 void peripheralsISR() {
@@ -217,10 +163,10 @@ void readEncoder() {
 void asleep() {
   if (auto_lock) {
     if (millis() - last_something > time_lock) {
-      pwmWrite(SCREENBACKLIGHT, screenBackLightMaxPWM);
+      digitalWrite(SCREENBACKLIGHT, HIGH);
     }
     else {
-      pwmWrite(SCREENBACKLIGHT, TFT_LED_PWR);
+      digitalWrite(SCREENBACKLIGHT, LOW);
     }
   }
 }
