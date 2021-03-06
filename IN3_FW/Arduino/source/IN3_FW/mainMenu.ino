@@ -34,7 +34,9 @@ void mainMenu() {
   controlTemperature = 0;
   controlHumidity = 0;
   enableSet = 0;
-  while (!digitalRead(ENC_SWITCH));
+  while (!digitalRead(ENC_SWITCH)){
+    updateData();
+  }
   delay(debounceTime);
   updateData();
   barSelection();

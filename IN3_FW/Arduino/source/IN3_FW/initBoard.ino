@@ -15,7 +15,7 @@ void initBoard() {
   //hardwareVerification();
   pinDirection(operativeMode);
   initGPRS();
-
+  watchdogInit();
 }
 
 void initTFT() {

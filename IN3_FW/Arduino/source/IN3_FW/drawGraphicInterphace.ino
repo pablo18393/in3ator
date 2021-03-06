@@ -153,7 +153,7 @@ void setSensorsGraphicPosition() {
       humBarPosY = 3 * tft.height() / 4 + 35;
       temperatureX = letter_width;
       temperatureY = tempBarPosY - barHeight / 2;
-      humidityX = letter_width;
+      humidityX = 2 * letter_width;
       humidityY = humBarPosY - barHeight / 2;
       separatorTopYPos = tft.height() / 3 + 5;
       separatorBotYPos = tft.height() * 2 / 3 + 10;

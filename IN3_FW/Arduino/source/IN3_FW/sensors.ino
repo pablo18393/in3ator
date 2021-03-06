@@ -1,8 +1,22 @@
 void initSensors() {
   // timer setup for encoder
-  Wire.begin();
-  mySHTC3.begin(Wire);
+  initEnvironmentalSensor();
   initPulsioximeterVariables();
+}
+
+void initEnvironmentalSensor() {
+  Serial4.println("detecting sensor");
+  Wire.begin();
+  Wire.beginTransmission(environmentalSensorAddress);
+  environmentalSensorPresent = Wire.endTransmission();
+  if (environmentalSensorPresent == 0) {
+    Serial4.println("Environmental sensor succesfully found");
+    mySHTC3.begin(Wire);
+  }
+  else {
+    Serial4.println("No environmental sensor found");
+    Wire.end();
+  }
 }
 
 void sensorsISR() {
@@ -125,10 +139,11 @@ void updateTemp(byte sensor) {
 }
 
 bool updateHumidity() {
-  delay(190);                                                 // Delay for the data rate you want - note that measurements take ~10 ms so the fastest data rate is 100 Hz (when no delay is used)
-  mySHTC3.update();
-  temperature[digitalTempSensor] = mySHTC3.toDegC(); //Add here measurement to temp array
-  humidity = int(mySHTC3.toPercent()) + diffHumidity;
+  if (environmentalSensorPresent == 0) {
+    mySHTC3.update();
+    temperature[digitalTempSensor] = mySHTC3.toDegC(); //Add here measurement to temp array
+    humidity = int(mySHTC3.toPercent()) + diffHumidity;
+  }
 }
 
 void peripheralsISR() {

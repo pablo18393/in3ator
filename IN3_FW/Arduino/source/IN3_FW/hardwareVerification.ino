@@ -14,7 +14,9 @@ void hardwareVerification() {
   if (!testOK) {
     logln("HARDWARE TEST FAIL");
     drawHardwareErrorMessage();
-    while (digitalRead(ENC_SWITCH));
+    while (digitalRead(ENC_SWITCH)){
+      updateData();
+    }
   }
 }
 

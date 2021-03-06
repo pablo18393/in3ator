@@ -1,4 +1,5 @@
 int updateData() {
+  watchdogReload();
   if (millis() - lastGraphicSensorsUpdate > sensorsUpdateRate) {
     updateHumidity();
     if (page == advancedModePage || page == actuatorsProgressPage) {
@@ -6,8 +7,8 @@ int updateData() {
       if (page == actuatorsProgressPage) {
         printStatus();
       }
-      lastGraphicSensorsUpdate = millis();
     }
+    lastGraphicSensorsUpdate = millis();
   }
   if ((page == mainMenuPage || page == advancedModePage) && !enableSet) {
     checkSetMessage();

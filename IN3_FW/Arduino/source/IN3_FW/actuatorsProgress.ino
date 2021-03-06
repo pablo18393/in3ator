@@ -45,7 +45,9 @@ void actuatorsProgress() {
   tft.setTextColor(COLOR_WARNING_TEXT);
   drawStop();
   state_blink = 1;
-  while (!digitalRead(ENC_SWITCH));
+  while (!digitalRead(ENC_SWITCH)){
+    updateData();
+  }
   turnFans(ON);
   if (temperatureAtStart > temperature[babyNTC]) {
     temperatureAtStart = temperature[babyNTC];
@@ -59,6 +61,7 @@ void actuatorsProgress() {
       basicHumidityControl();
     }
     while (!digitalRead(ENC_SWITCH)) {
+      updateData();
       back_mode();
     }
     blinkGoBackMessage();
