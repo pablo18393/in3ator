@@ -110,6 +110,7 @@ void heatUp() {
 
 void turnActuators(bool mode) {
   digitalWrite(HEATER, mode);
+  digitalWrite(BACKUP, mode);
   if (mode) {
     pwmWrite(HUMIDIFIER, humidifierMaxPWM / 2);
   }

@@ -45,7 +45,7 @@ void initEEPROM() {
 }
 
 void loadStandardValues() {
-  auto_lock = 1;
+  auto_lock = 0;
   EEPROM.write(EEPROM_autoLock, auto_lock);
   language = defaultLanguage;
   EEPROM.write(EEPROM_language, language);

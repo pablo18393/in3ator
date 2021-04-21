@@ -9,7 +9,7 @@ void factoryMenu() {
     pos_text[i] = leftMargin;
   }
   if (!language) {
-    words[0]  = "ENC_SWITCH to start";
+    words[0]  = "Hello";
     words[1]  = "Welcome to in3";
   }
   else {

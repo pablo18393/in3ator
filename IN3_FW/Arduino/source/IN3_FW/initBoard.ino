@@ -11,9 +11,9 @@ void initBoard() {
   //initSD();
   initTimers();
   pinDirection(testMode);
-  initTFT();
   //hardwareVerification();
   pinDirection(operativeMode);
+  initTFT();
   initGPRS();
   watchdogInit();
 }
@@ -41,7 +41,7 @@ void pinDirection(bool mode) {
       pinMode(encoderpinB, INPUT_PULLUP);
       pinMode(SYSTEM_SHUNT, INPUT);
       pwmWrite(HUMIDIFIER, 0);
-      digitalWrite(SCREENBACKLIGHT, LOW);
+      digitalWrite(SCREENBACKLIGHT, HIGH);
       digitalWrite(POWER_EN, LOW);
       digitalWrite(JAUNDICE, LOW);
       digitalWrite(HEATER, LOW);
@@ -64,7 +64,7 @@ void pinDirection(bool mode) {
       pinMode(SYSTEM_SHUNT, INPUT);
       pinMode(JAUNDICE, OUTPUT);
       pinMode(BACKUP, OUTPUT);
-      digitalWrite(SCREENBACKLIGHT, LOW);
+      digitalWrite(SCREENBACKLIGHT, HIGH);
       digitalWrite(HEATER, LOW);
       digitalWrite(FAN, LOW);
       pwmWrite(HUMIDIFIER, 0);
@@ -125,5 +125,5 @@ void initTimers() {
   humidifierMaxPWM = humidifierTimer.getOverflow();
   //fanHPMaxPWM = GPRSTimer.getOverflow();
   buzzerMaxPWM = sensorsTimer.getOverflow();
-  //screenBackLightMaxPWM = humidifierTimer.getOverflow();
+  screenBackLightMaxPWM = humidifierTimer.getOverflow();
 }

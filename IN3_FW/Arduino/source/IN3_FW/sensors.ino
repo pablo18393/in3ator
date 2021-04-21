@@ -5,7 +5,7 @@ void initSensors() {
 }
 
 void initEnvironmentalSensor() {
-  Serial4.println("detecting sensor");
+  Serial4.println("detecting sensor...");
   Wire.begin();
   Wire.beginTransmission(environmentalSensorAddress);
   environmentalSensorPresent = Wire.endTransmission();
@@ -143,6 +143,8 @@ bool updateHumidity() {
     mySHTC3.update();
     temperature[digitalTempSensor] = mySHTC3.toDegC(); //Add here measurement to temp array
     humidity = int(mySHTC3.toPercent()) + diffHumidity;
+    Serial4.println("Floor temperature: " + String(temperature[digitalTempSensor]) + "ºC");
+    Serial4.println("Humidity: " + String(humidity) + "%");
   }
 }
 
@@ -180,8 +182,8 @@ void asleep() {
     if (millis() - last_something > time_lock) {
       digitalWrite(SCREENBACKLIGHT, HIGH);
     }
-    else {
-      digitalWrite(SCREENBACKLIGHT, LOW);
-    }
+  }
+  else {
+    digitalWrite(SCREENBACKLIGHT, LOW);
   }
 }

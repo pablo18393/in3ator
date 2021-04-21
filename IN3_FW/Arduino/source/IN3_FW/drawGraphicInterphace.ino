@@ -219,24 +219,31 @@ void loadlogo() {
       i = 0;
     }
   }
+  digitalWrite(SCREENBACKLIGHT, LOW);
   delay(introDelay);
 }
 
 void drawIntroMessage() {
-  byte numWords = 1;
+  byte numWords = 3;
   switch (language) {
     case english:
-      words[0]  = "Welcome to in3";
+      words[0]  = "Welcome to in3ator";
+      words[1]  = "";
+      words[2]  = "Saving lives";
       break;
     case spanish:
       words[0]  = "Bienvenido a in3";
+      words[1]  = "";
+      words[2]  = "Salvando vidas";
       break;
     case french:
       words[0]  = "Bienvenue a in3";
+      words[1]  = "";
+      words[2]  = "Sauver des vies";
       break;
   }
   for (int i = 0; i < numWords; i++) {
-    tft.drawCentreString(words[i], tft.width() / 2, tft.height() / (2 + i) , textFontSize);
+    tft.drawCentreString(words[i], tft.width() / 2, tft.height() * (1 + i) / (2 + numWords) , textFontSize);
   }
 }
 
