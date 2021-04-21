@@ -1,0 +1,21 @@
+Circuit: * C:\Users\pablo\Desktop\IN3\in3\IN3_hardware\simulations\MOSFETs\Draft1.asc
+
+Direct Newton iteration for .op point succeeded.
+
+Date: Fri Sep 04 15:19:54 2020
+Total elapsed time: 0.058 seconds.
+
+tnom = 27
+temp = 27
+method = modified trap
+totiter = 2089
+traniter = 2086
+tranpoints = 1044
+accept = 1044
+rejected = 0
+matrix size = 4
+fillins = 0
+solver = Normal
+Matrix Compiler1: 234 bytes object code size  0.0/0.0/[0.0]
+Matrix Compiler2: 296 bytes object code size  0.0/0.0/[0.0]
+

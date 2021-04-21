@@ -9,7 +9,7 @@ void factoryMenu() {
     pos_text[i] = leftMargin;
   }
   if (!language) {
-    words[0]  = "ENC_SWITCH to start";
+    words[0]  = "Hello";
     words[1]  = "Welcome to in3";
   }
   else {
@@ -19,7 +19,9 @@ void factoryMenu() {
   for (int i = 0; i < numWords; i++) {
     tft.drawCentreString(words[i], tft.width() / 2, tft.height() / 2 - letter_height * 2 * i , textFontSize);
   }
-  while (digitalRead(ENC_SWITCH));
+  while (digitalRead(ENC_SWITCH)) {
+    updateData();
+  }
   delay(debounceTime);
   void helpingmainMenu();
   displayMenuHelp();
@@ -67,15 +69,21 @@ void helpingmainMenu() {
   graphics();
   drawHeading();
   updateDisplaySensors();
-  while (!digitalRead(ENC_SWITCH));
+  while (!digitalRead(ENC_SWITCH)) {
+    updateData();
+  }
   delay(debounceTime);
 }
 
 void waitForENC_SWITCH() {
-  while (digitalRead(ENC_SWITCH));
+  while (digitalRead(ENC_SWITCH)) {
+    updateData();
+  }
   delay(debounceTime);
   helpingmainMenu();
-  while (!digitalRead(ENC_SWITCH));
+  while (!digitalRead(ENC_SWITCH)) {
+    updateData();
+  }
   delay(debounceTime);
 }
 

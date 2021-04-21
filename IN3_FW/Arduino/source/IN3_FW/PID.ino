@@ -13,7 +13,7 @@ void roomPIDInterrupt() {
     if (interruptcounter == roomPIDfactor) {
       interruptcounter = 0;
       roomPID.Compute();
-      desiredHeaterTemp = PIDOutput[babyNTC] * (maxHeaterTemp - desiredSkinTemp) / (heaterMaxPWM) + desiredSkinTemp;  //map function: min value is
+      //desiredHeaterTemp = PIDOutput[babyNTC] * (maxHeaterTemp - desiredSkinTemp) / (heaterMaxPWM) + desiredSkinTemp;  //map function: min value is
     }
     if (!(interruptcounter % heaterPIDfactor)) {
       heaterPID.Compute();

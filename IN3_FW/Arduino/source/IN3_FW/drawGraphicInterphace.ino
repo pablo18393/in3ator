@@ -153,7 +153,7 @@ void setSensorsGraphicPosition() {
       humBarPosY = 3 * tft.height() / 4 + 35;
       temperatureX = letter_width;
       temperatureY = tempBarPosY - barHeight / 2;
-      humidityX = letter_width;
+      humidityX = 2 * letter_width;
       humidityY = humBarPosY - barHeight / 2;
       separatorTopYPos = tft.height() / 3 + 5;
       separatorBotYPos = tft.height() * 2 / 3 + 10;
@@ -213,36 +213,43 @@ void loadlogo() {
   int  timeOut = 4000;
   long processTime = millis();
   for (int i = screenBackLightMaxPWM; i >= TFT_LED_PWR; i--) {
-    pwmWrite(SCREENBACKLIGHT, i);
+    digitalWrite(SCREENBACKLIGHT, LOW);
     delayMicroseconds(brightenRate);
     if (millis() - processTime > timeOut) {
       i = 0;
     }
   }
+  digitalWrite(SCREENBACKLIGHT, LOW);
   delay(introDelay);
 }
 
 void drawIntroMessage() {
-  byte numWords = 1;
+  byte numWords = 3;
   switch (language) {
     case english:
-      words[0]  = "Welcome to in3";
+      words[0]  = "Welcome to in3ator";
+      words[1]  = "";
+      words[2]  = "Saving lives";
       break;
     case spanish:
       words[0]  = "Bienvenido a in3";
+      words[1]  = "";
+      words[2]  = "Salvando vidas";
       break;
     case french:
       words[0]  = "Bienvenue a in3";
+      words[1]  = "";
+      words[2]  = "Sauver des vies";
       break;
   }
   for (int i = 0; i < numWords; i++) {
-    tft.drawCentreString(words[i], tft.width() / 2, tft.height() / (2 + i) , textFontSize);
+    tft.drawCentreString(words[i], tft.width() / 2, tft.height() * (1 + i) / (2 + numWords) , textFontSize);
   }
 }
 
 /*
- * Function pending to complete
- */
+   Function pending to complete
+*/
 void drawHardwareErrorMessage() {
   byte numErrors = 0;
   byte j;

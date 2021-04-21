@@ -2,49 +2,38 @@
 #define operativeMode true
 
 void initBoard() {
+  Serial4.begin(115200);
+  if (SerialDebug) {
+    Serial4.begin(115200);
+  }
   initEEPROM();
   initSensors();
-  initSD();
+  //initSD();
   initTimers();
   pinDirection(testMode);
-  initTFT();
   //hardwareVerification();
   pinDirection(operativeMode);
-  pwmWrite(SCREENBACKLIGHT, TFT_LED_PWR);
-  //digitalWrite(POWER_EN, HIGH);
+  initTFT();
   initGPRS();
-  /*
-    if (!firstTurnOn) {
-    factoryMenu();
-    }
-  */
+  watchdogInit();
 }
 
 void initTFT() {
   SPI.setModule(SPI_SEL);
   tft.begin();
-  tft.setRotation(1);
+  tft.setRotation(3);
   loadlogo();
 }
 
 void pinDirection(bool mode) {
   switch (mode) {
     case testMode:
-      afio_cfg_debug_ports(AFIO_DEBUG_SW_ONLY); //release PA15 pin for GPIO purpose
-      if (SerialDebug) {
-        Serial.begin(115200);
-      }
-      else {
-        Serial.end();
-      }
       pinMode(HUMIDIFIER, PWM);
-      pinMode(SCREENBACKLIGHT, PWM);
+      pinMode(SCREENBACKLIGHT, OUTPUT);
       pinMode(JAUNDICE, OUTPUT);
       pinMode(HEATER, OUTPUT);
-      pinMode(FAN_HP, OUTPUT);
+      pinMode(FAN, OUTPUT);
       pinMode(BUZZER, OUTPUT);
-      pinMode(FAN_LP, OUTPUT);
-      pinMode(STERILIZE_CTL, OUTPUT);
       pinMode(ENC_SWITCH, INPUT_PULLUP);
       pinMode(POWER_EN, OUTPUT);
       pinMode(GPRS_PWRKEY, OUTPUT);
@@ -52,32 +41,21 @@ void pinDirection(bool mode) {
       pinMode(encoderpinB, INPUT_PULLUP);
       pinMode(SYSTEM_SHUNT, INPUT);
       pwmWrite(HUMIDIFIER, 0);
-      pwmWrite(SCREENBACKLIGHT, screenBackLightMaxPWM);
+      digitalWrite(SCREENBACKLIGHT, HIGH);
       digitalWrite(POWER_EN, LOW);
       digitalWrite(JAUNDICE, LOW);
       digitalWrite(HEATER, LOW);
-      digitalWrite(FAN_HP, LOW);
+      digitalWrite(FAN, LOW);
       digitalWrite(BUZZER, LOW);
-      digitalWrite(FAN_LP, LOW);
-      digitalWrite(STERILIZE_CTL, LOW);
       digitalWrite(GPRS_PWRKEY, HIGH);
       break;
 
     case operativeMode:
-      afio_cfg_debug_ports(AFIO_DEBUG_SW_ONLY); //release PA15 pin for GPIO purpose
-      if (SerialDebug) {
-        Serial.begin(115200);
-      }
-      else {
-        Serial.end();
-      }
-      pinMode(HEATER, PWM);
-      pinMode(FAN_HP, PWM);
+      pinMode(HEATER, OUTPUT);
+      pinMode(FAN, OUTPUT);
       pinMode(HUMIDIFIER, PWM);
       pinMode(BUZZER, PWM);
-      pinMode(SCREENBACKLIGHT, PWM);
-      pinMode(FAN_LP, OUTPUT);
-      pinMode(STERILIZE_CTL, OUTPUT);
+      pinMode(SCREENBACKLIGHT, OUTPUT);
       pinMode(ENC_SWITCH, INPUT_PULLUP);
       pinMode(POWER_EN, OUTPUT);
       pinMode(GPRS_PWRKEY, OUTPUT);
@@ -85,14 +63,14 @@ void pinDirection(bool mode) {
       pinMode(encoderpinB, INPUT_PULLUP);
       pinMode(SYSTEM_SHUNT, INPUT);
       pinMode(JAUNDICE, OUTPUT);
-      pwmWrite(SCREENBACKLIGHT, screenBackLightMaxPWM);
-      pwmWrite(HEATER, 0);
-      pwmWrite(FAN_HP, 0);
+      pinMode(BACKUP, OUTPUT);
+      digitalWrite(SCREENBACKLIGHT, HIGH);
+      digitalWrite(HEATER, LOW);
+      digitalWrite(FAN, LOW);
       pwmWrite(HUMIDIFIER, 0);
       pwmWrite(BUZZER, 0);
-      digitalWrite(FAN_LP, LOW);
-      digitalWrite(STERILIZE_CTL, LOW);
       digitalWrite(GPRS_PWRKEY, HIGH);
+      digitalWrite(POWER_EN, HIGH);
       break;
   }
 }
@@ -125,26 +103,27 @@ void initTimers() {
   encoderTimer.attachCompare1Interrupt(peripheralsISR);
   nvic_irq_set_priority(NVIC_TIMER8_CC, 15);
   nvic_irq_set_priority(NVIC_USART1 , 13);
+  nvic_irq_set_priority(NVIC_UART4 , 14);
   encoderTimer.refresh();
   encoderTimer.resume();
 
 
   //sensors handling ISR configuration
-  sensorsTimer.pause();
-  sensorsTimer.setPeriod(sensorsISRRate); // in microseconds
-  sensorsTimer.refresh();
-  sensorsTimer.resume();
-
+  /*
+    sensorsTimer.pause();
+    sensorsTimer.setPeriod(sensorsISRRate); // in microseconds
+    sensorsTimer.refresh();
+    sensorsTimer.resume();
+  */
   //GPRS timer configuration
-  GPRSTimer.pause();
-  GPRSTimer.setPeriod(GPRSISRRate); // in microseconds
-  GPRSTimer.refresh();
-  GPRSTimer.resume();
-
-  heaterMaxPWM = humidifierTimer.getOverflow();
-  jaundiceMaxPWM = humidifierTimer.getOverflow();
+  /*
+    GPRSTimer.pause();
+    GPRSTimer.setPeriod(GPRSISRRate); // in microseconds
+    GPRSTimer.refresh();
+    GPRSTimer.resume();
+  */
   humidifierMaxPWM = humidifierTimer.getOverflow();
-  fanHPMaxPWM = GPRSTimer.getOverflow();
+  //fanHPMaxPWM = GPRSTimer.getOverflow();
   buzzerMaxPWM = sensorsTimer.getOverflow();
-  screenBackLightMaxPWM = sensorsTimer.getOverflow();
+  screenBackLightMaxPWM = humidifierTimer.getOverflow();
 }

@@ -1,0 +1,23 @@
+Circuit: * C:\Users\pablo\Desktop\IN3\in3\IN3_hardware\simulations\PiezoElectric\Draft2.asc
+
+Limiting rise time of source v2 to 5e-005
+Limiting fall time of source v2 to 5e-005
+Direct Newton iteration for .op point succeeded.
+
+Date: Wed Aug 19 17:37:57 2020
+Total elapsed time: 0.551 seconds.
+
+tnom = 27
+temp = 27
+method = modified trap
+totiter = 330525
+traniter = 330520
+tranpoints = 108524
+accept = 76326
+rejected = 32198
+matrix size = 10
+fillins = 0
+solver = Normal
+Matrix Compiler1: 426 bytes object code size  0.1/0.1/[0.1]
+Matrix Compiler2: 706 bytes object code size  0.1/0.1/[0.1]
+

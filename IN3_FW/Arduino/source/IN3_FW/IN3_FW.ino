@@ -4,21 +4,61 @@
 #include <EEPROM.h>
 #include <Adafruit_ILI9341_STM.h> // STM32 DMA Hardware-specific library
 #include <SPI.h>
-#include "DHT.h"
 #include <PID_v1.h>
 #include "board.h"
-#include "libmaple/dac.h"
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
-#include <Adafruit_BME280.h>
 #include <SD.h>
 #include <TimeLib.h>
+#include "SparkFun_SHTC3.h" // Click here to get the library: http://librarymanager/All#SparkFun_SHTC3
 
+#define LIBMAPPLE_CORE //comment it for HAL based core
+
+#define IWDG_PR_DIV_4 0x0
+#define IWDG_PR_DIV_8 0x1
+#define IWDG_PR_DIV_16 0x2
+#define IWDG_PR_DIV_32 0x3
+#define IWDG_PR_DIV_64 0x4
+#define IWDG_PR_DIV_128 0x5
+#define IWDG_PR_DIV_256 0x6
+
+typedef enum iwdg_prescaler {
+  IWDG_PRE_4 = IWDG_PR_DIV_4,     /**< Divide by 4 */
+  IWDG_PRE_8 = IWDG_PR_DIV_8,     /**< Divide by 8 */
+  IWDG_PRE_16 = IWDG_PR_DIV_16,   /**< Divide by 16 */
+  IWDG_PRE_32 = IWDG_PR_DIV_32,   /**< Divide by 32 */
+  IWDG_PRE_64 = IWDG_PR_DIV_64,   /**< Divide by 64 */
+  IWDG_PRE_128 = IWDG_PR_DIV_128, /**< Divide by 128 */
+  IWDG_PRE_256 = IWDG_PR_DIV_256  /**< Divide by 256 */
+} iwdg_prescaler;
+
+#if defined(LIBMAPPLE_CORE)
+typedef struct iwdg_reg_map {
+  volatile uint32_t KR;  /**< Key register. */
+  volatile uint32_t PR;  /**< Prescaler register. */
+  volatile uint32_t RLR; /**< Reload register. */
+  volatile uint32_t SR;  /**< Status register */
+} iwdg_reg_map;
+
+#define IWDG ((struct iwdg_reg_map *)0x40003000)
+#endif
+
+void iwdg_feed(void) {
+  IWDG->KR = 0xAAAA;
+}
+
+void iwdg_init(iwdg_prescaler prescaler, uint16_t reload) {
+  IWDG->KR = 0x5555;
+  IWDG->PR = prescaler;
+  IWDG->RLR = reload;
+  IWDG->KR = 0xCCCC;
+  IWDG->KR = 0xAAAA;
+}
 
 //Firmware version and head title of UI screen
-#define FWversion "v3.2"
+#define FWversion "v4.0"
 #define headingTitle "in3ator"
-String serialNumber = "in3000002";
+String serialNumber = "in3000015";
 bool firstTurnOn;
 
 //configuration variables
@@ -85,10 +125,13 @@ byte encoderCount = 0;
 
 
 //sensor variables
-bool swapTempSensors; //variable to swap room and heater pin map in case are swapped
+byte environmentalSensorPresent;
+byte environmentalSensorAddress = 112;
 int pulsioximeterMean;
 const int maxPulsioximeterSamples = 320; //(tft width).
 float currentConsumption, currentConsumtionStacker;
+int currentOffset = 350;
+int ADCtoCurrent = 400;
 int currentConsumptionPos;
 float currentConsumptionFactor = 2.685; //factor to translate current consumtion in mA
 int pulsioximeterSample[maxPulsioximeterSamples][2]; //0 is previous data, 1 is actual data
@@ -134,7 +177,6 @@ const byte fanMaxSpeed = 100; //max fan speed (percentage) to be set
 
 //Encoder variables
 #define NUMENCODERS 1 //number of encoders in circuit
-byte NTCpin[numNTC] = {HEATER_NTC_PIN, BABY_NTC_PIN, INBOARD_LEFT_NTC_PIN, INBOARD_RIGHT_NTC_PIN}; //variable that handles which pin number is heater/room NTC (could be swapped by user in mounting stage)
 boolean A_set;
 boolean B_set;
 int encoderpinA = ENC_A; // pin  encoder A
@@ -201,7 +243,6 @@ int TFT_LED_PWR = 25000; //PWM that will be supplied to backlight LEDs
 const byte time_back_draw = 255;
 const byte time_back_wait = 255;
 long last_something; //last time there was a encoder movement or pulse
-long CheckTempSensorPinTimeout = 45000; //timeout for checking the thermistor pinout
 long sensorsUpdateRate = 4000;
 int blinkTimeON = 1000; //displayed text ON time
 int blinkTimeOFF = 100; //displayed text OFF time
@@ -241,10 +282,10 @@ byte goToProcessRow;
 //settings
 #define autoLockGraphicPosition 0
 #define languageGraphicPosition 1
-#define heaterTempGraphicPosition 2
-#define fanGraphicPosition 3
-#define setStandardValuesGraphicPosition 4
-#define calibrateGraphicPosition 5
+#define setStandardValuesGraphicPosition 2
+#define calibrateGraphicPosition 3
+#define heaterTempGraphicPosition 4
+#define fanGraphicPosition 5
 //calibration
 #define temperatureCalibrationGraphicPosition 0
 #define humidityCalibrationGraphicPosition 1
@@ -285,8 +326,9 @@ byte goToProcessRow;
 #define OFF false
 
 Adafruit_ILI9341_STM tft = Adafruit_ILI9341_STM(TFT_CS, TFT_DC, TFT_RST); // Use hardware SPI, tft class definition
-DHT dht; //dht sensor class definition
-Adafruit_BME280 bme(BME_CS, PB15, PB14, PB13); // software SPI, //BME280 (humidity, pressure and temperature sensor) configuration variables
+SHTC3 mySHTC3;              // Declare an instance of the SHTC3 class
+TwoWire WIRE2 (2,I2C_FAST_MODE);
+#define Wire WIRE2
 
 // timers configuration
 #define NTCInterruptRate 20000    // in microseconds; 
@@ -295,7 +337,7 @@ Adafruit_BME280 bme(BME_CS, PB15, PB14, PB13); // software SPI, //BME280 (humidi
 #define sensorsISRRate 500    // in microseconds, also for BUZZER optimal frequency (2khz); Prescale factor 6, Overflow 36000
 #define roomPIDRate 1000000    // in microseconds. Prescale factor 2, Overflow 65535
 #define peripheralsISRRate 1000    // in microseconds. Prescale factor 2, Overflow 36000
-#define humidifierTimerRate 9 //in microseconds, to generate a 110Khz PWM for ultra sonic humidifier. Prescale factor 1, Overflow 648
+#define humidifierTimerRate 100 //in microseconds, to generate a 110Khz PWM for ultra sonic humidifier. Prescale factor 1, Overflow 648
 int roomPIDfactor = roomPIDRate / NTCInterruptRate;
 int heaterPIDfactor = heaterPIDRate / NTCInterruptRate;
 volatile long interruptcounter;
@@ -310,10 +352,10 @@ volatile long interruptcounter;
 */
 
 HardwareTimer GPRSTimer(1);
-HardwareTimer roomPIDTimer(2);
-HardwareTimer humidifierTimer(3);
-HardwareTimer encoderTimer(4);
-HardwareTimer sensorsTimer(8);
+HardwareTimer roomPIDTimer(1);
+HardwareTimer humidifierTimer(4);
+HardwareTimer encoderTimer(2);
+HardwareTimer sensorsTimer(1);
 
 int hardwareComponents;
 

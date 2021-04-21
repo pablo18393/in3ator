@@ -12,7 +12,7 @@
 
 #define standByGPRSPostPeriod 3600
 #define actuatingGPRSPostPeriod 120
-#define jaundiceGPRSPostPeriod 600
+#define jaundiceGPRSPostPeriod 600 
 
 String user = "admin@admin.com";
 String password = "admin";
@@ -502,6 +502,7 @@ void readGPRSData() {
       logln("Buffer overflow");
     }
     GPRS.buffer[GPRS.bufferWritePos] = Serial1.read();
+    Serial4.print(GPRS.buffer[GPRS.bufferWritePos]);
     if (GPRS.post) {
       if (!GPRS.readToken) {
         if (GPRS.buffer[GPRS.bufferWritePos] == char('y')) {

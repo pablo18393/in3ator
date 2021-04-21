@@ -45,75 +45,29 @@ void actuatorsProgress() {
   tft.setTextColor(COLOR_WARNING_TEXT);
   drawStop();
   state_blink = 1;
-  while (!digitalRead(ENC_SWITCH));
+  while (!digitalRead(ENC_SWITCH)){
+    updateData();
+  }
   turnFans(ON);
-  turnSterilizeLED (ON);
   if (temperatureAtStart > temperature[babyNTC]) {
     temperatureAtStart = temperature[babyNTC];
-  }
-  if (controlTemperature) {
-    if (temperaturePIDcontrol) {
-      startPID();
-    }
   }
   while (1) {
     updateData();
     if (controlTemperature) {
-      if (!temperaturePIDcontrol) {
-        basictemperatureControl();
-      }
+      basictemperatureControl();
     }
     if (controlHumidity) {
       basicHumidityControl();
     }
     while (!digitalRead(ENC_SWITCH)) {
+      updateData();
       back_mode();
     }
     blinkGoBackMessage();
   }
 }
 
-void checkTempSensorPin() {
-  float prevroomTemp = temperature[babyNTC];
-  float prevHeaterTemp = temperature[heaterNTC];
-  bool exitCheck = 0;
-  long timeElapsedChecking = millis();
-  turnFans(ON);
-  heatUp();
-  while (!exitCheck) {
-    updateData();
-    if (temperature[babyNTC] > temperature[heaterNTC] + CheckSensorRaiseTemp) {
-      swapTempSensors = 1;
-      EEPROM.write(EEPROM_swapTempSensors, swapTempSensors);
-      exitCheck = 1;
-    }
-    if ((temperature[heaterNTC] - prevHeaterTemp) > CheckSensorRaiseTemp) {
-      swapTempSensors = 0;
-      exitCheck = 1;
-    }
-    if ((temperature[babyNTC] - prevroomTemp) > CheckSensorRaiseTemp) {
-      swapTempSensors = 1;
-      EEPROM.write(EEPROM_swapTempSensors, swapTempSensors);
-      exitCheck = 1;
-    }
-    if (millis() - timeElapsedChecking > CheckTempSensorPinTimeout) {
-      exitCheck = 1;
-    }
-    delay(500);
-    printStatus();
-    while (!digitalRead(ENC_SWITCH)) {
-      back_mode();
-    }
-  }
-}
-
-
-void asignCorrectTempSensorsPin() {
-  int valueRetainer = HEATER_NTC_PIN;
-  HEATER_NTC_PIN = BABY_NTC_PIN;
-  BABY_NTC_PIN = valueRetainer;
-  logln("NTC pins swapped");
-}
 
 void blinkGoBackMessage() {
   if (millis() - blinking > 1000) {
@@ -135,31 +89,28 @@ void basictemperatureControl() {
     heatUp();
   }
   else {
-    pwmWrite(HEATER, 0);
+    digitalWrite(HEATER, LOW);
   }
 }
 
 void basicHumidityControl() {
   if (humidity < desiredRoomHum) {
     pwmWrite(HUMIDIFIER, humidifierMaxPWM / 2);
+    digitalWrite(BACKUP, HIGH);
   }
   else {
     pwmWrite(HUMIDIFIER, 0);
+    digitalWrite(BACKUP, LOW);
   }
 }
 
 void heatUp() {
-  if (temperature[heaterNTC] < maxHeaterTemp) {
-    heaterPower = heaterMaxPWM;
-  }
-  else {
-    heaterPower = 0;
-  }
-  pwmWrite(HEATER, heaterPower);
+  digitalWrite(HEATER, HIGH);
 }
 
 void turnActuators(bool mode) {
-  pwmWrite(HEATER, mode * heaterMaxPWM);
+  digitalWrite(HEATER, mode);
+  digitalWrite(BACKUP, mode);
   if (mode) {
     pwmWrite(HUMIDIFIER, humidifierMaxPWM / 2);
   }
@@ -169,10 +120,5 @@ void turnActuators(bool mode) {
 }
 
 void turnFans(bool mode) {
-  pwmWrite(FAN_HP, mode * fanHPMaxPWM);
-  digitalWrite(FAN_LP, mode);
-}
-
-void turnSterilizeLED (bool mode) {
-  digitalWrite(STERILIZE_CTL, mode);
+  digitalWrite(FAN, mode);
 }

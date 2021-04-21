@@ -49,6 +49,7 @@ void barSelection() {
         tft.fillRect(0, (tft.height() - height_heading) * (i - 1) / rectangles + height_heading - 1, tft.height(), width_indentation, WHITE); //mejorable
       }
       while (!digitalRead(ENC_SWITCH)) {
+        updateData();
         checkEncoderPress();
         if (page != mainMenuPage && page != askSuccessPage) {
           back_mode();
@@ -82,6 +83,7 @@ void barSelection() {
               break;
             case LEDGraphicPosition:
               while (digitalRead(ENC_SWITCH)) {
+                updateData();
                 if (EncMove) {
                   jaundiceEnable = !jaundiceEnable;
                   tft.setTextColor(COLOR_MENU);
@@ -158,6 +160,7 @@ void barSelection() {
               break;
             case LEDGraphicPosition:
               while (digitalRead(ENC_SWITCH)) {
+                updateData();
                 if (EncMove) {
                   jaundiceEnable = !jaundiceEnable;
                   tft.setTextColor(COLOR_MENU);
@@ -425,6 +428,7 @@ void barSelection() {
       selected = 0;
       tft.fillRect(0, (tft.height() - height_heading) * (bar_pos - 1) / rectangles + height_heading, width_select, (tft.height() - height_heading) / rectangles, WHITE);
       while (!digitalRead(ENC_SWITCH)) {
+        updateData();
         checkEncoderPress();
         if (page != mainMenuPage && page != askSuccessPage) {
           back_mode();

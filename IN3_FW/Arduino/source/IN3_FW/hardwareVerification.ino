@@ -14,7 +14,9 @@ void hardwareVerification() {
   if (!testOK) {
     logln("HARDWARE TEST FAIL");
     drawHardwareErrorMessage();
-    while (digitalRead(ENC_SWITCH));
+    while (digitalRead(ENC_SWITCH)){
+      updateData();
+    }
   }
 }
 
@@ -24,9 +26,6 @@ bool shortcircuitTest() {
 
 bool sensorsTest() {
   //sensors verification
-  if ((HEATER_NTC_PIN) > 3200 || analogRead(HEATER_NTC_PIN) < 1200) {
-    return (false);
-  }
   if (analogRead(BABY_NTC_PIN) > 3200 || analogRead(BABY_NTC_PIN) < 1200) {
     return (false);
   }

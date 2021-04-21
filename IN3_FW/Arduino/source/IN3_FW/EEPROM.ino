@@ -7,7 +7,6 @@
 #define EEPROM_fanSpeed 5
 #define EEPROM_diffHumidity 10
 #define EEPROM_diffTemperature 20
-#define EEPROM_swapTempSensors 30
 #define EEPROM_usedGenericMosfet 40
 #define EEPROM_checkStatus 100
 
@@ -46,7 +45,7 @@ void initEEPROM() {
 }
 
 void loadStandardValues() {
-  auto_lock = 1;
+  auto_lock = 0;
   EEPROM.write(EEPROM_autoLock, auto_lock);
   language = defaultLanguage;
   EEPROM.write(EEPROM_language, language);
@@ -76,10 +75,6 @@ void recapVariables() {
   }
   maxHeaterTemp = EEPROM.read(EEPROM_maxHeaterTemp);
   fanSpeed = EEPROM.read(EEPROM_fanSpeed);
-  swapTempSensors = EEPROM.read(EEPROM_swapTempSensors);
-  if (swapTempSensors) {
-    asignCorrectTempSensorsPin();
-  }
 }
 
 long EEPROMReadLong(int p_address)
