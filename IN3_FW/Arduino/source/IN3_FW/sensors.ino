@@ -182,6 +182,9 @@ void asleep() {
     if (millis() - last_something > time_lock) {
       digitalWrite(SCREENBACKLIGHT, HIGH);
     }
+    else {
+      digitalWrite(SCREENBACKLIGHT, LOW);
+    }
   }
   else {
     digitalWrite(SCREENBACKLIGHT, LOW);
