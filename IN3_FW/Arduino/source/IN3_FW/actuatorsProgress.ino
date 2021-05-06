@@ -17,6 +17,7 @@ void actuatorsProgress() {
     printLoadingTemperatureBar();
     switch (language) {
       case spanish:
+      case portuguese:
         textToWrite = "Temperatura";
         break;
       case english:
@@ -39,13 +40,17 @@ void actuatorsProgress() {
       case french:
         textToWrite = "Humidite";
         break;
+      case portuguese:
+        textToWrite = "Umidade";
+        break;
+
     }
     tft.drawCentreString(textToWrite, tft.width() / 2, humBarPosY - 4 * letter_height / 3, textFontSize);
   }
   tft.setTextColor(COLOR_WARNING_TEXT);
   drawStop();
   state_blink = 1;
-  while (!digitalRead(ENC_SWITCH)){
+  while (!digitalRead(ENC_SWITCH)) {
     updateData();
   }
   turnFans(ON);
@@ -111,12 +116,7 @@ void heatUp() {
 void turnActuators(bool mode) {
   digitalWrite(HEATER, mode);
   digitalWrite(BACKUP, mode);
-  if (mode) {
-    pwmWrite(HUMIDIFIER, humidifierMaxPWM / 2);
-  }
-  else {
-    pwmWrite(HUMIDIFIER, 0);
-  }
+    pwmWrite(HUMIDIFIER, humidifierMaxPWM / 2 * mode);
 }
 
 void turnFans(bool mode) {

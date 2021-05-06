@@ -22,6 +22,10 @@ void advancedMode() {
       words[temperatureGraphicPosition]  = "Temperature";
       words[humidityGraphicPosition] = "Humidite";
       break;
+    case portuguese:
+      words[temperatureGraphicPosition]  = "Temperatura";
+      words[humidityGraphicPosition] = "Umidade";
+      break;
   }
   words[LEDGraphicPosition] = "LED";
   words[startGraphicPosition] = "";

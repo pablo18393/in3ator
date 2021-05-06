@@ -1,4 +1,4 @@
-
+ 
 //include libraries
 #include <Adafruit_GFX_AS.h>
 #include <EEPROM.h>
@@ -56,9 +56,9 @@ void iwdg_init(iwdg_prescaler prescaler, uint16_t reload) {
 }
 
 //Firmware version and head title of UI screen
-#define FWversion "v4.0"
+#define FWversion "v4.1"
 #define headingTitle "in3ator"
-String serialNumber = "in3000015";
+String serialNumber = "in3000016";
 bool firstTurnOn;
 
 //configuration variables
@@ -80,7 +80,8 @@ int page;
 #define spanish 0
 #define english 1
 #define french 2
-#define numLanguages 3
+#define portuguese 3
+#define numLanguages 4
 int language;
 
 //temperature variables

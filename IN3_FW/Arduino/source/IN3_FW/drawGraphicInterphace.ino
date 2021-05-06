@@ -75,6 +75,9 @@ void graphics() {
                   case french:
                     textToWrite = "OUI";
                     break;
+                  case portuguese:
+                    textToWrite = "Nao";
+                    break;
                 }
               }
               else {
@@ -87,6 +90,9 @@ void graphics() {
                     break;
                   case french:
                     textToWrite = "PAS";
+                    break;
+                  case portuguese:
+                    textToWrite = "SIM";
                     break;
                 }
               }
@@ -102,6 +108,9 @@ void graphics() {
                   break;
                 case french:
                   textToWrite = "FRA";
+                  break;
+                case portuguese:
+                  textToWrite = "POR";
                   break;
               }
               tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
@@ -241,6 +250,11 @@ void drawIntroMessage() {
       words[1]  = "";
       words[2]  = "Sauver des vies";
       break;
+    case portuguese:
+      words[0]  = "Bem-vindo ao";
+      words[1]  = "";
+      words[2]  = "Salvando vidas";
+      break;
   }
   for (int i = 0; i < numWords; i++) {
     tft.drawCentreString(words[i], tft.width() / 2, tft.height() * (1 + i) / (2 + numWords) , textFontSize);
@@ -323,6 +337,9 @@ void drawStop() {
       case french:
         textToWrite = "appuyez 2 sec pour voler";
         break;
+      case portuguese:
+        textToWrite = "Pressione 2 segundos para sair";
+        break;
     }
     tft.drawCentreString(textToWrite, tft.width() / 2, tft.height() - letter_height, textFontSize);
   }
@@ -363,6 +380,9 @@ void drawStartMessage() {
       case french:
         words[startGraphicPosition] = "Debut";
         break;
+      case portuguese:
+        words[startGraphicPosition] = "Começar";
+        break;        
     }
     tft.drawCentreString(words[startGraphicPosition], width_select + (tft.width() - width_select) / 2, getYpos(goToProcessRow), textFontSize);
   }

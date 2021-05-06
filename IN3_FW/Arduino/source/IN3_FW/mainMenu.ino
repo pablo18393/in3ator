@@ -20,8 +20,12 @@ void mainMenu() {
       words[advancedModeGraphicPosition] = "Advanced mode";
       break;
     case french:
-      words[gestationGraphicPosition]  = "Semaines de gestation";
+      words[gestationGraphicPosition]  = "Semaines gestation";
       words[advancedModeGraphicPosition] = "Mode avance";
+      break;
+    case portuguese:
+      words[gestationGraphicPosition]  = "Semanas gestaçao";
+      words[advancedModeGraphicPosition] = "Modo avançado";
       break;
   }
   words[LEDGraphicPosition] = "LED";

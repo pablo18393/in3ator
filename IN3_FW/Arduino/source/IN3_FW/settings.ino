@@ -28,12 +28,20 @@ void settings() {
       words[calibrateGraphicPosition] = "Calibrar";
       break;
     case french:
-      words[autoLockGraphicPosition]  = "verrouillage auto";
+      words[autoLockGraphicPosition]  = "Verrouillage auto";
       words[languageGraphicPosition] = "Langue";
       words[heaterTempGraphicPosition] = "Temp chauffage";
       words[fanGraphicPosition] = "Ventilateur";
-      words[setStandardValuesGraphicPosition] = "definir valeurs standard";
-      words[calibrateGraphicPosition] = "etalonner";
+      words[setStandardValuesGraphicPosition] = "Definir valeurs standard";
+      words[calibrateGraphicPosition] = "Etalonner";
+      break;
+    case portuguese:
+      words[autoLockGraphicPosition]  = "Bloqueio automático";
+      words[languageGraphicPosition] = "Idioma";
+      words[heaterTempGraphicPosition] = "Temperatura de aquecimento";
+      words[fanGraphicPosition] = "Ventilador";
+      words[setStandardValuesGraphicPosition] = "Definir valores de fabrica";
+      words[calibrateGraphicPosition] = "Calibrar";
       break;
   }
   rectangles = numWords;

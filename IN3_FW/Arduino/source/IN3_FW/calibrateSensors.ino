@@ -25,6 +25,11 @@ void calibrateSensors() {
       words[humidityCalibrationGraphicPosition] = "Humidite";
       words[restartCalibrationValuesTempGraphicPosition] = "Reinitialiser valeurs";
       break;
+    case portuguese:
+      words[temperatureCalibrationGraphicPosition]  = "Temperatura";
+      words[humidityCalibrationGraphicPosition] = "Umidade";
+      words[restartCalibrationValuesTempGraphicPosition] = "Redefinir valores";
+      break;      
   }
   rectangles = numWords;
   graphics();

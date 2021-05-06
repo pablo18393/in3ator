@@ -224,6 +224,9 @@ void barSelection() {
                       case french:
                         textToWrite = "OUI";
                         break;
+                      case portuguese:
+                        textToWrite = "SIM";
+                        break;
                     }
                     tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
@@ -236,6 +239,9 @@ void barSelection() {
                         break;
                       case french:
                         textToWrite = "PAS";
+                        break;
+                      case portuguese:
+                        textToWrite = "NAO";
                         break;
                     }
                     tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
@@ -252,6 +258,9 @@ void barSelection() {
                       case french:
                         textToWrite = "PAS";
                         break;
+                      case portuguese:
+                        textToWrite = "NAO";
+                        break;
                     }
                     tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
                     tft.setTextColor(COLOR_MENU_TEXT);
@@ -264,6 +273,9 @@ void barSelection() {
                         break;
                       case french:
                         textToWrite = "OUI";
+                        break;
+                      case portuguese:
+                        textToWrite = "SIM";
                         break;
                     }
                     tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
@@ -289,6 +301,9 @@ void barSelection() {
                     case french:
                       textToWrite = "FRA";
                       break;
+                    case portuguese:
+                      textToWrite = "POR";
+                      break;
                   }
                   tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
                   language -= EncMove;
@@ -308,6 +323,9 @@ void barSelection() {
                       break;
                     case french:
                       textToWrite = "FRA";
+                      break;
+                    case portuguese:
+                      textToWrite = "POR";
                       break;
                   }
                   tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
@@ -485,6 +503,9 @@ void checkSetMessage() {
         case french:
           helpMessage = "Regler semaines de gestation";
           break;
+        case portuguese:
+          helpMessage = "Entre nas semanas de gestaçao";
+          break;
       }
     }
     else if (page == advancedModePage) {
@@ -497,6 +518,9 @@ void checkSetMessage() {
           break;
         case french:
           helpMessage = "Regler temperature desiree";
+          break;
+        case portuguese:
+          helpMessage = "Insira a temperatura";
           break;
       }
     }
