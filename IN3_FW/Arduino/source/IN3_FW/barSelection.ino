@@ -504,7 +504,7 @@ void checkSetMessage() {
           helpMessage = "Regler semaines de gestation";
           break;
         case portuguese:
-          helpMessage = "Entre nas semanas de gestaçao";
+          helpMessage = "Entre semanas gestacao";
           break;
       }
     }

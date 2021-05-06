@@ -36,7 +36,7 @@ void settings() {
       words[calibrateGraphicPosition] = "Etalonner";
       break;
     case portuguese:
-      words[autoLockGraphicPosition]  = "Bloqueio automático";
+      words[autoLockGraphicPosition]  = "Bloqueio automatico";
       words[languageGraphicPosition] = "Idioma";
       words[heaterTempGraphicPosition] = "Temperatura de aquecimento";
       words[fanGraphicPosition] = "Ventilador";

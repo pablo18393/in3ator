@@ -381,7 +381,7 @@ void drawStartMessage() {
         words[startGraphicPosition] = "Debut";
         break;
       case portuguese:
-        words[startGraphicPosition] = "Começar";
+        words[startGraphicPosition] = "Comecar";
         break;        
     }
     tft.drawCentreString(words[startGraphicPosition], width_select + (tft.width() - width_select) / 2, getYpos(goToProcessRow), textFontSize);

@@ -24,8 +24,8 @@ void mainMenu() {
       words[advancedModeGraphicPosition] = "Mode avance";
       break;
     case portuguese:
-      words[gestationGraphicPosition]  = "Semanas gestaçao";
-      words[advancedModeGraphicPosition] = "Modo avançado";
+      words[gestationGraphicPosition]  = "Semanas gestacao";
+      words[advancedModeGraphicPosition] = "Modo avancado";
       break;
   }
   words[LEDGraphicPosition] = "LED";
@@ -38,7 +38,7 @@ void mainMenu() {
   controlTemperature = 0;
   controlHumidity = 0;
   enableSet = 0;
-  while (!digitalRead(ENC_SWITCH)){
+  while (!digitalRead(ENC_SWITCH)) {
     updateData();
   }
   delay(debounceTime);
@@ -67,9 +67,29 @@ void askSuccess() {
   }
   pos_text[afirmativeGraphicPosition] = centered;
   pos_text[negativeGraphicPosition] = centered;
-  words[successQuestionGraphicPosition] = "IS THE BABY ALIVE?";
-  words[afirmativeGraphicPosition] = "YES";
-  words[negativeGraphicPosition] = "NO";
+  switch (language) {
+    case english:
+      words[successQuestionGraphicPosition] = "IS THE BABY ALIVE?";
+      words[afirmativeGraphicPosition] = "YES";
+      words[negativeGraphicPosition] = "NO";
+      break;
+    case spanish:
+      words[successQuestionGraphicPosition] = "¿HA SOBREVIVIDO EL BEBE?";
+      words[afirmativeGraphicPosition] = "SI";
+      words[negativeGraphicPosition] = "NO";
+      break;
+    case french:
+      words[successQuestionGraphicPosition] = "LE BEBE ATIL SURVECU?";
+      words[afirmativeGraphicPosition] = "OUI";
+      words[negativeGraphicPosition] = "PAS";
+      break;
+    case portuguese:
+      words[successQuestionGraphicPosition] = "O BEBE SOBREVIVIU?";
+      words[afirmativeGraphicPosition] = "SIM";
+      words[negativeGraphicPosition] = "NAO";
+      break;
+  }
+
   rectangles = numWords;
   setSensorsGraphicPosition();
   goToProcessRow = numWords;
