@@ -1,4 +1,12 @@
 void actuatorsProgress() {
+
+  if (page == mainMenuPage) {
+    GPRSSetPostVariables(actuatorsModeON, "ON, wks:" + String(gestationWeeks) + "," + String (desiredSkinTemp, 1) + "," + String (desiredRoomHum));
+  }
+  else {
+    GPRSSetPostVariables(actuatorsModeON, "ON:" + String (desiredSkinTemp, 1) + "," + String (desiredRoomHum));
+  }
+
   byte  numWords = 0;
   temperaturePercentage = 0;
   page = actuatorsProgressPage;
@@ -10,7 +18,7 @@ void actuatorsProgress() {
   tft.setTextColor(COLOR_MENU_TEXT);
   setSensorsGraphicPosition();
   drawActuatorsSeparators();
-  GPRSSetPostVariables(actuatorsModeON, "Actuators ON:" + String (desiredSkinTemp, 1) + "," + String (desiredRoomHum));
+
   setGPRSPostPeriod(actuatingGPRSPostPeriod);
   if (controlTemperature) {
     temperatureAtStart = temperature[babyNTC];
@@ -116,7 +124,7 @@ void heatUp() {
 void turnActuators(bool mode) {
   digitalWrite(HEATER, mode);
   digitalWrite(BACKUP, mode);
-    pwmWrite(HUMIDIFIER, humidifierMaxPWM / 2 * mode);
+  pwmWrite(HUMIDIFIER, humidifierMaxPWM / 2 * mode);
 }
 
 void turnFans(bool mode) {
