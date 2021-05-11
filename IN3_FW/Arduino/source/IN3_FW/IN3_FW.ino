@@ -58,7 +58,7 @@ void iwdg_init(iwdg_prescaler prescaler, uint16_t reload) {
 //Firmware version and head title of UI screen
 #define FWversion "v4.1"
 #define headingTitle "in3ator"
-String serialNumber = "in3000017";
+String serialNumber = "in3000018";
 bool firstTurnOn;
 
 //configuration variables

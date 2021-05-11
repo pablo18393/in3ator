@@ -1,5 +1,5 @@
 void initSensors() {
-  // timer setup for encoder
+  measureOffsetConsumption();
   initEnvironmentalSensor();
   initPulsioximeterVariables();
 }
@@ -34,12 +34,24 @@ void sensorsISR() {
   */
 }
 
+void measureOffsetConsumption() {
+    currentConsumtionStacker = 0;
+    for (int i = 0; i < 1000; i++) {
+      delay(1);
+      currentConsumtionStacker += analogRead(SYSTEM_SHUNT);
+    }
+    currentOffset = currentConsumtionStacker / 1000;
+    currentConsumtionStacker = 0;
+    Serial4.println("offsetCurrent is: " + String (currentOffset));
+}
+
 void measureConsumption() {
   currentConsumtionStacker += analogRead(SYSTEM_SHUNT);
   currentConsumptionPos++;
   if (currentConsumptionPos == 999) {
     currentConsumptionPos = 0;
     currentConsumption = (currentConsumtionStacker / 1000 - currentOffset) / ADCtoCurrent;
+    Serial4.println("Current consumption is: " + analogRead(SYSTEM_SHUNT));
     currentConsumtionStacker = 0;
   }
 }

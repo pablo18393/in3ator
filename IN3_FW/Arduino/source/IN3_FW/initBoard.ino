@@ -2,10 +2,7 @@
 #define operativeMode true
 
 void initBoard() {
-  Serial4.begin(115200);
-  if (SerialDebug) {
-    Serial4.begin(115200);
-  }
+  initDebug();
   initEEPROM();
   initSensors();
   //initSD();
@@ -75,6 +72,10 @@ void pinDirection(bool mode) {
   }
 }
 
+void initDebug() {
+  Serial4.begin(115200);
+  Serial4.println("in3ator debug uart, version " + String (FWversion));
+}
 
 void initTimers() {
   /*
