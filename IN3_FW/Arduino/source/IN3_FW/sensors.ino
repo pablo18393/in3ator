@@ -35,14 +35,14 @@ void sensorsISR() {
 }
 
 void measureOffsetConsumption() {
-    currentConsumtionStacker = 0;
-    for (int i = 0; i < 1000; i++) {
-      delay(1);
-      currentConsumtionStacker += analogRead(SYSTEM_SHUNT);
-    }
-    currentOffset = currentConsumtionStacker / 1000;
-    currentConsumtionStacker = 0;
-    Serial4.println("offsetCurrent is: " + String (currentOffset));
+  currentConsumtionStacker = 0;
+  for (int i = 0; i < 1000; i++) {
+    delay(1);
+    currentConsumtionStacker += analogRead(SYSTEM_SHUNT);
+  }
+  currentOffset = currentConsumtionStacker / 1000;
+  currentConsumtionStacker = 0;
+  Serial4.println("offsetCurrent is: " + String (currentOffset));
 }
 
 void measureConsumption() {
@@ -50,8 +50,8 @@ void measureConsumption() {
   currentConsumptionPos++;
   if (currentConsumptionPos == 999) {
     currentConsumptionPos = 0;
-    currentConsumption = (currentConsumtionStacker / 1000 - currentOffset) / ADCtoCurrent;
-    Serial4.println("Current consumption is: " + analogRead(SYSTEM_SHUNT));
+    currentConsumption = (currentConsumtionStacker / 1000 - currentOffset) / correctionCurrentFactor;
+    Serial4.println("Current consumption is: " + String (currentConsumption) + ", instant value: " + String (analogRead(SYSTEM_SHUNT)));
     currentConsumtionStacker = 0;
   }
 }
@@ -165,6 +165,15 @@ void peripheralsISR() {
   sensorsISR();
   GPRSISR();
   asleep();
+}
+
+void buzzerBeep (int times, int timeDelay) {
+  for (int i = 0; i < times; i++) {
+    pwmWrite(BUZZER, buzzerMaxPWM / 2);
+    delay(timeDelay);
+    pwmWrite(BUZZER, buzzerMaxPWM / 0);
+    delay(timeDelay);
+  }
 }
 
 void readEncoder() {

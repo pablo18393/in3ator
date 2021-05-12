@@ -1,4 +1,4 @@
- 
+
 //include libraries
 #include <Adafruit_GFX_AS.h>
 #include <EEPROM.h>
@@ -131,8 +131,7 @@ byte environmentalSensorAddress = 112;
 int pulsioximeterMean;
 const int maxPulsioximeterSamples = 320; //(tft width).
 float currentConsumption, currentConsumtionStacker;
-int currentOffset = 350;
-int ADCtoCurrent = 400;
+int currentOffset, correctionCurrentFactor = 800;
 int currentConsumptionPos;
 float currentConsumptionFactor = 2.685; //factor to translate current consumtion in mA
 int pulsioximeterSample[maxPulsioximeterSamples][2]; //0 is previous data, 1 is actual data
@@ -328,14 +327,14 @@ byte goToProcessRow;
 
 Adafruit_ILI9341_STM tft = Adafruit_ILI9341_STM(TFT_CS, TFT_DC, TFT_RST); // Use hardware SPI, tft class definition
 SHTC3 mySHTC3;              // Declare an instance of the SHTC3 class
-TwoWire WIRE2 (2,I2C_FAST_MODE);
+TwoWire WIRE2 (2, I2C_FAST_MODE);
 #define Wire WIRE2
 
 // timers configuration
 #define NTCInterruptRate 20000    // in microseconds; 
 #define heaterPIDRate 200000   // times of roomPIDRate;
 #define GPRSISRRate 1000    // in microseconds, able to read 115200 baud rate uart; 
-#define sensorsISRRate 500    // in microseconds, also for BUZZER optimal frequency (2khz); Prescale factor 6, Overflow 36000
+#define buzzerTimerRate 500    // in microseconds, also for BUZZER optimal frequency (2khz); Prescale factor 6, Overflow 36000
 #define roomPIDRate 1000000    // in microseconds. Prescale factor 2, Overflow 65535
 #define peripheralsISRRate 1000    // in microseconds. Prescale factor 2, Overflow 36000
 #define humidifierTimerRate 100 //in microseconds, to generate a 110Khz PWM for ultra sonic humidifier. Prescale factor 1, Overflow 648
@@ -352,11 +351,9 @@ volatile long interruptcounter;
   8     PC6   PC7   PC8    PC9
 */
 
-HardwareTimer GPRSTimer(1);
-HardwareTimer roomPIDTimer(1);
+HardwareTimer buzzerTimer(8);
 HardwareTimer humidifierTimer(4);
 HardwareTimer encoderTimer(2);
-HardwareTimer sensorsTimer(1);
 
 int hardwareComponents;
 

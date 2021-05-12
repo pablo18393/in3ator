@@ -92,6 +92,12 @@ void initTimers() {
   */
 
   //humidifier timer configuration:
+  buzzerTimer.pause();
+  buzzerTimer.setPeriod(buzzerTimerRate); // in microseconds
+  buzzerTimer.refresh();
+  buzzerTimer.resume();
+
+  //humidifier timer configuration:
   humidifierTimer.pause();
   humidifierTimer.setPeriod(humidifierTimerRate); // in microseconds
   humidifierTimer.refresh();
@@ -125,6 +131,6 @@ void initTimers() {
   */
   humidifierMaxPWM = humidifierTimer.getOverflow();
   //fanHPMaxPWM = GPRSTimer.getOverflow();
-  buzzerMaxPWM = sensorsTimer.getOverflow();
+  buzzerMaxPWM = buzzerTimer.getOverflow();
   screenBackLightMaxPWM = humidifierTimer.getOverflow();
 }

@@ -219,6 +219,7 @@ void loadlogo() {
   tft.fillScreen(introBackColor);
   tft.setTextColor(introTextColor);
   drawIntroMessage();
+  buzzerBeep(2, 70);
   int  timeOut = 4000;
   long processTime = millis();
   for (int i = screenBackLightMaxPWM; i >= TFT_LED_PWR; i--) {
@@ -382,7 +383,7 @@ void drawStartMessage() {
         break;
       case portuguese:
         words[startGraphicPosition] = "Comecar";
-        break;        
+        break;
     }
     tft.drawCentreString(words[startGraphicPosition], width_select + (tft.width() - width_select) / 2, getYpos(goToProcessRow), textFontSize);
   }
