@@ -1,3 +1,8 @@
+//Firmware version and head title of UI screen
+#define FWversion "v4.2"
+String serialNumber = "in3000021";
+#define headingTitle "in3ator"
+bool firstTurnOn;
 
 //include libraries
 #include <Adafruit_GFX_AS.h>
@@ -54,12 +59,6 @@ void iwdg_init(iwdg_prescaler prescaler, uint16_t reload) {
   IWDG->KR = 0xCCCC;
   IWDG->KR = 0xAAAA;
 }
-
-//Firmware version and head title of UI screen
-#define FWversion "v4.1"
-#define headingTitle "in3ator"
-String serialNumber = "in3000018";
-bool firstTurnOn;
 
 //configuration variables
 #define debounceTime 100         //encoder debouncing time

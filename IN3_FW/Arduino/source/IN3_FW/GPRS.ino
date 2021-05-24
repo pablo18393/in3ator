@@ -10,7 +10,7 @@
 #define addLocation 8
 #define removeLocation 9
 
-#define standByGPRSPostPeriod 3600
+#define standByGPRSPostPeriod 800
 #define actuatingGPRSPostPeriod 120
 #define jaundiceGPRSPostPeriod 600 
 
@@ -106,10 +106,8 @@ void initGPRS()
 {
   Serial1.begin(115200);
   GPRS.enable = 1;
-  GPRSSetPostVariables(defaultPost, "");
-  GPRS.postBabyTemp = 1;
-  GPRS.postHumidity = 1;
   GPRS.powerUp = 1;
+  GPRSSetPostVariables(defaultPost, "");
   setGPRSPostPeriod(standByGPRSPostPeriod);
 }
 
@@ -639,17 +637,17 @@ void GPRSSetPostVariables(byte postContent, String postComment) {
   switch (postContent) {
     case defaultPost:
       GPRS.postBabyTemp = 1;
-      GPRS.postHeaterTemp = 1;
-      GPRS.postBoardTemp1 = 1;
-      GPRS.postBoardTemp2 = 1;
+      GPRS.postHeaterTemp = 0;
+      GPRS.postBoardTemp1 = 0;
+      GPRS.postBoardTemp2 = 0;
       GPRS.postBoardTemp3 = 1;
       GPRS.postHumidity = 1;
       GPRS.RSSI = 1;
       GPRS.postCurrentConsumption = 1;
       break;
     case addLocation:
-      GPRS.postLatitud = 1;
-      GPRS.postLongitud = 1;
+      GPRS.postLatitud = 0;
+      GPRS.postLongitud = 0;
       break;
     case removeLocation:
       GPRS.postLatitud = 0;
