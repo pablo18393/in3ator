@@ -6,6 +6,7 @@ void initBoard() {
   initEEPROM();
   initSensors();
   //initSD();
+  initInterrupts();
   initTimers();
   pinDirection(testMode);
   //hardwareVerification();
@@ -37,6 +38,7 @@ void pinDirection(bool mode) {
       pinMode(encoderpinA, INPUT_PULLUP);
       pinMode(encoderpinB, INPUT_PULLUP);
       pinMode(SYSTEM_SHUNT, INPUT);
+      pinMode(PWR_ALERT, INPUT);
       pwmWrite(HUMIDIFIER, 0);
       digitalWrite(SCREENBACKLIGHT, HIGH);
       digitalWrite(POWER_EN, LOW);
@@ -59,6 +61,7 @@ void pinDirection(bool mode) {
       pinMode(encoderpinA, INPUT_PULLUP);
       pinMode(encoderpinB, INPUT_PULLUP);
       pinMode(SYSTEM_SHUNT, INPUT);
+      pinMode(PWR_ALERT, INPUT);
       pinMode(JAUNDICE, OUTPUT);
       pinMode(BACKUP, OUTPUT);
       digitalWrite(SCREENBACKLIGHT, HIGH);
@@ -75,6 +78,10 @@ void pinDirection(bool mode) {
 void initDebug() {
   Serial4.begin(115200);
   Serial4.println("in3ator debug uart, version " + String (FWversion) + ", SN: " + String (serialNumber));
+}
+
+void initInterrupts(){
+  attachInterrupt(PWR_ALERT, powerAlert, RISING);
 }
 
 void initTimers() {

@@ -47,14 +47,6 @@ void initEEPROM() {
 void loadStandardValues() {
   auto_lock = 0;
   EEPROM.write(EEPROM_autoLock, auto_lock);
-  language = defaultLanguage;
-  EEPROM.write(EEPROM_language, language);
-  for (int i = 0; i < numTempSensors; i++) {
-    diffTemperature[numTempSensors] = 0;
-    EEPROM.write(EEPROM_diffTemperature + i, diffTemperature[i]);
-  }
-  diffHumidity = 0;
-  EEPROM.write(EEPROM_diffHumidity, diffHumidity);
   maxHeaterTemp = standardmaxHeaterTemp;
   EEPROM.write(EEPROM_maxHeaterTemp, maxHeaterTemp);
   fanSpeed = standardFanSpeed;

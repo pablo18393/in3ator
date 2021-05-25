@@ -130,7 +130,8 @@ byte environmentalSensorAddress = 112;
 int pulsioximeterMean;
 const int maxPulsioximeterSamples = 320; //(tft width).
 float currentConsumption, currentConsumtionStacker;
-int currentOffset, correctionCurrentFactor = 800;
+int currentOffset;
+float correctionCurrentFactor = 0.002;
 int currentConsumptionPos;
 float currentConsumptionFactor = 2.685; //factor to translate current consumtion in mA
 int pulsioximeterSample[maxPulsioximeterSamples][2]; //0 is previous data, 1 is actual data

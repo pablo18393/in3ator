@@ -50,7 +50,7 @@ void measureConsumption() {
   currentConsumptionPos++;
   if (currentConsumptionPos == 999) {
     currentConsumptionPos = 0;
-    currentConsumption = (currentConsumtionStacker / 1000 - currentOffset) / correctionCurrentFactor;
+    currentConsumption = ((currentConsumtionStacker / 1000) - currentOffset) * correctionCurrentFactor;
     Serial4.println("Current consumption is: " + String (currentConsumption) + ", instant value: " + String (analogRead(SYSTEM_SHUNT)));
     currentConsumtionStacker = 0;
   }
