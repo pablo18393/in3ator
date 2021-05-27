@@ -1,5 +1,5 @@
 //Firmware version and head title of UI screen
-#define FWversion "v4.2"
+#define FWversion "v5.0"
 String serialNumber = "in3000021";
 #define headingTitle "in3ator"
 bool firstTurnOn;

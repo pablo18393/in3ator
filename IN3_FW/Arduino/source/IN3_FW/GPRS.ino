@@ -14,7 +14,7 @@
 #define actuatingGPRSPostPeriod 120
 #define jaundiceGPRSPostPeriod 600
 #define GPRSRoutinePeriod 1 // in millis
-
+#define GPRS_SHUT OFF
 long lastGPRSRoutine;
 
 String user = "admin@admin.com";
@@ -64,7 +64,6 @@ struct GPRSstruct {
   bool postRPD;
   bool postRSSI;
   bool postCurrentConsumption;
-  bool postHeaterPower;
   bool postComment;
   int sendPeriod;
   long lastSent;
@@ -162,7 +161,7 @@ void GPRSStatusHandler() {
       GPRS.powerUp = 1;
     }
     if (millis() - GPRS.lastSent > GPRS.sendPeriod * 1000) {
-      GPRS.connect = 1;
+      GPRS.post = 1;
     }
   }
   if (!GPRS.firstPost && GPRS.connectionStatus) {
@@ -476,14 +475,21 @@ void GPRSPost() {
       }
       break;
     case 5:
-      checkSerial("CLOSED", "\n\n");
+      checkSerial("HTTP/1.1 200 OK", "status");
       break;
     case 6:
-      Serial1.print("AT+CIPSHUT\n");
+      if (GPRS_SHUT) {
+        Serial1.print("AT+CIPSHUT\n");
+      }
       GPRS.process++;
       break;
     case 7:
-      checkSerial("SHUT OK", "ERROR");
+      if (GPRS_SHUT) {
+        checkSerial("SHUT OK", "ERROR");
+      }
+      else {
+        GPRS.process++;
+      }
       break;
     case 8:
       logln("GPRS POST SUCCESS");
@@ -610,6 +616,7 @@ String checkSerial(String success, String error) {
         }
       }
       if (foundErrorString) {
+        Serial4.println("GPRS error: " + error);
         log(GPRS.reply);
         GPRS.processSuccess = 0;
         GPRS.initVars = 0;
@@ -662,12 +669,6 @@ void GPRSSetPostVariables(byte postContent, String postComment) {
     case jaundiceLEDOFF:
       GPRS.postJaundicePower = 0;
       break;
-    case actuatorsModeON:
-      GPRS.postHeaterPower = 1;
-      break;
-    case actuatorsModeOFF:
-      GPRS.postHeaterPower = 0;
-      break;
     case pulseFound:
       GPRS.postBPM = 1;
       GPRS.postIBI = 1;
@@ -717,9 +718,6 @@ bool GPRSLoadVariables() {
   }
   if (GPRS.postJaundicePower) {
     databasePost[7] += ",\"jaundice_power\":\"" + String(jaundiceEnable) + "\"";
-  }
-  if (GPRS.postHeaterPower) {
-    databasePost[7] += ",\"heater_power\":\"" + String(heaterPower) + "\"";
   }
   if (GPRS.postBPM) {
     databasePost[7] += ",\"bpm\":\"" + String(BPM) + "\"";
