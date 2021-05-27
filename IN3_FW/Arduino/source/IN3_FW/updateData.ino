@@ -1,6 +1,12 @@
+
 int updateData() {
   watchdogReload();
-  if (millis() - lastGraphicSensorsUpdate > sensorsUpdateRate) {
+  GPRSISR();
+  if (millis() - lastDebugUpdate > debugUpdatePeriod) {
+    Serial4.println("Current consumption is: " + String (currentConsumption));
+    lastDebugUpdate = millis();
+  }
+  if (millis() - lastGraphicSensorsUpdate > sensorsUpdatePeriod) {
     updateHumidity();
     if (page == advancedModePage || page == actuatorsProgressPage) {
       updateDisplaySensors();

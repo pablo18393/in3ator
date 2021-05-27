@@ -12,7 +12,10 @@
 
 #define standByGPRSPostPeriod 800
 #define actuatingGPRSPostPeriod 120
-#define jaundiceGPRSPostPeriod 600 
+#define jaundiceGPRSPostPeriod 600
+#define GPRSRoutinePeriod 1 // in millis
+
+long lastGPRSRoutine;
 
 String user = "admin@admin.com";
 String password = "admin";

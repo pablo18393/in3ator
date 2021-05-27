@@ -64,7 +64,8 @@ void iwdg_init(iwdg_prescaler prescaler, uint16_t reload) {
 #define debounceTime 100         //encoder debouncing time
 #define mosfet_switch_time 100   //delay to wait for mosfet to switch (in millis), oversized
 #define timePressToSettings 5000 //in millis, time to press to go to settings window in UI
-
+#define debugUpdatePeriod 1000 //in millis, 
+long lastDebugUpdate;
 //pages number in UI. Configuration and information will be displayed depending on the page number
 int page;
 #define mainMenuPage 0
@@ -122,7 +123,6 @@ byte encoderCount = 0;
 #define pulsioximeterSensorVariables 2 //transmit heart rate between others
 #define pulsioximeterSensorRaw 3 //transmit raw pulsioximeter signal
 #define aliveRefresh 4 //message to let know that incubator is still ON
-
 
 //sensor variables
 byte environmentalSensorPresent;
@@ -243,7 +243,7 @@ int TFT_LED_PWR = 25000; //PWM that will be supplied to backlight LEDs
 const byte time_back_draw = 255;
 const byte time_back_wait = 255;
 long last_something; //last time there was a encoder movement or pulse
-long sensorsUpdateRate = 4000;
+long sensorsUpdatePeriod = 4000;
 int blinkTimeON = 1000; //displayed text ON time
 int blinkTimeOFF = 100; //displayed text OFF time
 bool selected;
@@ -333,7 +333,6 @@ TwoWire WIRE2 (2, I2C_FAST_MODE);
 // timers configuration
 #define NTCInterruptRate 20000    // in microseconds; 
 #define heaterPIDRate 200000   // times of roomPIDRate;
-#define GPRSISRRate 1000    // in microseconds, able to read 115200 baud rate uart; 
 #define buzzerTimerRate 500    // in microseconds, also for BUZZER optimal frequency (2khz); Prescale factor 6, Overflow 36000
 #define roomPIDRate 1000000    // in microseconds. Prescale factor 2, Overflow 65535
 #define peripheralsISRRate 1000    // in microseconds. Prescale factor 2, Overflow 36000

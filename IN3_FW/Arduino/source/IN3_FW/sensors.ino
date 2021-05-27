@@ -54,7 +54,6 @@ void measureConsumption() {
     if (currentConsumtionStacker > 0) {
       currentConsumption = currentConsumtionStacker;
     }
-    Serial4.println("Current consumption is: " + String (currentConsumption));
     currentConsumtionStacker = 0;
   }
 }
@@ -167,7 +166,6 @@ bool updateHumidity() {
 void peripheralsISR() {
   readEncoder();
   sensorsISR();
-  GPRSISR();
   asleep();
 }
 
