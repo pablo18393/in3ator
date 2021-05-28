@@ -1,12 +1,7 @@
 void hardwareVerification() {
   bool testOK = 1;
-  if (sensorsTest() && shortcircuitTest()) {
-    if (openCircuitTest()) {
-      logln("HARDWARE TEST OK");
-    }
-    else {
-      testOK = 0;
-    }
+  if (sensorsTest() && shortcircuitTest() && openCircuitTest()) {
+    logln("HARDWARE TEST OK");
   }
   else {
     testOK = 0;
@@ -14,11 +9,13 @@ void hardwareVerification() {
   if (!testOK) {
     logln("HARDWARE TEST FAIL");
     drawHardwareErrorMessage();
-    while (digitalRead(ENC_SWITCH)){
+    while (digitalRead(ENC_SWITCH)) {
       updateData();
     }
   }
 }
+
+
 
 bool shortcircuitTest() {
   return true;
@@ -37,5 +34,6 @@ bool sensorsTest() {
 }
 
 bool openCircuitTest() {
+  
   return true;
 }

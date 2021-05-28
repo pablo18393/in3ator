@@ -1,3 +1,5 @@
+#define consumptionMeanSamples 1000
+
 void initSensors() {
   measureOffsetConsumption();
   initEnvironmentalSensor();
@@ -5,16 +7,16 @@ void initSensors() {
 }
 
 void initEnvironmentalSensor() {
-  Serial4.println("detecting sensor...");
+  logln("detecting sensor...");
   Wire.begin();
   Wire.beginTransmission(environmentalSensorAddress);
   environmentalSensorPresent = Wire.endTransmission();
   if (environmentalSensorPresent == 0) {
-    Serial4.println("Environmental sensor succesfully found");
+    logln("Environmental sensor succesfully found");
     mySHTC3.begin(Wire);
   }
   else {
-    Serial4.println("No environmental sensor found");
+    logln("No environmental sensor found");
     Wire.end();
   }
 }
@@ -34,15 +36,22 @@ void sensorsISR() {
   */
 }
 
+float sampleConsumption() {
+  for (int i = 0; i < consumptionMeanSamples; i++) {
+    measureConsumption();
+  }
+  return (currentConsumption);
+}
+
 void measureOffsetConsumption() {
   currentConsumtionStacker = 0;
-  for (int i = 0; i < 1000; i++) {
+  for (int i = 0; i < consumptionMeanSamples; i++) {
     delay(1);
     currentConsumtionStacker += analogRead(SYSTEM_SHUNT);
   }
-  currentOffset = currentConsumtionStacker / 1000;
+  currentOffset = currentConsumtionStacker / consumptionMeanSamples;
   currentConsumtionStacker = 0;
-  Serial4.println("offsetCurrent is: " + String (currentOffset));
+  logln("offsetCurrent is: " + String (currentOffset));
 }
 
 void measureConsumption() {
@@ -50,7 +59,7 @@ void measureConsumption() {
   currentConsumptionPos++;
   if (currentConsumptionPos == 999) {
     currentConsumptionPos = 0;
-    currentConsumtionStacker = ((currentConsumtionStacker / 1000) - currentOffset) * correctionCurrentFactor;
+    currentConsumtionStacker = ((currentConsumtionStacker / consumptionMeanSamples) - currentOffset) * correctionCurrentFactor;
     if (currentConsumtionStacker > 0) {
       currentConsumption = currentConsumtionStacker;
     }
@@ -157,9 +166,6 @@ bool updateHumidity() {
     mySHTC3.update();
     temperature[digitalTempSensor] = mySHTC3.toDegC(); //Add here measurement to temp array
     humidity = int(mySHTC3.toPercent()) + diffHumidity;
-    Serial4.println("baby temperature: " + String(temperature[babyNTC]) + "ºC");
-    Serial4.println("Floor temperature: " + String(temperature[digitalTempSensor]) + "ºC");
-    Serial4.println("Humidity: " + String(humidity) + "%");
   }
 }
 

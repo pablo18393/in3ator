@@ -6,7 +6,7 @@
 //Hardware
 #define SPI_SEL 1
 #define SDCard 0
-#define SerialDebug 0
+#define SerialDebug 1
 
 #ifdef v6Board
 #define SYSTEM_SHUNT PA0

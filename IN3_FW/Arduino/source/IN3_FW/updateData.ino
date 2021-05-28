@@ -3,7 +3,10 @@ int updateData() {
   watchdogReload();
   GPRSISR();
   if (millis() - lastDebugUpdate > debugUpdatePeriod) {
-    Serial4.println("Current consumption is: " + String (currentConsumption));
+    logln("[STATUS] -> Current consumption is: " + String (currentConsumption));
+    logln("[STATUS] -> baby temperature: " + String(temperature[babyNTC]) + "ºC");
+    logln("[STATUS] -> Floor temperature: " + String(temperature[digitalTempSensor]) + "ºC");
+    logln("[STATUS] -> Humidity: " + String(humidity) + "%");
     lastDebugUpdate = millis();
   }
   if (millis() - lastGraphicSensorsUpdate > sensorsUpdatePeriod) {
@@ -80,5 +83,74 @@ void printStatus() {
   //log(";");
   //log(heaterPower);
   //log(";");
-  //logln(String(PIDOutput[heaterNTC]));
+  //consumptionMeanSamples(String(PIDOutput[heaterNTC]));
+}
+
+void logln(String dataString) {
+  log(String(millis()/1000) + ": " + dataString + '\r' + '\n');
+}
+
+void log(String dataString) {
+  if (SDCard) {
+    digitalWrite(SD_CS, LOW);
+    digitalWrite(TFT_CS, HIGH);
+    // if the file is available, write to it:
+    File dataFile = SD.open(logFile, FILE_WRITE);
+    if (dataFile) {
+      dataFile.print(day());
+      dataFile.print("/");
+      dataFile.print(month());
+      dataFile.print("/");
+      dataFile.print(year());
+      dataFile.print("-");
+      dataFile.print(hour());
+      dataFile.print(":");
+      dataFile.print(minute());
+      dataFile.print(":");
+      dataFile.print(second());
+      dataFile.print(";");
+      dataFile.print(dataString);
+      dataFile.close();
+      // print to the serial port too:
+    }
+    digitalWrite(SD_CS, HIGH);
+    digitalWrite(TFT_CS, LOW);
+  }
+  if (SerialDebug) {
+    Serial4.print(dataString);
+  }
+}
+
+void GPRSLocalLog() {
+  if (SDCard) {
+    digitalWrite(SD_CS, LOW);
+    digitalWrite(TFT_CS, HIGH);
+    String dataString;
+    dataString += temperature[babyNTC];
+    dataString += ";";
+    dataString += humidity;
+    dataString += ";";
+    // if the file is available, write to it:
+    File dataFile = SD.open(GPRSFile, FILE_WRITE);
+    if (dataFile) {
+      dataFile.print(day());
+      dataFile.print("/");
+      dataFile.print(month());
+      dataFile.print("/");
+      dataFile.print(year());
+      dataFile.print("-");
+      dataFile.print(hour());
+      dataFile.print(":");
+      dataFile.print(minute());
+      dataFile.print(":");
+      dataFile.print(second());
+      dataFile.print(";");
+      dataFile.println(dataString);
+      dataFile.close();
+      // print to the serial port too:
+      //logln(dataString);
+    }
+    digitalWrite(SD_CS, HIGH);
+    digitalWrite(TFT_CS, LOW);
+  }
 }

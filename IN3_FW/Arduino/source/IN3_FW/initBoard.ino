@@ -77,7 +77,7 @@ void pinDirection(bool mode) {
 
 void initDebug() {
   Serial4.begin(115200);
-  Serial4.println("in3ator debug uart, version " + String (FWversion) + ", SN: " + String (serialNumber));
+  logln("in3ator debug uart, version " + String (FWversion) + ", SN: " + String (serialNumber));
 }
 
 void initInterrupts(){

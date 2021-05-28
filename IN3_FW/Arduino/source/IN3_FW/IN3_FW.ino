@@ -64,7 +64,7 @@ void iwdg_init(iwdg_prescaler prescaler, uint16_t reload) {
 #define debounceTime 100         //encoder debouncing time
 #define mosfet_switch_time 100   //delay to wait for mosfet to switch (in millis), oversized
 #define timePressToSettings 5000 //in millis, time to press to go to settings window in UI
-#define debugUpdatePeriod 1000 //in millis, 
+#define debugUpdatePeriod 5000 //in millis, 
 long lastDebugUpdate;
 //pages number in UI. Configuration and information will be displayed depending on the page number
 int page;
