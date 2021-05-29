@@ -24,6 +24,8 @@
 #define SCREEN_CONSUMPTION_MIN 0.02
 #define SCREEN_CONSUMPTION_MAX 1
 
+#define BUZZER_CONSUMPTION_MIN 0.03
+
 #define NTC_BABY_MIN_ERROR 1
 #define NTC_BABY_MAX_ERROR 1<<1
 #define DIG_TEMP_ROOM_MIN_ERROR 1<<2
@@ -56,6 +58,7 @@ void initHardware() {
   initGPRS();
   checkCurrentSenseCircuit();
   initTFT();
+  initBuzzer();
   initSensors();
   initPowerEn();
   actuatorsTest();
@@ -65,8 +68,8 @@ void initHardware() {
   }
   else {
     logln("[HW] -> HARDWARE TEST FAIL");
-    logln("[HW] -> HARDWARE ERROR CODE:" + String(HW_error,HEX));
-    GPRSSetPostVariables(NULL, "HW FAIL" + String(HW_error,HEX));
+    logln("[HW] -> HARDWARE ERROR CODE:" + String(HW_error, HEX));
+    GPRSSetPostVariables(NULL, "HW FAIL" + String(HW_error, HEX));
     drawHardwareErrorMessage(HW_error);
     while (digitalRead(ENC_SWITCH)) {
       updateData();
@@ -209,6 +212,36 @@ void initTFT() {
     logln("[HW] -> Fail -> test current is " + String (testCurrent) + " Amps");
   }
   GPRSSetPostVariables(NULL, ",TFT:" + String (testCurrent));
+}
+
+void initBuzzer() {
+  //buzzer timer configuration:
+  buzzerTimer.pause();
+  buzzerTimer.setPeriod(buzzerTimerRate); // in microseconds
+  buzzerTimer.refresh();
+  buzzerTimer.resume();
+  buzzerMaxPWM = buzzerTimer.getOverflow();
+  buzzerTest();
+}
+
+void buzzerTest() {
+  long error = HW_error;
+  float testCurrent, offsetCurrent;
+  offsetCurrent = sampleConsumption();
+  pwmWrite(BUZZER, buzzerMaxPWM / 2);
+  testCurrent = sampleConsumption() - offsetCurrent;
+  pwmWrite(BUZZER, buzzerMaxPWM / 0);
+  if (testCurrent < BUZZER_CONSUMPTION_MIN) {
+    HW_error += DEFECTIVE_BUZZER;
+    logln("[HW] -> Fail -> Buzzer current is not high enough");
+  }
+  if (error == HW_error) {
+    logln("[HW] -> OK -> Buzzer is working as expected: " + String (testCurrent) + " Amps");
+  }
+  else {
+    logln("[HW] -> Fail -> test current is " + String (testCurrent) + " Amps");
+  }
+  GPRSSetPostVariables(NULL, ",Buz:" + String (testCurrent));
 }
 
 void initPowerEn() {
