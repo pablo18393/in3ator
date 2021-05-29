@@ -9,7 +9,6 @@
 #define standByMode 7
 #define addLocation 8
 #define removeLocation 9
-#define addComent 10
 
 #define standByGPRSPostPeriod 800
 #define actuatingGPRSPostPeriod 120
@@ -104,15 +103,6 @@ struct GPRSstruct {
 int GPRSsequence = 0;
 
 struct GPRSstruct GPRS;
-
-void initGPRS()
-{
-  Serial1.begin(115200);
-  GPRS.enable = 1;
-  GPRS.powerUp = 1;
-  GPRSSetPostVariables(defaultPost, "");
-  setGPRSPostPeriod(standByGPRSPostPeriod);
-}
 
 void GPRSISR() {
   if (GPRS.enable) {
@@ -229,7 +219,7 @@ void getLocation() {
       else {
         if (!GPRS.firstPost) {
           GPRS.firstPost = 1;
-          GPRSSetPostVariables(addLocation, "first post, FW version: " + String (FWversion));
+          GPRSSetPostVariables(addLocation, "");
         }
         else {
           GPRSSetPostVariables(addLocation, "");
@@ -638,10 +628,6 @@ void GPRSSetPostVariables(byte postContent, String postComment) {
     GPRS.comment += postComment;
   }
   switch (postContent) {
-    case addComent:
-      GPRS.postComment = 1;
-      GPRS.comment += postComment;
-      break;
     case defaultPost:
       GPRS.postBabyTemp = 1;
       GPRS.postHeaterTemp = 0;

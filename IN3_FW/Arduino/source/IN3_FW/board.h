@@ -14,12 +14,11 @@
 #define HEATER PA8
 #define SD_CS PA11
 
-#define JAUNDICE PB0
-#define BACKUP PB1
+#define PHOTOTHERAPY PB0
+#define HUMIDIFIER PB1
 #define PWR_ALERT PB4
 #define PULSIOXIMETER_EN PB5
 #define SCREENBACKLIGHT PB6
-#define HUMIDIFIER PB7
 #define TFT_DC PB8
 #define TOUCH_CS PB9
 #define POWER_EN PB12

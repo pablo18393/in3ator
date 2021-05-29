@@ -229,7 +229,7 @@ void loadlogo() {
     }
   }
   digitalWrite(SCREENBACKLIGHT, LOW);
-  delay(introDelay);
+  //delay(introDelay);
 }
 
 void drawIntroMessage() {

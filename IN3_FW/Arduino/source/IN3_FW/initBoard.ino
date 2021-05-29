@@ -6,7 +6,6 @@ void initBoard() {
   //initSD();
   initInterrupts();
   initTimers();
-  initGPRS();
 }
 
 void initDebug() {

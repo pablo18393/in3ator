@@ -108,12 +108,10 @@ void basictemperatureControl() {
 
 void basicHumidityControl() {
   if (humidity < desiredRoomHum) {
-    pwmWrite(HUMIDIFIER, humidifierMaxPWM / 2);
-    digitalWrite(BACKUP, HIGH);
+    digitalWrite(HUMIDIFIER, HIGH);
   }
   else {
-    pwmWrite(HUMIDIFIER, 0);
-    digitalWrite(BACKUP, LOW);
+    digitalWrite(HUMIDIFIER, LOW);
   }
 }
 
@@ -123,8 +121,7 @@ void heatUp() {
 
 void turnActuators(bool mode) {
   digitalWrite(HEATER, mode);
-  digitalWrite(BACKUP, mode);
-  pwmWrite(HUMIDIFIER, humidifierMaxPWM / 2 * mode);
+  digitalWrite(HUMIDIFIER, mode);
 }
 
 void turnFans(bool mode) {

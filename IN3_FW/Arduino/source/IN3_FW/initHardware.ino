@@ -10,18 +10,18 @@
 
 #define HEATER_CONSUMPTION_MIN 2
 #define FAN_CONSUMPTION_MIN 0.05
-#define LEDS_CONSUMPTION_MIN 0.2
-#define WATER_CONSUMPTION_MIN 0.05
+#define PHOTOTHERAPY_CONSUMPTION_MIN 0.2
+#define HUMIDIFIER_CONSUMPTION_MIN 0.05
 
 #define HEATER_CONSUMPTION_MAX 9
 #define FAN_CONSUMPTION_MAX 2
-#define LEDS_CONSUMPTION_MAX 4
-#define WATER_CONSUMPTION_MAX 1
+#define PHOTOTHERAPY_CONSUMPTION_MAX 4
+#define HUMIDIFIER_CONSUMPTION_MAX 1
 
 #define STANDBY_CONSUMPTION_MIN 0.01
 #define STANDBY_CONSUMPTION_MAX 1
 
-#define SCREEN_CONSUMPTION_MIN 0.05
+#define SCREEN_CONSUMPTION_MIN 0.02
 #define SCREEN_CONSUMPTION_MAX 1
 
 #define NTC_BABY_MIN_ERROR 1
@@ -34,32 +34,39 @@
 
 #define HEATER_CONSUMPTION_MIN_ERROR 1<<7
 #define FAN_CONSUMPTION_MIN_ERROR    1<<8
-#define LEDS_CONSUMPTION_MIN_ERROR   1<<9
-#define WATER_CONSUMPTION_MIN_ERROR  1<<10
+#define PHOTOTHERAPY_CONSUMPTION_MIN_ERROR   1<<9
+#define HUMIDIFIER_CONSUMPTION_MIN_ERROR  1<<10
 
-#define STANDBY_CONSUMPTION_MAX_ERROR 1<<11
-#define DEFECTIVE_POWER_EN 1<<12
-#define DEFECTIVE_SCREEN 1<<13
-#define DEFECTIVE_BUZZER 1<<14
-#define DEFECTIVE_CURRENT_SENSOR 1<<15
+#define HEATER_CONSUMPTION_MAX_ERROR 1<<11
+#define FAN_CONSUMPTION_MAX_ERROR    1<<12
+#define PHOTOTHERAPY_CONSUMPTION_MAX_ERROR   1<<13
+#define HUMIDIFIER_CONSUMPTION_MAX_ERROR  1<<14
+
+#define STANDBY_CONSUMPTION_MAX_ERROR 1<<15
+#define DEFECTIVE_POWER_EN 1<<16
+#define DEFECTIVE_SCREEN 1<<17
+#define DEFECTIVE_BUZZER 1<<18
+#define DEFECTIVE_CURRENT_SENSOR 1<<19
 
 long HW_error = 0;
 
 void initHardware() {
   logln("[HW] -> Initialiting hardware");
   initPins();
+  initGPRS();
   checkCurrentSenseCircuit();
-  initSensors();
   initTFT();
+  initSensors();
   initPowerEn();
-  testActuators();
+  actuatorsTest();
   if (!HW_error) {
     logln("[HW] -> HARDWARE OK");
-    //GPRSSetPostVariables(addComent, "HW OK");
+    GPRSSetPostVariables(NULL, "HW OK");
   }
   else {
     logln("[HW] -> HARDWARE TEST FAIL");
     logln("[HW] -> HARDWARE ERROR CODE:" + String(HW_error));
+    GPRSSetPostVariables(NULL, "HW FAIL" + String(HW_error));
     //drawHardwareErrorMessage();
     /*
       while (digitalRead(ENC_SWITCH)) {
@@ -72,10 +79,10 @@ void initHardware() {
 void initPins() {
   logln("[HW] -> Initialiting pins");
   pinMode(SCREENBACKLIGHT, OUTPUT);
-  pinMode(JAUNDICE, OUTPUT);
+  pinMode(PHOTOTHERAPY, OUTPUT);
   pinMode(HEATER, OUTPUT);
   pinMode(FAN, OUTPUT);
-  pinMode(BACKUP, OUTPUT);
+  pinMode(HUMIDIFIER, OUTPUT);
   pinMode(ENC_SWITCH, INPUT_PULLUP);
   pinMode(POWER_EN, OUTPUT);
   pinMode(GPRS_PWRKEY, OUTPUT);
@@ -83,25 +90,24 @@ void initPins() {
   pinMode(encoderpinB, INPUT_PULLUP);
   pinMode(SYSTEM_SHUNT, INPUT);
   pinMode(PWR_ALERT, INPUT);
-  pinMode(HUMIDIFIER, PWM);
   pinMode(BUZZER, PWM);
-  pwmWrite(HUMIDIFIER, 0);
   pwmWrite(BUZZER, 0);
   digitalWrite(SCREENBACKLIGHT, HIGH);
-  digitalWrite(POWER_EN, LOW);
-  digitalWrite(JAUNDICE, LOW);
-  digitalWrite(HEATER, LOW);
-  digitalWrite(FAN, LOW);
   digitalWrite(GPRS_PWRKEY, HIGH);
 }
 
+void initGPRS()
+{
+  Serial1.begin(115200);
+  GPRS.enable = 1;
+  GPRS.powerUp = 1;
+  GPRSSetPostVariables(defaultPost, "First post, FW version: " + String (FWversion));
+  setGPRSPostPeriod(standByGPRSPostPeriod);
+}
+
 void checkCurrentSenseCircuit() {
-  long error = HW_error;
   standByCurrentTest();
   measureOffsetConsumption();
-  if (error == HW_error) {
-    logln("[HW] -> OK -> Current sensor is working as expected");
-  }
 }
 
 void initSensors() {
@@ -160,48 +166,134 @@ void initRoomSensor() {
 }
 
 void standByCurrentTest() {
+  long error = HW_error;
+  float testCurrent;
   logln("[HW] -> Measuring standby current...");
-  if (sampleConsumption() < STANDBY_CONSUMPTION_MIN) {
+  testCurrent = sampleConsumption();
+  if (testCurrent < STANDBY_CONSUMPTION_MIN) {
     HW_error += DEFECTIVE_CURRENT_SENSOR;
     logln("[HW] -> Fail -> Defective current sensor");
   }
-  if (sampleConsumption() > STANDBY_CONSUMPTION_MAX) {
+  if (testCurrent > STANDBY_CONSUMPTION_MAX) {
     HW_error += STANDBY_CONSUMPTION_MAX_ERROR;
     logln("[HW] -> Fail -> Maximum stanby current exceeded");
   }
+  if (error == HW_error) {
+    logln("[HW] -> OK -> Current sensor is working as expected: " + String (testCurrent) + " Amps");
+  }
+  else {
+    logln("[HW] -> Fail -> test current is " + String (testCurrent) + " Amps");
+  }
+  GPRSSetPostVariables(NULL, ",CT:" + String (testCurrent));
 }
 
 void initTFT() {
   long error = HW_error;
+  float testCurrent, offsetCurrent;
+  offsetCurrent = sampleConsumption();
   SPI.setModule(SPI_SEL);
   tft.begin();
   tft.setRotation(3);
   loadlogo();
-  if (sampleConsumption() < SCREEN_CONSUMPTION_MIN) {
+  testCurrent = sampleConsumption() - offsetCurrent;
+  if (testCurrent < SCREEN_CONSUMPTION_MIN) {
     HW_error += DEFECTIVE_SCREEN;
     logln("[HW] -> Fail -> Screen current is not high enough");
   }
-  if (sampleConsumption() > SCREEN_CONSUMPTION_MAX) {
+  if (testCurrent > SCREEN_CONSUMPTION_MAX) {
     HW_error += DEFECTIVE_SCREEN;
     logln("[HW] -> Fail -> Screen current exceeded");
   }
   if (error == HW_error) {
-    logln("[HW] -> OK -> Screen is working as expected");
+    logln("[HW] -> OK -> Screen is working as expected: " + String (testCurrent) + " Amps");
   }
+  else {
+    logln("[HW] -> Fail -> test current is " + String (testCurrent) + " Amps");
+  }
+  GPRSSetPostVariables(NULL, ",TFT:" + String (testCurrent));
 }
 
 void initPowerEn() {
   long error = HW_error;
+  float testCurrent, offsetCurrent;
+  offsetCurrent = sampleConsumption();
   logln("[HW] -> Checking power enable circuit...");
   digitalWrite(POWER_EN, HIGH);
-  if (sampleConsumption() > STANDBY_CONSUMPTION_MAX) {
+  testCurrent = sampleConsumption() - offsetCurrent;
+  if (testCurrent > STANDBY_CONSUMPTION_MAX) {
     HW_error += DEFECTIVE_POWER_EN;
     logln("[HW] -> Fail -> Defective power enable circuit");
   }
   if (error == HW_error) {
-    logln("[HW] -> OK -> Power enable circuit is working as expected");
+    logln("[HW] -> OK -> Power enable is working as expected: " + String (testCurrent) + " Amps");
   }
+  else {
+    logln("[HW] -> Fail -> test current is " + String (testCurrent) + " Amps");
+  }
+  GPRSSetPostVariables(NULL, ",PWEN:" + String (testCurrent));
 }
 
-void testActuators() {
+void actuatorsTest() {
+  long error = HW_error;
+  float testCurrent, offsetCurrent;
+  offsetCurrent = sampleConsumption();
+  logln("[HW] -> Checking actuators...");
+  digitalWrite(HEATER, HIGH);
+  testCurrent = sampleConsumption() - offsetCurrent;
+  logln("[HW] -> Heater current consumption: " + String (testCurrent) + " Amps");
+  GPRSSetPostVariables(NULL, ",Hea:" + String (testCurrent));
+  if (testCurrent < HEATER_CONSUMPTION_MIN) {
+    HW_error += HEATER_CONSUMPTION_MIN_ERROR;
+    logln("[HW] -> Fail -> Heater current consumption is too low");
+  }
+  if (testCurrent > HEATER_CONSUMPTION_MAX) {
+    HW_error += HEATER_CONSUMPTION_MAX_ERROR;
+    logln("[HW] -> Fail -> Heater current consumption is too high");
+  }
+  digitalWrite(HEATER, LOW);
+  digitalWrite(FAN, HIGH);
+  testCurrent = sampleConsumption() - offsetCurrent;
+  logln("[HW] -> FAN consumption: " + String (testCurrent) + " Amps");
+  GPRSSetPostVariables(NULL, ",Fan:" + String (testCurrent));
+  if (testCurrent < FAN_CONSUMPTION_MIN) {
+    HW_error += FAN_CONSUMPTION_MIN_ERROR;
+    logln("[HW] -> Fail -> Fan current consumption is too low");
+  }
+  if (testCurrent > FAN_CONSUMPTION_MAX) {
+    HW_error += FAN_CONSUMPTION_MAX_ERROR;
+    logln("[HW] -> Fail -> Fan current consumption is too high");
+  }
+  digitalWrite(FAN, LOW);
+  digitalWrite(PHOTOTHERAPY, HIGH);
+  testCurrent = sampleConsumption() - offsetCurrent;
+  logln("[HW] -> Phototherapy current consumption: " + String (testCurrent) + " Amps");
+  GPRSSetPostVariables(NULL, ",Pho:" + String (testCurrent));
+  if (testCurrent < PHOTOTHERAPY_CONSUMPTION_MIN) {
+    HW_error += PHOTOTHERAPY_CONSUMPTION_MIN_ERROR;
+    logln("[HW] -> Fail -> PHOTOTHERAPY current consumption is too low");
+  }
+  if (testCurrent > PHOTOTHERAPY_CONSUMPTION_MAX) {
+    HW_error += PHOTOTHERAPY_CONSUMPTION_MAX_ERROR;
+    logln("[HW] -> Fail -> PHOTOTHERAPY current consumption is too high");
+  }
+  digitalWrite(PHOTOTHERAPY, LOW);
+  digitalWrite(HUMIDIFIER, HIGH);
+  testCurrent = sampleConsumption() - offsetCurrent;
+  logln("[HW] -> Humidifier current consumption: " + String (testCurrent) + " Amps");
+  GPRSSetPostVariables(NULL, ",Hum:" + String (testCurrent));
+  if (testCurrent < HUMIDIFIER_CONSUMPTION_MIN) {
+    HW_error += HUMIDIFIER_CONSUMPTION_MIN_ERROR;
+    logln("[HW] -> Fail -> HUMIDIFIER current consumption is too low");
+  }
+  if (testCurrent > HUMIDIFIER_CONSUMPTION_MAX) {
+    HW_error += HUMIDIFIER_CONSUMPTION_MAX_ERROR;
+    logln("[HW] -> Fail -> HUMIDIFIER current consumption is too high");
+  }
+  digitalWrite(HUMIDIFIER, LOW);
+  if (error == HW_error) {
+    logln("[HW] -> OK -> Actuators are working as expected");
+  }
+  else {
+    logln("[HW] -> Fail -> Some actuators are not working as expected");
+  }
 }

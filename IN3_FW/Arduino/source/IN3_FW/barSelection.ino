@@ -105,7 +105,7 @@ void barSelection() {
                     GPRSSetPostVariables(jaundiceLEDOFF, "");
                     setGPRSPostPeriod(standByGPRSPostPeriod);
                   }
-                  digitalWrite(JAUNDICE, jaundiceEnable);
+                  digitalWrite(PHOTOTHERAPY, jaundiceEnable);
                   EncMove = 0;
                 }
               }
@@ -182,7 +182,7 @@ void barSelection() {
                     GPRSSetPostVariables(jaundiceLEDOFF, "");
                     setGPRSPostPeriod(standByGPRSPostPeriod);
                   }
-                  digitalWrite(JAUNDICE, jaundiceEnable);
+                  digitalWrite(PHOTOTHERAPY, jaundiceEnable);
                   EncMove = 0;
                 }
               }
