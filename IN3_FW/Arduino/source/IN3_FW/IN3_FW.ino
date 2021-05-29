@@ -104,7 +104,7 @@ byte temperature_measured; //temperature sensor number turn to measure
 float diffTemperature[numTempSensors]; //difference between measured temperature and user input real temperature
 bool faultNTC[numNTC]; //variable to control a failure in NTC
 byte numSensors; //number of total sensors
-int humidity; // environmental humidity variable
+int humidity; // room humidity variable
 int previousHumidity; //previous sampled humidity
 int diffHumidity; //difference between measured humidity and user input real humidity
 
@@ -119,20 +119,20 @@ byte encoderCount = 0;
 
 //GPRS variables to transmit
 #define turnedOn 0 //transmit first turned ON with hardware verification
-#define environmental 1 //transmit environmental variables
+#define room 1 //transmit room variables
 #define pulsioximeterSensorVariables 2 //transmit heart rate between others
 #define pulsioximeterSensorRaw 3 //transmit raw pulsioximeter signal
 #define aliveRefresh 4 //message to let know that incubator is still ON
 
 //sensor variables
-byte environmentalSensorPresent;
-byte environmentalSensorAddress = 112;
+byte roomSensorPresent;
+byte roomSensorAddress = 112;
 int pulsioximeterMean;
 const int maxPulsioximeterSamples = 320; //(tft width).
 float currentConsumption, currentConsumtionStacker;
 int currentOffset;
-float correctionCurrentFactor = 0.002;
-int currentConsumptionPos;
+float correctionCurrentFactor = 0.0023;
+int currentConsumptionPos=0;
 float currentConsumptionFactor = 2.685; //factor to translate current consumtion in mA
 int pulsioximeterSample[maxPulsioximeterSamples][2]; //0 is previous data, 1 is actual data
 int pulsioximeterPeakThreshold;
@@ -152,7 +152,7 @@ int pulsioximeterCounter[2];
 int BPM, IBI;
 String RPD; //(Raw Pulsioximeter Data)
 
-//environmental variables
+//room variables
 double desiredSkinTemp = 36.5; //preset baby skin temperature
 int desiredRoomHum = 80; //preset enviromental humidity
 int fanSpeed; //PWM that controls fan speed
@@ -160,7 +160,7 @@ bool jaundiceEnable; //PWM that controls jaundice LED intensity
 double maxHeaterTemp; //maximum heater temperature
 double desiredHeaterTemp; //desired temperature in heater
 
-//preset environmental variables
+//preset room variables
 const byte standardmaxHeaterTemp = 85; //preset max heater temperature in celsious
 const byte standardFanSpeed = 100;
 

@@ -1,26 +1,5 @@
 #define consumptionMeanSamples 1000
 
-void initSensors() {
-  measureOffsetConsumption();
-  initEnvironmentalSensor();
-  initPulsioximeterVariables();
-}
-
-void initEnvironmentalSensor() {
-  logln("detecting sensor...");
-  Wire.begin();
-  Wire.beginTransmission(environmentalSensorAddress);
-  environmentalSensorPresent = Wire.endTransmission();
-  if (environmentalSensorPresent == 0) {
-    logln("Environmental sensor succesfully found");
-    mySHTC3.begin(Wire);
-  }
-  else {
-    logln("No environmental sensor found");
-    Wire.end();
-  }
-}
-
 void sensorsISR() {
   measurenumNTC();
   measureConsumption();
@@ -37,10 +16,15 @@ void sensorsISR() {
 }
 
 float sampleConsumption() {
-  for (int i = 0; i < consumptionMeanSamples; i++) {
-    measureConsumption();
+  float consumption = 0;
+  for (int i = 0; i <= consumptionMeanSamples; i++) {
+    delayMicroseconds(100);
+    if (measureConsumption()) {
+      consumption = currentConsumption;
+      return consumption;
+    }
   }
-  return (currentConsumption);
+  return consumption;
 }
 
 void measureOffsetConsumption() {
@@ -51,24 +35,23 @@ void measureOffsetConsumption() {
   }
   currentOffset = currentConsumtionStacker / consumptionMeanSamples;
   currentConsumtionStacker = 0;
-  logln("offsetCurrent is: " + String (currentOffset));
 }
 
-void measureConsumption() {
-  currentConsumtionStacker += analogRead(SYSTEM_SHUNT);
+bool measureConsumption() {
   currentConsumptionPos++;
-  if (currentConsumptionPos == 999) {
+  if (currentConsumptionPos >= consumptionMeanSamples) {
     currentConsumptionPos = 0;
     currentConsumtionStacker = ((currentConsumtionStacker / consumptionMeanSamples) - currentOffset) * correctionCurrentFactor;
     if (currentConsumtionStacker > 0) {
       currentConsumption = currentConsumtionStacker;
     }
     currentConsumtionStacker = 0;
+    return true;
   }
-}
-
-void initPulsioximeterVariables() {
-
+  else {
+    currentConsumtionStacker += analogRead(SYSTEM_SHUNT);
+    return false;
+  }
 }
 
 void checkNewPulsioximeterData() {
@@ -107,7 +90,7 @@ void calculatePulsioximeterValues() {
 }
 
 
-void measurenumNTC() {
+bool measurenumNTC() {
   for (int i = 0; i < numNTC; i++) {
     temperatureArray[i][temperature_measured] = analogRead(BABY_NTC_PIN);
   }
@@ -115,7 +98,9 @@ void measurenumNTC() {
   if (temperature_measured == temperature_fraction) {
     updateTemp(babyNTC);
     temperature_measured = 0;
+    return true;
   }
+  return false;
 }
 
 void updateTemp(byte sensor) {
@@ -161,8 +146,8 @@ void updateTemp(byte sensor) {
   }
 }
 
-bool updateHumidity() {
-  if (environmentalSensorPresent == 0) {
+bool updateRoomSensor() {
+  if (roomSensorPresent == 0) {
     mySHTC3.update();
     temperature[digitalTempSensor] = mySHTC3.toDegC(); //Add here measurement to temp array
     humidity = int(mySHTC3.toPercent()) + diffHumidity;

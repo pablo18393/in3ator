@@ -1,78 +1,12 @@
-#define testMode false
-#define operativeMode true
-
 void initBoard() {
+  watchdogInit();
   initDebug();
   initEEPROM();
-  initSensors();
+  initHardware();
   //initSD();
   initInterrupts();
   initTimers();
-  pinDirection(testMode);
-  //hardwareVerification();
-  pinDirection(operativeMode);
-  initTFT();
   initGPRS();
-  watchdogInit();
-}
-
-void initTFT() {
-  SPI.setModule(SPI_SEL);
-  tft.begin();
-  tft.setRotation(3);
-  loadlogo();
-}
-
-void pinDirection(bool mode) {
-  switch (mode) {
-    case testMode:
-      pinMode(HUMIDIFIER, PWM);
-      pinMode(SCREENBACKLIGHT, OUTPUT);
-      pinMode(JAUNDICE, OUTPUT);
-      pinMode(HEATER, OUTPUT);
-      pinMode(FAN, OUTPUT);
-      pinMode(BUZZER, OUTPUT);
-      pinMode(ENC_SWITCH, INPUT_PULLUP);
-      pinMode(POWER_EN, OUTPUT);
-      pinMode(GPRS_PWRKEY, OUTPUT);
-      pinMode(encoderpinA, INPUT_PULLUP);
-      pinMode(encoderpinB, INPUT_PULLUP);
-      pinMode(SYSTEM_SHUNT, INPUT);
-      pinMode(PWR_ALERT, INPUT);
-      pwmWrite(HUMIDIFIER, 0);
-      digitalWrite(SCREENBACKLIGHT, HIGH);
-      digitalWrite(POWER_EN, LOW);
-      digitalWrite(JAUNDICE, LOW);
-      digitalWrite(HEATER, LOW);
-      digitalWrite(FAN, LOW);
-      digitalWrite(BUZZER, LOW);
-      digitalWrite(GPRS_PWRKEY, HIGH);
-      break;
-
-    case operativeMode:
-      pinMode(HEATER, OUTPUT);
-      pinMode(FAN, OUTPUT);
-      pinMode(HUMIDIFIER, PWM);
-      pinMode(BUZZER, PWM);
-      pinMode(SCREENBACKLIGHT, OUTPUT);
-      pinMode(ENC_SWITCH, INPUT_PULLUP);
-      pinMode(POWER_EN, OUTPUT);
-      pinMode(GPRS_PWRKEY, OUTPUT);
-      pinMode(encoderpinA, INPUT_PULLUP);
-      pinMode(encoderpinB, INPUT_PULLUP);
-      pinMode(SYSTEM_SHUNT, INPUT);
-      pinMode(PWR_ALERT, INPUT);
-      pinMode(JAUNDICE, OUTPUT);
-      pinMode(BACKUP, OUTPUT);
-      digitalWrite(SCREENBACKLIGHT, HIGH);
-      digitalWrite(HEATER, LOW);
-      digitalWrite(FAN, LOW);
-      pwmWrite(HUMIDIFIER, 0);
-      pwmWrite(BUZZER, 0);
-      digitalWrite(GPRS_PWRKEY, HIGH);
-      digitalWrite(POWER_EN, HIGH);
-      break;
-  }
 }
 
 void initDebug() {
@@ -80,7 +14,7 @@ void initDebug() {
   logln("in3ator debug uart, version " + String (FWversion) + ", SN: " + String (serialNumber));
 }
 
-void initInterrupts(){
+void initInterrupts() {
   attachInterrupt(PWR_ALERT, powerAlert, RISING);
 }
 
@@ -140,4 +74,5 @@ void initTimers() {
   //fanHPMaxPWM = GPRSTimer.getOverflow();
   buzzerMaxPWM = buzzerTimer.getOverflow();
   screenBackLightMaxPWM = humidifierTimer.getOverflow();
+  buzzerBeep(2, 70);
 }

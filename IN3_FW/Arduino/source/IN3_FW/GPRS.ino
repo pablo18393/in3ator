@@ -9,6 +9,7 @@
 #define standByMode 7
 #define addLocation 8
 #define removeLocation 9
+#define addComent 10
 
 #define standByGPRSPostPeriod 800
 #define actuatingGPRSPostPeriod 120
@@ -264,7 +265,7 @@ void GPRSPowerUp() {
       }
       break;
     case 2:
-      if (millis() - GPRS.packetSentenceTime > 2000) {
+      if (millis() - GPRS.packetSentenceTime > 7000) {
         logln("[GPRS] -> Sending AT command");
         Serial1.print("AT\n");
         GPRS.packetSentenceTime = millis();
@@ -275,7 +276,7 @@ void GPRSPowerUp() {
       if (GPRS.processSuccess) {
         GPRS.powerUp = 0;
         GPRS.connect = 1;
-        logln("Power up success");
+        logln("[GPRS] -> Power up success");
       }
       GPRS.process = 0;
       break;
@@ -637,6 +638,10 @@ void GPRSSetPostVariables(byte postContent, String postComment) {
     GPRS.comment += postComment;
   }
   switch (postContent) {
+    case addComent:
+      GPRS.postComment = 1;
+      GPRS.comment += postComment;
+      break;
     case defaultPost:
       GPRS.postBabyTemp = 1;
       GPRS.postHeaterTemp = 0;

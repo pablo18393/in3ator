@@ -1,16 +1,15 @@
-
 int updateData() {
   watchdogReload();
   GPRSISR();
   if (millis() - lastDebugUpdate > debugUpdatePeriod) {
-    logln("[STATUS] -> Current consumption is: " + String (currentConsumption));
-    logln("[STATUS] -> baby temperature: " + String(temperature[babyNTC]) + "ºC");
-    logln("[STATUS] -> Floor temperature: " + String(temperature[digitalTempSensor]) + "ºC");
-    logln("[STATUS] -> Humidity: " + String(humidity) + "%");
+    logln("[SENSORS] -> Current consumption is: " + String (currentConsumption) + " Amps");
+    logln("[SENSORS] -> baby temperature: " + String(temperature[babyNTC]) + "ºC");
+    logln("[SENSORS] -> Floor temperature: " + String(temperature[digitalTempSensor]) + "ºC");
+    logln("[SENSORS] -> Humidity: " + String(humidity) + "%");
     lastDebugUpdate = millis();
   }
   if (millis() - lastGraphicSensorsUpdate > sensorsUpdatePeriod) {
-    updateHumidity();
+    updateRoomSensor();
     if (page == advancedModePage || page == actuatorsProgressPage) {
       updateDisplaySensors();
       if (page == actuatorsProgressPage) {

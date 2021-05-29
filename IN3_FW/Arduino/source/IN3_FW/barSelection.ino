@@ -69,7 +69,7 @@ void barSelection() {
                   tft.drawRightString(initialSensorsValue, gestationWeeksXPos, ypos, textFontSize);
                   drawRightNumber(gestationWeeks, gestationWeeksXPos, ypos);
                   gestationWeeks -= EncMove;
-                  setPresetEnvironmentalValues();
+                  setPresetRoomValues();
                   tft.setTextColor(COLOR_MENU_TEXT);
                   drawRightNumber(gestationWeeks, gestationWeeksXPos, ypos);
                   enableSet = 1;
@@ -529,7 +529,7 @@ void checkSetMessage() {
   }
 }
 
-void setPresetEnvironmentalValues() {
+void setPresetRoomValues() {
   if (gestationWeeks <= 29) {
     desiredSkinTemp = 36;
   }
