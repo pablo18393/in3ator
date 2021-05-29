@@ -264,42 +264,21 @@ void drawIntroMessage() {
 /*
    Function pending to complete
 */
-void drawHardwareErrorMessage() {
-  byte numErrors = 0;
-  byte j;
-  int yErrorPos = letter_height;
-  bool testCritical;
+void drawHardwareErrorMessage(long error) {
+  page = HWErrorPage;
   tft.fillScreen(introBackColor);
   tft.setTextColor(introTextColor);
-  tft.drawCentreString("Hardware errors:", tft.width() / 2, yErrorPos , textFontSize);
-  yErrorPos += letter_height;
-  for (int i = 0; i < hardwareComponents; i++) {
-    if (numErrors) {
-      numErrors++;
-      if (yErrorPos > (tft.height() - 4 * letter_height)) {
-        i = hardwareComponents;
-      }
-      else {
-        tft.drawCentreString("complete", tft.width() / 2, yErrorPos , textFontSize);
-        yErrorPos += letter_height;
-      }
-    }
-  }
-  if (testCritical) {
-    tft.setTextColor(ILI9341_RED);
-    yErrorPos += letter_height;
-    tft.drawCentreString("CRITICAL ERROR, FIX", tft.width() / 2, yErrorPos , textFontSize);
-    yErrorPos += letter_height;
-    tft.drawCentreString("PROBLEM TO CONTINUE", tft.width() / 2, yErrorPos , textFontSize);
-  }
-  else {
-    tft.setTextColor(ILI9341_ORANGE);
-    tft.drawCentreString("lost functions:", tft.width() / 2, yErrorPos , textFontSize);
-    yErrorPos += letter_height;
-    tft.drawCentreString("temperature, jaundice LED", tft.width() / 2, yErrorPos , textFontSize);
-    yErrorPos += letter_height;
-    tft.drawCentreString("ENC_SWITCH to continue", tft.width() / 2, yErrorPos , textFontSize);
-  }
+  tft.setTextSize(3);
+  tft.setCursor(tft.width() / 4 - hexDigits(error) * 16, tft.height() / 5);
+  tft.print("HW error:");
+  tft.println(error, HEX);
+  tft.println();
+  tft.println(" Please contact:");
+  tft.setTextSize(2);
+  tft.println("  medicalopenworld.org");
+  tft.setTextSize(3);
+  tft.println();
+  tft.println("Press to continue");
 }
 
 void drawHumidityUnits() {
@@ -313,16 +292,28 @@ void drawTemperatureUnits() {
 }
 
 void drawCentreNumber(int n, int x, int i) {
-  length = 1;
+  if (text_size == 2) {
+    tft.drawNumber(n, x - decimalDigits(n) * 27, i, 6);
+  }
+  else {
+    tft.drawNumber(n, x - decimalDigits(n) * text_size * 7, i, textFontSize);
+  }
+}
+
+int decimalDigits(long n) {
+  int length = 1;
   for (long k = 10; k <= n; k *= 10) {
     length++;
   }
-  if (text_size == 2) {
-    tft.drawNumber(n, x - length * 27, i, 6);
+  return (length);
+}
+
+int hexDigits(long n) {
+  int length = 1;
+  for (long k = 16; k <= n; k *= 16) {
+    length++;
   }
-  else {
-    tft.drawNumber(n, x - length * text_size * 7, i, textFontSize);
-  }
+  return (length);
 }
 
 void drawStop() {

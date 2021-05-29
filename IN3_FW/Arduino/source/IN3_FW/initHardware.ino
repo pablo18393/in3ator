@@ -65,14 +65,12 @@ void initHardware() {
   }
   else {
     logln("[HW] -> HARDWARE TEST FAIL");
-    logln("[HW] -> HARDWARE ERROR CODE:" + String(HW_error));
-    GPRSSetPostVariables(NULL, "HW FAIL" + String(HW_error));
-    //drawHardwareErrorMessage();
-    /*
-      while (digitalRead(ENC_SWITCH)) {
+    logln("[HW] -> HARDWARE ERROR CODE:" + String(HW_error,HEX));
+    GPRSSetPostVariables(NULL, "HW FAIL" + String(HW_error,HEX));
+    drawHardwareErrorMessage(HW_error);
+    while (digitalRead(ENC_SWITCH)) {
       updateData();
-      }
-    */
+    }
   }
 }
 

@@ -74,6 +74,7 @@ int page;
 #define settingsPage 3
 #define calibrateSensorsPage 4
 #define askSuccessPage 5
+#define HWErrorPage 6
 
 //languages numbers that will be called in language variable
 #define defaultLanguage 1 //Preset number configuration when booting for first time
