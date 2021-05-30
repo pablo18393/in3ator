@@ -5,6 +5,7 @@ String serialNumber = "in3000021";
 
 #define buzzerStandbyPeriod 10000 //in millis, there will be a periodic tone
 #define buzzerStandbyTone 500 //in micros, tone freq
+#define buzzerRotaryEncoderTone 200 //in micros, tone freq
 #define buzzerStandbyToneDuration 50 //in micros, tone freq
 #define buzzerSwitchDuration 10 //in micros, tone freq
 #define buzzerStandbyToneTimes 1 //in micros, tone freq
@@ -21,6 +22,7 @@ String serialNumber = "in3000021";
 #include <SD.h>
 #include <TimeLib.h>
 #include "SparkFun_SHTC3.h" // Click here to get the library: http://librarymanager/All#SparkFun_SHTC3
+#include <RotaryEncoder.h>
 
 #define LIBMAPPLE_CORE //comment it for HAL based core
 
@@ -190,8 +192,8 @@ int encoderpinA = ENC_A; // pin  encoder A
 int encoderpinB = ENC_B; // pin  encoder B
 bool encPulsed, encPulsedBefore; //encoder switch status
 volatile int EncMove; //moved encoder
+volatile int last_encoder_move; //moved encoder
 long encoder_debounce_time = 1; //in milliseconds, debounce time in encoder to filter signal bounces
-long last_encoder_move;
 long last_encPulsed; //last time encoder was pulsed
 
 //User Interface display constants
@@ -336,6 +338,7 @@ Adafruit_ILI9341_STM tft = Adafruit_ILI9341_STM(TFT_CS, TFT_DC, TFT_RST); // Use
 SHTC3 mySHTC3;              // Declare an instance of the SHTC3 class
 TwoWire WIRE2 (2, I2C_FAST_MODE);
 #define Wire WIRE2
+RotaryEncoder encoder(ENC_A, ENC_B, RotaryEncoder::LatchMode::TWO03);
 
 // timers configuration
 #define NTCInterruptRate 20000    // in microseconds; 

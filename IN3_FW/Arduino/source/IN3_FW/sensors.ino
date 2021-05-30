@@ -155,32 +155,9 @@ bool updateRoomSensor() {
 }
 
 void peripheralsISR() {
-  readEncoder();
   sensorsISR();
   buzzerISR();
   userInteraction();
-}
-
-void readEncoder() {
-  if ( (digitalRead(ENC_A))  != A_set )
-  {
-    A_set = !A_set;
-    if ( A_set && !B_set)
-    {
-      lastUserInteraction = millis();
-      EncMove = 1;
-    }
-  }
-  if ( (digitalRead(ENC_B))  != B_set)
-  {
-    B_set = !B_set;
-    if ( B_set && !A_set )
-      EncMove = -1;
-    lastUserInteraction = millis();
-  }
-  if (!digitalRead(ENC_SWITCH)) {
-    lastUserInteraction = millis();
-  }
 }
 
 void userInteraction() {

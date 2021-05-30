@@ -314,7 +314,19 @@ void initPowerEn() {
 
 void encSwitchISR() {
   encPulseDetected = 1;
-  buzzerTone(buzzerStandbyToneTimes, buzzerSwitchDuration, buzzerStandbyTone);
+  buzzerTone(buzzerStandbyToneTimes, buzzerSwitchDuration, buzzerRotaryEncoderTone);
+  lastUserInteraction = millis();
+}
+
+void encoderISR() {
+  int newPos;
+  encoder.tick(); // just call tick() to check the state.
+  newPos = encoder.getPosition();
+  lastUserInteraction = millis();
+  if (abs(newPos - last_encoder_move) > 1) {
+    EncMove = int(encoder.getDirection());
+    last_encoder_move = newPos;
+  }
 }
 
 void actuatorsTest() {
