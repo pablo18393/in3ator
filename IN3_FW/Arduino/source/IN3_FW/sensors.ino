@@ -157,16 +157,8 @@ bool updateRoomSensor() {
 void peripheralsISR() {
   readEncoder();
   sensorsISR();
-  asleep();
-}
-
-void buzzerBeep (int times, int timeDelay) {
-  for (int i = 0; i < times; i++) {
-    pwmWrite(BUZZER, buzzerMaxPWM / 2);
-    delay(timeDelay);
-    pwmWrite(BUZZER, buzzerMaxPWM / 0);
-    delay(timeDelay);
-  }
+  buzzerISR();
+  userInteraction();
 }
 
 void readEncoder() {
@@ -175,7 +167,7 @@ void readEncoder() {
     A_set = !A_set;
     if ( A_set && !B_set)
     {
-      last_something = millis();
+      lastUserInteraction = millis();
       EncMove = 1;
     }
   }
@@ -184,16 +176,16 @@ void readEncoder() {
     B_set = !B_set;
     if ( B_set && !A_set )
       EncMove = -1;
-    last_something = millis();
+    lastUserInteraction = millis();
   }
   if (!digitalRead(ENC_SWITCH)) {
-    last_something = millis();
+    lastUserInteraction = millis();
   }
 }
 
-void asleep() {
+void userInteraction() {
   if (auto_lock) {
-    if (millis() - last_something > time_lock) {
+    if (millis() - lastUserInteraction > time_lock) {
       digitalWrite(SCREENBACKLIGHT, HIGH);
     }
     else {

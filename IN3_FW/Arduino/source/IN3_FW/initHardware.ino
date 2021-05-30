@@ -24,7 +24,7 @@
 #define SCREEN_CONSUMPTION_MIN 0.02
 #define SCREEN_CONSUMPTION_MAX 1
 
-#define BUZZER_CONSUMPTION_MIN 0.03
+#define BUZZER_CONSUMPTION_MIN 0.003
 
 #define NTC_BABY_MIN_ERROR 1
 #define NTC_BABY_MAX_ERROR 1<<1
@@ -51,6 +51,9 @@
 #define DEFECTIVE_CURRENT_SENSOR 1<<19
 
 long HW_error = 0;
+int buzzerBeeps, buzzerToneTime;
+long buzzerTime, buzzerStandbyTime;
+bool buzzerBuzzing;
 
 void initHardware() {
   logln("[HW] -> Initialiting hardware");
@@ -58,7 +61,7 @@ void initHardware() {
   initGPRS();
   checkCurrentSenseCircuit();
   initTFT();
-  initBuzzer();
+  buzzerTest();
   initSensors();
   initPowerEn();
   actuatorsTest();
@@ -75,11 +78,11 @@ void initHardware() {
       updateData();
     }
   }
+  buzzerTone(4, buzzerStandbyToneDuration, buzzerStandbyTone);
 }
 
 void initPins() {
   logln("[HW] -> Initialiting pins");
-  pinMode(SCREENBACKLIGHT, OUTPUT);
   pinMode(PHOTOTHERAPY, OUTPUT);
   pinMode(HEATER, OUTPUT);
   pinMode(FAN, OUTPUT);
@@ -87,6 +90,7 @@ void initPins() {
   pinMode(ENC_SWITCH, INPUT_PULLUP);
   pinMode(POWER_EN, OUTPUT);
   pinMode(GPRS_PWRKEY, OUTPUT);
+  pinMode(SCREENBACKLIGHT, OUTPUT);
   pinMode(encoderpinA, INPUT_PULLUP);
   pinMode(encoderpinB, INPUT_PULLUP);
   pinMode(SYSTEM_SHUNT, INPUT);
@@ -191,11 +195,26 @@ void standByCurrentTest() {
 void initTFT() {
   long error = HW_error;
   float testCurrent, offsetCurrent;
+  int  timeOut = 4000;
+  long processTime = millis();
   offsetCurrent = sampleConsumption();
   SPI.setModule(SPI_SEL);
   tft.begin();
   tft.setRotation(3);
   loadlogo();
+  /*
+    configTFTBacklightTimer(backlightTimerPeriod);
+    pwmWrite(SCREENBACKLIGHT, i);
+    TFT_LED_PWR = screenBackLightMaxPWM / 2;
+    for (int i = screenBackLightMaxPWM; i >= TFT_LED_PWR; i--) {
+    pwmWrite(SCREENBACKLIGHT, i);
+    delayMicroseconds(brightenRate);
+    if (millis() - processTime > timeOut) {
+      i = 0;
+    }
+    }
+  */
+  digitalWrite(SCREENBACKLIGHT, LOW);
   testCurrent = sampleConsumption() - offsetCurrent;
   if (testCurrent < SCREEN_CONSUMPTION_MIN) {
     HW_error += DEFECTIVE_SCREEN;
@@ -214,20 +233,28 @@ void initTFT() {
   GPRSSetPostVariables(NULL, ",TFT:" + String (testCurrent));
 }
 
-void initBuzzer() {
+void configTFTBacklightTimer(int freq) {
+  //humidifier timer configuration:
+  humidifierTimer.pause();
+  humidifierTimer.setPeriod(freq); // in microseconds
+  humidifierTimer.refresh();
+  humidifierTimer.resume();
+}
+
+void configBuzzerTimer(int freq) {
   //buzzer timer configuration:
   buzzerTimer.pause();
-  buzzerTimer.setPeriod(buzzerTimerRate); // in microseconds
+  buzzerTimer.setPeriod(freq); // in microseconds
   buzzerTimer.refresh();
   buzzerTimer.resume();
   buzzerMaxPWM = buzzerTimer.getOverflow();
-  buzzerTest();
 }
 
 void buzzerTest() {
   long error = HW_error;
   float testCurrent, offsetCurrent;
   offsetCurrent = sampleConsumption();
+  configBuzzerTimer(buzzerStandardPeriod);
   pwmWrite(BUZZER, buzzerMaxPWM / 2);
   testCurrent = sampleConsumption() - offsetCurrent;
   pwmWrite(BUZZER, buzzerMaxPWM / 0);
@@ -242,6 +269,27 @@ void buzzerTest() {
     logln("[HW] -> Fail -> test current is " + String (testCurrent) + " Amps");
   }
   GPRSSetPostVariables(NULL, ",Buz:" + String (testCurrent));
+}
+
+void buzzerISR() {
+  if (millis() - buzzerTime > buzzerToneTime && buzzerBeeps) {
+    buzzerBeeps -= buzzerBuzzing;
+    buzzerBuzzing = !buzzerBuzzing;
+    pwmWrite(BUZZER, buzzerMaxPWM / 2 * buzzerBuzzing);
+    buzzerTime = millis();
+  }
+  if (page == actuatorsProgressPage) {
+    buzzerStandbyTime = max(lastUserInteraction, buzzerStandbyTime);
+    if (millis() - buzzerStandbyTime > buzzerStandbyPeriod) {
+      buzzerStandbyTime = millis();
+      buzzerTone(buzzerStandbyToneTimes, buzzerStandbyToneDuration, buzzerStandbyTone);
+    }
+  }
+}
+
+void buzzerTone (int beepTimes, int timeDelay, int freq) {
+  buzzerBeeps += beepTimes;
+  buzzerToneTime = timeDelay;
 }
 
 void initPowerEn() {
@@ -262,6 +310,11 @@ void initPowerEn() {
     logln("[HW] -> Fail -> test current is " + String (testCurrent) + " Amps");
   }
   GPRSSetPostVariables(NULL, ",PWEN:" + String (testCurrent));
+}
+
+void encSwitchISR() {
+  encPulseDetected = 1;
+  buzzerTone(buzzerStandbyToneTimes, buzzerSwitchDuration, buzzerStandbyTone);
 }
 
 void actuatorsTest() {

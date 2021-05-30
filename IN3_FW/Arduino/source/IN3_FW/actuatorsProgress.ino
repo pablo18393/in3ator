@@ -1,12 +1,10 @@
 void actuatorsProgress() {
-
   if (page == mainMenuPage) {
     GPRSSetPostVariables(actuatorsModeON, "ON, wks:" + String(gestationWeeks) + "," + String (desiredSkinTemp, 1) + "," + String (desiredRoomHum));
   }
   else {
     GPRSSetPostVariables(actuatorsModeON, "ON:" + String (desiredSkinTemp, 1) + "," + String (desiredRoomHum));
   }
-
   byte  numWords = 0;
   temperaturePercentage = 0;
   page = actuatorsProgressPage;

@@ -1,8 +1,13 @@
 //Firmware version and head title of UI screen
-#define FWversion "v5.0"
+#define FWversion "v5.1"
 String serialNumber = "in3000021";
 #define headingTitle "in3ator"
-bool firstTurnOn;
+
+#define buzzerStandbyPeriod 10000 //in millis, there will be a periodic tone
+#define buzzerStandbyTone 500 //in micros, tone freq
+#define buzzerStandbyToneDuration 50 //in micros, tone freq
+#define buzzerSwitchDuration 10 //in micros, tone freq
+#define buzzerStandbyToneTimes 1 //in micros, tone freq
 
 //include libraries
 #include <Adafruit_GFX_AS.h>
@@ -117,6 +122,7 @@ const byte pulsioximeterRate = 5;
 byte pulsioximeterCount = 0;
 byte encoderRate = 1;
 byte encoderCount = 0;
+bool encPulseDetected;
 
 //GPRS variables to transmit
 #define turnedOn 0 //transmit first turned ON with hardware verification
@@ -133,7 +139,7 @@ const int maxPulsioximeterSamples = 320; //(tft width).
 float currentConsumption, currentConsumtionStacker;
 int currentOffset;
 float correctionCurrentFactor = 0.0023;
-int currentConsumptionPos=0;
+int currentConsumptionPos = 0;
 float currentConsumptionFactor = 2.685; //factor to translate current consumtion in mA
 int pulsioximeterSample[maxPulsioximeterSamples][2]; //0 is previous data, 1 is actual data
 int pulsioximeterPeakThreshold;
@@ -243,7 +249,7 @@ int time_lock = 16000; //time to lock screen if no user actions
 int TFT_LED_PWR = 25000; //PWM that will be supplied to backlight LEDs
 const byte time_back_draw = 255;
 const byte time_back_wait = 255;
-long last_something; //last time there was a encoder movement or pulse
+long lastUserInteraction; //last time there was a encoder movement or pulse
 long sensorsUpdatePeriod = 4000;
 int blinkTimeON = 1000; //displayed text ON time
 int blinkTimeOFF = 100; //displayed text OFF time
@@ -334,10 +340,10 @@ TwoWire WIRE2 (2, I2C_FAST_MODE);
 // timers configuration
 #define NTCInterruptRate 20000    // in microseconds; 
 #define heaterPIDRate 200000   // times of roomPIDRate;
-#define buzzerTimerRate 500    // in microseconds, also for BUZZER optimal frequency (2khz); Prescale factor 6, Overflow 36000
+#define buzzerStandardPeriod 500    // in microseconds, also for BUZZER optimal frequency (2khz); Prescale factor 6, Overflow 36000
 #define roomPIDRate 1000000    // in microseconds. Prescale factor 2, Overflow 65535
-#define peripheralsISRRate 1000    // in microseconds. Prescale factor 2, Overflow 36000
-#define humidifierTimerRate 100 //in microseconds, to generate a 110Khz PWM for ultra sonic humidifier. Prescale factor 1, Overflow 648
+#define peripheralsISRPeriod 1000    // in microseconds. Prescale factor 2, Overflow 36000
+#define backlightTimerPeriod 100 //in microseconds, to generate a 110Khz PWM for ultra sonic humidifier. Prescale factor 1, Overflow 648
 int roomPIDfactor = roomPIDRate / NTCInterruptRate;
 int heaterPIDfactor = heaterPIDRate / NTCInterruptRate;
 volatile long interruptcounter;

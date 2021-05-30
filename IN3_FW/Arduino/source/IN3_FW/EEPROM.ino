@@ -10,6 +10,8 @@
 #define EEPROM_usedGenericMosfet 40
 #define EEPROM_checkStatus 100
 
+bool firstTurnOn;
+
 void initEEPROM() {
   EEPROM.PageBase0 = 0x801F000;
   EEPROM.PageBase1 = 0x801F800;
@@ -36,10 +38,10 @@ void initEEPROM() {
       EEPROM.write(i, 0);
     }
     loadStandardValues();
-    logln("first turn on");
+    logln("[FLASH] -> First turn on, loading standard values");
   }
   else {
-    //logln("Recap all variables");
+    logln("[FLASH] -> Loading variables stored in flash");
     recapVariables();
   }
 }

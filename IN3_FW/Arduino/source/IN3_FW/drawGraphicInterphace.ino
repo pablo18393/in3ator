@@ -219,17 +219,6 @@ void loadlogo() {
   tft.fillScreen(introBackColor);
   tft.setTextColor(introTextColor);
   drawIntroMessage();
-  int  timeOut = 4000;
-  long processTime = millis();
-  for (int i = screenBackLightMaxPWM; i >= TFT_LED_PWR; i--) {
-    digitalWrite(SCREENBACKLIGHT, LOW);
-    delayMicroseconds(brightenRate);
-    if (millis() - processTime > timeOut) {
-      i = 0;
-    }
-  }
-  digitalWrite(SCREENBACKLIGHT, LOW);
-  //delay(introDelay);
 }
 
 void drawIntroMessage() {

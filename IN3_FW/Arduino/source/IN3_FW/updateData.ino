@@ -1,6 +1,14 @@
 int updateData() {
   watchdogReload();
   GPRSISR();
+  if (powerAlert) {
+    logln("[ALARM] -> maximum power exceeded");
+    powerAlert = 0;
+  }
+  if (encPulseDetected) {
+    logln("[ENCODER] -> Pushed");
+    encPulseDetected = 0;
+  }
   if (millis() - lastDebugUpdate > debugUpdatePeriod) {
     logln("[SENSORS] -> Current consumption is: " + String (currentConsumption) + " Amps");
     logln("[SENSORS] -> baby temperature: " + String(temperature[babyNTC]) + "ºC");
@@ -86,7 +94,7 @@ void printStatus() {
 }
 
 void logln(String dataString) {
-  log(String(millis()/1000) + ": " + dataString + '\r' + '\n');
+  log(String(millis() / 1000) + ": " + dataString + '\r' + '\n');
 }
 
 void log(String dataString) {

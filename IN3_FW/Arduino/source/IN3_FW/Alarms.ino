@@ -1,9 +1,10 @@
 #define powerAlertNotificationPeriod 1000
 long lastPowerAlertNotification;
+bool powerAlert;
 
-void powerAlert() {
+void powerAlertISR() {
   if (millis() - lastPowerAlertNotification > powerAlertNotificationPeriod) {
     lastPowerAlertNotification = millis();
-    logln("[ALARM] -> maximum power exceeded");
+    powerAlert=1;
   }
 }
