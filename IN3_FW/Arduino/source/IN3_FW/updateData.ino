@@ -10,7 +10,7 @@ int updateData() {
     encPulseDetected = 0;
   }
   if (millis() - lastDebugUpdate > debugUpdatePeriod) {
-    logln("[SENSORS] -> Current consumption is: " + String (currentConsumption) + " Amps");
+    logln("[SENSORS] -> Current consumption is: " + String (currentConsumption) + " Amps, instant measure is " + String(analogRead(SYSTEM_SHUNT)));
     logln("[SENSORS] -> baby temperature: " + String(temperature[babyNTC]) + "ºC");
     logln("[SENSORS] -> Floor temperature: " + String(temperature[digitalTempSensor]) + "ºC");
     logln("[SENSORS] -> Humidity: " + String(humidity) + "%");

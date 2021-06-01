@@ -28,13 +28,16 @@ float sampleConsumption() {
 }
 
 void measureOffsetConsumption() {
+  /*
   currentConsumtionStacker = 0;
   for (int i = 0; i < consumptionMeanSamples; i++) {
     delay(1);
     currentConsumtionStacker += analogRead(SYSTEM_SHUNT);
   }
   currentOffset = currentConsumtionStacker / consumptionMeanSamples;
+  logln("[SENSORS] -> Offset current consumption is: " + String (currentOffset * correctionCurrentFactor) + " Amps, instant measure is " + String(currentOffset));
   currentConsumtionStacker = 0;
+  */
 }
 
 bool measureConsumption() {
