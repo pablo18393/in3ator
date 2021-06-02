@@ -340,7 +340,7 @@ void encoderISR() {
   newPos = encoder.getPosition();
   lastUserInteraction = millis();
   if (abs(newPos - last_encoder_move) > 1) {
-    EncMove = int(encoder.getDirection());
+    EncMove = EncMoveOrientation * int(encoder.getDirection());
     last_encoder_move = newPos;
   }
 }

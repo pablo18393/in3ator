@@ -193,6 +193,7 @@ int encoderpinA = ENC_A; // pin  encoder A
 int encoderpinB = ENC_B; // pin  encoder B
 bool encPulsed, encPulsedBefore; //encoder switch status
 volatile int EncMove; //moved encoder
+int EncMoveOrientation = -1; //set to -1 to increase values clockwise
 volatile int last_encoder_move; //moved encoder
 long encoder_debounce_time = 1; //in milliseconds, debounce time in encoder to filter signal bounces
 long last_encPulsed; //last time encoder was pulsed
