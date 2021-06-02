@@ -345,11 +345,11 @@ RotaryEncoder encoder(ENC_A, ENC_B, RotaryEncoder::LatchMode::TWO03);
 
 // timers configuration
 #define NTCInterruptRate 20000    // in microseconds; 
-#define heaterPeriod 1000   // times of roomPIDRate;
 #define buzzerStandardPeriod 500    // in microseconds, also for BUZZER optimal frequency (2khz); Prescale factor 6, Overflow 36000
-#define roomPIDRate 1000000    // in microseconds. Prescale factor 2, Overflow 65535
-#define peripheralsISRPeriod 1000    // in microseconds. Prescale factor 2, Overflow 36000
-#define backlightTimerPeriod 100 //in microseconds, to generate a 110Khz PWM for ultra sonic humidifier. Prescale factor 1, Overflow 648
+#define roomPIDRate 1000000    // in microseconds
+#define peripheralsISRPeriod 1000    // in microseconds
+#define heaterPeriod 20*peripheralsISRPeriod   // in microseconds. Heater period, antialiasing factor for current sensing
+#define backlightTimerPeriod 100 //in microseconds
 int roomPIDfactor = roomPIDRate / NTCInterruptRate;
 int heaterPIDfactor = heaterPeriod / NTCInterruptRate;
 volatile long interruptcounter;

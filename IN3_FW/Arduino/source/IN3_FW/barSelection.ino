@@ -341,7 +341,7 @@ void barSelection() {
                 if (EncMove && -EncMove + maxHeaterPower >= heaterPowerMin && -EncMove + maxHeaterPower <= heaterPowerLimit) {
                   tft.setTextColor(COLOR_MENU);
                   drawRightNumber(maxHeaterPower, 280, ypos);
-                  maxHeaterPower -= 2 * EncMove;
+                  maxHeaterPower -= 10 * EncMove;
                   EEPROM.write(EEPROM_maxHeaterPower, maxHeaterPower);
                   tft.setTextColor(COLOR_MENU_TEXT);
                   drawRightNumber(maxHeaterPower, 280, ypos);
