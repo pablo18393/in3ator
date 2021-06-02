@@ -1,6 +1,6 @@
 
 void settings() {
-  byte numWords = 4;
+  byte numWords = 6;
   page = settingsPage;
   print_text = 1;
   tft.setTextSize(1);
@@ -14,32 +14,32 @@ void settings() {
     case english:
       words[autoLockGraphicPosition]  = "Auto lock";
       words[languageGraphicPosition] = "Language";
-      words[heaterTempGraphicPosition] = "Heater temp";
-      words[fanGraphicPosition] = "Fan speed";
+      words[heaterPowerGraphicPosition] = "Heater power";
+      words[DebugENGraphicPosition] = "UART debug";
       words[setStandardValuesGraphicPosition] = "Set standard values";
       words[calibrateGraphicPosition] = "Calibrate";
       break;
     case spanish:
       words[autoLockGraphicPosition]  = "Auto bloqueo";
       words[languageGraphicPosition] = "Idioma";
-      words[heaterTempGraphicPosition] = "Temp calefactor";
-      words[fanGraphicPosition] = "Ventilador";
+      words[heaterPowerGraphicPosition] = "Pot calefactor";
+      words[DebugENGraphicPosition] = "UART debug";
       words[setStandardValuesGraphicPosition] = "Fijar valores estandar";
       words[calibrateGraphicPosition] = "Calibrar";
       break;
     case french:
       words[autoLockGraphicPosition]  = "Verrouillage auto";
       words[languageGraphicPosition] = "Langue";
-      words[heaterTempGraphicPosition] = "Temp chauffage";
-      words[fanGraphicPosition] = "Ventilateur";
+      words[heaterPowerGraphicPosition] = "Pot chauffage";
+      words[DebugENGraphicPosition] = "UART debug";
       words[setStandardValuesGraphicPosition] = "Definir valeurs standard";
       words[calibrateGraphicPosition] = "Etalonner";
       break;
     case portuguese:
       words[autoLockGraphicPosition]  = "Bloqueio automatico";
       words[languageGraphicPosition] = "Idioma";
-      words[heaterTempGraphicPosition] = "Temperatura de aquecimento";
-      words[fanGraphicPosition] = "Ventilador";
+      words[heaterPowerGraphicPosition] = "Pot de aquecimento";
+      words[DebugENGraphicPosition] = "UART debug";
       words[setStandardValuesGraphicPosition] = "Definir valores de fabrica";
       words[calibrateGraphicPosition] = "Calibrar";
       break;

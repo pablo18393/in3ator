@@ -72,6 +72,8 @@ void iwdg_init(iwdg_prescaler prescaler, uint16_t reload) {
 #define mosfet_switch_time 100   //delay to wait for mosfet to switch (in millis), oversized
 #define timePressToSettings 5000 //in millis, time to press to go to settings window in UI
 #define debugUpdatePeriod 5000 //in millis, 
+bool UARTDebug;
+bool standardUARTDebug = 0;
 long lastDebugUpdate;
 //pages number in UI. Configuration and information will be displayed depending on the page number
 int page;
@@ -139,7 +141,7 @@ byte roomSensorAddress = 112;
 int pulsioximeterMean;
 const int maxPulsioximeterSamples = 320; //(tft width).
 float currentConsumption, currentConsumtionStacker;
-float currentOffset=110;
+float currentOffset = 110;
 float correctionCurrentFactor = 0.0038;
 int currentConsumptionPos = 0;
 float currentConsumptionFactor = 2.685; //factor to translate current consumtion in mA
@@ -162,19 +164,18 @@ int BPM, IBI;
 String RPD; //(Raw Pulsioximeter Data)
 
 //room variables
-double desiredSkinTemp = 36.5; //preset baby skin temperature
-int desiredRoomHum = 80; //preset enviromental humidity
-int fanSpeed; //PWM that controls fan speed
+double desiredSkinTemp = 34; //preset baby skin temperature
+int desiredRoomHum = 75; //preset enviromental humidity
 bool jaundiceEnable; //PWM that controls jaundice LED intensity
-double maxHeaterTemp; //maximum heater temperature
+double maxHeaterPower; //maximum heater power
 double desiredHeaterTemp; //desired temperature in heater
 
 //preset room variables
-const byte standardmaxHeaterTemp = 85; //preset max heater temperature in celsious
-const byte standardFanSpeed = 100;
+const byte standardmaxHeaterPower = 100; //preset max heater temperature in celsious
 
 //constants
-const byte heaterMaxTemp = 100; //maximum temperature in heater to be set
+const byte heaterPowerLimit = 100; //maximum temperature in heater to be set
+const byte heaterPowerMin = 10; //maximum temperature in heater to be set
 const byte minTemp = 15; //minimum allowed temperature to be set
 const byte maxTemp = 45; //maximum allowed temperature to be set
 const byte maxHum = 100; //maximum allowed humidity to be set
@@ -246,7 +247,8 @@ int barWidth, barHeight, tempBarPosX, tempBarPosY, humBarPosX, humBarPosY;
 byte barThickness;
 
 //User Interface display variables
-bool auto_lock; //setting that enables backlight switch OFF after a given time of no user actions
+bool autoLock; //setting that enables backlight switch OFF after a given time of no user actions
+bool standardAutoLock; //setting that enables backlight switch OFF after a given time of no user actions
 int time_lock = 16000; //time to lock screen if no user actions
 int TFT_LED_PWR = 25000; //PWM that will be supplied to backlight LEDs
 const byte time_back_draw = 255;
@@ -291,10 +293,10 @@ byte goToProcessRow;
 //settings
 #define autoLockGraphicPosition 0
 #define languageGraphicPosition 1
-#define setStandardValuesGraphicPosition 2
-#define calibrateGraphicPosition 3
-#define heaterTempGraphicPosition 4
-#define fanGraphicPosition 5
+#define heaterPowerGraphicPosition 2
+#define DebugENGraphicPosition 3
+#define calibrateGraphicPosition 4
+#define setStandardValuesGraphicPosition 5
 //calibration
 #define temperatureCalibrationGraphicPosition 0
 #define humidityCalibrationGraphicPosition 1
@@ -342,13 +344,13 @@ RotaryEncoder encoder(ENC_A, ENC_B, RotaryEncoder::LatchMode::TWO03);
 
 // timers configuration
 #define NTCInterruptRate 20000    // in microseconds; 
-#define heaterPIDRate 200000   // times of roomPIDRate;
+#define heaterPeriod 1000   // times of roomPIDRate;
 #define buzzerStandardPeriod 500    // in microseconds, also for BUZZER optimal frequency (2khz); Prescale factor 6, Overflow 36000
 #define roomPIDRate 1000000    // in microseconds. Prescale factor 2, Overflow 65535
 #define peripheralsISRPeriod 1000    // in microseconds. Prescale factor 2, Overflow 36000
 #define backlightTimerPeriod 100 //in microseconds, to generate a 110Khz PWM for ultra sonic humidifier. Prescale factor 1, Overflow 648
 int roomPIDfactor = roomPIDRate / NTCInterruptRate;
-int heaterPIDfactor = heaterPIDRate / NTCInterruptRate;
+int heaterPIDfactor = heaterPeriod / NTCInterruptRate;
 volatile long interruptcounter;
 /*
   STM32F103RE Timers
@@ -361,8 +363,9 @@ volatile long interruptcounter;
 */
 
 HardwareTimer buzzerTimer(8);
-HardwareTimer humidifierTimer(4);
+HardwareTimer TFTbacklightTimer(4);
 HardwareTimer encoderTimer(2);
+HardwareTimer heaterTimer(1);
 
 int hardwareComponents;
 

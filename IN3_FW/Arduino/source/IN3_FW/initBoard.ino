@@ -31,7 +31,4 @@ void initTimers() {
   nvic_irq_set_priority(NVIC_UART4 , 14);
   encoderTimer.refresh();
   encoderTimer.resume();
-
-  humidifierMaxPWM = humidifierTimer.getOverflow();
-  screenBackLightMaxPWM = humidifierTimer.getOverflow();
 }

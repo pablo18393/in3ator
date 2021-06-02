@@ -100,7 +100,7 @@ void basictemperatureControl() {
     heatUp();
   }
   else {
-    digitalWrite(HEATER, LOW);
+    pwmWrite(HEATER, LOW);
   }
 }
 
@@ -114,11 +114,11 @@ void basicHumidityControl() {
 }
 
 void heatUp() {
-  digitalWrite(HEATER, HIGH);
+  pwmWrite(HEATER, heaterMaxPWM * maxHeaterPower / 100 );
 }
 
 void turnActuators(bool mode) {
-  digitalWrite(HEATER, mode);
+  pwmWrite(HEATER, mode * heaterMaxPWM * maxHeaterPower / 100 );
   digitalWrite(HUMIDIFIER, mode);
 }
 

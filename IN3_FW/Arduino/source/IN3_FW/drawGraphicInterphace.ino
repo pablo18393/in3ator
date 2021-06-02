@@ -64,7 +64,7 @@ void graphics() {
         case settingsPage:
           switch (i) {
             case autoLockGraphicPosition:
-              if (auto_lock) {
+              if (autoLock) {
                 switch (language) {
                   case spanish:
                     textToWrite = "SI";
@@ -115,14 +115,17 @@ void graphics() {
               }
               tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
               break;
-            case heaterTempGraphicPosition:
-              drawRightNumber(maxHeaterTemp, 280, ypos);
-              tft.drawRightString("C", unitPosition, ypos, textFontSize);
-              break;
-            case fanGraphicPosition:
-              drawRightNumber(fanSpeed, 280, ypos);
+            case heaterPowerGraphicPosition:
+              drawRightNumber(maxHeaterPower, 280, ypos);
               tft.drawRightString("%", unitPosition, ypos, textFontSize);
               break;
+            case DebugENGraphicPosition:
+              if (UARTDebug) {
+                tft.drawRightString("ON", unitPosition, ypos, textFontSize);
+              }
+              else {
+                tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
+              }
           }
           break;
         case calibrateSensorsPage:

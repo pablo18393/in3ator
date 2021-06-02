@@ -164,7 +164,7 @@ void peripheralsISR() {
 }
 
 void userInteraction() {
-  if (auto_lock) {
+  if (autoLock) {
     if (millis() - lastUserInteraction > time_lock) {
       digitalWrite(SCREENBACKLIGHT, HIGH);
     }

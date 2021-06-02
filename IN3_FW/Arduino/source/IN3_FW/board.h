@@ -6,7 +6,6 @@
 //Hardware
 #define SPI_SEL 1
 #define SDCard 0
-#define SerialDebug 1
 
 #ifdef v6Board
 #define SYSTEM_SHUNT PA0
@@ -40,6 +39,5 @@
 #define maxADCvalue 4095
 #define maxDACvalue 4095         //for STM32F103RE with arduino IDE
 int screenBackLightMaxPWM;
-int fanHPMaxPWM;
-int humidifierMaxPWM;
+int heaterMaxPWM;
 int buzzerMaxPWM;

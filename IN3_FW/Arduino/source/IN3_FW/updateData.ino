@@ -10,7 +10,7 @@ int updateData() {
     encPulseDetected = 0;
   }
   if (millis() - lastDebugUpdate > debugUpdatePeriod) {
-    logln("[SENSORS] -> Current consumption is: " + String (currentConsumption) + " Amps, instant measure is " + String(analogRead(SYSTEM_SHUNT)));
+    logln("[SENSORS] -> Current consumption is: " + String (currentConsumption) + " Amps");
     logln("[SENSORS] -> baby temperature: " + String(temperature[babyNTC]) + "ºC");
     logln("[SENSORS] -> Floor temperature: " + String(temperature[digitalTempSensor]) + "ºC");
     logln("[SENSORS] -> Humidity: " + String(humidity) + "%");
@@ -76,7 +76,7 @@ void printStatus() {
   //log(";");
   //log(desiredSkinTemp);
   //log(";");
-  //log(maxHeaterTemp);
+  //log(maxHeaterPower);
   //log(";");
   for (int i = 0; i < numTempSensors; i++) {
     //log(temperature[i]);
@@ -123,7 +123,7 @@ void log(String dataString) {
     digitalWrite(SD_CS, HIGH);
     digitalWrite(TFT_CS, LOW);
   }
-  if (SerialDebug) {
+  if (UARTDebug) {
     Serial4.print(dataString);
   }
 }

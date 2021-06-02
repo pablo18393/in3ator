@@ -3,8 +3,8 @@
 #define EEPROM_firstTurnOn 0
 #define EEPROM_autoLock 1
 #define EEPROM_language 2
-#define EEPROM_maxHeaterTemp 3
-#define EEPROM_fanSpeed 5
+#define EEPROM_maxHeaterPower 3
+#define EEPROM_UARTDebug 5
 #define EEPROM_diffHumidity 10
 #define EEPROM_diffTemperature 20
 #define EEPROM_usedGenericMosfet 40
@@ -47,16 +47,16 @@ void initEEPROM() {
 }
 
 void loadStandardValues() {
-  auto_lock = 0;
-  EEPROM.write(EEPROM_autoLock, auto_lock);
-  maxHeaterTemp = standardmaxHeaterTemp;
-  EEPROM.write(EEPROM_maxHeaterTemp, maxHeaterTemp);
-  fanSpeed = standardFanSpeed;
-  EEPROM.write(EEPROM_fanSpeed, fanSpeed);
+  autoLock = standardAutoLock;
+  EEPROM.write(EEPROM_autoLock, autoLock);
+  maxHeaterPower = standardmaxHeaterPower;
+  EEPROM.write(EEPROM_maxHeaterPower, maxHeaterPower);
+  UARTDebug = standardUARTDebug;
+  EEPROM.write(EEPROM_UARTDebug, UARTDebug);
 }
 
 void recapVariables() {
-  auto_lock = EEPROM.read(EEPROM_autoLock);
+  autoLock = EEPROM.read(EEPROM_autoLock);
   language = EEPROM.read(EEPROM_language);
   diffTemperature[babyNTC] = EEPROM.read(EEPROM_diffTemperature);
   if (diffTemperature[babyNTC] > 1000) {
@@ -67,8 +67,8 @@ void recapVariables() {
   if (diffHumidity > 1000) {
     diffHumidity -= 65535;
   }
-  maxHeaterTemp = EEPROM.read(EEPROM_maxHeaterTemp);
-  fanSpeed = EEPROM.read(EEPROM_fanSpeed);
+  maxHeaterPower = EEPROM.read(EEPROM_maxHeaterPower);
+  UARTDebug = EEPROM.read(EEPROM_UARTDebug);
 }
 
 long EEPROMReadLong(int p_address)

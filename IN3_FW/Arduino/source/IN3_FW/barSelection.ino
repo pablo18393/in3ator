@@ -213,7 +213,7 @@ void barSelection() {
                 updateData();
                 if (EncMove) {
                   tft.setTextColor(COLOR_MENU);
-                  if (auto_lock) {
+                  if (autoLock) {
                     switch (language) {
                       case spanish:
                         textToWrite = "SI";
@@ -280,8 +280,8 @@ void barSelection() {
                     }
                     tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
                   }
-                  auto_lock = !auto_lock;
-                  EEPROM.write(EEPROM_autoLock, auto_lock);
+                  autoLock = !autoLock;
+                  EEPROM.write(EEPROM_autoLock, autoLock);
                   EncMove = 0;
                 }
               }
@@ -335,61 +335,43 @@ void barSelection() {
               }
               settings();
               break;
-            case heaterTempGraphicPosition:
+            case heaterPowerGraphicPosition:
               while (digitalRead(ENC_SWITCH) ) {
                 updateData();
-                if (EncMove && -EncMove + maxHeaterTemp >= 0 && -EncMove + maxHeaterTemp <= heaterMaxTemp) {
+                if (EncMove && -EncMove + maxHeaterPower >= heaterPowerMin && -EncMove + maxHeaterPower <= heaterPowerLimit) {
                   tft.setTextColor(COLOR_MENU);
-                  drawRightNumber(maxHeaterTemp, 280, ypos);
-                  if (!maxHeaterTemp && EncMove) {
-                    tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
-                    tft.setTextColor(COLOR_MENU_TEXT);
-                    tft.drawRightString("C", unitPosition, ypos, textFontSize);
-                  }
-                  maxHeaterTemp -= 5 * EncMove;
-                  EEPROM.write(EEPROM_maxHeaterTemp, maxHeaterTemp);
+                  drawRightNumber(maxHeaterPower, 280, ypos);
+                  maxHeaterPower -= 2 * EncMove;
+                  EEPROM.write(EEPROM_maxHeaterPower, maxHeaterPower);
                   tft.setTextColor(COLOR_MENU_TEXT);
-                  if (!maxHeaterTemp && EncMove) {
-                    tft.setTextColor(COLOR_MENU);
-                    tft.drawRightString("C", unitPosition, ypos, textFontSize);
-                    tft.setTextColor(COLOR_MENU_TEXT);
-                    tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
-                  }
-                  else {
-                    drawRightNumber(maxHeaterTemp, 280, ypos);
-                  }
+                  drawRightNumber(maxHeaterPower, 280, ypos);
                 }
                 EncMove = 0;
               }
               break;
-            case fanGraphicPosition:
+            case DebugENGraphicPosition:
               while (digitalRead(ENC_SWITCH)) {
                 updateData();
-                turnFans(ON);
-                if (EncMove && -EncMove + fanSpeed >= 0 && -EncMove + fanSpeed <= fanMaxSpeed) {
+                if (EncMove) {
+                  UARTDebug = !UARTDebug;
+                  EEPROM.write(EEPROM_UARTDebug, UARTDebug);
                   tft.setTextColor(COLOR_MENU);
-                  drawRightNumber(fanSpeed, 280, ypos);
-                  if (!fanSpeed && EncMove) {
-                    tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
-                    tft.setTextColor(COLOR_MENU_TEXT);
-                    tft.drawRightString("%", unitPosition, ypos, textFontSize);
-                  }
-                  fanSpeed -= 5 * EncMove;
-                  EEPROM.write(EEPROM_fanSpeed, fanSpeed);
-                  tft.setTextColor(COLOR_MENU_TEXT);
-                  if (!fanSpeed && EncMove) {
-                    tft.setTextColor(COLOR_MENU);
-                    tft.drawRightString("%", unitPosition, ypos, textFontSize);
-                    tft.setTextColor(COLOR_MENU_TEXT);
+                  if (UARTDebug) {
                     tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
                   }
                   else {
-                    drawRightNumber(fanSpeed, 280, ypos);
+                    tft.drawRightString("ON", unitPosition, ypos, textFontSize);
                   }
+                  tft.setTextColor(COLOR_MENU_TEXT);
+                  if (UARTDebug) {
+                    tft.drawRightString("ON", unitPosition, ypos, textFontSize);
+                  }
+                  else {
+                    tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
+                  }
+                  EncMove = 0;
                 }
-                EncMove = 0;
               }
-              turnFans(OFF);
               break;
             case setStandardValuesGraphicPosition:
               loadStandardValues();

@@ -63,6 +63,7 @@ void initHardware() {
   initTFT();
   buzzerTest();
   initSensors();
+  initHeater();
   initPowerEn();
   actuatorsTest();
   if (!HW_error) {
@@ -84,7 +85,6 @@ void initHardware() {
 void initPins() {
   logln("[HW] -> Initialiting pins");
   pinMode(PHOTOTHERAPY, OUTPUT);
-  pinMode(HEATER, OUTPUT);
   pinMode(FAN, OUTPUT);
   pinMode(HUMIDIFIER, OUTPUT);
   pinMode(ENC_SWITCH, INPUT_PULLUP);
@@ -95,6 +95,8 @@ void initPins() {
   pinMode(encoderpinB, INPUT_PULLUP);
   pinMode(SYSTEM_SHUNT, INPUT);
   pinMode(PWR_ALERT, INPUT);
+  pinMode(HEATER, PWM);
+  pwmWrite(HEATER, 0);
   pinMode(BUZZER, PWM);
   pwmWrite(BUZZER, 0);
   digitalWrite(SCREENBACKLIGHT, HIGH);
@@ -233,12 +235,26 @@ void initTFT() {
   GPRSSetPostVariables(NULL, ",TFT:" + String (testCurrent));
 }
 
-void configTFTBacklightTimer(int freq) {
+void initHeater() {
+  configHeaterTimer(heaterPeriod);
+}
+
+void configHeaterTimer(int freq) {
   //humidifier timer configuration:
-  humidifierTimer.pause();
-  humidifierTimer.setPeriod(freq); // in microseconds
-  humidifierTimer.refresh();
-  humidifierTimer.resume();
+  heaterTimer.pause();
+  heaterTimer.setPeriod(freq); // in microseconds
+  heaterTimer.refresh();
+  heaterTimer.resume();
+  heaterMaxPWM = heaterTimer.getOverflow();
+}
+
+void configTFTBacklightTimer(int freq) { 
+  //humidifier timer configuration:
+  TFTbacklightTimer.pause();
+  TFTbacklightTimer.setPeriod(freq); // in microseconds
+  TFTbacklightTimer.refresh();
+  TFTbacklightTimer.resume();
+  screenBackLightMaxPWM = TFTbacklightTimer.getOverflow();
 }
 
 void configBuzzerTimer(int freq) {
@@ -334,7 +350,7 @@ void actuatorsTest() {
   float testCurrent, offsetCurrent;
   offsetCurrent = sampleConsumption();
   logln("[HW] -> Checking actuators...");
-  digitalWrite(HEATER, HIGH);
+  pwmWrite(HEATER, heaterMaxPWM * maxHeaterPower / 100 );
   testCurrent = sampleConsumption() - offsetCurrent;
   logln("[HW] -> Heater current consumption: " + String (testCurrent) + " Amps");
   GPRSSetPostVariables(NULL, ",Hea:" + String (testCurrent));
@@ -346,7 +362,7 @@ void actuatorsTest() {
     HW_error += HEATER_CONSUMPTION_MAX_ERROR;
     logln("[HW] -> Fail -> Heater current consumption is too high");
   }
-  digitalWrite(HEATER, LOW);
+  pwmWrite(HEATER, LOW);
   digitalWrite(FAN, HIGH);
   testCurrent = sampleConsumption() - offsetCurrent;
   logln("[HW] -> FAN consumption: " + String (testCurrent) + " Amps");
