@@ -71,7 +71,7 @@ void iwdg_init(iwdg_prescaler prescaler, uint16_t reload) {
 #define debounceTime 100         //encoder debouncing time
 #define mosfet_switch_time 100   //delay to wait for mosfet to switch (in millis), oversized
 #define timePressToSettings 5000 //in millis, time to press to go to settings window in UI
-#define debugUpdatePeriod 5000 //in millis, 
+#define debugUpdatePeriod 1000 //in millis, 
 bool UARTDebug;
 bool standardUARTDebug = 0;
 long lastDebugUpdate;
@@ -167,14 +167,14 @@ String RPD; //(Raw Pulsioximeter Data)
 double desiredSkinTemp = 34; //preset baby skin temperature
 int desiredRoomHum = 75; //preset enviromental humidity
 bool jaundiceEnable; //PWM that controls jaundice LED intensity
-double maxHeaterPower; //maximum heater power
+double HeaterPower; //maximum heater power
 double desiredHeaterTemp; //desired temperature in heater
 
 //preset room variables
-const byte standardmaxHeaterPower = 100; //preset max heater temperature in celsious
+const byte standardHeaterPower = 100; //preset max heater temperature in celsious
 
 //constants
-const byte heaterPowerLimit = 100; //maximum temperature in heater to be set
+const byte heaterPowerMax = 100; //maximum temperature in heater to be set
 const byte heaterPowerMin = 10; //maximum temperature in heater to be set
 const byte minTemp = 15; //minimum allowed temperature to be set
 const byte maxTemp = 45; //maximum allowed temperature to be set
@@ -344,15 +344,6 @@ TwoWire WIRE2 (2, I2C_FAST_MODE);
 RotaryEncoder encoder(ENC_A, ENC_B, RotaryEncoder::LatchMode::TWO03);
 
 // timers configuration
-#define NTCInterruptRate 20000    // in microseconds; 
-#define buzzerStandardPeriod 500    // in microseconds, also for BUZZER optimal frequency (2khz); Prescale factor 6, Overflow 36000
-#define roomPIDRate 1000000    // in microseconds
-#define peripheralsISRPeriod 1000    // in microseconds
-#define heaterPeriod 20*peripheralsISRPeriod   // in microseconds. Heater period, antialiasing factor for current sensing
-#define backlightTimerPeriod 100 //in microseconds
-int roomPIDfactor = roomPIDRate / NTCInterruptRate;
-int heaterPIDfactor = heaterPeriod / NTCInterruptRate;
-volatile long interruptcounter;
 /*
   STM32F103RE Timers
   Timer Ch. 1 Ch. 2 Ch. 3 Ch. 4
@@ -365,8 +356,16 @@ volatile long interruptcounter;
 
 HardwareTimer buzzerTimer(8);
 HardwareTimer TFTbacklightTimer(4);
+HardwareTimer PIDTimer(3);
 HardwareTimer encoderTimer(2);
 HardwareTimer heaterTimer(1);
+
+#define buzzerStandardPeriod 500    // in microseconds, also for BUZZER optimal frequency (2khz); Prescale factor 6, Overflow 36000
+#define PIDISRPeriod 200000    // in microseconds
+#define peripheralsISRPeriod 1000    // in microseconds
+#define heaterTimerPeriod 20*peripheralsISRPeriod   // in microseconds. Heater period, antialiasing factor for current sensing
+#define backlightTimerPeriod 100 //in microseconds
+
 
 int hardwareComponents;
 

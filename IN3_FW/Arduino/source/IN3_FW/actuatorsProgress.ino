@@ -63,10 +63,11 @@ void actuatorsProgress() {
   if (temperatureAtStart > temperature[babyNTC]) {
     temperatureAtStart = temperature[babyNTC];
   }
+  startHeaterPID();
   while (1) {
     updateData();
     if (controlTemperature) {
-      basictemperatureControl();
+      //basictemperatureControl();
     }
     if (controlHumidity) {
       basicHumidityControl();
@@ -114,11 +115,11 @@ void basicHumidityControl() {
 }
 
 void heatUp() {
-  pwmWrite(HEATER, heaterMaxPWM * maxHeaterPower / 100 );
+  pwmWrite(HEATER, heaterMaxPWM * HeaterPower / 100);
 }
 
 void turnActuators(bool mode) {
-  pwmWrite(HEATER, mode * heaterMaxPWM * maxHeaterPower / 100 );
+  pwmWrite(HEATER, mode * heaterMaxPWM * HeaterPower / 100 );
   digitalWrite(HUMIDIFIER, mode);
 }
 

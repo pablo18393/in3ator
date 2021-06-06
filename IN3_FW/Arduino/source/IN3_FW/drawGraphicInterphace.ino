@@ -116,7 +116,7 @@ void graphics() {
               tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
               break;
             case heaterPowerGraphicPosition:
-              drawRightNumber(maxHeaterPower, 280, ypos);
+              drawRightNumber(HeaterPower, 280, ypos);
               tft.drawRightString("%", unitPosition, ypos, textFontSize);
               break;
             case DebugENGraphicPosition:

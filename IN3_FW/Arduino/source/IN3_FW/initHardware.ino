@@ -236,7 +236,7 @@ void initTFT() {
 }
 
 void initHeater() {
-  configHeaterTimer(heaterPeriod);
+  configHeaterTimer(heaterTimerPeriod);
 }
 
 void configHeaterTimer(int freq) {
@@ -248,7 +248,7 @@ void configHeaterTimer(int freq) {
   heaterMaxPWM = heaterTimer.getOverflow();
 }
 
-void configTFTBacklightTimer(int freq) { 
+void configTFTBacklightTimer(int freq) {
   //humidifier timer configuration:
   TFTbacklightTimer.pause();
   TFTbacklightTimer.setPeriod(freq); // in microseconds
@@ -328,12 +328,6 @@ void initPowerEn() {
   GPRSSetPostVariables(NULL, ",PWEN:" + String (testCurrent));
 }
 
-void encSwitchISR() {
-  encPulseDetected = 1;
-  buzzerTone(buzzerStandbyToneTimes, buzzerSwitchDuration, buzzerRotaryEncoderTone);
-  lastUserInteraction = millis();
-}
-
 void encoderISR() {
   int newPos;
   encoder.tick(); // just call tick() to check the state.
@@ -350,7 +344,7 @@ void actuatorsTest() {
   float testCurrent, offsetCurrent;
   offsetCurrent = sampleConsumption();
   logln("[HW] -> Checking actuators...");
-  pwmWrite(HEATER, heaterMaxPWM * maxHeaterPower / 100 );
+  pwmWrite(HEATER, heaterMaxPWM * HeaterPower / 100 );
   testCurrent = sampleConsumption() - offsetCurrent;
   logln("[HW] -> Heater current consumption: " + String (testCurrent) + " Amps");
   GPRSSetPostVariables(NULL, ",Hea:" + String (testCurrent));
@@ -362,7 +356,7 @@ void actuatorsTest() {
     HW_error += HEATER_CONSUMPTION_MAX_ERROR;
     logln("[HW] -> Fail -> Heater current consumption is too high");
   }
-  pwmWrite(HEATER, LOW);
+  pwmWrite(HEATER, 0);
   digitalWrite(FAN, HIGH);
   testCurrent = sampleConsumption() - offsetCurrent;
   logln("[HW] -> FAN consumption: " + String (testCurrent) + " Amps");

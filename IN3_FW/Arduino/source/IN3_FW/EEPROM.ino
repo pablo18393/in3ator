@@ -3,7 +3,7 @@
 #define EEPROM_firstTurnOn 0
 #define EEPROM_autoLock 1
 #define EEPROM_language 2
-#define EEPROM_maxHeaterPower 3
+#define EEPROM_HeaterPower 3
 #define EEPROM_UARTDebug 5
 #define EEPROM_diffHumidity 10
 #define EEPROM_diffTemperature 20
@@ -49,8 +49,8 @@ void initEEPROM() {
 void loadStandardValues() {
   autoLock = standardAutoLock;
   EEPROM.write(EEPROM_autoLock, autoLock);
-  maxHeaterPower = standardmaxHeaterPower;
-  EEPROM.write(EEPROM_maxHeaterPower, maxHeaterPower);
+  HeaterPower = standardHeaterPower;
+  EEPROM.write(EEPROM_HeaterPower, HeaterPower);
   UARTDebug = standardUARTDebug;
   EEPROM.write(EEPROM_UARTDebug, UARTDebug);
 }
@@ -67,7 +67,7 @@ void recapVariables() {
   if (diffHumidity > 1000) {
     diffHumidity -= 65535;
   }
-  maxHeaterPower = EEPROM.read(EEPROM_maxHeaterPower);
+  HeaterPower = EEPROM.read(EEPROM_HeaterPower);
   UARTDebug = EEPROM.read(EEPROM_UARTDebug);
 }
 

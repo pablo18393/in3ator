@@ -1,39 +1,41 @@
 
 //PID VARIABLES
-double Kp_heater = 0.1, Ki_heater = 0.3, Kd_heater = 0.1;
-double Kp_room = 0.1, Ki_room = 0.3, Kd_room = 0.1;
-double PIDOutput[2];
-bool temperaturePIDcontrolStart;
-PID heaterPID(&temperature[heaterNTC], &PIDOutput[heaterNTC], &desiredHeaterTemp, Kp_heater, Ki_heater, Kd_heater, P_ON_M, DIRECT);
-PID roomPID(&temperature[babyNTC], &PIDOutput[babyNTC], &desiredSkinTemp, Kp_room, Ki_room, Kd_room, P_ON_M, DIRECT);
+double Kp = 600, Ki = 150, Kd = 400;
+double PIDOutput;
+PID heatUPPID(&temperature[babyNTC], &PIDOutput, &desiredSkinTemp, Kp, Ki, Kd, P_ON_M, DIRECT);
 
-#define temperaturePIDcontrol 0         //0 to disable, 1 to enable
-void roomPIDInterrupt() {
-  if (temperaturePIDcontrolStart) {
-    if (interruptcounter == roomPIDfactor) {
-      interruptcounter = 0;
-      roomPID.Compute();
-      //desiredHeaterTemp = PIDOutput[babyNTC] * (maxHeaterPower - desiredSkinTemp) / (heaterMaxPWM) + desiredSkinTemp;  //map function: min value is
-    }
-    if (!(interruptcounter % heaterPIDfactor)) {
-      heaterPID.Compute();
-      heaterPower = PIDOutput[heaterNTC];
-      pwmWrite(HEATER, heaterPower);
-    }
-    interruptcounter++;
+void heatUPPIDISR() {
+  if (heatUPPID.GetMode()) {
+    heatUPPID.Compute();
+    pwmWrite(HEATER, PIDOutput);
   }
 }
 
-void startPID() {
-  roomPID.SetMode(AUTOMATIC);
-  heaterPID.SetMode(AUTOMATIC);
-  temperaturePIDcontrolStart = 1;
-  interruptcounter = 0;
+void initHeaterPIDControl() {
+  heatUPPID.SetOutputLimits(heaterMaxPWM * heaterPowerMin / 100, heaterMaxPWM * heaterPowerMax / 100);
+  heatUPPID.SetTunings(Kp, Ki, Kd);
+  configPIDTimer(PIDISRPeriod); //in micros
+  heatUPPID.SetSampleTime(PIDISRPeriod / 1000); // in millis
+  heatUPPID.SetControllerDirection(DIRECT);
 }
 
-void stopPID() {
-  roomPID.SetMode(MANUAL);
-  heaterPID.SetMode(MANUAL);
-  temperaturePIDcontrolStart = 0;
+void configPIDTimer(int freq) {
+  //PID timer configuration:
+  PIDTimer.pause();
+  PIDTimer.setPeriod(freq); // in microseconds
+  PIDTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
+  PIDTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
+  PIDTimer.attachCompare1Interrupt(heatUPPIDISR);
+  PIDTimer.refresh();
+  PIDTimer.resume();
+}
+
+void startHeaterPID() {
+  initHeaterPIDControl();
+  heatUPPID.SetMode(AUTOMATIC);
+}
+
+void stopHeaterPID() {
+  heatUPPID.SetMode(MANUAL);
   pwmWrite(HEATER, 0);
 }

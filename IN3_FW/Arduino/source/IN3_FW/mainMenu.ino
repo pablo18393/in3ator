@@ -48,9 +48,7 @@ void mainMenu() {
 
 void askSuccess() {
   if (page == actuatorsProgressPage) {
-    if (temperaturePIDcontrol) {
-      stopPID();
-    }
+    stopHeaterPID();
     turnActuators(OFF);
     turnFans(OFF);
     GPRSSetPostVariables(actuatorsModeOFF, "");

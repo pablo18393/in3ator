@@ -3,16 +3,6 @@
 void sensorsISR() {
   measurenumNTC();
   measureConsumption();
-
-  /*
-    readPulsioximeter();
-    if (!pulsioximeterCount) {
-    pulsioximeterCount = pulsioximeterRate;
-    calculatePulsioximeterValues();
-    }
-    pulsioximeterCount--;
-      checkNewPulsioximeterData();
-  */
 }
 
 float sampleConsumption() {
@@ -155,12 +145,6 @@ bool updateRoomSensor() {
     temperature[digitalTempSensor] = mySHTC3.toDegC(); //Add here measurement to temp array
     humidity = int(mySHTC3.toPercent()) + diffHumidity;
   }
-}
-
-void peripheralsISR() {
-  sensorsISR();
-  buzzerISR();
-  userInteraction();
 }
 
 void userInteraction() {

@@ -338,13 +338,13 @@ void barSelection() {
             case heaterPowerGraphicPosition:
               while (digitalRead(ENC_SWITCH) ) {
                 updateData();
-                if (EncMove && -EncMove + maxHeaterPower >= heaterPowerMin && -EncMove + maxHeaterPower <= heaterPowerLimit) {
+                if (EncMove && -EncMove + HeaterPower >= heaterPowerMin && -EncMove + HeaterPower <= heaterPowerMax) {
                   tft.setTextColor(COLOR_MENU);
-                  drawRightNumber(maxHeaterPower, 280, ypos);
-                  maxHeaterPower -= 10 * EncMove;
-                  EEPROM.write(EEPROM_maxHeaterPower, maxHeaterPower);
+                  drawRightNumber(HeaterPower, 280, ypos);
+                  HeaterPower -= 10 * EncMove;
+                  EEPROM.write(EEPROM_HeaterPower, HeaterPower);
                   tft.setTextColor(COLOR_MENU_TEXT);
-                  drawRightNumber(maxHeaterPower, 280, ypos);
+                  drawRightNumber(HeaterPower, 280, ypos);
                 }
                 EncMove = 0;
               }

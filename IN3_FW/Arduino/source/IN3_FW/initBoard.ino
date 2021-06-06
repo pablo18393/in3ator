@@ -26,9 +26,6 @@ void initTimers() {
   encoderTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
   encoderTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
   encoderTimer.attachCompare1Interrupt(peripheralsISR);
-  nvic_irq_set_priority(NVIC_TIMER8_CC, 15);
-  nvic_irq_set_priority(NVIC_USART1 , 13);
-  nvic_irq_set_priority(NVIC_UART4 , 14);
   encoderTimer.refresh();
   encoderTimer.resume();
 }

@@ -104,7 +104,7 @@ int GPRSsequence = 0;
 
 struct GPRSstruct GPRS;
 
-void GPRSISR() {
+void GPRS_Handler() {
   if (GPRS.enable) {
     if (GPRS.powerUp) {
       GPRSPowerUp();

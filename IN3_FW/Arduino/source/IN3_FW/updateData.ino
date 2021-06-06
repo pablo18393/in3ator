@@ -1,6 +1,6 @@
 int updateData() {
   watchdogReload();
-  GPRSISR();
+  GPRS_Handler();
   if (powerAlert) {
     logln("[ALARM] -> maximum power exceeded");
     powerAlert = 0;
@@ -10,6 +10,9 @@ int updateData() {
     encPulseDetected = 0;
   }
   if (millis() - lastDebugUpdate > debugUpdatePeriod) {
+    if (heatUPPID.GetMode()) {
+      logln("[PID] -> PWM output is: " + String (PIDOutput / heaterMaxPWM * 100) + " %");
+    }
     logln("[SENSORS] -> Current consumption is: " + String (currentConsumption) + " Amps");
     logln("[SENSORS] -> baby temperature: " + String(temperature[babyNTC]) + "ºC");
     logln("[SENSORS] -> Floor temperature: " + String(temperature[digitalTempSensor]) + "ºC");
@@ -20,9 +23,6 @@ int updateData() {
     updateRoomSensor();
     if (page == advancedModePage || page == actuatorsProgressPage) {
       updateDisplaySensors();
-      if (page == actuatorsProgressPage) {
-        printStatus();
-      }
     }
     lastGraphicSensorsUpdate = millis();
   }
@@ -67,30 +67,6 @@ void updateDisplaySensors() {
       updateLoadingHumidityBar(int(previousHumidityPercentage), int(humidityPercentage));
     }
   }
-}
-
-
-
-void printStatus() {
-  //log(millis() / 1000);
-  //log(";");
-  //log(desiredSkinTemp);
-  //log(";");
-  //log(maxHeaterPower);
-  //log(";");
-  for (int i = 0; i < numTempSensors; i++) {
-    //log(temperature[i]);
-    //log(";");
-  }
-  //log(desiredHeaterTemp);
-  //log(";");
-  //log(humidity);
-  //log(";");
-  //log(desiredRoomHum);
-  //log(";");
-  //log(heaterPower);
-  //log(";");
-  //consumptionMeanSamples(String(PIDOutput[heaterNTC]));
 }
 
 void logln(String dataString) {
