@@ -82,9 +82,6 @@ void barSelection() {
               advancedMode();
               break;
             case LEDGraphicPosition:
-              while (digitalRead(ENC_SWITCH)) {
-                updateData();
-                if (EncMove) {
                   jaundiceEnable = !jaundiceEnable;
                   tft.setTextColor(COLOR_MENU);
                   if (jaundiceEnable) {
@@ -106,9 +103,6 @@ void barSelection() {
                     setGPRSPostPeriod(standByGPRSPostPeriod);
                   }
                   digitalWrite(PHOTOTHERAPY, jaundiceEnable);
-                  EncMove = 0;
-                }
-              }
               break;
             case settingsGraphicPosition:
               settings();
@@ -159,33 +153,27 @@ void barSelection() {
               drawStartMessage();
               break;
             case LEDGraphicPosition:
-              while (digitalRead(ENC_SWITCH)) {
-                updateData();
-                if (EncMove) {
-                  jaundiceEnable = !jaundiceEnable;
-                  tft.setTextColor(COLOR_MENU);
-                  if (jaundiceEnable) {
-                    tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
-                  }
-                  else {
-                    tft.drawRightString("ON", unitPosition, ypos, textFontSize);
-                  }
-                  tft.setTextColor(COLOR_MENU_TEXT);
-                  if (jaundiceEnable) {
-                    tft.drawRightString("ON", unitPosition, ypos, textFontSize);
-                    GPRSSetPostVariables(jaundiceLEDON, "");
-                    setGPRSPostPeriod(jaundiceGPRSPostPeriod);
-                  }
-                  else {
-                    tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
-                    GPRSSetPostVariables(jaundiceLEDOFF, "");
-                    GPRSSetPostVariables(jaundiceLEDOFF, "");
-                    setGPRSPostPeriod(standByGPRSPostPeriod);
-                  }
-                  digitalWrite(PHOTOTHERAPY, jaundiceEnable);
-                  EncMove = 0;
-                }
+              jaundiceEnable = !jaundiceEnable;
+              tft.setTextColor(COLOR_MENU);
+              if (jaundiceEnable) {
+                tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
               }
+              else {
+                tft.drawRightString("ON", unitPosition, ypos, textFontSize);
+              }
+              tft.setTextColor(COLOR_MENU_TEXT);
+              if (jaundiceEnable) {
+                tft.drawRightString("ON", unitPosition, ypos, textFontSize);
+                GPRSSetPostVariables(jaundiceLEDON, "");
+                setGPRSPostPeriod(jaundiceGPRSPostPeriod);
+              }
+              else {
+                tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
+                GPRSSetPostVariables(jaundiceLEDOFF, "");
+                GPRSSetPostVariables(jaundiceLEDOFF, "");
+                setGPRSPostPeriod(standByGPRSPostPeriod);
+              }
+              digitalWrite(PHOTOTHERAPY, jaundiceEnable);
               break;
             case settingsGraphicPosition:
               settings();
@@ -209,82 +197,76 @@ void barSelection() {
         case settingsPage:
           switch (bar_pos - graphicTextOffset ) {
             case autoLockGraphicPosition:
-              while (digitalRead(ENC_SWITCH)) {
-                updateData();
-                if (EncMove) {
-                  tft.setTextColor(COLOR_MENU);
-                  if (autoLock) {
-                    switch (language) {
-                      case spanish:
-                        textToWrite = "SI";
-                        break;
-                      case english:
-                        textToWrite = "YES";
-                        break;
-                      case french:
-                        textToWrite = "OUI";
-                        break;
-                      case portuguese:
-                        textToWrite = "SIM";
-                        break;
-                    }
-                    tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
-                    tft.setTextColor(COLOR_MENU_TEXT);
-                    switch (language) {
-                      case spanish:
-                        textToWrite = "NO";
-                        break;
-                      case english:
-                        textToWrite = "NO";
-                        break;
-                      case french:
-                        textToWrite = "PAS";
-                        break;
-                      case portuguese:
-                        textToWrite = "NAO";
-                        break;
-                    }
-                    tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
-                  }
-                  else {
-                    tft.setTextColor(COLOR_MENU);
-                    switch (language) {
-                      case spanish:
-                        textToWrite = "NO";
-                        break;
-                      case english:
-                        textToWrite = "NO";
-                        break;
-                      case french:
-                        textToWrite = "PAS";
-                        break;
-                      case portuguese:
-                        textToWrite = "NAO";
-                        break;
-                    }
-                    tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
-                    tft.setTextColor(COLOR_MENU_TEXT);
-                    switch (language) {
-                      case spanish:
-                        textToWrite = "SI";
-                        break;
-                      case english:
-                        textToWrite = "YES";
-                        break;
-                      case french:
-                        textToWrite = "OUI";
-                        break;
-                      case portuguese:
-                        textToWrite = "SIM";
-                        break;
-                    }
-                    tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
-                  }
-                  autoLock = !autoLock;
-                  EEPROM.write(EEPROM_autoLock, autoLock);
-                  EncMove = 0;
+              tft.setTextColor(COLOR_MENU);
+              if (autoLock) {
+                switch (language) {
+                  case spanish:
+                    textToWrite = "SI";
+                    break;
+                  case english:
+                    textToWrite = "YES";
+                    break;
+                  case french:
+                    textToWrite = "OUI";
+                    break;
+                  case portuguese:
+                    textToWrite = "SIM";
+                    break;
                 }
+                tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
+                tft.setTextColor(COLOR_MENU_TEXT);
+                switch (language) {
+                  case spanish:
+                    textToWrite = "NO";
+                    break;
+                  case english:
+                    textToWrite = "NO";
+                    break;
+                  case french:
+                    textToWrite = "PAS";
+                    break;
+                  case portuguese:
+                    textToWrite = "NAO";
+                    break;
+                }
+                tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
               }
+              else {
+                tft.setTextColor(COLOR_MENU);
+                switch (language) {
+                  case spanish:
+                    textToWrite = "NO";
+                    break;
+                  case english:
+                    textToWrite = "NO";
+                    break;
+                  case french:
+                    textToWrite = "PAS";
+                    break;
+                  case portuguese:
+                    textToWrite = "NAO";
+                    break;
+                }
+                tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
+                tft.setTextColor(COLOR_MENU_TEXT);
+                switch (language) {
+                  case spanish:
+                    textToWrite = "SI";
+                    break;
+                  case english:
+                    textToWrite = "YES";
+                    break;
+                  case french:
+                    textToWrite = "OUI";
+                    break;
+                  case portuguese:
+                    textToWrite = "SIM";
+                    break;
+                }
+                tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
+              }
+              autoLock = !autoLock;
+              EEPROM.write(EEPROM_autoLock, autoLock);
               break;
             case languageGraphicPosition:
               while (digitalRead(ENC_SWITCH)) {
@@ -335,6 +317,24 @@ void barSelection() {
               }
               settings();
               break;
+            case controlModeGraphicPosition:
+              controlMode = !controlMode;
+              EEPROM.write(EEPROM_controlMode, controlMode);
+              tft.setTextColor(COLOR_MENU);
+              if (controlMode) {
+                tft.drawRightString("BASIC", unitPosition, ypos, textFontSize);
+              }
+              else {
+                tft.drawRightString("PID", unitPosition, ypos, textFontSize);
+              }
+              tft.setTextColor(COLOR_MENU_TEXT);
+              if (controlMode) {
+                tft.drawRightString("PID", unitPosition, ypos, textFontSize);
+              }
+              else {
+                tft.drawRightString("BASIC", unitPosition, ypos, textFontSize);
+              }
+              break;
             case heaterPowerGraphicPosition:
               while (digitalRead(ENC_SWITCH) ) {
                 updateData();
@@ -350,27 +350,21 @@ void barSelection() {
               }
               break;
             case DebugENGraphicPosition:
-              while (digitalRead(ENC_SWITCH)) {
-                updateData();
-                if (EncMove) {
-                  UARTDebug = !UARTDebug;
-                  EEPROM.write(EEPROM_UARTDebug, UARTDebug);
-                  tft.setTextColor(COLOR_MENU);
-                  if (UARTDebug) {
-                    tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
-                  }
-                  else {
-                    tft.drawRightString("ON", unitPosition, ypos, textFontSize);
-                  }
-                  tft.setTextColor(COLOR_MENU_TEXT);
-                  if (UARTDebug) {
-                    tft.drawRightString("ON", unitPosition, ypos, textFontSize);
-                  }
-                  else {
-                    tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
-                  }
-                  EncMove = 0;
-                }
+              UARTDebug = !UARTDebug;
+              EEPROM.write(EEPROM_UARTDebug, UARTDebug);
+              tft.setTextColor(COLOR_MENU);
+              if (UARTDebug) {
+                tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
+              }
+              else {
+                tft.drawRightString("ON", unitPosition, ypos, textFontSize);
+              }
+              tft.setTextColor(COLOR_MENU_TEXT);
+              if (UARTDebug) {
+                tft.drawRightString("ON", unitPosition, ypos, textFontSize);
+              }
+              else {
+                tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
               }
               break;
             case setStandardValuesGraphicPosition:

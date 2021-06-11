@@ -63,11 +63,15 @@ void actuatorsProgress() {
   if (temperatureAtStart > temperature[babyNTC]) {
     temperatureAtStart = temperature[babyNTC];
   }
-  startHeaterPID();
+  if (controlMode == PID_CONTROL) {
+    startHeaterPID();
+  }
   while (1) {
     updateData();
     if (controlTemperature) {
-      //basictemperatureControl();
+      if (controlMode == BASIC_CONTROL) {
+        basictemperatureControl();
+      }
     }
     if (controlHumidity) {
       basicHumidityControl();

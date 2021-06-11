@@ -8,7 +8,8 @@
 #define EEPROM_diffHumidity 0x60
 #define EEPROM_diffTemperature 0x70
 #define EEPROM_usedGenericMosfet 0x80
-#define EEPROM_checkStatus 0x90
+#define EEPROM_controlMode 0x80
+#define EEPROM_checkStatus 0xF0
 
 bool firstTurnOn;
 
@@ -55,7 +56,8 @@ void loadStandardValues() {
   EEPROM.write(EEPROM_UARTDebug, UARTDebug);
   language = defaultLanguage;
   EEPROM.write(EEPROM_language, language);
-
+  controlMode = standardControlMode;
+  EEPROM.write(EEPROM_controlMode, controlMode);
 }
 
 void recapVariables() {
@@ -72,6 +74,7 @@ void recapVariables() {
   }
   HeaterPower = EEPROM.read(EEPROM_HeaterPower);
   UARTDebug = EEPROM.read(EEPROM_UARTDebug);
+  controlMode = EEPROM.read(EEPROM_controlMode);
 }
 
 long EEPROMReadLong(int p_address)

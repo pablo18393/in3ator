@@ -1,6 +1,6 @@
 
 void settings() {
-  byte numWords = 6;
+  byte numWords = 7;
   page = settingsPage;
   print_text = 1;
   tft.setTextSize(1);
@@ -14,6 +14,7 @@ void settings() {
     case english:
       words[autoLockGraphicPosition]  = "Auto lock";
       words[languageGraphicPosition] = "Language";
+      words[controlModeGraphicPosition] = "Control mode";
       words[heaterPowerGraphicPosition] = "Heater power";
       words[DebugENGraphicPosition] = "UART debug";
       words[setStandardValuesGraphicPosition] = "Set standard values";
@@ -22,6 +23,7 @@ void settings() {
     case spanish:
       words[autoLockGraphicPosition]  = "Auto bloqueo";
       words[languageGraphicPosition] = "Idioma";
+      words[controlModeGraphicPosition] = "Modo de control";
       words[heaterPowerGraphicPosition] = "Pot calefactor";
       words[DebugENGraphicPosition] = "UART debug";
       words[setStandardValuesGraphicPosition] = "Fijar valores estandar";
@@ -30,6 +32,7 @@ void settings() {
     case french:
       words[autoLockGraphicPosition]  = "Verrouillage auto";
       words[languageGraphicPosition] = "Langue";
+      words[controlModeGraphicPosition] = "Mode de controle";
       words[heaterPowerGraphicPosition] = "Pot chauffage";
       words[DebugENGraphicPosition] = "UART debug";
       words[setStandardValuesGraphicPosition] = "Definir valeurs standard";
@@ -38,6 +41,7 @@ void settings() {
     case portuguese:
       words[autoLockGraphicPosition]  = "Bloqueio automatico";
       words[languageGraphicPosition] = "Idioma";
+      words[controlModeGraphicPosition] = "Modo de controle";
       words[heaterPowerGraphicPosition] = "Pot de aquecimento";
       words[DebugENGraphicPosition] = "UART debug";
       words[setStandardValuesGraphicPosition] = "Definir valores de fabrica";

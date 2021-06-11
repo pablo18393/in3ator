@@ -57,9 +57,11 @@ typedef struct iwdg_reg_map {
 
 #define ON true
 #define OFF false
+#define BASIC_CONTROL false
+#define PID_CONTROL true
 
 //configuration variables
-#define debounceTime 100         //encoder debouncing time
+#define debounceTime 10         //encoder debouncing time
 #define mosfet_switch_time 100   //delay to wait for mosfet to switch (in millis), oversized
 #define timePressToSettings 5000 //in millis, time to press to go to settings window in UI
 #define debugUpdatePeriod 1000 //in millis, 
@@ -155,6 +157,8 @@ int BPM, IBI;
 String RPD; //(Raw Pulsioximeter Data)
 
 //room variables
+bool controlMode;
+bool standardControlMode = BASIC_CONTROL;
 double desiredSkinTemp = 34; //preset baby skin temperature
 int desiredRoomHum = 75; //preset enviromental humidity
 bool jaundiceEnable; //PWM that controls jaundice LED intensity
@@ -285,10 +289,11 @@ byte goToProcessRow;
 //settings
 #define autoLockGraphicPosition 0
 #define languageGraphicPosition 1
-#define heaterPowerGraphicPosition 2
-#define DebugENGraphicPosition 3
-#define calibrateGraphicPosition 4
-#define setStandardValuesGraphicPosition 5
+#define controlModeGraphicPosition 2
+#define heaterPowerGraphicPosition 3
+#define DebugENGraphicPosition 4
+#define calibrateGraphicPosition 5
+#define setStandardValuesGraphicPosition 6
 //calibration
 #define temperatureCalibrationGraphicPosition 0
 #define humidityCalibrationGraphicPosition 1

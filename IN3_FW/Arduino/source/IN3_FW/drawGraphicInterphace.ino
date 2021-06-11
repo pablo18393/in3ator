@@ -115,6 +115,15 @@ void graphics() {
               }
               tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
               break;
+            case controlModeGraphicPosition:
+              if (controlMode) {
+                textToWrite = "PID";
+              }
+              else {
+                textToWrite = "BASIC";
+              }
+              tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
+              break;
             case heaterPowerGraphicPosition:
               drawRightNumber(HeaterPower, 280, ypos);
               tft.drawRightString("%", unitPosition, ypos, textFontSize);
