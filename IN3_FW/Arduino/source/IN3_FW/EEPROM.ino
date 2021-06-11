@@ -38,8 +38,8 @@ void initEEPROM() {
     for (int i = 0; i <= 253; i++) {
       EEPROM.write(i, 0);
     }
-    loadStandardValues();
-    logln("[FLASH] -> First turn on, loading standard values");
+    loaddefaultValues();
+    logln("[FLASH] -> First turn on, loading default values");
   }
   else {
     logln("[FLASH] -> Loading variables stored in flash");
@@ -47,16 +47,16 @@ void initEEPROM() {
   }
 }
 
-void loadStandardValues() {
-  autoLock = standardAutoLock;
+void loaddefaultValues() {
+  autoLock = defaultAutoLock;
   EEPROM.write(EEPROM_autoLock, autoLock);
-  HeaterPower = standardHeaterPower;
+  HeaterPower = defaultHeaterPower;
   EEPROM.write(EEPROM_HeaterPower, HeaterPower);
-  UARTDebug = standardUARTDebug;
+  UARTDebug = defaultUARTDebug;
   EEPROM.write(EEPROM_UARTDebug, UARTDebug);
   language = defaultLanguage;
   EEPROM.write(EEPROM_language, language);
-  controlMode = standardControlMode;
+  controlMode = defaultControlMode;
   EEPROM.write(EEPROM_controlMode, controlMode);
 }
 

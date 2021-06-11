@@ -367,8 +367,8 @@ void barSelection() {
                 tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
               }
               break;
-            case setStandardValuesGraphicPosition:
-              loadStandardValues();
+            case setdefaultValuesGraphicPosition:
+              loaddefaultValues();
               settings();
               break;
             case calibrateGraphicPosition:

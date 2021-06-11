@@ -113,7 +113,7 @@ void initGPRS()
 }
 
 void checkCurrentSenseCircuit() {
-  standByCurrentTest();
+  //standByCurrentTest();
   measureOffsetConsumption();
 }
 
@@ -270,7 +270,7 @@ void buzzerTest() {
   long error = HW_error;
   float testCurrent, offsetCurrent;
   offsetCurrent = sampleConsumption();
-  configBuzzerTimer(buzzerStandardPeriod);
+  configBuzzerTimer(buzzerdefaultPeriod);
   pwmWrite(BUZZER, buzzerMaxPWM / 2);
   testCurrent = sampleConsumption() - offsetCurrent;
   pwmWrite(BUZZER, buzzerMaxPWM / 0);

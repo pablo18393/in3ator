@@ -1,6 +1,6 @@
 //Firmware version and head title of UI screen
 #define FWversion "v5.1"
-String serialNumber = "in3000022";
+String serialNumber = "in3000021";
 #define headingTitle "in3ator"
 
 #define buzzerStandbyPeriod 10000 //in millis, there will be a periodic tone
@@ -14,7 +14,7 @@ String serialNumber = "in3000022";
 #include <Adafruit_GFX_AS.h>
 #include <EEPROM.h>
 #include <Adafruit_ILI9341_STM.h> // STM32 DMA Hardware-specific library
-#include <SPI.h>
+#include <SPI.h>put
 #include <PID_v1.h>
 #include "board.h"
 #include <Wire.h>
@@ -66,7 +66,7 @@ typedef struct iwdg_reg_map {
 #define timePressToSettings 5000 //in millis, time to press to go to settings window in UI
 #define debugUpdatePeriod 1000 //in millis, 
 bool UARTDebug;
-bool standardUARTDebug = ON;
+bool defaultUARTDebug = OFF;
 long lastDebugUpdate;
 //pages number in UI. Configuration and information will be displayed depending on the page number
 int page;
@@ -158,7 +158,7 @@ String RPD; //(Raw Pulsioximeter Data)
 
 //room variables
 bool controlMode;
-bool standardControlMode = BASIC_CONTROL;
+bool defaultControlMode = BASIC_CONTROL;
 double desiredSkinTemp = 34; //preset baby skin temperature
 int desiredRoomHum = 75; //preset enviromental humidity
 bool jaundiceEnable; //PWM that controls jaundice LED intensity
@@ -166,7 +166,7 @@ double HeaterPower; //maximum heater power
 double desiredHeaterTemp; //desired temperature in heater
 
 //preset room variables
-const byte standardHeaterPower = 100; //preset max heater temperature in celsious
+const byte defaultHeaterPower = 100; //preset max heater temperature in celsious
 
 //constants
 const byte heaterPowerMax = 100; //maximum temperature in heater to be set
@@ -199,7 +199,7 @@ long last_encPulsed; //last time encoder was pulsed
 #define valuePosition 245
 #define separatorPosition 240
 #define unitPosition 315
-#define textFontSize 4          //text standard size
+#define textFontSize 4          //text default size
 #define helpTextMenuCentreX tft.width()/2;
 #define width_select  7
 #define height_heading  34
@@ -244,7 +244,7 @@ byte barThickness;
 
 //User Interface display variables
 bool autoLock; //setting that enables backlight switch OFF after a given time of no user actions
-bool standardAutoLock = OFF; //setting that enables backlight switch OFF after a given time of no user actions
+bool defaultAutoLock = OFF; //setting that enables backlight switch OFF after a given time of no user actions
 int time_lock = 16000; //time to lock screen if no user actions
 int TFT_LED_PWR = 25000; //PWM that will be supplied to backlight LEDs
 const byte time_back_draw = 255;
@@ -293,7 +293,7 @@ byte goToProcessRow;
 #define heaterPowerGraphicPosition 3
 #define DebugENGraphicPosition 4
 #define calibrateGraphicPosition 5
-#define setStandardValuesGraphicPosition 6
+#define setdefaultValuesGraphicPosition 6
 //calibration
 #define temperatureCalibrationGraphicPosition 0
 #define humidityCalibrationGraphicPosition 1
@@ -353,7 +353,7 @@ HardwareTimer PIDTimer(3);
 HardwareTimer encoderTimer(2);
 HardwareTimer heaterTimer(1);
 
-#define buzzerStandardPeriod 500    // in microseconds, also for BUZZER optimal frequency (2khz); Prescale factor 6, Overflow 36000
+#define buzzerdefaultPeriod 500    // in microseconds, also for BUZZER optimal frequency (2khz); Prescale factor 6, Overflow 36000
 #define PIDISRPeriod 200000    // in microseconds
 #define peripheralsISRPeriod 1000    // in microseconds
 #define heaterTimerPeriod 20*peripheralsISRPeriod   // in microseconds. Heater period, antialiasing factor for current sensing

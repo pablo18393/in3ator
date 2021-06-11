@@ -8,7 +8,7 @@ void settings() {
   for (int i = 0; i < numWords; i++) {
     pos_text[i] = leftMargin;
   }
-  pos_text[setStandardValuesGraphicPosition] = centered;
+  pos_text[setdefaultValuesGraphicPosition] = centered;
   pos_text[calibrateGraphicPosition] = centered;
   switch (language) {
     case english:
@@ -17,7 +17,7 @@ void settings() {
       words[controlModeGraphicPosition] = "Control mode";
       words[heaterPowerGraphicPosition] = "Heater power";
       words[DebugENGraphicPosition] = "UART debug";
-      words[setStandardValuesGraphicPosition] = "Set standard values";
+      words[setdefaultValuesGraphicPosition] = "Set default values";
       words[calibrateGraphicPosition] = "Calibrate";
       break;
     case spanish:
@@ -26,7 +26,7 @@ void settings() {
       words[controlModeGraphicPosition] = "Modo de control";
       words[heaterPowerGraphicPosition] = "Pot calefactor";
       words[DebugENGraphicPosition] = "UART debug";
-      words[setStandardValuesGraphicPosition] = "Fijar valores estandar";
+      words[setdefaultValuesGraphicPosition] = "Fijar valores estandar";
       words[calibrateGraphicPosition] = "Calibrar";
       break;
     case french:
@@ -35,7 +35,7 @@ void settings() {
       words[controlModeGraphicPosition] = "Mode de controle";
       words[heaterPowerGraphicPosition] = "Pot chauffage";
       words[DebugENGraphicPosition] = "UART debug";
-      words[setStandardValuesGraphicPosition] = "Definir valeurs standard";
+      words[setdefaultValuesGraphicPosition] = "Definir valeurs default";
       words[calibrateGraphicPosition] = "Etalonner";
       break;
     case portuguese:
@@ -44,7 +44,7 @@ void settings() {
       words[controlModeGraphicPosition] = "Modo de controle";
       words[heaterPowerGraphicPosition] = "Pot de aquecimento";
       words[DebugENGraphicPosition] = "UART debug";
-      words[setStandardValuesGraphicPosition] = "Definir valores de fabrica";
+      words[setdefaultValuesGraphicPosition] = "Definir valores de fabrica";
       words[calibrateGraphicPosition] = "Calibrar";
       break;
   }
