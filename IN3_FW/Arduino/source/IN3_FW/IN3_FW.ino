@@ -1,6 +1,6 @@
 //Firmware version and head title of UI screen
 #define FWversion "v5.1"
-String serialNumber = "in3000021";
+String serialNumber = "in3000022";
 #define headingTitle "in3ator"
 
 #define buzzerStandbyPeriod 10000 //in millis, there will be a periodic tone
@@ -55,17 +55,8 @@ typedef struct iwdg_reg_map {
 #define IWDG ((struct iwdg_reg_map *)0x40003000)
 #endif
 
-void iwdg_feed(void) {
-  IWDG->KR = 0xAAAA;
-}
-
-void iwdg_init(iwdg_prescaler prescaler, uint16_t reload) {
-  IWDG->KR = 0x5555;
-  IWDG->PR = prescaler;
-  IWDG->RLR = reload;
-  IWDG->KR = 0xCCCC;
-  IWDG->KR = 0xAAAA;
-}
+#define ON true
+#define OFF false
 
 //configuration variables
 #define debounceTime 100         //encoder debouncing time
@@ -73,7 +64,7 @@ void iwdg_init(iwdg_prescaler prescaler, uint16_t reload) {
 #define timePressToSettings 5000 //in millis, time to press to go to settings window in UI
 #define debugUpdatePeriod 1000 //in millis, 
 bool UARTDebug;
-bool standardUARTDebug = 0;
+bool standardUARTDebug = ON;
 long lastDebugUpdate;
 //pages number in UI. Configuration and information will be displayed depending on the page number
 int page;
@@ -86,13 +77,13 @@ int page;
 #define HWErrorPage 6
 
 //languages numbers that will be called in language variable
-#define defaultLanguage 1 //Preset number configuration when booting for first time
+int language;
 #define spanish 0
 #define english 1
 #define french 2
 #define portuguese 3
 #define numLanguages 4
-int language;
+#define defaultLanguage english //Preset number configuration when booting for first time
 
 //temperature variables
 #define CheckSensorRaiseTemp 3   //(in celsius degrees) Due to a probable missplacement issue, a Temperature difference threshold is set to distinguish between heater or room NTC at the beggining of a thermal control
@@ -249,7 +240,7 @@ byte barThickness;
 
 //User Interface display variables
 bool autoLock; //setting that enables backlight switch OFF after a given time of no user actions
-bool standardAutoLock; //setting that enables backlight switch OFF after a given time of no user actions
+bool standardAutoLock = OFF; //setting that enables backlight switch OFF after a given time of no user actions
 int time_lock = 16000; //time to lock screen if no user actions
 int TFT_LED_PWR = 25000; //PWM that will be supplied to backlight LEDs
 const byte time_back_draw = 255;
@@ -333,9 +324,6 @@ byte goToProcessRow;
 #define introBackColor WHITE
 #define introTextColor BLACK
 #define transitionEffect BLACK
-
-#define ON true
-#define OFF false
 
 Adafruit_ILI9341_STM tft = Adafruit_ILI9341_STM(TFT_CS, TFT_DC, TFT_RST); // Use hardware SPI, tft class definition
 SHTC3 mySHTC3;              // Declare an instance of the SHTC3 class

@@ -1,21 +1,21 @@
 
 //EEPROM variables
-#define EEPROM_firstTurnOn 0
-#define EEPROM_autoLock 1
-#define EEPROM_language 2
-#define EEPROM_HeaterPower 3
-#define EEPROM_UARTDebug 5
-#define EEPROM_diffHumidity 10
-#define EEPROM_diffTemperature 20
-#define EEPROM_usedGenericMosfet 40
-#define EEPROM_checkStatus 100
+#define EEPROM_firstTurnOn 0x10
+#define EEPROM_autoLock 0x20
+#define EEPROM_language 0x30
+#define EEPROM_HeaterPower 0x40
+#define EEPROM_UARTDebug 0x50
+#define EEPROM_diffHumidity 0x60
+#define EEPROM_diffTemperature 0x70
+#define EEPROM_usedGenericMosfet 0x80
+#define EEPROM_checkStatus 0x90
 
 bool firstTurnOn;
 
 void initEEPROM() {
   EEPROM.PageBase0 = 0x801F000;
   EEPROM.PageBase1 = 0x801F800;
-  EEPROM.PageSize  = 0x400;
+  EEPROM.PageSize  = 0x800;
   EEPROM.init();
   if (EEPROM.read(EEPROM_checkStatus)) {
     EEPROM.write(EEPROM_checkStatus, 0);
@@ -31,7 +31,7 @@ void initEEPROM() {
       EEPROM.format();
     }
   }
-  firstTurnOn=EEPROM.read(EEPROM_firstTurnOn);
+  firstTurnOn = EEPROM.read(EEPROM_firstTurnOn);
   if (firstTurnOn) { //firstTimePowerOn
     EEPROM.format();
     for (int i = 0; i <= 253; i++) {
@@ -53,6 +53,9 @@ void loadStandardValues() {
   EEPROM.write(EEPROM_HeaterPower, HeaterPower);
   UARTDebug = standardUARTDebug;
   EEPROM.write(EEPROM_UARTDebug, UARTDebug);
+  language = defaultLanguage;
+  EEPROM.write(EEPROM_language, language);
+
 }
 
 void recapVariables() {
