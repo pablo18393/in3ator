@@ -22,39 +22,38 @@ void actuatorsProgress() {
 
   setGPRSPostPeriod(actuatingGPRSPostPeriod);
   if (controlTemperature) {
-    temperatureAtStart = temperature[babyNTC];
     printLoadingTemperatureBar();
-    switch (language) {
-      case spanish:
-      case portuguese:
-        textToWrite = "Temperatura";
-        break;
-      case english:
-      case french:
-        textToWrite = "Temperature";
-        break;
-    }
-    tft.drawCentreString(textToWrite, tft.width() / 2, tempBarPosY - 4 * letter_height / 3, textFontSize);
   }
+  temperatureAtStart = temperature[babyNTC];
+  switch (language) {
+    case spanish:
+    case portuguese:
+      textToWrite = "Temperatura";
+      break;
+    case english:
+    case french:
+      textToWrite = "Temperature";
+      break;
+  }
+  tft.drawCentreString(textToWrite, tft.width() / 2, tempBarPosY - 4 * letter_height / 3, textFontSize);
   if (controlHumidity) {
-    humidityAtStart = humidity;
     printLoadingHumidityBar();
-    switch (language) {
-      case spanish:
-        textToWrite = "Humedad";
-        break;
-      case english:
-        textToWrite = "Humidity";
-        break;
-      case french:
-        textToWrite = "Humidite";
-        break;
-      case portuguese:
-        textToWrite = "Umidade";
-        break;
-
-    }
-    tft.drawCentreString(textToWrite, tft.width() / 2, humBarPosY - 4 * letter_height / 3, textFontSize);
+  }
+  humidityAtStart = humidity;
+  switch (language) {
+    case spanish:
+      textToWrite = "Humedad";
+      break;
+    case english:
+      textToWrite = "Humidity";
+      break;
+    case french:
+      textToWrite = "Humidite";
+      break;
+    case portuguese:
+      textToWrite = "Umidade";
+      break;
+      tft.drawCentreString(textToWrite, tft.width() / 2, humBarPosY - 4 * letter_height / 3, textFontSize);
   }
   tft.setTextColor(COLOR_WARNING_TEXT);
   drawStop();
@@ -77,7 +76,7 @@ void actuatorsProgress() {
         if (checkAlarms(desiredSkinTemp, temperature[babyNTC], temperatureError, temperatureAlarmTime)) {
           alarmOnGoing[temperatureAlarm] = 1;
           buzzerConstantTone(buzzerAlarmTone);
-          drawAlarmMessage(temperatureAlarm);
+          drawAlarmMessage(DRAW, temperatureAlarm);
         }
       }
       if (controlMode == BASIC_CONTROL) {
@@ -90,7 +89,7 @@ void actuatorsProgress() {
         if (checkAlarms(humidity, desiredRoomHum, humidityError, humidityAlarmTime)) {
           alarmOnGoing[humidityAlarm] = 1;
           buzzerConstantTone(buzzerAlarmTone);
-          drawAlarmMessage(humidityAlarm);
+          drawAlarmMessage(DRAW, humidityAlarm);
         }
       }
     }

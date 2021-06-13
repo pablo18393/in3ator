@@ -256,6 +256,8 @@ bool pos_text[8];
 
 
 //Graphic variables
+#define ERASE false
+#define DRAW  true
 bool enableSet;
 float temperaturePercentage, temperatureAtStart;
 float humidityPercentage, humidityAtStart;

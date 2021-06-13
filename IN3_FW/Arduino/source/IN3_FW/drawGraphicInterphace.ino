@@ -285,8 +285,26 @@ void drawHardwareErrorMessage(long error) {
   }
 }
 
-void drawAlarmMessage(bool roomVariable){
-  
+void drawAlarmMessage(bool write, bool roomVariable) {
+  int alarmHeight;
+  if (write == DRAW) {
+    tft.setTextColor(COLOR_WARNING_TEXT);
+  }
+  else {
+    tft.setTextColor(COLOR_MENU);
+  }
+  switch (roomVariable) {
+    case temperatureAlarm:
+      helpMessage = "TEMPERATURE ALARM";
+      alarmHeight = 105;
+      break;
+    case humidityAlarm:
+      helpMessage = "HUMIDITY ALARM";
+      alarmHeight = 140;
+      break;
+  }
+
+  tft.drawCentreString(helpMessage, width_select + (tft.width() - width_select) / 2, alarmHeight, textFontSize);
 }
 
 void drawHumidityUnits() {

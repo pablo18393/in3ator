@@ -7,10 +7,12 @@ void resetAlarms() {
   if (alarmOnGoing[temperatureAlarm]) {
     alarmOnGoing[temperatureAlarm] = 0;
     temperatureAlarmTime = millis();
+    drawAlarmMessage(ERASE, temperatureAlarm);
   }
   if (alarmOnGoing[humidityAlarm]) {
     alarmOnGoing[humidityAlarm] = 0;
     humidityAlarmTime = millis();
+    drawAlarmMessage(ERASE, humidityAlarm);
   }
 }
 

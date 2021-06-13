@@ -32,7 +32,7 @@ int updateData() {
 }
 
 void updateDisplaySensors() {
-  if (page == advancedModePage || (page == actuatorsProgressPage && controlTemperature)) {
+  if (page == advancedModePage || (page == actuatorsProgressPage)) {
     drawBabyTemperature();
     drawHumidity();
   }
