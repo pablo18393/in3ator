@@ -18,7 +18,7 @@ void settings() {
       words[heaterPowerGraphicPosition] = "Heater power";
       words[DebugENGraphicPosition] = "UART debug";
       words[setdefaultValuesGraphicPosition] = "Set default values";
-      words[calibrateGraphicPosition] = "Calibrate";
+      words[calibrateGraphicPosition] = "Calibration";
       break;
     case spanish:
       words[autoLockGraphicPosition]  = "Auto bloqueo";
@@ -27,7 +27,7 @@ void settings() {
       words[heaterPowerGraphicPosition] = "Pot calefactor";
       words[DebugENGraphicPosition] = "UART debug";
       words[setdefaultValuesGraphicPosition] = "Fijar valores estandar";
-      words[calibrateGraphicPosition] = "Calibrar";
+      words[calibrateGraphicPosition] = "Calibracion";
       break;
     case french:
       words[autoLockGraphicPosition]  = "Verrouillage auto";

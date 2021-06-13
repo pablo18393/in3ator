@@ -1,11 +1,12 @@
 //Firmware version and head title of UI screen
-#define FWversion "v5.1"
-String serialNumber = "in3000021";
+#define FWversion "v5.2"
+String serialNumber = "in3000024";
 #define headingTitle "in3ator"
 
-#define buzzerStandbyPeriod 10000 //in millis, there will be a periodic tone
+#define buzzerStandbyPeriod 10000 //in millis, there will be a periodic tone when regulating baby's constants
 #define buzzerStandbyTone 500 //in micros, tone freq
-#define buzzerRotaryEncoderTone 200 //in micros, tone freq
+#define buzzerAlarmTone 500 //in micros, tone freq
+#define buzzerRotaryEncoderTone 450 //in micros, tone freq
 #define buzzerStandbyToneDuration 50 //in micros, tone freq
 #define buzzerSwitchDuration 10 //in micros, tone freq
 #define buzzerStandbyToneTimes 1 //in micros, tone freq
@@ -59,6 +60,17 @@ typedef struct iwdg_reg_map {
 #define OFF false
 #define BASIC_CONTROL false
 #define PID_CONTROL true
+
+//Alarm variables
+#define powerAlertNotificationPeriod 1000
+long lastPowerAlertNotification;
+bool powerAlert;
+bool alarmsEnable;
+bool defaultAlarmsEnable = true;
+int temperatureError = 2; // 2 degrees in
+int humidityError = 12; //12 %RH to trigger alarm
+long temperatureAlarmTime, humidityAlarmTime;
+int alarmTimeDelay = 1; //in mins, time to check alarm
 
 //configuration variables
 #define debounceTime 10         //encoder debouncing time

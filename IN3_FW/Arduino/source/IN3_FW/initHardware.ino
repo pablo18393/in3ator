@@ -8,23 +8,23 @@
 #define DIG_HUM_ROOM_MIN 1
 #define DIG_HUM_ROOM_MAX 100
 
-#define HEATER_CONSUMPTION_MIN 2
-#define FAN_CONSUMPTION_MIN 0.05
-#define PHOTOTHERAPY_CONSUMPTION_MIN 0.2
-#define HUMIDIFIER_CONSUMPTION_MIN 0.05
+#define HEATER_CONSUMPTION_MIN 1
+#define FAN_CONSUMPTION_MIN 0.02
+#define PHOTOTHERAPY_CONSUMPTION_MIN 0.02
+#define HUMIDIFIER_CONSUMPTION_MIN 0.02
 
 #define HEATER_CONSUMPTION_MAX 9
 #define FAN_CONSUMPTION_MAX 2
 #define PHOTOTHERAPY_CONSUMPTION_MAX 4
 #define HUMIDIFIER_CONSUMPTION_MAX 1
 
-#define STANDBY_CONSUMPTION_MIN 0.01
+#define STANDBY_CONSUMPTION_MIN 0
 #define STANDBY_CONSUMPTION_MAX 1
 
-#define SCREEN_CONSUMPTION_MIN 0.02
+#define SCREEN_CONSUMPTION_MIN 0
 #define SCREEN_CONSUMPTION_MAX 1
 
-#define BUZZER_CONSUMPTION_MIN 0.003
+#define BUZZER_CONSUMPTION_MIN 0
 
 #define NTC_BABY_MIN_ERROR 1
 #define NTC_BABY_MAX_ERROR 1<<1
@@ -61,7 +61,7 @@ void initHardware() {
   initGPRS();
   checkCurrentSenseCircuit();
   initTFT();
-  buzzerTest();
+  initBuzzer();
   initSensors();
   initHeater();
   initPowerEn();
@@ -77,6 +77,7 @@ void initHardware() {
     drawHardwareErrorMessage(HW_error);
     while (digitalRead(ENC_SWITCH)) {
       updateData();
+
     }
   }
   buzzerTone(4, buzzerStandbyToneDuration, buzzerStandbyTone);
@@ -113,7 +114,7 @@ void initGPRS()
 }
 
 void checkCurrentSenseCircuit() {
-  //standByCurrentTest();
+  standByCurrentTest();
   measureOffsetConsumption();
 }
 
@@ -266,7 +267,7 @@ void configBuzzerTimer(int freq) {
   buzzerMaxPWM = buzzerTimer.getOverflow();
 }
 
-void buzzerTest() {
+void initBuzzer() {
   long error = HW_error;
   float testCurrent, offsetCurrent;
   offsetCurrent = sampleConsumption();
@@ -303,7 +304,17 @@ void buzzerISR() {
   }
 }
 
+void buzzerConstantTone (int freq) {
+  configBuzzerTimer(freq);
+  pwmWrite(BUZZER, buzzerMaxPWM / 2);
+}
+
+void shutBuzzer () {
+  pwmWrite(BUZZER, false);
+}
+
 void buzzerTone (int beepTimes, int timeDelay, int freq) {
+  configBuzzerTimer(freq);
   buzzerBeeps += beepTimes;
   buzzerToneTime = timeDelay;
 }

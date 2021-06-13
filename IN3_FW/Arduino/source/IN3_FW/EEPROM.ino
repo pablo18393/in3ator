@@ -9,6 +9,7 @@
 #define EEPROM_diffTemperature 0x70
 #define EEPROM_usedGenericMosfet 0x80
 #define EEPROM_controlMode 0x80
+#define EEPROM_alarmsEnable 0x90
 #define EEPROM_checkStatus 0xF0
 
 bool firstTurnOn;
@@ -58,6 +59,8 @@ void loaddefaultValues() {
   EEPROM.write(EEPROM_language, language);
   controlMode = defaultControlMode;
   EEPROM.write(EEPROM_controlMode, controlMode);
+  alarmsEnable= defaultAlarmsEnable;
+  EEPROM.write(EEPROM_alarmsEnable, alarmsEnable);  
 }
 
 void recapVariables() {

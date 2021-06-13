@@ -66,15 +66,24 @@ void actuatorsProgress() {
   if (controlMode == PID_CONTROL) {
     startHeaterPID();
   }
+  alarmTimerStart();
   while (1) {
     updateData();
     if (controlTemperature) {
+      if (checkAlarms(desiredSkinTemp, temperature[babyNTC], temperatureError, temperatureAlarmTime)) {
+        temperatureAlarmTime = millis();
+        buzzerConstantTone(buzzerAlarmTone);
+      }
       if (controlMode == BASIC_CONTROL) {
         basictemperatureControl();
       }
     }
     if (controlHumidity) {
       basicHumidityControl();
+      if (checkAlarms(humidity, desiredRoomHum, humidityError, humidityAlarmTime)) {
+        temperatureAlarmTime = millis();
+        buzzerConstantTone(buzzerAlarmTone);
+      }
     }
     while (!digitalRead(ENC_SWITCH)) {
       updateData();
