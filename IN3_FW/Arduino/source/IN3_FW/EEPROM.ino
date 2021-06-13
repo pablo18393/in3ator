@@ -67,17 +67,18 @@ void recapVariables() {
   autoLock = EEPROM.read(EEPROM_autoLock);
   language = EEPROM.read(EEPROM_language);
   diffTemperature[babyNTC] = EEPROM.read(EEPROM_diffTemperature);
-  if (diffTemperature[babyNTC] > 1000) {
-    diffTemperature[babyNTC] -= 65535;
+  if (diffTemperature[babyNTC] > 100) {
+    diffTemperature[babyNTC] = 0;
   }
   diffTemperature[babyNTC] /= 10;
   diffHumidity = EEPROM.read(EEPROM_diffHumidity);
-  if (diffHumidity > 1000) {
-    diffHumidity -= 65535;
+  if (diffHumidity > 100) {
+    diffHumidity = 0;
   }
   HeaterPower = EEPROM.read(EEPROM_HeaterPower);
   UARTDebug = EEPROM.read(EEPROM_UARTDebug);
   controlMode = EEPROM.read(EEPROM_controlMode);
+  alarmsEnable= EEPROM.read(EEPROM_alarmsEnable);
 }
 
 long EEPROMReadLong(int p_address)

@@ -3,14 +3,6 @@
 String serialNumber = "in3000024";
 #define headingTitle "in3ator"
 
-#define buzzerStandbyPeriod 10000 //in millis, there will be a periodic tone when regulating baby's constants
-#define buzzerStandbyTone 500 //in micros, tone freq
-#define buzzerAlarmTone 500 //in micros, tone freq
-#define buzzerRotaryEncoderTone 450 //in micros, tone freq
-#define buzzerStandbyToneDuration 50 //in micros, tone freq
-#define buzzerSwitchDuration 10 //in micros, tone freq
-#define buzzerStandbyToneTimes 1 //in micros, tone freq
-
 //include libraries
 #include <Adafruit_GFX_AS.h>
 #include <EEPROM.h>
@@ -61,16 +53,32 @@ typedef struct iwdg_reg_map {
 #define BASIC_CONTROL false
 #define PID_CONTROL true
 
+
+//buzzer variables
+#define buzzerStandbyPeriod 10000 //in millis, there will be a periodic tone when regulating baby's constants
+#define buzzerStandbyTone 500 //in micros, tone freq
+#define buzzerAlarmTone 500 //in micros, tone freq
+#define buzzerRotaryEncoderTone 450 //in micros, tone freq
+#define buzzerStandbyToneDuration 50 //in micros, tone freq
+#define buzzerSwitchDuration 10 //in micros, tone freq
+#define buzzerStandbyToneTimes 1 //in micros, tone freq
+int buzzerBeeps, buzzerToneTime;
+long buzzerTime, buzzerStandbyTime;
+bool buzzerBuzzing;
+
 //Alarm variables
 #define powerAlertNotificationPeriod 1000
+#define humidityAlarm 0
+#define temperatureAlarm 1
 long lastPowerAlertNotification;
 bool powerAlert;
 bool alarmsEnable;
 bool defaultAlarmsEnable = true;
+bool alarmOnGoing[2];
 int temperatureError = 2; // 2 degrees in
 int humidityError = 12; //12 %RH to trigger alarm
 long temperatureAlarmTime, humidityAlarmTime;
-int alarmTimeDelay = 1; //in mins, time to check alarm
+float alarmTimeDelay = 0.2; //in mins, time to check alarm
 
 //configuration variables
 #define debounceTime 10         //encoder debouncing time
@@ -88,7 +96,7 @@ int page;
 #define settingsPage 3
 #define calibrateSensorsPage 4
 #define askSuccessPage 5
-#define HWErrorPage 6
+#define errorPage 6
 
 //languages numbers that will be called in language variable
 int language;

@@ -266,7 +266,7 @@ void drawIntroMessage() {
    Function pending to complete
 */
 void drawHardwareErrorMessage(long error) {
-  page = HWErrorPage;
+  page = errorPage;
   tft.fillScreen(introBackColor);
   tft.setTextColor(introTextColor);
   tft.setTextSize(3);
@@ -280,6 +280,13 @@ void drawHardwareErrorMessage(long error) {
   tft.setTextSize(3);
   tft.println();
   tft.println("Press to continue");
+  while (digitalRead(ENC_SWITCH)) {
+    updateData();
+  }
+}
+
+void drawAlarmMessage(bool roomVariable){
+  
 }
 
 void drawHumidityUnits() {
@@ -453,6 +460,21 @@ void updateLoadingHumidityBar(float prev, float actual) {
       drawRightNumber(actual, tft.width() / 2, humidityY);
       tft.drawCentreString("%", tft.width() / 2 + 14, humidityY, textFontSize);
     }
+  }
+}
+
+void blinkGoBackMessage() {
+  if (millis() - blinking > 1000) {
+    blinking = millis();
+    state_blink = !state_blink;
+    if (state_blink) {
+      tft.setTextColor(ILI9341_ORANGE);
+    }
+    else {
+      tft.setTextColor(COLOR_MENU);
+      blinking += 400;
+    }
+    drawStop();
   }
 }
 

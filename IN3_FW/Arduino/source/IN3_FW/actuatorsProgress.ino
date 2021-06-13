@@ -1,5 +1,8 @@
 void actuatorsProgress() {
-  if (page == mainMenuPage) {
+  if (page == errorPage) {
+    GPRSSetPostVariables(NULL, "ALARM");
+  }
+  else if (page == mainMenuPage) {
     GPRSSetPostVariables(actuatorsModeON, "ON, wks:" + String(gestationWeeks) + "," + String (desiredSkinTemp, 1) + "," + String (desiredRoomHum));
   }
   else {
@@ -70,9 +73,12 @@ void actuatorsProgress() {
   while (1) {
     updateData();
     if (controlTemperature) {
-      if (checkAlarms(desiredSkinTemp, temperature[babyNTC], temperatureError, temperatureAlarmTime)) {
-        temperatureAlarmTime = millis();
-        buzzerConstantTone(buzzerAlarmTone);
+      if (!alarmOnGoing[temperatureAlarm]) {
+        if (checkAlarms(desiredSkinTemp, temperature[babyNTC], temperatureError, temperatureAlarmTime)) {
+          alarmOnGoing[temperatureAlarm] = 1;
+          buzzerConstantTone(buzzerAlarmTone);
+          drawAlarmMessage(temperatureAlarm);
+        }
       }
       if (controlMode == BASIC_CONTROL) {
         basictemperatureControl();
@@ -80,9 +86,18 @@ void actuatorsProgress() {
     }
     if (controlHumidity) {
       basicHumidityControl();
-      if (checkAlarms(humidity, desiredRoomHum, humidityError, humidityAlarmTime)) {
-        temperatureAlarmTime = millis();
-        buzzerConstantTone(buzzerAlarmTone);
+      if (!alarmOnGoing[humidityAlarm]) {
+        if (checkAlarms(humidity, desiredRoomHum, humidityError, humidityAlarmTime)) {
+          alarmOnGoing[humidityAlarm] = 1;
+          buzzerConstantTone(buzzerAlarmTone);
+          drawAlarmMessage(humidityAlarm);
+        }
+      }
+    }
+    if (!alarmOnGoing[temperatureAlarm] && !alarmOnGoing[humidityAlarm]) {
+      if (millis() - buzzerStandbyTime > buzzerStandbyPeriod) {
+        buzzerStandbyTime = millis();
+        buzzerTone(buzzerStandbyToneTimes, buzzerStandbyToneDuration, buzzerStandbyTone);
       }
     }
     while (!digitalRead(ENC_SWITCH)) {
@@ -93,21 +108,6 @@ void actuatorsProgress() {
   }
 }
 
-
-void blinkGoBackMessage() {
-  if (millis() - blinking > 1000) {
-    blinking = millis();
-    state_blink = !state_blink;
-    if (state_blink) {
-      tft.setTextColor(ILI9341_ORANGE);
-    }
-    else {
-      tft.setTextColor(COLOR_MENU);
-      blinking += 400;
-    }
-    drawStop();
-  }
-}
 
 void basictemperatureControl() {
   if (temperature[babyNTC] < desiredSkinTemp) {

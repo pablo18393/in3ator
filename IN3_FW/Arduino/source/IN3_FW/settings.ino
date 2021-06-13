@@ -1,4 +1,3 @@
-
 void settings() {
   byte numWords = 7;
   page = settingsPage;

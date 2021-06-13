@@ -51,9 +51,6 @@
 #define DEFECTIVE_CURRENT_SENSOR 1<<19
 
 long HW_error = 0;
-int buzzerBeeps, buzzerToneTime;
-long buzzerTime, buzzerStandbyTime;
-bool buzzerBuzzing;
 
 void initHardware() {
   logln("[HW] -> Initialiting hardware");
@@ -77,7 +74,6 @@ void initHardware() {
     drawHardwareErrorMessage(HW_error);
     while (digitalRead(ENC_SWITCH)) {
       updateData();
-
     }
   }
   buzzerTone(4, buzzerStandbyToneDuration, buzzerStandbyTone);
@@ -297,10 +293,6 @@ void buzzerISR() {
   }
   if (page == actuatorsProgressPage) {
     buzzerStandbyTime = max(lastUserInteraction, buzzerStandbyTime);
-    if (millis() - buzzerStandbyTime > buzzerStandbyPeriod) {
-      buzzerStandbyTime = millis();
-      buzzerTone(buzzerStandbyToneTimes, buzzerStandbyToneDuration, buzzerStandbyTone);
-    }
   }
 }
 
