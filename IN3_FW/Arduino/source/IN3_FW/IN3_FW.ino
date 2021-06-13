@@ -70,6 +70,7 @@ bool buzzerBuzzing;
 #define powerAlertNotificationPeriod 1000
 #define humidityAlarm 0
 #define temperatureAlarm 1
+#define allAlarms 255
 long lastPowerAlertNotification;
 bool powerAlert;
 bool alarmsEnable;

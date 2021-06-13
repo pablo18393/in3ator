@@ -53,8 +53,8 @@ void actuatorsProgress() {
     case portuguese:
       textToWrite = "Umidade";
       break;
-      tft.drawCentreString(textToWrite, tft.width() / 2, humBarPosY - 4 * letter_height / 3, textFontSize);
   }
+  tft.drawCentreString(textToWrite, tft.width() / 2, humBarPosY - 4 * letter_height / 3, textFontSize);
   tft.setTextColor(COLOR_WARNING_TEXT);
   drawStop();
   state_blink = 1;
@@ -72,11 +72,18 @@ void actuatorsProgress() {
   while (1) {
     updateData();
     if (controlTemperature) {
-      if (!alarmOnGoing[temperatureAlarm]) {
-        if (checkAlarms(desiredSkinTemp, temperature[babyNTC], temperatureError, temperatureAlarmTime)) {
+      if (checkAlarms(desiredSkinTemp, temperature[babyNTC], temperatureError, temperatureAlarmTime)) {
+        if (!alarmOnGoing[temperatureAlarm]) {
           alarmOnGoing[temperatureAlarm] = 1;
           buzzerConstantTone(buzzerAlarmTone);
           drawAlarmMessage(DRAW, temperatureAlarm);
+        }
+      }
+      else {
+        if (alarmOnGoing[temperatureAlarm]) {
+          alarmOnGoing[temperatureAlarm] = 0;
+          shutBuzzer();
+          drawAlarmMessage(ERASE, temperatureAlarm);
         }
       }
       if (controlMode == BASIC_CONTROL) {
@@ -85,11 +92,18 @@ void actuatorsProgress() {
     }
     if (controlHumidity) {
       basicHumidityControl();
-      if (!alarmOnGoing[humidityAlarm]) {
-        if (checkAlarms(humidity, desiredRoomHum, humidityError, humidityAlarmTime)) {
+      if (checkAlarms(humidity, desiredRoomHum, humidityError, humidityAlarmTime)) {
+        if (!alarmOnGoing[humidityAlarm]) {
           alarmOnGoing[humidityAlarm] = 1;
           buzzerConstantTone(buzzerAlarmTone);
           drawAlarmMessage(DRAW, humidityAlarm);
+        }
+      }
+      else {
+        if (alarmOnGoing[humidityAlarm]) {
+          alarmOnGoing[humidityAlarm] = 0;
+          shutBuzzer();
+          drawAlarmMessage(ERASE, humidityAlarm);
         }
       }
     }

@@ -5,15 +5,24 @@ void alarmTimerStart() {
 
 void resetAlarms() {
   if (alarmOnGoing[temperatureAlarm]) {
-    alarmOnGoing[temperatureAlarm] = 0;
-    temperatureAlarmTime = millis();
-    drawAlarmMessage(ERASE, temperatureAlarm);
+    resetTemperatureAlarm();
   }
   if (alarmOnGoing[humidityAlarm]) {
-    alarmOnGoing[humidityAlarm] = 0;
-    humidityAlarmTime = millis();
-    drawAlarmMessage(ERASE, humidityAlarm);
+    resetHumidityAlarm();
   }
+  resetHumidityAlarm();
+}
+
+void resetTemperatureAlarm() {
+  alarmOnGoing[temperatureAlarm] = 0;
+  temperatureAlarmTime = millis();
+  drawAlarmMessage(ERASE, temperatureAlarm);
+}
+
+void resetHumidityAlarm() {
+  alarmOnGoing[humidityAlarm] = 0;
+  humidityAlarmTime = millis();
+  drawAlarmMessage(ERASE, humidityAlarm);
 }
 
 bool checkAlarms(float setValue, float measuredValue, int errorMargin, long alarmTime) {
