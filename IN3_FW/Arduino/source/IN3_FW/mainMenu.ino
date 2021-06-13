@@ -14,21 +14,24 @@ void mainMenu() {
     case spanish:
       words[gestationGraphicPosition]  = "Semanas gestacion";
       words[advancedModeGraphicPosition] = "Modo avanzado";
+      words[LEDGraphicPosition] = "Fototerapia";
       break;
     case english:
       words[gestationGraphicPosition]  = "Gestation weeks";
       words[advancedModeGraphicPosition] = "Advanced mode";
+      words[LEDGraphicPosition] = "Phototherapy";
       break;
     case french:
       words[gestationGraphicPosition]  = "Semaines gestation";
       words[advancedModeGraphicPosition] = "Mode avance";
+      words[LEDGraphicPosition] = "Phototherapie";
       break;
     case portuguese:
       words[gestationGraphicPosition]  = "Semanas gestacao";
       words[advancedModeGraphicPosition] = "Modo avancado";
+      words[LEDGraphicPosition] = "Fototerapia";
       break;
   }
-  words[LEDGraphicPosition] = "LED";
   words[startGraphicPosition] = "";
   rectangles = numWords;
   setSensorsGraphicPosition();
