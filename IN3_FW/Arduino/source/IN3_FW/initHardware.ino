@@ -54,15 +54,14 @@ long HW_error = 0;
 
 void initHardware() {
   logln("[HW] -> Initialiting hardware");
-  initPins();
+  initPowerAlarm();
   initGPRS();
-  checkCurrentSenseCircuit();
+  initSenseCircuit();
   initTFT();
   initBuzzer();
   initSensors();
-  initHeater();
+  initActuators();
   initPowerEn();
-  actuatorsTest();
   if (!HW_error) {
     logln("[HW] -> HARDWARE OK");
     GPRSSetPostVariables(NULL, "HW OK");
@@ -79,25 +78,8 @@ void initHardware() {
   buzzerTone(4, buzzerStandbyToneDuration, buzzerStandbyTone);
 }
 
-void initPins() {
-  logln("[HW] -> Initialiting pins");
-  pinMode(PHOTOTHERAPY, OUTPUT);
-  pinMode(FAN, OUTPUT);
-  pinMode(HUMIDIFIER, OUTPUT);
-  pinMode(ENC_SWITCH, INPUT_PULLUP);
-  pinMode(POWER_EN, OUTPUT);
-  pinMode(GPRS_PWRKEY, OUTPUT);
-  pinMode(encoderpinA, INPUT_PULLUP);
-  pinMode(encoderpinB, INPUT_PULLUP);
-  pinMode(SYSTEM_SHUNT, INPUT);
+void initPowerAlarm() {
   pinMode(PWR_ALERT, INPUT);
-  pinMode(SCREENBACKLIGHT, PWM);
-  pwmWrite(SCREENBACKLIGHT, maxPWMvalue);
-  pinMode(HEATER, PWM);
-  pwmWrite(HEATER, false);
-  pinMode(BUZZER, PWM);
-  pwmWrite(BUZZER, false);
-  digitalWrite(GPRS_PWRKEY, HIGH);
 }
 
 void initGPRS()
@@ -107,9 +89,12 @@ void initGPRS()
   GPRS.powerUp = 1;
   GPRSSetPostVariables(defaultPost, "First post, FW version: " + String (FWversion));
   setGPRSPostPeriod(standByGPRSPostPeriod);
+  pinMode(GPRS_PWRKEY, OUTPUT);
+  digitalWrite(GPRS_PWRKEY, HIGH);
 }
 
-void checkCurrentSenseCircuit() {
+void initSenseCircuit() {
+  pinMode(SYSTEM_SHUNT, INPUT);
   standByCurrentTest();
   measureOffsetConsumption();
 }
@@ -118,6 +103,7 @@ void initSensors() {
   long error = HW_error;
   logln("[HW] -> Initialiting sensors");
   initRoomSensor();
+  initEncoder();
   //sensors verification
   while (!measurenumNTC());
   if (temperature[babyNTC] < NTC_BABY_MIN) {
@@ -153,6 +139,12 @@ void initSensors() {
   if (error == HW_error) {
     logln("[HW] -> OK -> Sensors are working as expected");
   }
+}
+
+void initEncoder() {
+  pinMode(encoderpinA, INPUT_PULLUP);
+  pinMode(encoderpinB, INPUT_PULLUP);
+  pinMode(ENC_SWITCH, INPUT_PULLUP);
 }
 
 void initRoomSensor() {
@@ -202,6 +194,7 @@ void initTFT() {
   tft.begin();
   tft.setRotation(3);
   loadlogo();
+  pinMode(SCREENBACKLIGHT, PWM);
   for (int i = TFTbacklightTimer.getOverflow(); i >= backlightPower; i--) {
     pwmWrite(SCREENBACKLIGHT, i);
     delayMicroseconds(brightenRate);
@@ -225,7 +218,17 @@ void initTFT() {
   GPRSSetPostVariables(NULL, ",TFT:" + String (testCurrent));
 }
 
+void initActuators() {
+  initHeater();
+  pinMode(PHOTOTHERAPY, OUTPUT);
+  pinMode(FAN, OUTPUT);
+  pinMode(HUMIDIFIER, OUTPUT);
+  actuatorsTest();
+}
+
 void initHeater() {
+  pinMode(HEATER, PWM);
+  pwmWrite(HEATER, false);
   configHeaterTimer(heaterTimerPeriod);
 }
 
@@ -261,6 +264,7 @@ void initBuzzer() {
   float testCurrent, offsetCurrent;
   offsetCurrent = sampleConsumption();
   configBuzzerTimer(buzzerdefaultPeriod);
+  pinMode(BUZZER, PWM);
   pwmWrite(BUZZER, buzzerMaxPWM / 2);
   testCurrent = sampleConsumption() - offsetCurrent;
   pwmWrite(BUZZER, buzzerMaxPWM / 0);
@@ -309,6 +313,7 @@ void initPowerEn() {
   float testCurrent, offsetCurrent;
   offsetCurrent = sampleConsumption();
   logln("[HW] -> Checking power enable circuit...");
+  pinMode(POWER_EN, OUTPUT);
   digitalWrite(POWER_EN, HIGH);
   testCurrent = sampleConsumption() - offsetCurrent;
   if (testCurrent > STANDBY_CONSUMPTION_MAX) {
@@ -322,17 +327,6 @@ void initPowerEn() {
     logln("[HW] -> Fail -> test current is " + String (testCurrent) + " Amps");
   }
   GPRSSetPostVariables(NULL, ",PWEN:" + String (testCurrent));
-}
-
-void encoderISR() {
-  int newPos;
-  encoder.tick(); // just call tick() to check the state.
-  newPos = encoder.getPosition();
-  lastUserInteraction = millis();
-  if (abs(newPos - last_encoder_move) > 1) {
-    EncMove = EncMoveOrientation * int(encoder.getDirection());
-    last_encoder_move = newPos;
-  }
 }
 
 void actuatorsTest() {
