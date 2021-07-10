@@ -474,7 +474,7 @@ void checkSetMessage() {
           helpMessage = "Set gestation weeks";
           break;
         case spanish:
-          helpMessage = "Introduce semanas de gestacion";
+          helpMessage = "Introduce S.D.G.";
           break;
         case french:
           helpMessage = "Regler semaines de gestation";

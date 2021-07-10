@@ -267,7 +267,7 @@ byte barThickness;
 
 //User Interface display variables
 bool autoLock; //setting that enables backlight switch OFF after a given time of no user actions
-bool defaultAutoLock = OFF; //setting that enables backlight switch OFF after a given time of no user actions
+bool defaultAutoLock = ON; //setting that enables backlight switch OFF after a given time of no user actions
 int time_lock = 16000; //time to lock screen if no user actions
 const byte time_back_draw = 255;
 const byte time_back_wait = 255;
