@@ -9,9 +9,9 @@
 #define DIG_HUM_ROOM_MAX 100
 
 #define HEATER_CONSUMPTION_MIN 1
-#define FAN_CONSUMPTION_MIN 0.02
-#define PHOTOTHERAPY_CONSUMPTION_MIN 0.02
-#define HUMIDIFIER_CONSUMPTION_MIN 0.02
+#define FAN_CONSUMPTION_MIN 0.03
+#define PHOTOTHERAPY_CONSUMPTION_MIN 0.03
+#define HUMIDIFIER_CONSUMPTION_MIN 0.03
 
 #define HEATER_CONSUMPTION_MAX 9
 #define FAN_CONSUMPTION_MAX 2
@@ -87,16 +87,16 @@ void initPins() {
   pinMode(ENC_SWITCH, INPUT_PULLUP);
   pinMode(POWER_EN, OUTPUT);
   pinMode(GPRS_PWRKEY, OUTPUT);
-  pinMode(SCREENBACKLIGHT, OUTPUT);
   pinMode(encoderpinA, INPUT_PULLUP);
   pinMode(encoderpinB, INPUT_PULLUP);
   pinMode(SYSTEM_SHUNT, INPUT);
   pinMode(PWR_ALERT, INPUT);
+  pinMode(SCREENBACKLIGHT, PWM);
+  pwmWrite(SCREENBACKLIGHT, maxPWMvalue);
   pinMode(HEATER, PWM);
-  pwmWrite(HEATER, 0);
+  pwmWrite(HEATER, false);
   pinMode(BUZZER, PWM);
-  pwmWrite(BUZZER, 0);
-  digitalWrite(SCREENBACKLIGHT, HIGH);
+  pwmWrite(BUZZER, false);
   digitalWrite(GPRS_PWRKEY, HIGH);
 }
 
@@ -196,24 +196,17 @@ void initTFT() {
   float testCurrent, offsetCurrent;
   int  timeOut = 4000;
   long processTime = millis();
+  configTFTBacklightTimer(backlightTimerPeriod);
   offsetCurrent = sampleConsumption();
   SPI.setModule(SPI_SEL);
   tft.begin();
   tft.setRotation(3);
   loadlogo();
-  /*
-    configTFTBacklightTimer(backlightTimerPeriod);
-    pwmWrite(SCREENBACKLIGHT, i);
-    TFT_LED_PWR = screenBackLightMaxPWM / 2;
-    for (int i = screenBackLightMaxPWM; i >= TFT_LED_PWR; i--) {
+  for (int i = TFTbacklightTimer.getOverflow(); i >= backlightPower; i--) {
     pwmWrite(SCREENBACKLIGHT, i);
     delayMicroseconds(brightenRate);
-    if (millis() - processTime > timeOut) {
-      i = 0;
-    }
-    }
-  */
-  digitalWrite(SCREENBACKLIGHT, LOW);
+    updateData();
+  }
   testCurrent = sampleConsumption() - offsetCurrent;
   if (testCurrent < SCREEN_CONSUMPTION_MIN) {
     HW_error += DEFECTIVE_SCREEN;
@@ -251,7 +244,7 @@ void configTFTBacklightTimer(int freq) {
   TFTbacklightTimer.setPeriod(freq); // in microseconds
   TFTbacklightTimer.refresh();
   TFTbacklightTimer.resume();
-  screenBackLightMaxPWM = TFTbacklightTimer.getOverflow();
+  backlightPower = TFTbacklightTimer.getOverflow() / screenBrightnessFactor;
 }
 
 void configBuzzerTimer(int freq) {

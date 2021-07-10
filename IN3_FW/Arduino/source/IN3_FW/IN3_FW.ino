@@ -53,7 +53,6 @@ typedef struct iwdg_reg_map {
 #define BASIC_CONTROL false
 #define PID_CONTROL true
 
-
 //buzzer variables
 #define buzzerStandbyPeriod 10000 //in millis, there will be a periodic tone when regulating baby's constants
 #define buzzerStandbyTone 500 //in micros, tone freq
@@ -91,13 +90,13 @@ bool defaultUARTDebug = OFF;
 long lastDebugUpdate;
 //pages number in UI. Configuration and information will be displayed depending on the page number
 int page;
-#define mainMenuPage 0
-#define advancedModePage 1
-#define actuatorsProgressPage 2
-#define settingsPage 3
-#define calibrateSensorsPage 4
-#define askSuccessPage 5
-#define errorPage 6
+#define mainMenuPage 1
+#define advancedModePage 2
+#define actuatorsProgressPage 3
+#define settingsPage 4
+#define calibrateSensorsPage 5
+#define askSuccessPage 6
+#define errorPage 7
 
 //languages numbers that will be called in language variable
 int language;
@@ -200,6 +199,7 @@ const byte maxGestation = 99; //maximum gestation weeks to be set
 const byte minGestation = 1; //minimum gestation weeks to be set
 const byte LEDMaxIntensity = 100; //max LED intensity to be set
 const byte fanMaxSpeed = 100; //max fan speed (percentage) to be set
+const float screenBrightnessFactor = 2.5; //Max brightness will be divided by this constant
 
 //Encoder variables
 #define NUMENCODERS 1 //number of encoders in circuit
@@ -216,7 +216,7 @@ long last_encPulsed; //last time encoder was pulsed
 
 //User Interface display constants
 #define introDelay    1500      //initial delay between intro and menu
-#define brightenRate  100        //intro brighten speed (Higher value, slower)
+#define brightenRate  200        //intro brighten speed (Higher value, slower)
 #define valuePosition 245
 #define separatorPosition 240
 #define unitPosition 315
@@ -269,7 +269,6 @@ byte barThickness;
 bool autoLock; //setting that enables backlight switch OFF after a given time of no user actions
 bool defaultAutoLock = OFF; //setting that enables backlight switch OFF after a given time of no user actions
 int time_lock = 16000; //time to lock screen if no user actions
-int TFT_LED_PWR = 25000; //PWM that will be supplied to backlight LEDs
 const byte time_back_draw = 255;
 const byte time_back_wait = 255;
 long lastUserInteraction; //last time there was a encoder movement or pulse

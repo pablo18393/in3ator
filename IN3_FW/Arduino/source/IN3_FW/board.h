@@ -38,6 +38,7 @@
 
 #define maxADCvalue 4095
 #define maxDACvalue 4095         //for STM32F103RE with arduino IDE
-int screenBackLightMaxPWM;
+#define maxPWMvalue 65535
+float backlightPower;
 int heaterMaxPWM;
 int buzzerMaxPWM;
