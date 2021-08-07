@@ -248,6 +248,7 @@ void configTFTBacklightTimer(int freq) {
   TFTbacklightTimer.refresh();
   TFTbacklightTimer.resume();
   backlightPower = TFTbacklightTimer.getOverflow() / screenBrightnessFactor;
+  backlightPowerSafe = TFTbacklightTimer.getOverflow() * backlightPowerSafePercentage;
 }
 
 void configBuzzerTimer(int freq) {

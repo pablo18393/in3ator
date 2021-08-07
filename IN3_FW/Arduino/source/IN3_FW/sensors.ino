@@ -150,7 +150,7 @@ bool updateRoomSensor() {
 void userInteraction() {
   if (autoLock) {
     if (millis() - lastUserInteraction > time_lock) {
-      pwmWrite(SCREENBACKLIGHT, TFTbacklightTimer.getOverflow());
+      pwmWrite(SCREENBACKLIGHT, backlightPowerSafe);
     }
     else {
       pwmWrite(SCREENBACKLIGHT, backlightPower);
