@@ -78,7 +78,7 @@ bool alarmOnGoing[2];
 int temperatureError = 2; // 2 degrees in
 int humidityError = 12; //12 %RH to trigger alarm
 long temperatureAlarmTime, humidityAlarmTime;
-float alarmTimeDelay = 0.2; //in mins, time to check alarm
+float alarmTimeDelay = 30; //in mins, time to check alarm
 
 //configuration variables
 #define debounceTime 10         //encoder debouncing time
@@ -216,7 +216,7 @@ long last_encPulsed; //last time encoder was pulsed
 
 //User Interface display constants
 #define introDelay    1500      //initial delay between intro and menu
-#define brightenRate  200        //intro brighten speed (Higher value, slower)
+#define brightenRate  50        //intro brighten speed (Higher value, slower)
 #define valuePosition 245
 #define separatorPosition 240
 #define unitPosition 315

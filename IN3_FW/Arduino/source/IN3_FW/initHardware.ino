@@ -57,8 +57,8 @@ void initHardware() {
   initPowerAlarm();
   initGPRS();
   initSenseCircuit();
-  initTFT();
   initBuzzer();
+  initTFT();
   initSensors();
   initActuators();
   initPowerEn();
@@ -188,7 +188,8 @@ void initTFT() {
   float testCurrent, offsetCurrent;
   int  timeOut = 4000;
   long processTime = millis();
-  configTFTBacklightTimer(backlightTimerPeriod);
+  backlightPower = TFTbacklightTimer.getOverflow() / screenBrightnessFactor;
+  backlightPowerSafe = TFTbacklightTimer.getOverflow() * backlightPowerSafePercentage;
   offsetCurrent = sampleConsumption();
   SPI.setModule(SPI_SEL);
   tft.begin();
@@ -239,16 +240,6 @@ void configHeaterTimer(int freq) {
   heaterTimer.refresh();
   heaterTimer.resume();
   heaterMaxPWM = heaterTimer.getOverflow();
-}
-
-void configTFTBacklightTimer(int freq) {
-  //humidifier timer configuration:
-  TFTbacklightTimer.pause();
-  TFTbacklightTimer.setPeriod(freq); // in microseconds
-  TFTbacklightTimer.refresh();
-  TFTbacklightTimer.resume();
-  backlightPower = TFTbacklightTimer.getOverflow() / screenBrightnessFactor;
-  backlightPowerSafe = TFTbacklightTimer.getOverflow() * backlightPowerSafePercentage;
 }
 
 void configBuzzerTimer(int freq) {
