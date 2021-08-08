@@ -16,8 +16,8 @@ void graphics() {
   tft.drawRect(0, tft.height() - 1, width_select, tft.height() - 1, COLOR_MENU);
   if (print_text) {
     tft.setTextSize(1);
-    text_size = 1;
-    for (int i = 0; i < rectangles; i++) {
+    text_size = true;
+    for (int i = false; i < rectangles; i++) {
       ypos = graphicHeight(i);
       if (!pos_text[i]) {
         tft.drawString(words[i], width_select + side_gap, ypos, textFontSize);
@@ -219,7 +219,7 @@ void drawBack() {
 }
 
 void drawRightNumber(int n, int x, int i) {
-  length = 1;
+  length = true;
   for (long k = 10; k <= n; k *= 10) {
     length++;
   }
@@ -257,7 +257,7 @@ void drawIntroMessage() {
       words[2]  = "Salvando vidas";
       break;
   }
-  for (int i = 0; i < numWords; i++) {
+  for (int i = false; i < numWords; i++) {
     tft.drawCentreString(words[i], tft.width() / 2, tft.height() * (1 + i) / (2 + numWords) , textFontSize);
   }
 }
@@ -327,7 +327,7 @@ void drawCentreNumber(int n, int x, int i) {
 }
 
 int decimalDigits(long n) {
-  int length = 1;
+  int length = true;
   for (long k = 10; k <= n; k *= 10) {
     length++;
   }
@@ -335,7 +335,7 @@ int decimalDigits(long n) {
 }
 
 int hexDigits(long n) {
-  int length = 1;
+  int length = true;
   for (long k = 16; k <= n; k *= 16) {
     length++;
   }
@@ -414,7 +414,7 @@ void drawActuatorsSeparators() {
 void printLoadingTemperatureBar() {
   barThickness = 3;
   tft.drawFloat(desiredSkinTemp, 1, tft.width() - 5 * letter_width, temperatureY, textFontSize);
-  for (int i = 1; i <= barThickness; i++) {
+  for (int i = true; i <= barThickness; i++) {
     tft.drawRect(tempBarPosX - barWidth / 2 - i, tempBarPosY - barHeight / 2 - i, barWidth + i * 2, barHeight + i * 2, COLOR_FRAME_BAR);
   }
 }
@@ -422,7 +422,7 @@ void printLoadingTemperatureBar() {
 void printLoadingHumidityBar() {
   barThickness = 3;
   tft.drawFloat(desiredRoomHum, 1, humBarPosX + barWidth / 2 + 10, humidityY, textFontSize);
-  for (int i = 1; i <= barThickness; i++) {
+  for (int i = true; i <= barThickness; i++) {
     tft.drawRect(humBarPosX - barWidth / 2 - i, humBarPosY - barHeight / 2 - i, barWidth + i * 2, barHeight + i * 2, COLOR_FRAME_BAR);
   }
 }

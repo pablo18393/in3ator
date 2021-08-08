@@ -14,13 +14,13 @@ void resetAlarms() {
 }
 
 void resetTemperatureAlarm() {
-  alarmOnGoing[temperatureAlarm] = 0;
+  alarmOnGoing[temperatureAlarm] = false;
   temperatureAlarmTime = millis();
   drawAlarmMessage(ERASE, temperatureAlarm);
 }
 
 void resetHumidityAlarm() {
-  alarmOnGoing[humidityAlarm] = 0;
+  alarmOnGoing[humidityAlarm] = false;
   humidityAlarmTime = millis();
   drawAlarmMessage(ERASE, humidityAlarm);
 }

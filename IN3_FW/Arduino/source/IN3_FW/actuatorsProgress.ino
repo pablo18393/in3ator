@@ -8,11 +8,11 @@ void actuatorsProgress() {
   else {
     GPRSSetPostVariables(actuatorsModeON, "ON:" + String (desiredSkinTemp, 1) + "," + String (desiredRoomHum));
   }
-  byte  numWords = 0;
-  temperaturePercentage = 0;
+  byte  numWords = false;
+  temperaturePercentage = false;
   page = actuatorsProgressPage;
   tft.setTextSize(1);
-  print_text = 0;
+  print_text = false;
   rectangles = numWords;
   graphics();
   drawHeading();
@@ -57,7 +57,7 @@ void actuatorsProgress() {
   tft.drawCentreString(textToWrite, tft.width() / 2, humBarPosY - 4 * letter_height / 3, textFontSize);
   tft.setTextColor(COLOR_WARNING_TEXT);
   drawStop();
-  state_blink = 1;
+  state_blink = true;
   while (!digitalRead(ENC_SWITCH)) {
     updateData();
   }
@@ -66,7 +66,12 @@ void actuatorsProgress() {
     temperatureAtStart = temperature[babyNTC];
   }
   if (controlMode == PID_CONTROL) {
-    startHeaterPID();
+    if (controlTemperature) {
+      startTemperaturePID();
+    }
+    if (controlHumidity) {
+      startHumidityPID();
+    }
   }
   alarmTimerStart();
   while (1) {
@@ -74,14 +79,14 @@ void actuatorsProgress() {
     if (controlTemperature) {
       if (checkAlarms(desiredSkinTemp, temperature[babyNTC], temperatureError, temperatureAlarmTime)) {
         if (!alarmOnGoing[temperatureAlarm]) {
-          alarmOnGoing[temperatureAlarm] = 1;
+          alarmOnGoing[temperatureAlarm] = true;
           buzzerConstantTone(buzzerAlarmTone);
           drawAlarmMessage(DRAW, temperatureAlarm);
         }
       }
       else {
         if (alarmOnGoing[temperatureAlarm]) {
-          alarmOnGoing[temperatureAlarm] = 0;
+          alarmOnGoing[temperatureAlarm] = false;
           shutBuzzer();
           drawAlarmMessage(ERASE, temperatureAlarm);
         }
@@ -91,17 +96,19 @@ void actuatorsProgress() {
       }
     }
     if (controlHumidity) {
-      basicHumidityControl();
+      if (controlMode == BASIC_CONTROL) {
+        basicHumidityControl();
+      }
       if (checkAlarms(humidity, desiredRoomHum, humidityError, humidityAlarmTime)) {
         if (!alarmOnGoing[humidityAlarm]) {
-          alarmOnGoing[humidityAlarm] = 1;
+          alarmOnGoing[humidityAlarm] = true;
           buzzerConstantTone(buzzerAlarmTone);
           drawAlarmMessage(DRAW, humidityAlarm);
         }
       }
       else {
         if (alarmOnGoing[humidityAlarm]) {
-          alarmOnGoing[humidityAlarm] = 0;
+          alarmOnGoing[humidityAlarm] = false;
           shutBuzzer();
           drawAlarmMessage(ERASE, humidityAlarm);
         }

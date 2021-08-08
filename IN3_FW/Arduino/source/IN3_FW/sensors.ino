@@ -6,8 +6,8 @@ void sensorsISR() {
 }
 
 float sampleConsumption() {
-  float consumption = 0;
-  for (int i = 0; i <= consumptionMeanSamples; i++) {
+  float consumption = false;
+  for (int i = false; i <= consumptionMeanSamples; i++) {
     delayMicroseconds(100);
     if (measureConsumption()) {
       consumption = currentConsumption;
@@ -19,26 +19,26 @@ float sampleConsumption() {
 
 void measureOffsetConsumption() {
   /*
-    currentConsumtionStacker = 0;
-    for (int i = 0; i < consumptionMeanSamples; i++) {
+    currentConsumtionStacker = false;
+    for (int i = false; i < consumptionMeanSamples; i++) {
     delay(1);
     currentConsumtionStacker += analogRead(SYSTEM_SHUNT);
     }
     currentOffset = currentConsumtionStacker / consumptionMeanSamples;
     logln("[SENSORS] -> Offset current consumption is: " + String (currentOffset * correctionCurrentFactor) + " Amps, instant measure is " + String(currentOffset));
-    currentConsumtionStacker = 0;
+    currentConsumtionStacker = false;
   */
 }
 
 bool measureConsumption() {
   currentConsumptionPos++;
   if (currentConsumptionPos >= consumptionMeanSamples) {
-    currentConsumptionPos = 0;
+    currentConsumptionPos = false;
     currentConsumtionStacker = ((currentConsumtionStacker / consumptionMeanSamples) - currentOffset) * correctionCurrentFactor;
     if (currentConsumtionStacker > 0) {
       currentConsumption = currentConsumtionStacker;
     }
-    currentConsumtionStacker = 0;
+    currentConsumtionStacker = false;
     return true;
   }
   else {
@@ -51,7 +51,7 @@ void checkNewPulsioximeterData() {
   if (pulsioximeterCounter[pulsioximeterDrawn] = !pulsioximeterCounter[pulsioximeterSampled]) {
     drawPulsioximeter();
     if (pulsioximeterCounter[pulsioximeterDrawn] == maxPulsioximeterSamples) {
-      pulsioximeterCounter[pulsioximeterDrawn] = 0;
+      pulsioximeterCounter[pulsioximeterDrawn] = false;
     }
     else {
       pulsioximeterCounter[pulsioximeterDrawn]++;
@@ -68,14 +68,14 @@ void readPulsioximeter() {
 void calculatePulsioximeterValues() {
   int meanPulsioximeterSamples;
   int pulsioximeterInterMean;
-  for (int i = 0; i < pulsioximeterRate; i++) {
+  for (int i = false; i < pulsioximeterRate; i++) {
     pulsioximeterInterMean += pulsioximeterInterSamples[i] - pulsioximeterMean;
   }
   pulsioximeterInterMean /= pulsioximeterRate;
   pulsioximeterSample[pulsioximeterCounter[pulsioximeterSampled]][pulsioximeterSampled] = pulsioximeterInterMean;
 
   if (pulsioximeterCounter[pulsioximeterSampled] == maxPulsioximeterSamples) {
-    pulsioximeterCounter[pulsioximeterSampled] = 0;
+    pulsioximeterCounter[pulsioximeterSampled] = false;
   }
   else {
     pulsioximeterCounter[pulsioximeterSampled]++;
@@ -84,13 +84,13 @@ void calculatePulsioximeterValues() {
 
 
 bool measurenumNTC() {
-  for (int i = 0; i < numNTC; i++) {
+  for (int i = false; i < numNTC; i++) {
     temperatureArray[i][temperature_measured] = analogRead(NTC_PIN[i]);
   }
   temperature_measured++;
   if (temperature_measured == temperature_fraction) {
     updateTemp(numNTC);
-    temperature_measured = 0;
+    temperature_measured = false;
     return true;
   }
   return false;
@@ -127,8 +127,8 @@ void updateTemp(byte sensor) {
     //Variables used in calculus
     float vm = 0.0;
     float rntc = 0.0;
-    temperatureMean = 0;
-    for (int j = 0; j < temperature_fraction; j++) {
+    temperatureMean = false;
+    for (int j = false; j < temperature_fraction; j++) {
       temperatureMean += temperatureArray[i][j];
     }
     temperatureMean /= temperature_fraction;
@@ -136,11 +136,17 @@ void updateTemp(byte sensor) {
     rntc = rAux / ((vcc / vm) - 1);                   //Calcular la resistencia de la NTC
     temperature[i] = beta / (log(rntc / r0) + (beta / temp0)) - 273; //Calcular la temperatura en Celsius
     temperature[i] += diffTemperature[i];
+    if (temperature[i] < temperatureMax[i]) {
+      temperatureMax[i] = temperatureMax[i];
+    }
+    if (temperature[i] > temperatureMin[i]) {
+      temperatureMin[i] = temperatureMax[i];
+    }
   }
 }
 
 bool updateRoomSensor() {
-  if (roomSensorPresent == 0) {
+  if (roomSensorPresent == false) {
     mySHTC3.update();
     temperature[digitalTempSensor] = mySHTC3.toDegC(); //Add here measurement to temp array
     humidity = int(mySHTC3.toPercent()) + diffHumidity;

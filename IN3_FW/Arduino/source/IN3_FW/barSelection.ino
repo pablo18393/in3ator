@@ -1,7 +1,7 @@
 
 void barSelection() {
-  bar_pos = 1;
-  selected = 0;
+  bar_pos = true;
+  selected = false;
   ypos = (tft.height() - height_heading) / (2 * rectangles) + letter_height;
   if (page == askSuccessPage) {
     eraseBar();
@@ -18,7 +18,7 @@ void barSelection() {
             enableSetProcess = enableSet;
           }
           else {
-            enableSetProcess = 1;
+            enableSetProcess = true;
           }
           if (bar_pos < rectangles - !enableSetProcess) {
             eraseBar();
@@ -64,17 +64,17 @@ void barSelection() {
                 updateData();
                 if (EncMove && -EncMove + gestationWeeks >= minGestation && -EncMove + gestationWeeks <= maxGestation) {
                   tft.setTextColor(COLOR_MENU);
-                  controlTemperature = 1;
-                  controlHumidity = 1;
+                  controlTemperature = true;
+                  controlHumidity = true;
                   tft.drawRightString(initialSensorsValue, gestationWeeksXPos, ypos, textFontSize);
                   drawRightNumber(gestationWeeks, gestationWeeksXPos, ypos);
                   gestationWeeks -= EncMove;
                   setPresetRoomValues();
                   tft.setTextColor(COLOR_MENU_TEXT);
                   drawRightNumber(gestationWeeks, gestationWeeksXPos, ypos);
-                  enableSet = 1;
+                  enableSet = true;
                 }
-                EncMove = 0;
+                EncMove = false;
               }
               drawStartMessage();
               break;
@@ -120,16 +120,16 @@ void barSelection() {
                 if (EncMove && -EncMove + desiredSkinTemp >= minTemp && -EncMove + desiredSkinTemp <= maxTemp) {
                   tft.setTextColor(COLOR_MENU);
                   if (!controlTemperature) {
-                    controlTemperature = 1;
+                    controlTemperature = true;
                     tft.drawRightString(initialSensorsValue, initialSensorPosition, temperatureY, textFontSize);
                   }
                   tft.drawFloat(desiredSkinTemp, 1, temperatureX - 65, temperatureY, textFontSize);
                   desiredSkinTemp -= float(EncMove) / 10;
                   tft.setTextColor(COLOR_MENU_TEXT);
                   tft.drawFloat(desiredSkinTemp, 1, temperatureX - 65, temperatureY, textFontSize);
-                  enableSet = 1;
+                  enableSet = true;
                 }
-                EncMove = 0;
+                EncMove = false;
               }
               drawStartMessage();
               break;
@@ -139,16 +139,16 @@ void barSelection() {
                 if (EncMove && -EncMove + desiredRoomHum >= minHum && -EncMove + desiredRoomHum <= maxHum) {
                   tft.setTextColor(COLOR_MENU);
                   if (!controlHumidity) {
-                    controlHumidity = 1;
+                    controlHumidity = true;
                     tft.drawRightString(initialSensorsValue, initialSensorPosition, humidityY, textFontSize);
                   }
                   drawCentreNumber(desiredRoomHum, humidityX - 65, humidityY);
                   desiredRoomHum -= (EncMove);
                   tft.setTextColor(COLOR_MENU_TEXT);
                   drawCentreNumber(desiredRoomHum, humidityX - 65, humidityY);
-                  enableSet = 1;
+                  enableSet = true;
                 }
-                EncMove = 0;
+                EncMove = false;
               }
               drawStartMessage();
               break;
@@ -293,7 +293,7 @@ void barSelection() {
                     language = numLanguages - 1;
                   }
                   if (language >= numLanguages) {
-                    language = 0;
+                    language = false;
                   }
                   tft.setTextColor(COLOR_MENU_TEXT);
                   switch (language) {
@@ -312,7 +312,7 @@ void barSelection() {
                   }
                   tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
                   EEPROM.write(EEPROM_language, language);
-                  EncMove = 0;
+                  EncMove = false;
                 }
               }
               settings();
@@ -346,7 +346,7 @@ void barSelection() {
                   tft.setTextColor(COLOR_MENU_TEXT);
                   drawRightNumber(HeaterPower, 280, ypos);
                 }
-                EncMove = 0;
+                EncMove = false;
               }
               break;
             case DebugENGraphicPosition:
@@ -389,7 +389,7 @@ void barSelection() {
                   temperature[babyNTC] += EncMove * (0.1);
                   tft.drawFloat(temperature[babyNTC], 1, valuePosition, ypos, textFontSize);
                   previousTemperature[babyNTC] = temperature[babyNTC];
-                  EncMove = 0;
+                  EncMove = false;
                   EEPROM.write(EEPROM_diffTemperature, int(diffTemperature[babyNTC] * 10));
                 }
               }
@@ -404,14 +404,14 @@ void barSelection() {
                   diffHumidity += EncMove;
                   humidity += EncMove;
                   tft.drawFloat(humidity, 0, valuePosition, ypos, textFontSize);
-                  EncMove = 0;
+                  EncMove = false;
                   EEPROM.write(EEPROM_diffHumidity, diffHumidity );
                 }
               }
               break;
             case restartCalibrationValuesTempGraphicPosition:
-              diffTemperature[babyNTC] = 0;
-              diffHumidity = 0;
+              diffTemperature[babyNTC] = false;
+              diffHumidity = false;
               EEPROM.write(EEPROM_diffTemperature, diffTemperature[babyNTC]);
               EEPROM.write(EEPROM_diffHumidity, diffHumidity);
               calibrateSensors();
@@ -419,7 +419,7 @@ void barSelection() {
           }
           break;
       }
-      selected = 0;
+      selected = false;
       tft.fillRect(0, (tft.height() - height_heading) * (bar_pos - 1) / rectangles + height_heading, width_select, (tft.height() - height_heading) / rectangles, WHITE);
       while (!digitalRead(ENC_SWITCH)) {
         updateData();
@@ -532,7 +532,7 @@ void setPresetRoomValues() {
 void back_mode() {
   delay(debounceTime);
   last_encPulsed = millis();
-  byte back_bar = 0;
+  byte back_bar = false;
   while (!digitalRead(ENC_SWITCH)) {
     updateData();
     if (millis() - last_encPulsed > time_back_wait) {

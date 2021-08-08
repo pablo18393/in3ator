@@ -2,13 +2,13 @@
 void calibrateSensors() {
   byte numWords = 3;
   page = calibrateSensorsPage;
-  print_text = 1;
+  print_text = true;
   tft.setTextSize(1);
   tft.setTextColor(COLOR_MENU_TEXT);
-  for (int i = 0; i < numWords; i++) {
+  for (int i = false; i < numWords; i++) {
     pos_text[i] = leftMargin;
   }
-  pos_text[2] = 1;
+  pos_text[2] = true;
   switch (language) {
     case english:
       words[temperatureCalibrationGraphicPosition]  = "Temperature";

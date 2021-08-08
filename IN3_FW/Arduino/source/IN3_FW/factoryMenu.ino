@@ -1,11 +1,11 @@
 void factoryMenu() {
   byte numWords = 2;
-  print_text = 1;
+  print_text = true;
   tft.setTextSize(1);
   tft.setTextColor(introBackColor);
   drawIntroMessage();
   tft.setTextColor(introTextColor);
-  for (int i = 0; i < numWords; i++) {
+  for (int i = false; i < numWords; i++) {
     pos_text[i] = leftMargin;
   }
   if (!language) {
@@ -16,7 +16,7 @@ void factoryMenu() {
     words[0]  = "pulsa para empezar";
     words[1]  = "Bienvenido a in3";
   }
-  for (int i = 0; i < numWords; i++) {
+  for (int i = false; i < numWords; i++) {
     tft.drawCentreString(words[i], tft.width() / 2, tft.height() / 2 - letter_height * 2 * i , textFontSize);
   }
   while (digitalRead(ENC_SWITCH)) {
@@ -37,7 +37,7 @@ void helpingmainMenu() {
   setSensorsGraphicPosition();
   tft.setTextSize(1);
   tft.setTextColor(COLOR_MENU_TEXT);
-  for (int i = 0; i < numWords; i++) {
+  for (int i = false; i < numWords; i++) {
     pos_text[i] = leftMargin;
   }
   pos_text[2] = centered;

@@ -107,9 +107,6 @@ int language;
 #define numLanguages 4
 #define defaultLanguage english //Preset number configuration when booting for first time
 
-//temperature variables
-#define CheckSensorRaiseTemp 3   //(in celsius degrees) Due to a probable missplacement issue, a Temperature difference threshold is set to distinguish between heater or room NTC at the beggining of a thermal control
-
 //number assignment of each enviromental sensor for later call in variable
 #define babyNTC 0
 #define airNTC 1
@@ -122,24 +119,26 @@ int language;
 #define temperature_fraction 50 //amount of temperature samples to filter
 int NTC_PIN[numNTC] = {BABY_NTC_PIN, AIR_NTC_PIN};
 double temperature[numTempSensors];
+double temperatureMax[numTempSensors], temperatureMin[numTempSensors];
 double previousTemperature[numTempSensors];
 int temperatureArray [numNTC][temperature_fraction]; //variable to handle each NTC with the array of last samples (only for NTC)
 byte temperature_measured; //temperature sensor number turn to measure
 float diffTemperature[numTempSensors]; //difference between measured temperature and user input real temperature
 bool faultNTC[numNTC]; //variable to control a failure in NTC
 byte numSensors; //number of total sensors
-int humidity; // room humidity variable
+double humidity; // room humidity variable
 int previousHumidity; //previous sampled humidity
 int diffHumidity; //difference between measured humidity and user input real humidity
+
 
 int gestationWeeks = 28; //preterm baby gestation time in weeks
 int heaterPower; //duty cycle of control signal of system heater
 
 //Sensor check rate (in ms). Both sensors are checked in same interrupt and they have different check rates
 const byte pulsioximeterRate = 5;
-byte pulsioximeterCount = 0;
-byte encoderRate = 1;
-byte encoderCount = 0;
+byte pulsioximeterCount = false;
+byte encoderRate = true;
+byte encoderCount = false;
 bool encPulseDetected;
 
 //GPRS variables to transmit
@@ -157,7 +156,7 @@ const int maxPulsioximeterSamples = 320; //(tft width).
 float currentConsumption, currentConsumtionStacker;
 float currentOffset = 110;
 float correctionCurrentFactor = 0.0038;
-int currentConsumptionPos = 0;
+int currentConsumptionPos = false;
 float currentConsumptionFactor = 2.685; //factor to translate current consumtion in mA
 int pulsioximeterSample[maxPulsioximeterSamples][2]; //0 is previous data, 1 is actual data
 int pulsioximeterPeakThreshold;
@@ -167,11 +166,11 @@ long pulsioximeterMinPeakTime;
 long pulsioximeterMaxPeakTime;
 int minPulsioximeterCoordinate;
 int maxPulsioximeterCoordinate;
-const bool pulsioximeterDrawn = 0;
-const bool pulsioximeterSampled = 1;
+const bool pulsioximeterDrawn = false;
+const bool pulsioximeterSampled = true;
 int pulsioximeterInterSamples[pulsioximeterRate];
 int pulsioximeterMultiplierFilterFactor = 1000;
-int pulsioximeterRestFilterFactor = 1;
+int pulsioximeterRestFilterFactor = true;
 int pulsioximeterAmplitud;
 int pulsioximeterCounter[2];
 int BPM, IBI;
@@ -181,7 +180,7 @@ String RPD; //(Raw Pulsioximeter Data)
 bool controlMode;
 bool defaultControlMode = BASIC_CONTROL;
 double desiredSkinTemp = 34; //preset baby skin temperature
-int desiredRoomHum = 75; //preset enviromental humidity
+double desiredRoomHum = 75; //preset enviromental humidity
 bool jaundiceEnable; //PWM that controls jaundice LED intensity
 double HeaterPower; //maximum heater power
 double desiredHeaterTemp; //desired temperature in heater
@@ -191,13 +190,13 @@ const byte defaultHeaterPower = 100; //preset max heater temperature in celsious
 
 //constants
 const byte heaterPowerMax = 100; //maximum temperature in heater to be set
-const byte heaterPowerMin = 0; //maximum temperature in heater to be set
+const byte heaterPowerMin = false; //maximum temperature in heater to be set
 const byte minTemp = 15; //minimum allowed temperature to be set
 const byte maxTemp = 45; //maximum allowed temperature to be set
 const byte maxHum = 100; //maximum allowed humidity to be set
 const byte minHum = 20; //minimum allowed humidity to be set
 const byte maxGestation = 99; //maximum gestation weeks to be set
-const byte minGestation = 1; //minimum gestation weeks to be set
+const byte minGestation = true; //minimum gestation weeks to be set
 const byte LEDMaxIntensity = 100; //max LED intensity to be set
 const byte fanMaxSpeed = 100; //max fan speed (percentage) to be set
 const float screenBrightnessFactor = 2.5; //Max brightness will be divided by this constant
@@ -212,7 +211,7 @@ bool encPulsed, encPulsedBefore; //encoder switch status
 volatile int EncMove; //moved encoder
 int EncMoveOrientation = -1; //set to -1 to increase values clockwise
 volatile int last_encoder_move; //moved encoder
-long encoder_debounce_time = 1; //in milliseconds, debounce time in encoder to filter signal bounces
+long encoder_debounce_time = true; //in milliseconds, debounce time in encoder to filter signal bounces
 long last_encPulsed; //last time encoder was pulsed
 
 //User Interface display constants
@@ -248,9 +247,9 @@ int pulsioximeterXPos;
 bool controlTemperature;
 bool controlHumidity;
 int ypos;
-bool displayProcessPercentage = 0;
+bool displayProcessPercentage = false;
 bool print_text;
-bool display_drawStop = 0;
+bool display_drawStop = false;
 char* initialSensorsValue = "XX";
 int initialSensorPosition = separatorPosition - letter_width;
 byte text_size;
@@ -377,7 +376,7 @@ HardwareTimer encoderTimer(2);
 HardwareTimer heaterTimer(1);
 
 #define buzzerdefaultPeriod 500    // in microseconds, also for BUZZER optimal frequency (2khz); Prescale factor 6, Overflow 36000
-#define PIDISRPeriod 1000000    // in microseconds -> 1 secs
+#define PIDISRPeriod 1000    // in microseconds -> 1 msecs
 #define peripheralsISRPeriod 1000    // in microseconds
 #define heaterTimerPeriod 20*peripheralsISRPeriod   // in microseconds. Heater period, antialiasing factor for current sensing
 #define backlightTimerPeriod 100 //in microseconds

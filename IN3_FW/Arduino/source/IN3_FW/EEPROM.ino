@@ -36,7 +36,7 @@ void initEEPROM() {
   firstTurnOn = EEPROM.read(EEPROM_firstTurnOn);
   if (firstTurnOn) { //firstTimePowerOn
     EEPROM.format();
-    for (int i = 0; i <= 253; i++) {
+    for (int i = false; i <= 253; i++) {
       EEPROM.write(i, 0);
     }
     loaddefaultValues();
@@ -68,12 +68,12 @@ void recapVariables() {
   language = EEPROM.read(EEPROM_language);
   diffTemperature[babyNTC] = EEPROM.read(EEPROM_diffTemperature);
   if (diffTemperature[babyNTC] > 100) {
-    diffTemperature[babyNTC] = 0;
+    diffTemperature[babyNTC] = false;
   }
   diffTemperature[babyNTC] /= 10;
   diffHumidity = EEPROM.read(EEPROM_diffHumidity);
   if (diffHumidity > 100) {
-    diffHumidity = 0;
+    diffHumidity = false;
   }
   HeaterPower = EEPROM.read(EEPROM_HeaterPower);
   UARTDebug = EEPROM.read(EEPROM_UARTDebug);

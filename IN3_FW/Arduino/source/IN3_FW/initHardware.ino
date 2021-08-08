@@ -50,7 +50,7 @@
 #define DEFECTIVE_BUZZER 1<<18
 #define DEFECTIVE_CURRENT_SENSOR 1<<19
 
-long HW_error = 0;
+long HW_error = false;
 
 void initHardware() {
   logln("[HW] -> Initialiting hardware");
@@ -85,8 +85,8 @@ void initPowerAlarm() {
 void initGPRS()
 {
   Serial1.begin(115200);
-  GPRS.enable = 1;
-  GPRS.powerUp = 1;
+  GPRS.enable = true;
+  GPRS.powerUp = true;
   GPRSSetPostVariables(defaultPost, "First post, FW version: " + String (FWversion));
   setGPRSPostPeriod(standByGPRSPostPeriod);
   pinMode(GPRS_PWRKEY, OUTPUT);
@@ -152,7 +152,7 @@ void initRoomSensor() {
   Wire.begin();
   Wire.beginTransmission(roomSensorAddress);
   roomSensorPresent = Wire.endTransmission();
-  if (roomSensorPresent == 0) {
+  if (roomSensorPresent == false) {
     logln("[HW] -> Room sensor succesfully found, initializing...");
     mySHTC3.begin(Wire);
   }

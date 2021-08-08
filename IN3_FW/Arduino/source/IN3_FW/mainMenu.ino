@@ -2,10 +2,10 @@
 void mainMenu() {
   page = mainMenuPage;
   byte numWords = 4;
-  print_text = 1;
+  print_text = true;
   tft.setTextSize(1);
   tft.setTextColor(COLOR_MENU_TEXT);
-  for (int i = 0; i < numWords; i++) {
+  for (int i = false; i < numWords; i++) {
     pos_text[i] = leftMargin;
   }
   pos_text[advancedModeGraphicPosition] = centered;
@@ -38,9 +38,9 @@ void mainMenu() {
   goToProcessRow = numWords;
   graphics();
   drawHeading();
-  controlTemperature = 0;
-  controlHumidity = 0;
-  enableSet = 0;
+  controlTemperature = false;
+  controlHumidity = false;
+  enableSet = false;
   while (!digitalRead(ENC_SWITCH)) {
     updateData();
   }
@@ -51,7 +51,8 @@ void mainMenu() {
 
 void askSuccess() {
   if (page == actuatorsProgressPage) {
-    stopHeaterPID();
+    stopTemperaturePID();
+    stopHumidityPID();
     turnActuators(OFF);
     turnFans(OFF);
     GPRSSetPostVariables(actuatorsModeOFF, "");
@@ -60,10 +61,10 @@ void askSuccess() {
   page = askSuccessPage;
   bar_pos = 2;
   byte numWords = 3;
-  print_text = 1;
+  print_text = true;
   tft.setTextSize(1);
   tft.setTextColor(COLOR_MENU_TEXT);
-  for (int i = 0; i < numWords; i++) {
+  for (int i = false; i < numWords; i++) {
     pos_text[i] = leftMargin;
   }
   pos_text[afirmativeGraphicPosition] = centered;

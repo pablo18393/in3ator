@@ -3,19 +3,22 @@ int updateData() {
   GPRS_Handler();
   if (powerAlert) {
     logln("[ALARM] -> maximum power exceeded");
-    powerAlert = 0;
+    powerAlert = false;
   }
   if (encPulseDetected) {
     logln("[ENCODER] -> Pushed");
-    encPulseDetected = 0;
+    encPulseDetected = false;
   }
   if (millis() - lastDebugUpdate > debugUpdatePeriod) {
-    if (heatUPPID.GetMode()) {
-      logln("[PID] -> PWM output is: " + String (100 *PIDOutput / heaterMaxPWM) + "%");
+    if (temperaturePID.GetMode() == AUTOMATIC) {
+      logln("[PID] -> Heater PWM output is: " + String (100 * PIDOutput / heaterMaxPWM) + "%");
+    }
+    if (humidityPID.GetMode() == AUTOMATIC) {
+      logln("[PID] -> Humidifier output is: " + String (100 * humidityPIDOutput / WindowSize) + "%");
     }
     logln("[SENSORS] -> Current consumption is: " + String (currentConsumption) + " Amps");
     logln("[SENSORS] -> Baby temperature: " + String(temperature[babyNTC]) + "ºC");
-    logln("[SENSORS] -> Roof temperature: " + String(temperature[airNTC]) + "ºC");
+    logln("[SENSORS] -> Air temperature: " + String(temperature[airNTC]) + "ºC");
     logln("[SENSORS] -> Floor temperature: " + String(temperature[digitalTempSensor]) + "ºC");
     logln("[SENSORS] -> Humidity: " + String(humidity) + "%");
     lastDebugUpdate = millis();
@@ -49,7 +52,7 @@ void updateDisplaySensors() {
         temperaturePercentage = 100;
       }
       if (temperaturePercentage < 0) {
-        temperaturePercentage = 0;
+        temperaturePercentage = false;
       }
       updateLoadingTemperatureBar(int(previousTemperaturePercentage), int(temperaturePercentage));
     }
@@ -63,7 +66,7 @@ void updateDisplaySensors() {
         humidityPercentage = 100;
       }
       if (humidityPercentage < 0) {
-        humidityPercentage = 0;
+        humidityPercentage = false;
       }
       updateLoadingHumidityBar(int(previousHumidityPercentage), int(humidityPercentage));
     }

@@ -1,22 +1,34 @@
-
 //PID VARIABLES
-double Kp = 30000, Ki = 200, Kd = 5000;
-double PIDOutput;
-PID heatUPPID(&temperature[babyNTC], &PIDOutput, &desiredSkinTemp, Kp, Ki, Kd, P_ON_E, DIRECT);
+#define tempCTL 0
+#define humidityCTL 1
+#define numPID 2
 
-void heatUPPIDISR() {
-  if (heatUPPID.GetMode()) {
-    heatUPPID.Compute();
+double Kp[numPID] = {30000, 200}, Ki[numPID] = {50, 2} , Kd[numPID] = {10000, 20};
+double PIDOutput;
+double humidityPIDOutput;
+int WindowSize = 5000;
+unsigned long windowStartTime;
+PID temperaturePID(&temperature[babyNTC], &PIDOutput, &desiredSkinTemp, Kp[tempCTL], Ki[tempCTL], Kd[tempCTL], P_ON_E, DIRECT);
+PID humidityPID(&humidity, &humidityPIDOutput, &desiredRoomHum, Kp[humidityCTL], Ki[humidityCTL], Kd[humidityCTL], P_ON_E, DIRECT);
+
+void PIDISR() {
+  if (temperaturePID.GetMode() == AUTOMATIC) {
+    temperaturePID.Compute();
     pwmWrite(HEATER, PIDOutput);
   }
-}
-
-void initHeaterPIDControl() {
-  heatUPPID.SetOutputLimits(heaterMaxPWM * heaterPowerMin / 100, heaterMaxPWM * heaterPowerMax / 100);
-  heatUPPID.SetTunings(Kp, Ki, Kd);
-  configPIDTimer(PIDISRPeriod); //in micros
-  heatUPPID.SetSampleTime(PIDISRPeriod / 1000); // in millis
-  heatUPPID.SetControllerDirection(DIRECT);
+  if (humidityPID.GetMode() == AUTOMATIC) {
+    humidityPID.Compute();
+    if (millis() - windowStartTime > WindowSize)
+    { //time to shift the Relay Window
+      windowStartTime += WindowSize;
+    }
+    if (humidityPIDOutput < millis() - windowStartTime) {
+      digitalWrite(HUMIDIFIER, LOW);
+    }
+    else {
+      digitalWrite(HUMIDIFIER, HIGH);
+    }
+  }
 }
 
 void configPIDTimer(int freq) {
@@ -25,17 +37,35 @@ void configPIDTimer(int freq) {
   PIDTimer.setPeriod(freq); // in microseconds
   PIDTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
   PIDTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
-  PIDTimer.attachCompare1Interrupt(heatUPPIDISR);
+  PIDTimer.attachCompare1Interrupt(PIDISR);
   PIDTimer.refresh();
   PIDTimer.resume();
 }
 
-void startHeaterPID() {
-  initHeaterPIDControl();
-  heatUPPID.SetMode(AUTOMATIC);
+void startTemperaturePID() {
+  temperaturePID.SetOutputLimits(heaterMaxPWM * heaterPowerMin / 100, heaterMaxPWM * heaterPowerMax / 100);
+  temperaturePID.SetTunings(Kp[tempCTL], Ki[tempCTL], Kd[tempCTL]);
+  temperaturePID.SetSampleTime(PIDISRPeriod * 200); // in millis
+  temperaturePID.SetControllerDirection(DIRECT);
+  temperaturePID.SetMode(AUTOMATIC);
+  configPIDTimer(PIDISRPeriod); //in micros
 }
 
-void stopHeaterPID() {
-  heatUPPID.SetMode(MANUAL);
-  pwmWrite(HEATER, 0);
+void stopTemperaturePID() {
+  temperaturePID.SetMode(MANUAL);
+  pwmWrite(HEATER, LOW);
+  PIDTimer.pause();
+}
+
+void startHumidityPID() {
+  windowStartTime = millis();
+  humidityPID.SetOutputLimits(0, WindowSize);
+  humidityPID.SetMode(AUTOMATIC);
+  configPIDTimer(PIDISRPeriod); //in micros
+}
+
+void stopHumidityPID() {
+  humidityPID.SetMode(MANUAL);
+  digitalWrite(HUMIDIFIER, LOW);
+  PIDTimer.pause();
 }

@@ -5,7 +5,7 @@ void peripheralsISR() {
 }
 
 void encSwitchISR() {
-  encPulseDetected = 1;
+  encPulseDetected = true;
   buzzerTone(buzzerStandbyToneTimes, buzzerSwitchDuration, buzzerRotaryEncoderTone);
   lastUserInteraction = millis();
   if (alarmOnGoing[temperatureAlarm] || alarmOnGoing[humidityAlarm]) {
@@ -27,6 +27,6 @@ void encoderISR() {
 void powerAlertISR() {
   if (millis() - lastPowerAlertNotification > powerAlertNotificationPeriod) {
     lastPowerAlertNotification = millis();
-    powerAlert = 1;
+    powerAlert = true;
   }
 }

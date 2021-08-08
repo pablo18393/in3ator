@@ -2,10 +2,10 @@
 void advancedMode() {
   page = advancedModePage;
   byte numWords = 4;
-  print_text = 1;
+  print_text = true;
   tft.setTextSize(1);
   tft.setTextColor(COLOR_MENU_TEXT);
-  for (int i = 0; i < numWords; i++) {
+  for (int i = false; i < numWords; i++) {
     pos_text[i] = leftMargin;
   }
   pos_text[startGraphicPosition] = centered;
@@ -38,9 +38,9 @@ void advancedMode() {
   graphics();
   drawHeading();
   updateDisplaySensors();
-  controlTemperature = 0;
-  controlHumidity = 0;
-  enableSet = 0;
+  controlTemperature = false;
+  controlHumidity = false;
+  enableSet = false;
   while (!digitalRead(ENC_SWITCH)) {
     updateData();
   }
