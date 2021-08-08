@@ -57,8 +57,8 @@ void initHardware() {
   initPowerAlarm();
   initGPRS();
   initSenseCircuit();
-  initBuzzer();
   initTFT();
+  initBuzzer();
   initSensors();
   initActuators();
   initPowerEn();
@@ -195,6 +195,7 @@ void initTFT() {
   tft.begin();
   tft.setRotation(3);
   loadlogo();
+  pwmWrite(SCREENBACKLIGHT, TFTbacklightTimer.getOverflow()); //write it before, so no 
   pinMode(SCREENBACKLIGHT, PWM);
   for (int i = TFTbacklightTimer.getOverflow(); i >= backlightPower; i--) {
     pwmWrite(SCREENBACKLIGHT, i);
