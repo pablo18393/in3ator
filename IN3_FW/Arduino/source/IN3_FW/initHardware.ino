@@ -60,8 +60,8 @@ void initHardware() {
   initTFT();
   initBuzzer();
   initSensors();
-  initActuators();
   initPowerEn();
+  initActuators();
   if (!HW_error) {
     logln("[HW] -> HARDWARE OK");
     GPRSSetPostVariables(NULL, "HW OK");
