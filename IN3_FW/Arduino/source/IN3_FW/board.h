@@ -23,6 +23,7 @@
 #define POWER_EN PB12
 
 #define BABY_NTC_PIN PC1
+#define AIR_NTC_PIN PC3
 #define ENC_SWITCH PC5
 #define BUZZER PC6
 #define FAN PC7

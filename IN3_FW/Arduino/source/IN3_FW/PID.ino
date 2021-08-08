@@ -1,8 +1,8 @@
 
 //PID VARIABLES
-double Kp = 600, Ki = 150, Kd = 400;
+double Kp = 30000, Ki = 200, Kd = 5000;
 double PIDOutput;
-PID heatUPPID(&temperature[babyNTC], &PIDOutput, &desiredSkinTemp, Kp, Ki, Kd, P_ON_M, DIRECT);
+PID heatUPPID(&temperature[babyNTC], &PIDOutput, &desiredSkinTemp, Kp, Ki, Kd, P_ON_E, DIRECT);
 
 void heatUPPIDISR() {
   if (heatUPPID.GetMode()) {

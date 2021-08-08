@@ -85,11 +85,11 @@ void calculatePulsioximeterValues() {
 
 bool measurenumNTC() {
   for (int i = 0; i < numNTC; i++) {
-    temperatureArray[i][temperature_measured] = analogRead(BABY_NTC_PIN);
+    temperatureArray[i][temperature_measured] = analogRead(NTC_PIN[i]);
   }
   temperature_measured++;
   if (temperature_measured == temperature_fraction) {
-    updateTemp(babyNTC);
+    updateTemp(numNTC);
     temperature_measured = 0;
     return true;
   }
@@ -112,13 +112,13 @@ void updateTemp(byte sensor) {
       startSensor = babyNTC;
       endSensor = babyNTC;
       break;
-    case heaterNTC:
-      startSensor = heaterNTC;
-      endSensor = heaterNTC;
+    case airNTC:
+      startSensor = airNTC;
+      endSensor = airNTC;
       break;
     case numNTC:
       startSensor = babyNTC;
-      endSensor = inBoardRightNTC;
+      endSensor = airNTC;
       break;
   }
 

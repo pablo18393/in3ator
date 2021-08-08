@@ -112,14 +112,15 @@ int language;
 
 //number assignment of each enviromental sensor for later call in variable
 #define babyNTC 0
-#define heaterNTC 1
+#define airNTC 1
 #define inBoardLeftNTC 2
 #define inBoardRightNTC 3
 #define digitalTempSensor 4
 
-#define numNTC 4 //number of out of board NTC
-#define numTempSensors 5 //number of total temperature sensors in system
+#define numNTC 2 //number of NTC
+#define numTempSensors 3 //number of total temperature sensors in system
 #define temperature_fraction 50 //amount of temperature samples to filter
+int NTC_PIN[numNTC] = {BABY_NTC_PIN, AIR_NTC_PIN};
 double temperature[numTempSensors];
 double previousTemperature[numTempSensors];
 int temperatureArray [numNTC][temperature_fraction]; //variable to handle each NTC with the array of last samples (only for NTC)
@@ -190,7 +191,7 @@ const byte defaultHeaterPower = 100; //preset max heater temperature in celsious
 
 //constants
 const byte heaterPowerMax = 100; //maximum temperature in heater to be set
-const byte heaterPowerMin = 10; //maximum temperature in heater to be set
+const byte heaterPowerMin = 0; //maximum temperature in heater to be set
 const byte minTemp = 15; //minimum allowed temperature to be set
 const byte maxTemp = 45; //maximum allowed temperature to be set
 const byte maxHum = 100; //maximum allowed humidity to be set
@@ -376,7 +377,7 @@ HardwareTimer encoderTimer(2);
 HardwareTimer heaterTimer(1);
 
 #define buzzerdefaultPeriod 500    // in microseconds, also for BUZZER optimal frequency (2khz); Prescale factor 6, Overflow 36000
-#define PIDISRPeriod 200000    // in microseconds
+#define PIDISRPeriod 1000000    // in microseconds -> 1 secs
 #define peripheralsISRPeriod 1000    // in microseconds
 #define heaterTimerPeriod 20*peripheralsISRPeriod   // in microseconds. Heater period, antialiasing factor for current sensing
 #define backlightTimerPeriod 100 //in microseconds

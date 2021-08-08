@@ -676,7 +676,7 @@ bool GPRSLoadVariables() {
     databasePost[7] += ",\"baby_temp\":\"" + String(temperature[babyNTC], 2) + "\"";
   }
   if (GPRS.postHeaterTemp) {
-    databasePost[7] += ",\"heater_temp\":\"" + String(temperature[heaterNTC], 2) + "\"";
+    databasePost[7] += ",\"heater_temp\":\"" + String(temperature[airNTC], 2) + "\"";
   }
   if (GPRS.postBoardTemp1) {
     databasePost[7] += ",\"board_temp1\":\"" + String(temperature[inBoardLeftNTC], 2) + "\"";

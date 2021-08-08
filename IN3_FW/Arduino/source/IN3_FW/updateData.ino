@@ -11,10 +11,11 @@ int updateData() {
   }
   if (millis() - lastDebugUpdate > debugUpdatePeriod) {
     if (heatUPPID.GetMode()) {
-      logln("[PID] -> PWM output is: " + String (PIDOutput / heaterMaxPWM * 100) + " %");
+      logln("[PID] -> PWM output is: " + String (100 *PIDOutput / heaterMaxPWM) + "%");
     }
     logln("[SENSORS] -> Current consumption is: " + String (currentConsumption) + " Amps");
-    logln("[SENSORS] -> baby temperature: " + String(temperature[babyNTC]) + "ºC");
+    logln("[SENSORS] -> Baby temperature: " + String(temperature[babyNTC]) + "ºC");
+    logln("[SENSORS] -> Roof temperature: " + String(temperature[airNTC]) + "ºC");
     logln("[SENSORS] -> Floor temperature: " + String(temperature[digitalTempSensor]) + "ºC");
     logln("[SENSORS] -> Humidity: " + String(humidity) + "%");
     lastDebugUpdate = millis();
