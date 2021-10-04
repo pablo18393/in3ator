@@ -54,22 +54,16 @@ long HW_error = false;
 
 void initHardware() {
   logln("[HW] -> Initialiting hardware");
+  initI2CBus();
   initGPIOExpander();
-  logln("[HW] -> Initialiting GPIO");
+  initCurrentSensor();
   initPWMGPIO();
-  logln("[HW] -> Initialiting PWM");
   initPowerAlarm();
-  logln("[HW] -> Initialiting ALARM");
   initGPRS();
-  logln("[HW] -> Initialiting GPRS");
   initSenseCircuit();
-  logln("[HW] -> Initialiting SENSE");
   initTFT();
-  logln("[HW] -> Initialiting TFT");
   initBuzzer();
-  logln("[HW] -> Initialiting BUZZER");
   initSensors();
-  logln("[HW] -> Initialiting SENSORS");
   initPowerEn();
   initActuators();
   if (!HW_error) {
@@ -88,6 +82,15 @@ void initHardware() {
   buzzerTone(4, buzzerStandbyToneDuration, buzzerStandbyTone);
 }
 
+void initI2CBus() {
+  Wire.begin();
+}
+
+void initCurrentSensor() {
+  PAC.begin();
+  PAC.UpdateCurrent();
+}
+
 void initPWMGPIO() {
   ledcSetup(SCREENBACKLIGHT_PWM_CHANNEL, PWM_FREQUENCY, PWM_RESOLUTION);
   ledcSetup(HEATER_PWM_CHANNEL, PWM_FREQUENCY, PWM_RESOLUTION);
@@ -103,9 +106,7 @@ void initPWMGPIO() {
 }
 
 void initGPIOExpander() {
-  Wire.begin();
   TCA.begin();
-  //Wire.setClock(50);
 }
 
 void initPin(uint8_t GPIO, uint8_t Mode) {
@@ -208,7 +209,6 @@ void initEncoder() {
 
 void initRoomSensor() {
   logln("[HW] -> Detecting room sensor...");
-  Wire.begin();
   Wire.beginTransmission(roomSensorAddress);
   roomSensorPresent = !(Wire.endTransmission());
   if (roomSensorPresent == true) {
@@ -221,7 +221,7 @@ void standByCurrentTest() {
   long error = HW_error;
   float testCurrent;
   logln("[HW] -> Measuring standby current...");
-  testCurrent = sampleConsumption();
+  testCurrent = measureConsumption();
   if (testCurrent < STANDBY_CONSUMPTION_MIN) {
     HW_error += DEFECTIVE_CURRENT_SENSOR;
     logln("[HW] -> Fail -> Defective current sensor");
@@ -246,7 +246,7 @@ void initTFT() {
   long processTime = millis();
   backlightPower = maxPWMvalue / screenBrightnessFactor;
   backlightPowerSafe = maxPWMvalue * backlightPowerSafePercentage;
-  offsetCurrent = sampleConsumption();
+  offsetCurrent = measureConsumption();
   initPin(TOUCH_CS, OUTPUT);
   initPin(SD_CS, OUTPUT);
   initPin(TFT_CS, OUTPUT);
@@ -266,7 +266,7 @@ void initTFT() {
     delayMicroseconds(brightenRate);
     updateData();
   }
-  testCurrent = sampleConsumption() - offsetCurrent;
+  testCurrent = measureConsumption() - offsetCurrent;
   if (testCurrent < SCREEN_CONSUMPTION_MIN) {
     HW_error += DEFECTIVE_SCREEN;
     logln("[HW] -> Fail -> Screen current is not high enough");
@@ -294,34 +294,23 @@ void initActuators() {
 
 void initHeater() {
 
-  //configheaterTimer(heaterTimerPeriod);
 }
 
 void configheaterTimer(int freq) {
-  //humidifier timer configuration:
-  //heaterTimer.pause();
-  //heaterTimer.setPeriod(freq); // in microseconds
-  //heaterTimer.refresh();
-  //heaterTimer.resume();
-  //heaterMaxPWM = heaterTimer.getOverflow();
+
 }
 
 void configbuzzerTimer(int freq) {
-  //buzzer timer configuration:
-  //buzzerTimer.pause();
-  //buzzerTimer.setPeriod(freq); // in microseconds
-  //buzzerTimer.refresh();
-  //buzzerTimer.resume();
-  //buzzerMaxPWM = buzzerTimer.getOverflow();
+
 }
 
 void initBuzzer() {
   long error = HW_error;
   float testCurrent, offsetCurrent;
-  offsetCurrent = sampleConsumption();
+  offsetCurrent = measureConsumption();
 
   ledcWrite(BUZZER_PWM_CHANNEL, buzzerMaxPWM / 2);
-  testCurrent = sampleConsumption() - offsetCurrent;
+  testCurrent = measureConsumption() - offsetCurrent;
   ledcWrite(BUZZER_PWM_CHANNEL, false);
   if (testCurrent < BUZZER_CONSUMPTION_MIN) {
     HW_error += DEFECTIVE_BUZZER;
@@ -366,11 +355,11 @@ void buzzerTone (int beepTimes, int timeDelay, int freq) {
 void initPowerEn() {
   long error = HW_error;
   float testCurrent, offsetCurrent;
-  offsetCurrent = sampleConsumption();
+  offsetCurrent = measureConsumption();
   logln("[HW] -> Checking power enable circuit...");
   initPin(POWER_EN, OUTPUT);
   GPIOWrite(POWER_EN, HIGH);
-  testCurrent = sampleConsumption() - offsetCurrent;
+  testCurrent = measureConsumption() - offsetCurrent;
   if (testCurrent > STANDBY_CONSUMPTION_MAX) {
     HW_error += DEFECTIVE_POWER_EN;
     logln("[HW] -> Fail -> Defective power enable circuit");
@@ -387,10 +376,10 @@ void initPowerEn() {
 void actuatorsTest() {
   long error = HW_error;
   float testCurrent, offsetCurrent;
-  offsetCurrent = sampleConsumption();
+  offsetCurrent = measureConsumption();
   logln("[HW] -> Checking actuators...");
   ledcWrite(HEATER_PWM_CHANNEL, heaterMaxPWM * HeaterPower / 100 );
-  testCurrent = sampleConsumption() - offsetCurrent;
+  testCurrent = measureConsumption() - offsetCurrent;
   logln("[HW] -> Heater current consumption: " + String (testCurrent) + " Amps");
   GPRSSetPostVariables(NULL, ",Hea:" + String (testCurrent));
   if (testCurrent < HEATER_CONSUMPTION_MIN) {
@@ -403,7 +392,7 @@ void actuatorsTest() {
   }
   ledcWrite(HEATER_PWM_CHANNEL, 0);
   GPIOWrite(FAN, HIGH);
-  testCurrent = sampleConsumption() - offsetCurrent;
+  testCurrent = measureConsumption() - offsetCurrent;
   logln("[HW] -> FAN consumption: " + String (testCurrent) + " Amps");
   GPRSSetPostVariables(NULL, ",Fan:" + String (testCurrent));
   if (testCurrent < FAN_CONSUMPTION_MIN) {
@@ -416,7 +405,7 @@ void actuatorsTest() {
   }
   GPIOWrite(FAN, LOW);
   GPIOWrite(PHOTOTHERAPY, HIGH);
-  testCurrent = sampleConsumption() - offsetCurrent;
+  testCurrent = measureConsumption() - offsetCurrent;
   logln("[HW] -> Phototherapy current consumption: " + String (testCurrent) + " Amps");
   GPRSSetPostVariables(NULL, ",Pho:" + String (testCurrent));
   if (testCurrent < PHOTOTHERAPY_CONSUMPTION_MIN) {
@@ -429,7 +418,7 @@ void actuatorsTest() {
   }
   GPIOWrite(PHOTOTHERAPY, LOW);
   GPIOWrite(HUMIDIFIER, HIGH);
-  testCurrent = sampleConsumption() - offsetCurrent;
+  testCurrent = measureConsumption() - offsetCurrent;
   logln("[HW] -> Humidifier current consumption: " + String (testCurrent) + " Amps");
   GPRSSetPostVariables(NULL, ",Hum:" + String (testCurrent));
   if (testCurrent < HUMIDIFIER_CONSUMPTION_MIN) {

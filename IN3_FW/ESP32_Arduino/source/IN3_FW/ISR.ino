@@ -1,5 +1,5 @@
-void peripheralsISR() {
-  sensorsISR();
+void IRAM_ATTR peripheralsISR() {
+  //sensorsISR();
   buzzerISR();
   userInteraction();
 }
@@ -25,8 +25,10 @@ void encoderISR() {
 }
 
 void powerAlertISR() {
+  /*
   if (millis() - lastPowerAlertNotification > powerAlertNotificationPeriod) {
     lastPowerAlertNotification = millis();
     powerAlert = true;
   }
+  */
 }

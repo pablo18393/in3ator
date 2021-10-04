@@ -16,18 +16,20 @@ void initDebug() {
 }
 
 void initInterrupts() {
-  attachInterrupt(PWR_ALERT, powerAlertISR, RISING);
+  //attachInterrupt(PWR_ALERT, powerAlertISR, RISING);
   attachInterrupt(ENC_SWITCH, encSwitchISR, FALLING);
   attachInterrupt(ENC_A, encoderISR, CHANGE);
   attachInterrupt(ENC_B, encoderISR, CHANGE);
 }
 
 void initTimers() {
-  //encoderTimer.pause();
-  //encoderTimer.setPeriod(peripheralsISRPeriod); // in microseconds
-  //encoderTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
-  //encoderTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
-  //encoderTimer.attachCompare1Interrupt(peripheralsISR);
-  //encoderTimer.refresh();
-  //encoderTimer.resume();
+  // Interval in microsecs
+  /*
+  if (ITimer0.attachInterruptInterval(peripheralsISRPeriod, peripheralsISR)) {
+    Serial.print(F("Starting  ITimer0 OK, millis() = ")); Serial.println(millis());
+  }
+  else {
+    Serial.println(F("Can't set ITimer0. Select another freq. or timer"));
+  }
+  */
 }

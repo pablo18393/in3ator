@@ -1,5 +1,7 @@
 int updateData() {
+  loopCounts++;
   watchdogReload();
+  sensorsISR();
   GPRS_Handler();
   if (powerAlert) {
     logln("[ALARM] -> maximum power exceeded");
@@ -16,11 +18,14 @@ int updateData() {
     if (humidityPID.GetMode() == AUTOMATIC) {
       logln("[PID] -> Humidifier output is: " + String (100 * humidityPIDOutput / WindowSize) + "%");
     }
+    currentConsumption=measureConsumption();
     logln("[SENSORS] -> Current consumption is: " + String (currentConsumption) + " Amps");
     logln("[SENSORS] -> Baby temperature: " + String(temperature[babyNTC]) + "ºC");
     logln("[SENSORS] -> Air temperature: " + String(temperature[airNTC]) + "ºC");
     logln("[SENSORS] -> Floor temperature: " + String(temperature[digitalTempSensor]) + "ºC");
     logln("[SENSORS] -> Humidity: " + String(humidity) + "%");
+    logln("[LATENCY] -> Looped " + String(loopCounts * 1000 / (millis() - lastDebugUpdate)) + " Times per second");
+    loopCounts = 0;
     lastDebugUpdate = millis();
   }
   if (millis() - lastGraphicSensorsUpdate > sensorsUpdatePeriod) {
@@ -80,11 +85,11 @@ void logln(String dataString) {
 void log(String dataString) {
   if (SDCard) {
     /*
-    GPIOWrite(SD_CS, LOW);
-    GPIOWrite(TFT_CS, HIGH);
-    // if the file is available, write to it:
-    File dataFile = SD.open(logFile, FILE_WRITE);
-    if (dataFile) {
+      GPIOWrite(SD_CS, LOW);
+      GPIOWrite(TFT_CS, HIGH);
+      // if the file is available, write to it:
+      File dataFile = SD.open(logFile, FILE_WRITE);
+      if (dataFile) {
       dataFile.print(day());
       dataFile.print("/");
       dataFile.print(month());
@@ -100,9 +105,9 @@ void log(String dataString) {
       dataFile.print(dataString);
       dataFile.close();
       // print to the serial port too:
-    }
-    GPIOWrite(SD_CS, HIGH);
-    GPIOWrite(TFT_CS, LOW);
+      }
+      GPIOWrite(SD_CS, HIGH);
+      GPIOWrite(TFT_CS, LOW);
     */
   }
   if (UARTDebug) {
@@ -113,16 +118,16 @@ void log(String dataString) {
 void GPRSLocalLog() {
   if (SDCard) {
     /*
-    GPIOWrite(SD_CS, LOW);
-    GPIOWrite(TFT_CS, HIGH);
-    String dataString;
-    dataString += temperature[babyNTC];
-    dataString += ";";
-    dataString += humidity;
-    dataString += ";";
-    // if the file is available, write to it:
-    File dataFile = SD.open(GPRSFile, FILE_WRITE);
-    if (dataFile) {
+      GPIOWrite(SD_CS, LOW);
+      GPIOWrite(TFT_CS, HIGH);
+      String dataString;
+      dataString += temperature[babyNTC];
+      dataString += ";";
+      dataString += humidity;
+      dataString += ";";
+      // if the file is available, write to it:
+      File dataFile = SD.open(GPRSFile, FILE_WRITE);
+      if (dataFile) {
       dataFile.print(day());
       dataFile.print("/");
       dataFile.print(month());
@@ -139,9 +144,9 @@ void GPRSLocalLog() {
       dataFile.close();
       // print to the serial port too:
       //logln(dataString);
-    }
-    GPIOWrite(SD_CS, HIGH);
-    GPIOWrite(TFT_CS, LOW);
-  */
+      }
+      GPIOWrite(SD_CS, HIGH);
+      GPIOWrite(TFT_CS, LOW);
+    */
   }
 }

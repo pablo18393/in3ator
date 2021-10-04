@@ -48,7 +48,7 @@ void startTemperaturePID() {
   temperaturePID.SetSampleTime(PIDISRPeriod * 200); // in millis
   temperaturePID.SetControllerDirection(DIRECT);
   temperaturePID.SetMode(AUTOMATIC);
-  configPIDTimer(PIDISRPeriod); //in micros
+  //configPIDTimer(PIDISRPeriod); //in millis
 }
 
 void stopTemperaturePID() {
@@ -61,7 +61,7 @@ void startHumidityPID() {
   windowStartTime = millis();
   humidityPID.SetOutputLimits(0, WindowSize);
   humidityPID.SetMode(AUTOMATIC);
-  configPIDTimer(PIDISRPeriod); //in micros
+  //configPIDTimer(PIDISRPeriod); //in millis
 }
 
 void stopHumidityPID() {

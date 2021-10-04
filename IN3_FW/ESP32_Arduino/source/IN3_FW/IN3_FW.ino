@@ -1,9 +1,6 @@
 /* * Pending:
-    watchdog
-    drawCenter, drawRight, drawFloat
     EEPROM
     SD
-    tft.drawString
 */
 
 //Firmware version and head title of UI screen
@@ -26,6 +23,7 @@ String serialNumber = "in3000031";
 #include <RotaryEncoder.h>
 #include "TCA9555.h"
 #include <Microchip_PAC193x.h>
+#include "ESP32TimerInterrupt.h"
 
 #define ON true
 #define OFF false
@@ -67,6 +65,7 @@ float alarmTimeDelay = 30; //in mins, time to check alarm
 bool UARTDebug=1;
 bool defaultUARTDebug = ON;
 long lastDebugUpdate;
+long loopCounts;
 //pages number in UI. Configuration and information will be displayed depending on the page number
 int page;
 #define mainMenuPage 1
@@ -96,6 +95,11 @@ int language;
 #define numNTC 2 //number of NTC
 #define numTempSensors 3 //number of total temperature sensors in system
 #define temperature_fraction 50 //amount of temperature samples to filter
+
+#define NTCMeasurementPeriod 10 //in micros
+#define CurrentMeasurementPeriod 1000 //in micros
+long lastNTCmeasurement, lastCurrentMeasurement;
+
 int NTC_PIN[numNTC] = {BABY_NTC_PIN, AIR_NTC_PIN};
 double temperature[numTempSensors];
 double temperatureMaxReset = -1000;
@@ -110,7 +114,6 @@ byte numSensors; //number of total sensors
 double humidity; // room humidity variable
 int previousHumidity; //previous sampled humidity
 int diffHumidity; //difference between measured humidity and user input real humidity
-
 
 int gestationWeeks = 28; //preterm baby gestation time in weeks
 int heaterPower; //duty cycle of control signal of system heater
@@ -340,7 +343,7 @@ SHTC3 mySHTC3;              // Declare an instance of the SHTC3 class
 RotaryEncoder encoder(ENC_A, ENC_B, RotaryEncoder::LatchMode::TWO03);
 TCA9555 TCA(0x20);
 Microchip_PAC193x PAC;
-
+ESP32Timer ITimer0(0);
 
 /*
   HardwareTimer //buzzerTimer(8);
@@ -350,11 +353,8 @@ Microchip_PAC193x PAC;
   HardwareTimer //heaterTimer(1);
 */
 
-#define buzzerdefaultPeriod 500    // in microseconds, also for BUZZER optimal frequency (2khz); Prescale factor 6, Overflow 36000
-#define PIDISRPeriod 1000    // in microseconds -> 1 msecs
-#define peripheralsISRPeriod 1000    // in microseconds
-#define heaterTimerPeriod 20*peripheralsISRPeriod   // in microseconds. Heater period, antialiasing factor for current sensing
-#define backlightTimerPeriod 100 //in microseconds
+#define PIDISRPeriod 1000    // in msecs
+#define peripheralsISRPeriod 100000    // in milliseconds
 
 int hardwareComponents;
 

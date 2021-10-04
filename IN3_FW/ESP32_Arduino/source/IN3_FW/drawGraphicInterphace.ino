@@ -602,15 +602,16 @@ int16_t drawFloat(float floatNumber, int16_t decimal, int16_t poX, int16_t poY, 
   float eep = 0.000001;
   int16_t sumX    = 0;
   int16_t xPlus   = 0;
-  //char negativeSymbol = '-';
-  //char decimalSymbol = '.';
+  char negativeSymbol[] = "-";
+  char decimalSymbol[] = ".";
   int16_t width = 8;
   int16_t gap = -2;
+  int r = 1;
 
-  
+
   if (floatNumber - 0.0 < eep)    // floatNumber < 0
   {
-    drawString("-", poX, poY, size);
+    drawString(negativeSymbol, poX, poY, size);
     floatNumber = -floatNumber;
     poX  += (width + gap) * size;
     sumX += (width + gap) * size;
@@ -627,12 +628,17 @@ int16_t drawFloat(float floatNumber, int16_t decimal, int16_t poX, int16_t poY, 
 
   xPlus = drawNumber(temp, poX, poY, size);
 
-  poX  += (width + gap) * size * 2;
+  while (temp > 9) {
+    temp /= 10;
+    r++;
+  }
+  temp = (long)floatNumber;
+  poX  += (width + gap) * size * r;
   sumX += (width + gap) * size;
 
   if (decimal > 0)
   {
-    drawString(".", poX, poY, size);
+    drawString(decimalSymbol, poX, poY, size);
     poX  += (width + gap) * size;                            /* Move cursor right            */
     sumX += (width + gap) * size;
   }

@@ -1,50 +1,23 @@
 #define consumptionMeanSamples 1000
 
 void sensorsISR() {
-  measurenumNTC();
-  measureConsumption();
-}
-
-float sampleConsumption() {
-  float consumption = false;
-  for (int i = false; i <= consumptionMeanSamples; i++) {
-    delayMicroseconds(100);
-    if (measureConsumption()) {
-      consumption = currentConsumption;
-      return consumption;
-    }
+  if (millis() - lastNTCmeasurement > NTCMeasurementPeriod) {
+    lastNTCmeasurement = millis();
+    measurenumNTC();
   }
-  return consumption;
+  if (millis() - lastCurrentMeasurement > CurrentMeasurementPeriod) {
+    lastCurrentMeasurement = millis();
+    measureConsumption();
+  }
 }
 
 void measureOffsetConsumption() {
-  /*
-    currentConsumtionStacker = false;
-    for (int i = false; i < consumptionMeanSamples; i++) {
-    delay(1);
-    currentConsumtionStacker += analogRead(SYSTEM_SHUNT);
-    }
-    currentOffset = currentConsumtionStacker / consumptionMeanSamples;
-    logln("[SENSORS] -> Offset current consumption is: " + String (currentOffset * correctionCurrentFactor) + " Amps, instant measure is " + String(currentOffset));
-    currentConsumtionStacker = false;
-  */
+
 }
 
-bool measureConsumption() {
-  currentConsumptionPos++;
-  if (currentConsumptionPos >= consumptionMeanSamples) {
-    currentConsumptionPos = false;
-    currentConsumtionStacker = ((currentConsumtionStacker / consumptionMeanSamples) - currentOffset) * correctionCurrentFactor;
-    if (currentConsumtionStacker > 0) {
-      currentConsumption = currentConsumtionStacker;
-    }
-    currentConsumtionStacker = false;
-    return true;
-  }
-  else {
-    currentConsumtionStacker += analogRead(SYSTEM_SHUNT);
-    return false;
-  }
+float measureConsumption() {
+  PAC.UpdateCurrent();
+  return (PAC.Current);
 }
 
 void checkNewPulsioximeterData() {
