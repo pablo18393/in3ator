@@ -17,7 +17,7 @@ void measureOffsetConsumption() {
 
 float measureConsumption() {
   PAC.UpdateCurrent();
-  return (PAC.Current);
+  return (PAC.Current/1000); //Amperes
 }
 
 void checkNewPulsioximeterData() {

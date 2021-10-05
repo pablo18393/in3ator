@@ -56,12 +56,12 @@
 #define SCREENBACKLIGHT_PWM_CHANNEL 0
 #define HEATER_PWM_CHANNEL 1
 #define BUZZER_PWM_CHANNEL 2
-#define PWM_RESOLUTION 16
+#define PWM_RESOLUTION 8
 #define PWM_FREQUENCY 2000
 
 #define maxADCvalue 4095
 #define maxDACvalue 4095         //for STM32F103RE with arduino IDE
-#define maxPWMvalue 65535
+int maxPWMvalue = pow(2,PWM_RESOLUTION) - 1;
 
 float backlightPower;
 float backlightPowerSafe;

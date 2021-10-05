@@ -270,9 +270,9 @@ void drawIntroMessage() {
 void drawHardwareErrorMessage(long error) {
   page = errorPage;
   tft.fillScreen(introBackColor);
-  setTextColor(introTextColor);
-  tft.setTextSize(3);
+  tft.setTextColor(introTextColor); //use tft. because tft.print is configured by it
   tft.setCursor(tft.width() / 4 - hexDigits(error) * 16, tft.height() / 5);
+  tft.setTextSize(3);
   tft.print("HW error:");
   tft.println(error, HEX);
   tft.println();

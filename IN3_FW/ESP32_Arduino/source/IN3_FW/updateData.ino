@@ -1,7 +1,9 @@
 int updateData() {
   loopCounts++;
   watchdogReload();
-  sensorsISR();
+  //sensorsISR();
+  //userInteraction();
+  buzzerISR();
   GPRS_Handler();
   if (powerAlert) {
     logln("[ALARM] -> maximum power exceeded");
@@ -18,7 +20,7 @@ int updateData() {
     if (humidityPID.GetMode() == AUTOMATIC) {
       logln("[PID] -> Humidifier output is: " + String (100 * humidityPIDOutput / WindowSize) + "%");
     }
-    currentConsumption=measureConsumption();
+    currentConsumption = measureConsumption();
     logln("[SENSORS] -> Current consumption is: " + String (currentConsumption) + " Amps");
     logln("[SENSORS] -> Baby temperature: " + String(temperature[babyNTC]) + "ºC");
     logln("[SENSORS] -> Air temperature: " + String(temperature[airNTC]) + "ºC");

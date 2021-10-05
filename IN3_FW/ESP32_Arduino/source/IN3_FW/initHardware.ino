@@ -64,6 +64,7 @@ void initHardware() {
   initTFT();
   initBuzzer();
   initSensors();
+  initInterrupts();
   initPowerEn();
   initActuators();
   if (!HW_error) {
@@ -79,7 +80,7 @@ void initHardware() {
       updateData();
     }
   }
-  buzzerTone(4, buzzerStandbyToneDuration, buzzerStandbyTone);
+  buzzerTone(2, buzzerStandbyToneDuration, buzzerStandbyTone);
 }
 
 void initI2CBus() {
@@ -308,8 +309,8 @@ void initBuzzer() {
   long error = HW_error;
   float testCurrent, offsetCurrent;
   offsetCurrent = measureConsumption();
-
   ledcWrite(BUZZER_PWM_CHANNEL, buzzerMaxPWM / 2);
+  delay(300);
   testCurrent = measureConsumption() - offsetCurrent;
   ledcWrite(BUZZER_PWM_CHANNEL, false);
   if (testCurrent < BUZZER_CONSUMPTION_MIN) {

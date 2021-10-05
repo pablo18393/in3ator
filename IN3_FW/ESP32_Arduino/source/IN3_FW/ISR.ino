@@ -1,16 +1,22 @@
 void IRAM_ATTR peripheralsISR() {
-  //sensorsISR();
+  sensorsISR();
   buzzerISR();
   userInteraction();
 }
 
 void encSwitchISR() {
-  encPulseDetected = true;
-  buzzerTone(buzzerStandbyToneTimes, buzzerSwitchDuration, buzzerRotaryEncoderTone);
-  lastUserInteraction = millis();
-  if (alarmOnGoing[temperatureAlarm] || alarmOnGoing[humidityAlarm]) {
-    resetAlarms();
+  if (millis() - lastEncPulse > encPulseDebounce) {
+    statusEncSwitch = !statusEncSwitch;
+    if (statusEncSwitch) {
+      encPulseDetected = true;
+      buzzerTone(buzzerStandbyToneTimes, buzzerSwitchDuration, buzzerRotaryEncoderTone);
+      lastUserInteraction = millis();
+      if (alarmOnGoing[temperatureAlarm] || alarmOnGoing[humidityAlarm]) {
+        resetAlarms();
+      }
+    }
   }
+  lastEncPulse = millis();
 }
 
 void encoderISR() {
@@ -26,9 +32,9 @@ void encoderISR() {
 
 void powerAlertISR() {
   /*
-  if (millis() - lastPowerAlertNotification > powerAlertNotificationPeriod) {
+    if (millis() - lastPowerAlertNotification > powerAlertNotificationPeriod) {
     lastPowerAlertNotification = millis();
     powerAlert = true;
-  }
+    }
   */
 }

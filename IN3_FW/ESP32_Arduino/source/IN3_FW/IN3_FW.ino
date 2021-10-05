@@ -34,7 +34,7 @@ String serialNumber = "in3000031";
 #define buzzerStandbyPeriod 10000 //in millis, there will be a periodic tone when regulating baby's constants
 #define buzzerStandbyTone 500 //in micros, tone freq
 #define buzzerAlarmTone 500 //in micros, tone freq
-#define buzzerRotaryEncoderTone 450 //in micros, tone freq
+#define buzzerRotaryEncoderTone 2200 //in micros, tone freq
 #define buzzerStandbyToneDuration 50 //in micros, tone freq
 #define buzzerSwitchDuration 10 //in micros, tone freq
 #define buzzerStandbyToneTimes 1 //in micros, tone freq
@@ -124,6 +124,9 @@ byte pulsioximeterCount = false;
 byte encoderRate = true;
 byte encoderCount = false;
 bool encPulseDetected;
+long lastEncPulse;
+#define encPulseDebounce 10
+bool statusEncSwitch;
 
 //GPRS variables to transmit
 #define turnedOn 0 //transmit first turned ON with hardware verification
