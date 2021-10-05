@@ -12,7 +12,7 @@ String serialNumber = "in3000031";
 #include "SPI.h"
 #include "Adafruit_GFX.h"
 #include "Adafruit_ILI9341.h"
-//#include <EEPROM.h>
+#include <EEPROM.h>
 #include <SPI.h>
 #include <PID_v1.h>
 #include "board.h"

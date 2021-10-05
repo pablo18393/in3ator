@@ -1,7 +1,7 @@
 void initBoard() {
   //watchdogInit();
   initDebug();
-  //initEEPROM();
+  initEEPROM();
   initHardware();
   //initSD();
   initTimers();
@@ -10,7 +10,6 @@ void initBoard() {
 void initDebug() {
   Serial.begin(115200);
   delay(100);
-  Serial.println("hello");
   logln("in3ator debug uart, version " + String (FWversion) + ", SN: " + String (serialNumber));
 }
 

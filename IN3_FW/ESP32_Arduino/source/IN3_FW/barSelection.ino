@@ -82,27 +82,27 @@ void barSelection() {
               advancedMode();
               break;
             case LEDGraphicPosition:
-                  jaundiceEnable = !jaundiceEnable;
-                  setTextColor(COLOR_MENU);
-                  if (jaundiceEnable) {
-                    drawRightString("OFF", unitPosition, ypos, textFontSize);
-                  }
-                  else {
-                    drawRightString("ON", unitPosition, ypos, textFontSize);
-                  }
-                  setTextColor(COLOR_MENU_TEXT);
-                  if (jaundiceEnable) {
-                    drawRightString("ON", unitPosition, ypos, textFontSize);
-                    GPRSSetPostVariables(jaundiceLEDON, "");
-                    setGPRSPostPeriod(jaundiceGPRSPostPeriod);
-                  }
-                  else {
-                    drawRightString("OFF", unitPosition, ypos, textFontSize);
-                    GPRSSetPostVariables(jaundiceLEDOFF, "");
-                    GPRSSetPostVariables(jaundiceLEDOFF, "");
-                    setGPRSPostPeriod(standByGPRSPostPeriod);
-                  }
-                  GPIOWrite(PHOTOTHERAPY, jaundiceEnable);
+              jaundiceEnable = !jaundiceEnable;
+              setTextColor(COLOR_MENU);
+              if (jaundiceEnable) {
+                drawRightString("OFF", unitPosition, ypos, textFontSize);
+              }
+              else {
+                drawRightString("ON", unitPosition, ypos, textFontSize);
+              }
+              setTextColor(COLOR_MENU_TEXT);
+              if (jaundiceEnable) {
+                drawRightString("ON", unitPosition, ypos, textFontSize);
+                GPRSSetPostVariables(jaundiceLEDON, "");
+                setGPRSPostPeriod(jaundiceGPRSPostPeriod);
+              }
+              else {
+                drawRightString("OFF", unitPosition, ypos, textFontSize);
+                GPRSSetPostVariables(jaundiceLEDOFF, "");
+                GPRSSetPostVariables(jaundiceLEDOFF, "");
+                setGPRSPostPeriod(standByGPRSPostPeriod);
+              }
+              GPIOWrite(PHOTOTHERAPY, jaundiceEnable);
               break;
             case settingsGraphicPosition:
               settings();
@@ -266,7 +266,8 @@ void barSelection() {
                 drawRightString(textToWrite, unitPosition, ypos, textFontSize);
               }
               autoLock = !autoLock;
-              //EEPROM.write(EEPROM_autoLock, autoLock);
+              EEPROM.write(EEPROM_autoLock, autoLock);
+              EEPROM.commit();
               break;
             case languageGraphicPosition:
               while (GPIORead(ENC_SWITCH)) {
@@ -311,7 +312,8 @@ void barSelection() {
                       break;
                   }
                   drawRightString(textToWrite, unitPosition, ypos, textFontSize);
-                  //EEPROM.write(EEPROM_language, language);
+                  EEPROM.write(EEPROM_language, language);
+                  EEPROM.commit();
                   EncMove = false;
                 }
               }
@@ -319,7 +321,8 @@ void barSelection() {
               break;
             case controlModeGraphicPosition:
               controlMode = !controlMode;
-              //EEPROM.write(EEPROM_controlMode, controlMode);
+              EEPROM.write(EEPROM_controlMode, controlMode);
+              EEPROM.commit();
               setTextColor(COLOR_MENU);
               if (controlMode) {
                 drawRightString("BASIC", unitPosition, ypos, textFontSize);
@@ -342,7 +345,8 @@ void barSelection() {
                   setTextColor(COLOR_MENU);
                   drawRightNumber(HeaterPower, 280, ypos);
                   HeaterPower -= 10 * EncMove;
-                  //EEPROM.write(EEPROM_HeaterPower, HeaterPower);
+                  EEPROM.write(EEPROM_HeaterPower, HeaterPower);
+                  EEPROM.commit();
                   setTextColor(COLOR_MENU_TEXT);
                   drawRightNumber(HeaterPower, 280, ypos);
                 }
@@ -351,7 +355,8 @@ void barSelection() {
               break;
             case DebugENGraphicPosition:
               UARTDebug = !UARTDebug;
-              //EEPROM.write(EEPROM_UARTDebug, UARTDebug);
+              EEPROM.write(EEPROM_UARTDebug, UARTDebug);
+              EEPROM.commit();
               setTextColor(COLOR_MENU);
               if (UARTDebug) {
                 drawRightString("OFF", unitPosition, ypos, textFontSize);
@@ -390,7 +395,8 @@ void barSelection() {
                   drawFloat(temperature[babyNTC], 1, valuePosition, ypos, textFontSize);
                   previousTemperature[babyNTC] = temperature[babyNTC];
                   EncMove = false;
-                  //EEPROM.write(EEPROM_diffTemperature, int(diffTemperature[babyNTC] * 10));
+                  EEPROM.write(EEPROM_diffTemperature, int(diffTemperature[babyNTC] * 10));
+                  EEPROM.commit();
                 }
               }
               break;
@@ -405,15 +411,17 @@ void barSelection() {
                   humidity += EncMove;
                   drawFloat(humidity, 0, valuePosition, ypos, textFontSize);
                   EncMove = false;
-                  //EEPROM.write(EEPROM_diffHumidity, diffHumidity );
+                  EEPROM.write(EEPROM_diffHumidity, diffHumidity );
+                  EEPROM.commit();
                 }
               }
               break;
             case restartCalibrationValuesTempGraphicPosition:
               diffTemperature[babyNTC] = false;
               diffHumidity = false;
-              //EEPROM.write(EEPROM_diffTemperature, diffTemperature[babyNTC]);
-              //EEPROM.write(EEPROM_diffHumidity, diffHumidity);
+              EEPROM.write(EEPROM_diffTemperature, diffTemperature[babyNTC]);
+              EEPROM.write(EEPROM_diffHumidity, diffHumidity);
+              EEPROM.commit();
               calibrateSensors();
               break;
           }
