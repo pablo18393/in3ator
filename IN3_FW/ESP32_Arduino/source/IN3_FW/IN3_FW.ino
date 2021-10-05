@@ -1,5 +1,4 @@
 /* * Pending:
-    EEPROM
     SD
 */
 
@@ -8,6 +7,11 @@
 String serialNumber = "in3000031";
 #define headingTitle "in3ator"
 
+#include <WiFi.h>
+#include <WiFiClient.h>
+#include <WebServer.h>
+#include <ESPmDNS.h>
+#include <Update.h>
 //include libraries
 #include "SPI.h"
 #include "Adafruit_GFX.h"

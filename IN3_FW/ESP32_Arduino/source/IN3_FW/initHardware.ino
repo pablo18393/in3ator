@@ -54,6 +54,7 @@ long HW_error = false;
 
 void initHardware() {
   logln("[HW] -> Initialiting hardware");
+  wifiInit();
   initI2CBus();
   initGPIOExpander();
   initCurrentSensor();

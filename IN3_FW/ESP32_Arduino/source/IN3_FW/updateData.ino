@@ -1,6 +1,7 @@
 int updateData() {
   loopCounts++;
   watchdogReload();
+  OTAHandler();
   //sensorsISR();
   //userInteraction();
   buzzerISR();
