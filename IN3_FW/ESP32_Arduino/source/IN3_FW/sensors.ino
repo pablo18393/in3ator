@@ -3,11 +3,11 @@
 void sensorsISR() {
   if (millis() - lastNTCmeasurement > NTCMeasurementPeriod) {
     lastNTCmeasurement = millis();
-    //measurenumNTC();
+    measurenumNTC();
   }
   if (millis() - lastCurrentMeasurement > CurrentMeasurementPeriod) {
     lastCurrentMeasurement = millis();
-    currentConsumption = measureConsumption();
+    //currentConsumption = measureConsumption();
   }
 }
 
@@ -121,7 +121,7 @@ void updateTemp(byte sensor) {
 bool updateRoomSensor() {
   if (roomSensorPresent == true) {
     mySHTC3.update();
-    temperature[digitalTempSensor] = mySHTC3.toDegC(); //Add here measurement to temp array
+    temperature[digitalTempSensor] =  mySHTC3.toDegC(); //Add here measurement to temp array
     humidity = int(mySHTC3.toPercent()) + diffHumidity;
     if (temperature[digitalTempSensor]) {
       return true;

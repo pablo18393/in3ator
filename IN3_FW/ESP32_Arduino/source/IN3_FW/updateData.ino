@@ -2,7 +2,7 @@ int updateData() {
   loopCounts++;
   watchdogReload();
   OTAHandler();
-  //sensorsISR();
+  sensorsISR();
   userInteraction();
   buzzerISR();
   GPRS_Handler();

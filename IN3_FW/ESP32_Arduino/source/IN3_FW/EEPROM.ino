@@ -1,4 +1,4 @@
-#define EEPROM_SIZE 1000
+#define EEPROM_SIZE 256
 
 //EEPROM variables
 #define EEPROM_checkStatus 0
@@ -12,7 +12,6 @@
 #define EEPROM_usedGenericMosfet 8
 #define EEPROM_controlMode 8
 #define EEPROM_alarmsEnable 9
-#define EEPROM_numVariables 10
 
 bool firstTurnOn;
 
@@ -23,7 +22,6 @@ void initEEPROM() {
     EEPROM.commit();
     delay(30);
     if (EEPROM.read(EEPROM_checkStatus) != 0) {
-      //EEPROM.format();
     }
   }
   else {
@@ -31,16 +29,14 @@ void initEEPROM() {
     EEPROM.commit();
     delay(30);
     if (EEPROM.read(EEPROM_checkStatus) != 1) {
-      //EEPROM.format();
     }
   }
   firstTurnOn = EEPROM.read(EEPROM_firstTurnOn);
   if (firstTurnOn) { //firstTimePowerOn
-    //EEPROM.format(); -> PENDING FORMAT FLASH
-    for (int i = false; i < EEPROM_numVariables; i++) {
+    for (int i = false; i < EEPROM_SIZE; i++) {
       EEPROM.write(i, 0);
-      EEPROM.commit();
     }
+    EEPROM.commit();
     loaddefaultValues();
     logln("[FLASH] -> First turn on, loading default values");
   }

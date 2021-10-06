@@ -81,7 +81,7 @@ int page;
 #define errorPage 7
 
 //languages numbers that will be called in language variable
-int language;
+byte language;
 #define spanish 0
 #define english 1
 #define french 2
@@ -92,16 +92,14 @@ int language;
 //number assignment of each enviromental sensor for later call in variable
 #define babyNTC 0
 #define airNTC 1
-#define inBoardLeftNTC 2
-#define inBoardRightNTC 3
-#define digitalTempSensor 4
+#define digitalTempSensor 2
 
 #define numNTC 2 //number of NTC
 #define numTempSensors 3 //number of total temperature sensors in system
 #define temperature_fraction 50 //amount of temperature samples to filter
 
-#define NTCMeasurementPeriod 10 //in micros
-#define CurrentMeasurementPeriod 1000 //in micros
+#define NTCMeasurementPeriod 10 //in millis
+#define CurrentMeasurementPeriod 1000 //in millis
 long lastNTCmeasurement, lastCurrentMeasurement;
 
 int NTC_PIN[numNTC] = {BABY_NTC_PIN, AIR_NTC_PIN};
@@ -177,7 +175,7 @@ bool defaultControlMode = PID_CONTROL;
 double desiredSkinTemp = 34; //preset baby skin temperature
 double desiredRoomHum = 75; //preset enviromental humidity
 bool jaundiceEnable; //PWM that controls jaundice LED intensity
-double HeaterPower; //maximum heater power
+byte HeaterPower; //maximum heater power
 double desiredHeaterTemp; //desired temperature in heater
 
 //preset room variables

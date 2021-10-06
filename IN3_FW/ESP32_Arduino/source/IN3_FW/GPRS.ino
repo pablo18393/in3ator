@@ -678,10 +678,10 @@ bool GPRSLoadVariables() {
     databasePost[7] += ",\"heater_temp\":\"" + String(temperature[airNTC], 2) + "\"";
   }
   if (GPRS.postBoardTemp1) {
-    databasePost[7] += ",\"board_temp1\":\"" + String(temperature[inBoardLeftNTC], 2) + "\"";
+    //databasePost[7] += ",\"board_temp1\":\"" + String(temperature[inBoardLeftNTC], 2) + "\"";
   }
   if (GPRS.postBoardTemp2) {
-    databasePost[7] += ",\"board_temp2\":\"" + String(temperature[inBoardRightNTC], 2) + "\"";
+    //databasePost[7] += ",\"board_temp2\":\"" + String(temperature[inBoardRightNTC], 2) + "\"";
   }
   if (GPRS.postBoardTemp3) {
     databasePost[7] += ",\"board_temp3\":\"" + String(temperature[digitalTempSensor], 2) + "\"";
