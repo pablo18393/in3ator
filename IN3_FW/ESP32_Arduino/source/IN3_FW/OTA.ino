@@ -1,5 +1,3 @@
-
-
 const char* wifiHost = "esp32";
 const char* ssid = "in3wifi";
 const char* wifiPassword = "12345678";
@@ -7,63 +5,63 @@ const char* wifiPassword = "12345678";
 WebServer wifiServer(80);
 
 /*
- * Login page
- */
+   Login page
+*/
 
 const char* loginIndex =
- "<form name='loginForm'>"
-    "<table width='20%' bgcolor='A09F9F' align='center'>"
-        "<tr>"
-            "<td colspan=2>"
-                "<center><font size=4><b>ESP32 Login Page</b></font></center>"
-                "<br>"
-            "</td>"
-            "<br>"
-            "<br>"
-        "</tr>"
-        "<tr>"
-             "<td>Username:</td>"
-             "<td><input type='text' size=25 name='userid'><br></td>"
-        "</tr>"
-        "<br>"
-        "<br>"
-        "<tr>"
-            "<td>Password:</td>"
-            "<td><input type='Password' size=25 name='pwd'><br></td>"
-            "<br>"
-            "<br>"
-        "</tr>"
-        "<tr>"
-            "<td><input type='submit' onclick='check(this.form)' value='Login'></td>"
-        "</tr>"
-    "</table>"
-"</form>"
-"<script>"
-    "function check(form)"
-    "{"
-    "if(form.userid.value=='in3admin' && form.pwd.value=='savinglives')"
-    "{"
-    "window.open('/serverIndex')"
-    "}"
-    "else"
-    "{"
-    " alert('Error Password or Username')/*displays error message*/"
-    "}"
-    "}"
-"</script>";
+  "<form name='loginForm'>"
+  "<table width='20%' bgcolor='A09F9F' align='center'>"
+  "<tr>"
+  "<td colspan=2>"
+  "<center><font size=4><b>ESP32 Login Page</b></font></center>"
+  "<br>"
+  "</td>"
+  "<br>"
+  "<br>"
+  "</tr>"
+  "<tr>"
+  "<td>Username:</td>"
+  "<td><input type='text' size=25 name='userid'><br></td>"
+  "</tr>"
+  "<br>"
+  "<br>"
+  "<tr>"
+  "<td>Password:</td>"
+  "<td><input type='Password' size=25 name='pwd'><br></td>"
+  "<br>"
+  "<br>"
+  "</tr>"
+  "<tr>"
+  "<td><input type='submit' onclick='check(this.form)' value='Login'></td>"
+  "</tr>"
+  "</table>"
+  "</form>"
+  "<script>"
+  "function check(form)"
+  "{"
+  "if(form.userid.value=='in3admin' && form.pwd.value=='savinglives')"
+  "{"
+  "window.open('/serverIndex')"
+  "}"
+  "else"
+  "{"
+  " alert('Error Password or Username')/*displays error message*/"
+  "}"
+  "}"
+  "</script>";
 
 /*
- * wifiServer Index Page
- */
+   wifiServer Index Page
+*/
 
 const char* serverIndex =
-"<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>"
-"<form method='POST' action='#' enctype='multipart/form-data' id='upload_form'>"
-   "<input type='file' name='update'>"
-        "<input type='submit' value='Update'>"
-    "</form>"
- "<div id='prg'>progress: 0%</div>"
- "<script>"
+  "<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>"
+  "<form method='POST' action='#' enctype='multipart/form-data' id='upload_form'>"
+  "<input type='file' name='update'>"
+  "<input type='submit' value='Update'>"
+  "</form>"
+  "<div id='prg'>progress: 0%</div>"
+  "<script>"
   "$('form').submit(function(e){"
   "e.preventDefault();"
   "var form = $('#upload_form')[0];"
@@ -86,26 +84,24 @@ const char* serverIndex =
   "},"
   "success:function(d, s) {"
   "console.log('success!')"
- "},"
- "error: function (a, b, c) {"
- "}"
- "});"
- "});"
- "</script>";
+  "},"
+  "error: function (a, b, c) {"
+  "}"
+  "});"
+  "});"
+  "</script>";
 
 
 /*
- * setup function
- */
+   setup function
+*/
 void wifiInit(void) {
   // Connect to WiFi network
   WiFi.begin(ssid, wifiPassword);
+}
 
+void configWifiServer() {
   // Wait for connection
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
   Serial.println("");
   Serial.print("Connected to ");
   Serial.println(ssid);
@@ -115,9 +111,6 @@ void wifiInit(void) {
   /*use mdns for wifiHost name resolution*/
   if (!MDNS.begin(wifiHost)) { //http://esp32.local
     Serial.println("Error setting up MDNS responder!");
-    while (1) {
-      delay(1000);
-    }
   }
   Serial.println("mDNS responder started");
   /*return index page which is stored in ServerIndex */
@@ -158,5 +151,16 @@ void wifiInit(void) {
 }
 
 void OTAHandler(void) {
-  wifiServer.handleClient();
+  if (WiFi.status() == WL_CONNECTED ) {
+    if (!WIFI_connection_status) {
+      configWifiServer();
+    }
+    else {
+      wifiServer.handleClient();
+    }
+    WIFI_connection_status = true;
+  }
+  else {
+    WIFI_connection_status = false;
+  }
 }

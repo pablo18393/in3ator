@@ -132,6 +132,10 @@ long lastEncPulse;
 #define encPulseDebounce 10
 bool statusEncSwitch;
 
+//WIFI
+#define WIFI_connection_try 60000 //in millis
+bool WIFI_connection_status=false;
+
 //GPRS variables to transmit
 #define turnedOn 0 //transmit first turned ON with hardware verification
 #define room 1 //transmit room variables
