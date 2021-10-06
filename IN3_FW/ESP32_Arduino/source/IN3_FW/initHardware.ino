@@ -223,6 +223,7 @@ void standByCurrentTest() {
   long error = HW_error;
   float testCurrent;
   logln("[HW] -> Measuring standby current...");
+  delay(100);
   testCurrent = measureConsumption();
   if (testCurrent < STANDBY_CONSUMPTION_MIN) {
     HW_error += DEFECTIVE_CURRENT_SENSOR;
@@ -248,6 +249,7 @@ void initTFT() {
   long processTime = millis();
   backlightPower = maxPWMvalue / screenBrightnessFactor;
   backlightPowerSafe = maxPWMvalue * backlightPowerSafePercentage;
+  delay(100);
   offsetCurrent = measureConsumption();
   initPin(TOUCH_CS, OUTPUT);
   initPin(SD_CS, OUTPUT);
@@ -268,6 +270,7 @@ void initTFT() {
     delayMicroseconds(brightenRate);
     updateData();
   }
+  delay(100);
   testCurrent = measureConsumption() - offsetCurrent;
   if (testCurrent < SCREEN_CONSUMPTION_MIN) {
     HW_error += DEFECTIVE_SCREEN;
@@ -309,9 +312,10 @@ void configbuzzerTimer(int freq) {
 void initBuzzer() {
   long error = HW_error;
   float testCurrent, offsetCurrent;
+  delay(100);
   offsetCurrent = measureConsumption();
   ledcWrite(BUZZER_PWM_CHANNEL, buzzerMaxPWM / 2);
-  delay(300);
+  delay(100);
   testCurrent = measureConsumption() - offsetCurrent;
   ledcWrite(BUZZER_PWM_CHANNEL, false);
   if (testCurrent < BUZZER_CONSUMPTION_MIN) {
@@ -357,10 +361,12 @@ void buzzerTone (int beepTimes, int timeDelay, int freq) {
 void initPowerEn() {
   long error = HW_error;
   float testCurrent, offsetCurrent;
+  delay(100);
   offsetCurrent = measureConsumption();
   logln("[HW] -> Checking power enable circuit...");
   initPin(POWER_EN, OUTPUT);
   GPIOWrite(POWER_EN, HIGH);
+  delay(100);
   testCurrent = measureConsumption() - offsetCurrent;
   if (testCurrent > STANDBY_CONSUMPTION_MAX) {
     HW_error += DEFECTIVE_POWER_EN;
@@ -378,9 +384,11 @@ void initPowerEn() {
 void actuatorsTest() {
   long error = HW_error;
   float testCurrent, offsetCurrent;
+  delay(100);
   offsetCurrent = measureConsumption();
   logln("[HW] -> Checking actuators...");
   ledcWrite(HEATER_PWM_CHANNEL, heaterMaxPWM * HeaterPower / 100 );
+  delay(100);
   testCurrent = measureConsumption() - offsetCurrent;
   logln("[HW] -> Heater current consumption: " + String (testCurrent) + " Amps");
   GPRSSetPostVariables(NULL, ",Hea:" + String (testCurrent));
@@ -394,6 +402,7 @@ void actuatorsTest() {
   }
   ledcWrite(HEATER_PWM_CHANNEL, 0);
   GPIOWrite(FAN, HIGH);
+  delay(100);
   testCurrent = measureConsumption() - offsetCurrent;
   logln("[HW] -> FAN consumption: " + String (testCurrent) + " Amps");
   GPRSSetPostVariables(NULL, ",Fan:" + String (testCurrent));
@@ -407,6 +416,7 @@ void actuatorsTest() {
   }
   GPIOWrite(FAN, LOW);
   GPIOWrite(PHOTOTHERAPY, HIGH);
+  delay(100);
   testCurrent = measureConsumption() - offsetCurrent;
   logln("[HW] -> Phototherapy current consumption: " + String (testCurrent) + " Amps");
   GPRSSetPostVariables(NULL, ",Pho:" + String (testCurrent));
@@ -420,6 +430,7 @@ void actuatorsTest() {
   }
   GPIOWrite(PHOTOTHERAPY, LOW);
   GPIOWrite(HUMIDIFIER, HIGH);
+  delay(100);
   testCurrent = measureConsumption() - offsetCurrent;
   logln("[HW] -> Humidifier current consumption: " + String (testCurrent) + " Amps");
   GPRSSetPostVariables(NULL, ",Hum:" + String (testCurrent));

@@ -63,8 +63,13 @@
 #define maxDACvalue 4095         //for STM32F103RE with arduino IDE
 int maxPWMvalue = pow(2,PWM_RESOLUTION) - 1;
 
+#define BL_NORMAL 0
+#define BL_POWERSAVE 1
+
+int ScreenBacklightMode;
 float backlightPower;
 float backlightPowerSafe;
 float backlightPowerSafePercentage=0.98; //2% screen bright
+
 int heaterMaxPWM;
 int buzzerMaxPWM = maxPWMvalue;

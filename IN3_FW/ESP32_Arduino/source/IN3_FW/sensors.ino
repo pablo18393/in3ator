@@ -3,11 +3,11 @@
 void sensorsISR() {
   if (millis() - lastNTCmeasurement > NTCMeasurementPeriod) {
     lastNTCmeasurement = millis();
-    measurenumNTC();
+    //measurenumNTC();
   }
   if (millis() - lastCurrentMeasurement > CurrentMeasurementPeriod) {
     lastCurrentMeasurement = millis();
-    measureConsumption();
+    currentConsumption = measureConsumption();
   }
 }
 
@@ -17,7 +17,7 @@ void measureOffsetConsumption() {
 
 float measureConsumption() {
   PAC.UpdateCurrent();
-  return (PAC.Current/1000); //Amperes
+  return (PAC.Current / 1000); //Amperes
 }
 
 void checkNewPulsioximeterData() {
@@ -135,13 +135,22 @@ bool updateRoomSensor() {
 void userInteraction() {
   if (autoLock) {
     if (millis() - lastUserInteraction > time_lock) {
-      ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, backlightPowerSafe);
+      if (ScreenBacklightMode != BL_POWERSAVE) {
+        ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, backlightPowerSafe);
+        ScreenBacklightMode = BL_POWERSAVE;
+      }
     }
     else {
-      ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, backlightPower);
+      if (ScreenBacklightMode != BL_NORMAL) {
+        ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, backlightPower);
+        ScreenBacklightMode = BL_NORMAL;
+      }
     }
   }
   else {
-    ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, backlightPower);
+    if (ScreenBacklightMode != BL_NORMAL) {
+      ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, backlightPower);
+      ScreenBacklightMode = BL_NORMAL;
+    }
   }
 }
