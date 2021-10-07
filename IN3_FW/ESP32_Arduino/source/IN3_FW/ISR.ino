@@ -12,7 +12,7 @@ void encSwitchISR() {
       buzzerTone(buzzerStandbyToneTimes, buzzerSwitchDuration, buzzerRotaryEncoderTone);
       lastUserInteraction = millis();
       if (alarmOnGoing[temperatureAlarm] || alarmOnGoing[humidityAlarm]) {
-        resetAlarms();
+        resetAlarms(); 
       }
     }
   }

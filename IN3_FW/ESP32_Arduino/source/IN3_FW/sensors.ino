@@ -7,7 +7,7 @@ void sensorsISR() {
   }
   if (millis() - lastCurrentMeasurement > CurrentMeasurementPeriod) {
     lastCurrentMeasurement = millis();
-    //currentConsumption = measureConsumption();
+    currentConsumption = measureConsumption();
   }
 }
 

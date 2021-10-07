@@ -71,5 +71,5 @@ float backlightPower;
 float backlightPowerSafe;
 float backlightPowerSafePercentage=0.98; //2% screen bright
 
-int heaterMaxPWM;
+int heaterMaxPWM = maxPWMvalue;
 int buzzerMaxPWM = maxPWMvalue;

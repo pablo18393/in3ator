@@ -387,7 +387,7 @@ void actuatorsTest() {
   delay(100);
   offsetCurrent = measureConsumption();
   logln("[HW] -> Checking actuators...");
-  ledcWrite(HEATER_PWM_CHANNEL, heaterMaxPWM * HeaterPower / 100 );
+  ledcWrite(HEATER_PWM_CHANNEL, maxPWMvalue);
   delay(100);
   testCurrent = measureConsumption() - offsetCurrent;
   logln("[HW] -> Heater current consumption: " + String (testCurrent) + " Amps");
