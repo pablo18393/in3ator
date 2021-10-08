@@ -117,7 +117,7 @@ void actuatorsProgress() {
     if (!alarmOnGoing[temperatureAlarm] && !alarmOnGoing[humidityAlarm]) {
       if (millis() - buzzerStandbyTime > buzzerStandbyPeriod) {
         buzzerStandbyTime = millis();
-        buzzerTone(buzzerStandbyToneTimes, buzzerStandbyToneDuration, buzzerStandbyTone);
+        //buzzerTone(buzzerStandbyToneTimes, buzzerStandbyToneDuration, buzzerStandbyTone);
       }
     }
     while (!GPIORead(ENC_SWITCH)) {

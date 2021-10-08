@@ -15,8 +15,29 @@ void measureOffsetConsumption() {
 
 }
 
+float measureConsumptionForTime (long testTimeout) {
+  long ongoingTestTime = millis();
+  float instantCurrent;
+  float averageConsumption = 0;
+  long measuredTimes = 0;
+  while (millis() - ongoingTestTime < testTimeout) {
+    instantCurrent = measureConsumption();
+    if (instantCurrent) {
+      averageConsumption += instantCurrent;
+      measuredTimes++;
+    }
+  }
+  if (measuredTimes) {
+    return averageConsumption / measuredTimes;
+  } else {
+    return false;
+  }
+}
+
 float measureConsumption() {
-  PAC.UpdateCurrent();
+  if (PAC.UpdateCurrent()) {
+    Serial.println("[SENSORS] -> Current sensing returned zero");
+  }
   return (PAC.Current / 1000); //Amperes
 }
 

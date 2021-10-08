@@ -1,6 +1,8 @@
 #define testMode false
 #define operativeMode true
 
+#define testTime 100
+
 #define NTC_BABY_MIN 0
 #define NTC_BABY_MAX 60
 #define DIG_TEMP_ROOM_MIN 0
@@ -9,9 +11,9 @@
 #define DIG_HUM_ROOM_MAX 100
 
 #define HEATER_CONSUMPTION_MIN 1
-#define FAN_CONSUMPTION_MIN 0.03
-#define PHOTOTHERAPY_CONSUMPTION_MIN 0.03
-#define HUMIDIFIER_CONSUMPTION_MIN 0.03
+#define FAN_CONSUMPTION_MIN 0.05
+#define PHOTOTHERAPY_CONSUMPTION_MIN 0.07
+#define HUMIDIFIER_CONSUMPTION_MIN 0.07
 
 #define HEATER_CONSUMPTION_MAX 9
 #define FAN_CONSUMPTION_MAX 4
@@ -60,14 +62,14 @@ void initHardware() {
   initCurrentSensor();
   initPWMGPIO();
   initPowerAlarm();
-  initGPRS();
-  initSenseCircuit();
+  initSensors();
+  //initSenseCircuit();
   initTFT();
   initBuzzer();
-  initSensors();
   initInterrupts();
   initPowerEn();
   initActuators();
+  initGPRS();
   if (!HW_error) {
     logln("[HW] -> HARDWARE OK");
     GPRSSetPostVariables(NULL, "HW OK");
@@ -156,9 +158,11 @@ void initGPRS()
 }
 
 void initSenseCircuit() {
+  /*
   initPin(SYSTEM_SHUNT, INPUT);
   standByCurrentTest();
   measureOffsetConsumption();
+  */
 }
 
 void initSensors() {
@@ -223,8 +227,8 @@ void standByCurrentTest() {
   long error = HW_error;
   float testCurrent;
   logln("[HW] -> Measuring standby current...");
-  delay(100);
-  testCurrent = measureConsumption();
+
+  testCurrent = measureConsumptionForTime(testTime);
   if (testCurrent < STANDBY_CONSUMPTION_MIN) {
     HW_error += DEFECTIVE_CURRENT_SENSOR;
     logln("[HW] -> Fail -> Defective current sensor");
@@ -249,8 +253,7 @@ void initTFT() {
   long processTime = millis();
   backlightPower = maxPWMvalue / screenBrightnessFactor;
   backlightPowerSafe = maxPWMvalue * backlightPowerSafePercentage;
-  delay(100);
-  offsetCurrent = measureConsumption();
+  offsetCurrent = measureConsumptionForTime(testTime);
   initPin(TOUCH_CS, OUTPUT);
   initPin(SD_CS, OUTPUT);
   initPin(TFT_CS, OUTPUT);
@@ -270,15 +273,14 @@ void initTFT() {
     delayMicroseconds(brightenRate);
     updateData();
   }
-  delay(100);
-  testCurrent = measureConsumption() - offsetCurrent;
+  testCurrent = measureConsumptionForTime(testTime) - offsetCurrent;
   if (testCurrent < SCREEN_CONSUMPTION_MIN) {
-    HW_error += DEFECTIVE_SCREEN;
-    logln("[HW] -> Fail -> Screen current is not high enough");
+    //HW_error += DEFECTIVE_SCREEN;
+    logln("[HW] -> WARNING -> Screen current is not high enough");
   }
   if (testCurrent > SCREEN_CONSUMPTION_MAX) {
-    HW_error += DEFECTIVE_SCREEN;
-    logln("[HW] -> Fail -> Screen current exceeded");
+    //HW_error += DEFECTIVE_SCREEN;
+    logln("[HW] -> WARNING -> Screen current exceeded");
   }
   if (error == HW_error) {
     logln("[HW] -> OK -> Screen is working as expected: " + String (testCurrent) + " Amps");
@@ -312,11 +314,11 @@ void configbuzzerTimer(int freq) {
 void initBuzzer() {
   long error = HW_error;
   float testCurrent, offsetCurrent;
-  delay(100);
-  offsetCurrent = measureConsumption();
+
+  offsetCurrent = measureConsumptionForTime(testTime);
   ledcWrite(BUZZER_PWM_CHANNEL, buzzerMaxPWM / 2);
-  delay(100);
-  testCurrent = measureConsumption() - offsetCurrent;
+
+  testCurrent = measureConsumptionForTime(testTime) - offsetCurrent;
   ledcWrite(BUZZER_PWM_CHANNEL, false);
   if (testCurrent < BUZZER_CONSUMPTION_MIN) {
     HW_error += DEFECTIVE_BUZZER;
@@ -361,13 +363,13 @@ void buzzerTone (int beepTimes, int timeDelay, int freq) {
 void initPowerEn() {
   long error = HW_error;
   float testCurrent, offsetCurrent;
-  delay(100);
-  offsetCurrent = measureConsumption();
+
+  offsetCurrent = measureConsumptionForTime(testTime);
   logln("[HW] -> Checking power enable circuit...");
   initPin(POWER_EN, OUTPUT);
   GPIOWrite(POWER_EN, HIGH);
-  delay(100);
-  testCurrent = measureConsumption() - offsetCurrent;
+
+  testCurrent = measureConsumptionForTime(testTime) - offsetCurrent;
   if (testCurrent > STANDBY_CONSUMPTION_MAX) {
     HW_error += DEFECTIVE_POWER_EN;
     logln("[HW] -> Fail -> Defective power enable circuit");
@@ -384,12 +386,12 @@ void initPowerEn() {
 void actuatorsTest() {
   long error = HW_error;
   float testCurrent, offsetCurrent;
-  delay(100);
-  offsetCurrent = measureConsumption();
+
+  offsetCurrent = measureConsumptionForTime(testTime);
   logln("[HW] -> Checking actuators...");
   ledcWrite(HEATER_PWM_CHANNEL, maxPWMvalue);
-  delay(100);
-  testCurrent = measureConsumption() - offsetCurrent;
+
+  testCurrent = measureConsumptionForTime(testTime) - offsetCurrent;
   logln("[HW] -> Heater current consumption: " + String (testCurrent) + " Amps");
   GPRSSetPostVariables(NULL, ",Hea:" + String (testCurrent));
   if (testCurrent < HEATER_CONSUMPTION_MIN) {
@@ -402,8 +404,8 @@ void actuatorsTest() {
   }
   ledcWrite(HEATER_PWM_CHANNEL, 0);
   GPIOWrite(FAN, HIGH);
-  delay(100);
-  testCurrent = measureConsumption() - offsetCurrent;
+
+  testCurrent = measureConsumptionForTime(testTime) - offsetCurrent;
   logln("[HW] -> FAN consumption: " + String (testCurrent) + " Amps");
   GPRSSetPostVariables(NULL, ",Fan:" + String (testCurrent));
   if (testCurrent < FAN_CONSUMPTION_MIN) {
@@ -416,8 +418,8 @@ void actuatorsTest() {
   }
   GPIOWrite(FAN, LOW);
   GPIOWrite(PHOTOTHERAPY, HIGH);
-  delay(100);
-  testCurrent = measureConsumption() - offsetCurrent;
+
+  testCurrent = measureConsumptionForTime(testTime) - offsetCurrent;
   logln("[HW] -> Phototherapy current consumption: " + String (testCurrent) + " Amps");
   GPRSSetPostVariables(NULL, ",Pho:" + String (testCurrent));
   if (testCurrent < PHOTOTHERAPY_CONSUMPTION_MIN) {
@@ -430,8 +432,8 @@ void actuatorsTest() {
   }
   GPIOWrite(PHOTOTHERAPY, LOW);
   GPIOWrite(HUMIDIFIER, HIGH);
-  delay(100);
-  testCurrent = measureConsumption() - offsetCurrent;
+
+  testCurrent = measureConsumptionForTime(testTime) - offsetCurrent;
   logln("[HW] -> Humidifier current consumption: " + String (testCurrent) + " Amps");
   GPRSSetPostVariables(NULL, ",Hum:" + String (testCurrent));
   if (testCurrent < HUMIDIFIER_CONSUMPTION_MIN) {

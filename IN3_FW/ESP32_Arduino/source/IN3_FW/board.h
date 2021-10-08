@@ -43,7 +43,7 @@
 #define AIR_NTC_PIN 35
 #define ENC_SWITCH 33
 #define BUZZER 5
-#define FAN 36
+#define FAN MUX_4
 #define ENC_A 25
 #define ENC_B 32
 #define TFT_CS MUX_9
