@@ -1,7 +1,7 @@
 #define testMode false
 #define operativeMode true
 
-#define testTime 100
+#define testTime 200
 
 #define NTC_BABY_MIN 0
 #define NTC_BABY_MAX 60
@@ -69,7 +69,7 @@ void initHardware() {
   initInterrupts();
   initPowerEn();
   initActuators();
-  //initGPRS();
+  initGPRS();
   if (!HW_error) {
     logln("[HW] -> HARDWARE OK");
     GPRSSetPostVariables(NULL, "HW OK");
@@ -159,8 +159,6 @@ void initGPRS()
   GPRS.powerUp = true;
   GPRSSetPostVariables(defaultPost, "First post, FW version: " + String (FWversion));
   setGPRSPostPeriod(standByGPRSPostPeriod);
-  initPin(GPRS_EN, OUTPUT);
-  GPIOWrite(GPRS_EN, HIGH);
   initPin(GPRS_PWRKEY, OUTPUT);
   GPIOWrite(GPRS_PWRKEY, HIGH);
 }
@@ -376,6 +374,8 @@ void initPowerEn() {
   logln("[HW] -> Checking power enable circuit...");
   initPin(POWER_EN, OUTPUT);
   GPIOWrite(POWER_EN, HIGH);
+  initPin(GPRS_EN, OUTPUT);
+  GPIOWrite(GPRS_EN, HIGH);
 
   testCurrent = measureConsumptionForTime(testTime) - offsetCurrent;
   if (testCurrent > STANDBY_CONSUMPTION_MAX) {
@@ -397,36 +397,8 @@ void actuatorsTest() {
 
   offsetCurrent = measureConsumptionForTime(testTime);
   logln("[HW] -> Checking actuators...");
-  ledcWrite(HEATER_PWM_CHANNEL, maxPWMvalue);
 
-  testCurrent = measureConsumptionForTime(testTime) - offsetCurrent;
-  logln("[HW] -> Heater current consumption: " + String (testCurrent) + " Amps");
-  GPRSSetPostVariables(NULL, ",Hea:" + String (testCurrent));
-  if (testCurrent < HEATER_CONSUMPTION_MIN) {
-    HW_error += HEATER_CONSUMPTION_MIN_ERROR;
-    logln("[HW] -> Fail -> Heater current consumption is too low");
-  }
-  if (testCurrent > HEATER_CONSUMPTION_MAX) {
-    HW_error += HEATER_CONSUMPTION_MAX_ERROR;
-    logln("[HW] -> Fail -> Heater current consumption is too high");
-  }
-  ledcWrite(HEATER_PWM_CHANNEL, 0);
-  GPIOWrite(FAN, HIGH);
-
-  testCurrent = measureConsumptionForTime(testTime) - offsetCurrent;
-  logln("[HW] -> FAN consumption: " + String (testCurrent) + " Amps");
-  GPRSSetPostVariables(NULL, ",Fan:" + String (testCurrent));
-  if (testCurrent < FAN_CONSUMPTION_MIN) {
-    HW_error += FAN_CONSUMPTION_MIN_ERROR;
-    logln("[HW] -> Fail -> Fan current consumption is too low");
-  }
-  if (testCurrent > FAN_CONSUMPTION_MAX) {
-    HW_error += FAN_CONSUMPTION_MAX_ERROR;
-    logln("[HW] -> Fail -> Fan current consumption is too high");
-  }
-  GPIOWrite(FAN, LOW);
   GPIOWrite(PHOTOTHERAPY, HIGH);
-
   testCurrent = measureConsumptionForTime(testTime) - offsetCurrent;
   logln("[HW] -> Phototherapy current consumption: " + String (testCurrent) + " Amps");
   GPRSSetPostVariables(NULL, ",Pho:" + String (testCurrent));
@@ -439,8 +411,8 @@ void actuatorsTest() {
     logln("[HW] -> Fail -> PHOTOTHERAPY current consumption is too high");
   }
   GPIOWrite(PHOTOTHERAPY, LOW);
+  
   GPIOWrite(HUMIDIFIER, HIGH);
-
   testCurrent = measureConsumptionForTime(testTime) - offsetCurrent;
   logln("[HW] -> Humidifier current consumption: " + String (testCurrent) + " Amps");
   GPRSSetPostVariables(NULL, ",Hum:" + String (testCurrent));
@@ -453,6 +425,35 @@ void actuatorsTest() {
     logln("[HW] -> Fail -> HUMIDIFIER current consumption is too high");
   }
   GPIOWrite(HUMIDIFIER, LOW);
+  
+  GPIOWrite(FAN, HIGH);
+  testCurrent = measureConsumptionForTime(testTime) - offsetCurrent;
+  logln("[HW] -> FAN consumption: " + String (testCurrent) + " Amps");
+  GPRSSetPostVariables(NULL, ",Fan:" + String (testCurrent));
+  if (testCurrent < FAN_CONSUMPTION_MIN) {
+    HW_error += FAN_CONSUMPTION_MIN_ERROR;
+    logln("[HW] -> Fail -> Fan current consumption is too low");
+  }
+  if (testCurrent > FAN_CONSUMPTION_MAX) {
+    HW_error += FAN_CONSUMPTION_MAX_ERROR;
+    logln("[HW] -> Fail -> Fan current consumption is too high");
+  }
+  GPIOWrite(FAN, LOW);
+
+  ledcWrite(HEATER_PWM_CHANNEL, maxPWMvalue);
+  testCurrent = measureConsumptionForTime(testTime) - offsetCurrent;
+  logln("[HW] -> Heater current consumption: " + String (testCurrent) + " Amps");
+  GPRSSetPostVariables(NULL, ",Hea:" + String (testCurrent));
+  if (testCurrent < HEATER_CONSUMPTION_MIN) {
+    HW_error += HEATER_CONSUMPTION_MIN_ERROR;
+    logln("[HW] -> Fail -> Heater current consumption is too low");
+  }
+  if (testCurrent > HEATER_CONSUMPTION_MAX) {
+    HW_error += HEATER_CONSUMPTION_MAX_ERROR;
+    logln("[HW] -> Fail -> Heater current consumption is too high");
+  }
+  ledcWrite(HEATER_PWM_CHANNEL, 0);
+
   if (error == HW_error) {
     logln("[HW] -> OK -> Actuators are working as expected");
   }
