@@ -11,7 +11,7 @@ unsigned long windowStartTime;
 PID temperaturePID(&temperature[babyNTC], &PIDOutput, &desiredSkinTemp, Kp[tempCTL], Ki[tempCTL], Kd[tempCTL], P_ON_E, DIRECT);
 PID humidityPID(&humidity, &humidityPIDOutput, &desiredRoomHum, Kp[humidityCTL], Ki[humidityCTL], Kd[humidityCTL], P_ON_E, DIRECT);
 
-void PIDISR() {
+void PIDHandler() {
   if (temperaturePID.GetMode() == AUTOMATIC) {
     temperaturePID.Compute();
     ledcWrite(HEATER_PWM_CHANNEL, PIDOutput);
@@ -48,13 +48,11 @@ void startTemperaturePID() {
   temperaturePID.SetSampleTime(PIDISRPeriod * 200); // in millis
   temperaturePID.SetControllerDirection(DIRECT);
   temperaturePID.SetMode(AUTOMATIC);
-  //configPIDTimer(PIDISRPeriod); //in millis
 }
 
 void stopTemperaturePID() {
   temperaturePID.SetMode(MANUAL);
   ledcWrite(HEATER_PWM_CHANNEL, LOW);
-  //PIDTimer.pause();
 }
 
 void startHumidityPID() {

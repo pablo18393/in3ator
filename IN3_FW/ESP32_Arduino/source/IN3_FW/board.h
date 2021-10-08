@@ -8,49 +8,54 @@
 
 #ifdef v6Board
 
-#define MUX_BASE 100 //To differentiate with ESP32 GPIO
-#define MUX_0 0 + MUX_BASE
-#define MUX_1 1 + MUX_BASE
-#define MUX_2 2 + MUX_BASE
-#define MUX_3 3 + MUX_BASE
-#define MUX_4 4 + MUX_BASE
-#define MUX_5 5 + MUX_BASE
-#define MUX_6 6 + MUX_BASE
-#define MUX_7 7 + MUX_BASE
-#define MUX_8 8 + MUX_BASE
-#define MUX_9 9 + MUX_BASE
-#define MUX_10 10 + MUX_BASE
-#define MUX_11 11 + MUX_BASE
-#define MUX_12 12 + MUX_BASE
-#define MUX_13 13 + MUX_BASE
-#define MUX_14 14 + MUX_BASE
-#define MUX_15 15 + MUX_BASE
+#define GPIO_EXP_BASE 100 //To differentiate with ESP32 GPIO
+#define GPIO_EXP_0 0 + GPIO_EXP_BASE
+#define GPIO_EXP_1 1 + GPIO_EXP_BASE
+#define GPIO_EXP_2 2 + GPIO_EXP_BASE
+#define GPIO_EXP_3 3 + GPIO_EXP_BASE
+#define GPIO_EXP_4 4 + GPIO_EXP_BASE
+#define GPIO_EXP_5 5 + GPIO_EXP_BASE
+#define GPIO_EXP_6 6 + GPIO_EXP_BASE
+#define GPIO_EXP_7 7 + GPIO_EXP_BASE
+#define GPIO_EXP_8 8 + GPIO_EXP_BASE
+#define GPIO_EXP_9 9 + GPIO_EXP_BASE
+#define GPIO_EXP_10 10 + GPIO_EXP_BASE
+#define GPIO_EXP_11 11 + GPIO_EXP_BASE
+#define GPIO_EXP_12 12 + GPIO_EXP_BASE
+#define GPIO_EXP_13 13 + GPIO_EXP_BASE
+#define GPIO_EXP_14 14 + GPIO_EXP_BASE
+#define GPIO_EXP_15 15 + GPIO_EXP_BASE
+
+#define UNUSED_GPIO_EXP0 GPIO_EXP_5
+#define UNUSED_GPIO_EXP1 GPIO_EXP_12
+#define UNUSED_GPIO_EXP2 GPIO_EXP_14
+#define UNUSED_GPIO_EXP3 GPIO_EXP_15
 
 #define SYSTEM_SHUNT 2
 #define HEATER 27
-#define SD_CS MUX_2
+#define SD_CS GPIO_EXP_2
 
-#define PHOTOTHERAPY MUX_7
+#define PHOTOTHERAPY GPIO_EXP_7
 #define PWR_ALERT 2
 #define SCREENBACKLIGHT 0
-#define HUMIDIFIER MUX_6
+#define HUMIDIFIER GPIO_EXP_6
 #define TFT_DC 4
-#define TOUCH_CS MUX_11
-#define POWER_EN MUX_0
-#define GPRS_EN MUX_1
+#define TOUCH_CS GPIO_EXP_11
+#define POWER_EN GPIO_EXP_0
+#define GPRS_EN GPIO_EXP_1
 
 #define BABY_NTC_PIN 34
 #define AIR_NTC_PIN 35
 #define ENC_SWITCH 33
 #define BUZZER 5
-#define FAN MUX_4
+#define FAN GPIO_EXP_4
 #define ENC_A 25
 #define ENC_B 32
-#define TFT_CS MUX_9
-#define GPRS_PWRKEY MUX_8
-#define TOUCH_IRQ MUX_10
+#define TFT_CS GPIO_EXP_9
+#define GPRS_PWRKEY GPIO_EXP_8
+#define TOUCH_IRQ GPIO_EXP_10
 
-#define TFT_RST MUX_13
+#define TFT_RST GPIO_EXP_13
 #endif
 
 #define SCREENBACKLIGHT_PWM_CHANNEL 0

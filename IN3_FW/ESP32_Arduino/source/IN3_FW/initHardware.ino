@@ -69,7 +69,7 @@ void initHardware() {
   initInterrupts();
   initPowerEn();
   initActuators();
-  initGPRS();
+  //initGPRS();
   if (!HW_error) {
     logln("[HW] -> HARDWARE OK");
     GPRSSetPostVariables(NULL, "HW OK");
@@ -111,14 +111,22 @@ void initPWMGPIO() {
 
 void initGPIOExpander() {
   TCA.begin();
+  initPin(UNUSED_GPIO_EXP0, OUTPUT);
+  initPin(UNUSED_GPIO_EXP1, OUTPUT);
+  initPin(UNUSED_GPIO_EXP2, OUTPUT);
+  initPin(UNUSED_GPIO_EXP3, OUTPUT);
+  GPIOWrite(UNUSED_GPIO_EXP0, HIGH);
+  GPIOWrite(UNUSED_GPIO_EXP1, HIGH);
+  GPIOWrite(UNUSED_GPIO_EXP2, HIGH);
+  GPIOWrite(UNUSED_GPIO_EXP3, HIGH);
 }
 
 void initPin(uint8_t GPIO, uint8_t Mode) {
-  if (GPIO < MUX_BASE) {
+  if (GPIO < GPIO_EXP_BASE) {
     pinMode(GPIO, Mode);
   }
   else {
-    TCA.pinMode(GPIO - MUX_BASE, Mode);
+    TCA.pinMode(GPIO - GPIO_EXP_BASE, Mode);
   }
 }
 
@@ -127,20 +135,20 @@ void initPowerAlarm() {
 }
 
 void GPIOWrite(uint8_t GPIO, uint8_t Mode) {
-  if (GPIO < MUX_BASE) {
+  if (GPIO < GPIO_EXP_BASE) {
     digitalWrite(GPIO, Mode);
   }
   else {
-    TCA.digitalWrite(GPIO - MUX_BASE, Mode);
+    TCA.digitalWrite(GPIO - GPIO_EXP_BASE, Mode);
   }
 }
 
 bool GPIORead(uint8_t GPIO) {
-  if (GPIO < MUX_BASE) {
+  if (GPIO < GPIO_EXP_BASE) {
     return (digitalRead(GPIO));
   }
   else {
-    return (TCA.digitalRead(GPIO - MUX_BASE));
+    return (TCA.digitalRead(GPIO - GPIO_EXP_BASE));
   }
 }
 
@@ -159,9 +167,9 @@ void initGPRS()
 
 void initSenseCircuit() {
   /*
-  initPin(SYSTEM_SHUNT, INPUT);
-  standByCurrentTest();
-  measureOffsetConsumption();
+    initPin(SYSTEM_SHUNT, INPUT);
+    standByCurrentTest();
+    measureOffsetConsumption();
   */
 }
 

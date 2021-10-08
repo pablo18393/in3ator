@@ -5,7 +5,7 @@ int updateData() {
   sensorsISR();
   userInteraction();
   buzzerISR();
-  GPRS_Handler();
+  //GPRS_Handler();
   if (powerAlert) {
     logln("[ALARM] -> maximum power exceeded");
     powerAlert = false;

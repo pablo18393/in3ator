@@ -94,10 +94,16 @@ void actuatorsProgress() {
       if (controlMode == BASIC_CONTROL) {
         basictemperatureControl();
       }
+      else {
+        PIDHandler();
+      }
     }
     if (controlHumidity) {
       if (controlMode == BASIC_CONTROL) {
         basicHumidityControl();
+      }
+      else {
+        PIDHandler();
       }
       if (checkAlarms(humidity, desiredRoomHum, humidityError, humidityAlarmTime)) {
         if (!alarmOnGoing[humidityAlarm]) {
