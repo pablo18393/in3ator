@@ -395,7 +395,7 @@ void barSelection() {
                   drawFloat(temperature[babyNTC], 1, valuePosition, ypos, textFontSize);
                   previousTemperature[babyNTC] = temperature[babyNTC];
                   EncMove = false;
-                  EEPROM.write(EEPROM_diffTemperature, int(diffTemperature[babyNTC] * 10));
+                  EEPROM.writeFloat(EEPROM_diffTemperature, diffTemperature[babyNTC]);
                   EEPROM.commit();
                 }
               }
@@ -419,7 +419,7 @@ void barSelection() {
             case restartCalibrationValuesTempGraphicPosition:
               diffTemperature[babyNTC] = false;
               diffHumidity = false;
-              EEPROM.write(EEPROM_diffTemperature, diffTemperature[babyNTC]);
+              EEPROM.writeFloat(EEPROM_diffTemperature, diffTemperature[babyNTC]);
               EEPROM.write(EEPROM_diffHumidity, diffHumidity);
               EEPROM.commit();
               calibrateSensors();

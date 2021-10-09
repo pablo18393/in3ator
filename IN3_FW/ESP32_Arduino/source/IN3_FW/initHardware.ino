@@ -52,6 +52,8 @@
 #define DEFECTIVE_BUZZER 1<<18
 #define DEFECTIVE_CURRENT_SENSOR 1<<19
 
+#define HW_TEST_OVERRIDE true
+
 long HW_error = false;
 
 void initHardware() {
@@ -69,7 +71,7 @@ void initHardware() {
   initInterrupts();
   initPowerEn();
   initActuators();
-  initGPRS();
+  //initGPRS();
   if (!HW_error) {
     logln("[HW] -> HARDWARE OK");
     GPRSSetPostVariables(NULL, "HW OK");
@@ -78,9 +80,11 @@ void initHardware() {
     logln("[HW] -> HARDWARE TEST FAIL");
     logln("[HW] -> HARDWARE ERROR CODE:" + String(HW_error, HEX));
     GPRSSetPostVariables(NULL, "HW FAIL" + String(HW_error, HEX));
-    drawHardwareErrorMessage(HW_error);
-    while (GPIORead(ENC_SWITCH)) {
-      updateData();
+    if (!HW_TEST_OVERRIDE) {
+      drawHardwareErrorMessage(HW_error);
+      while (GPIORead(ENC_SWITCH)) {
+        updateData();
+      }
     }
   }
   buzzerTone(2, buzzerStandbyToneDuration, buzzerStandbyTone);
@@ -411,7 +415,7 @@ void actuatorsTest() {
     logln("[HW] -> Fail -> PHOTOTHERAPY current consumption is too high");
   }
   GPIOWrite(PHOTOTHERAPY, LOW);
-  
+
   GPIOWrite(HUMIDIFIER, HIGH);
   testCurrent = measureConsumptionForTime(testTime) - offsetCurrent;
   logln("[HW] -> Humidifier current consumption: " + String (testCurrent) + " Amps");
@@ -425,7 +429,7 @@ void actuatorsTest() {
     logln("[HW] -> Fail -> HUMIDIFIER current consumption is too high");
   }
   GPIOWrite(HUMIDIFIER, LOW);
-  
+
   GPIOWrite(FAN, HIGH);
   testCurrent = measureConsumptionForTime(testTime) - offsetCurrent;
   logln("[HW] -> FAN consumption: " + String (testCurrent) + " Amps");

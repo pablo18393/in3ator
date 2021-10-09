@@ -268,6 +268,7 @@ void drawIntroMessage() {
    Function pending to complete
 */
 void drawHardwareErrorMessage(long error) {
+  char* messageToWrite[50];
   page = errorPage;
   tft.fillScreen(introBackColor);
   tft.setTextColor(introTextColor); //use tft. because tft.print is configured by it
@@ -276,12 +277,43 @@ void drawHardwareErrorMessage(long error) {
   tft.print("HW error:");
   tft.println(error, HEX);
   tft.println();
-  tft.println(" Please contact:");
+  tft.print(" ");
+  switch (language) {
+    case spanish:
+      textToWrite = "Por favor contacta";
+      break;
+    case portuguese:
+      textToWrite = "Por favor entre em contato";
+      break;
+    case english:
+      textToWrite = "Please contact";
+      break;
+    case french:
+      textToWrite = "S'il vous plait contactez";
+      break;
+  }
+  tft.println(textToWrite);
   tft.setTextSize(2);
   tft.println("  medicalopenworld.org");
-  tft.setTextSize(3);
+  tft.setTextSize(2);
   tft.println();
-  tft.println("Press to continue");
+  tft.println();
+  tft.print(" ");
+  switch (language) {
+    case spanish:
+      textToWrite = "Presione para continuar";
+      break;
+    case portuguese:
+      textToWrite = "Pressione para continuar";
+      break;
+    case english:
+      textToWrite = "Press to continue";
+      break;
+    case french:
+      textToWrite = "Appuyez pour continuer";
+      break;
+  }
+  tft.println(textToWrite);
   while (GPIORead(ENC_SWITCH)) {
     updateData();
   }

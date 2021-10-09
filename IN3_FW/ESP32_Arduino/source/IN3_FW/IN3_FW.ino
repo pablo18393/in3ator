@@ -4,7 +4,7 @@
 
 //Firmware version and head title of UI screen
 #define FWversion "v6.1"
-String serialNumber = "in3000031";
+String serialNumber = "in3000032";
 #define headingTitle "in3ator"
 
 #include <WiFi.h>
@@ -115,7 +115,7 @@ bool faultNTC[numNTC]; //variable to control a failure in NTC
 byte numSensors; //number of total sensors
 double humidity; // room humidity variable
 int previousHumidity; //previous sampled humidity
-int diffHumidity; //difference between measured humidity and user input real humidity
+float diffHumidity; //difference between measured humidity and user input real humidity
 
 int gestationWeeks = 28; //preterm baby gestation time in weeks
 int heaterPower; //duty cycle of control signal of system heater

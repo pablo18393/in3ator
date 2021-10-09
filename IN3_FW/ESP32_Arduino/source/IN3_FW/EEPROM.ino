@@ -7,11 +7,11 @@
 #define EEPROM_language 3
 #define EEPROM_HeaterPower 4
 #define EEPROM_UARTDebug 5
-#define EEPROM_diffHumidity 6
-#define EEPROM_diffTemperature 7
-#define EEPROM_usedGenericMosfet 8
-#define EEPROM_controlMode 8
-#define EEPROM_alarmsEnable 9
+#define EEPROM_usedGenericMosfet 6
+#define EEPROM_controlMode 7
+#define EEPROM_alarmsEnable 8
+#define EEPROM_diffHumidity 9
+#define EEPROM_diffTemperature 10
 
 bool firstTurnOn;
 
@@ -65,11 +65,10 @@ void loaddefaultValues() {
 void recapVariables() {
   autoLock = EEPROM.read(EEPROM_autoLock);
   language = EEPROM.read(EEPROM_language);
-  diffTemperature[babyNTC] = EEPROM.read(EEPROM_diffTemperature);
+  diffTemperature[babyNTC] = EEPROM.readFloat(EEPROM_diffTemperature);
   if (diffTemperature[babyNTC] > 100) {
     diffTemperature[babyNTC] = false;
   }
-  diffTemperature[babyNTC] /= 10;
   diffHumidity = EEPROM.read(EEPROM_diffHumidity);
   if (diffHumidity > 100) {
     diffHumidity = false;
