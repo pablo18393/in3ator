@@ -43,6 +43,42 @@ void graphics() {
           break;
         case advancedModePage:
           switch (i) {
+            case controlModeGraphicPosition:
+              if (controlMode) {
+                switch (language) {
+                  case spanish:
+                    textToWrite = "AIRE";
+                    break;
+                  case english:
+                    textToWrite = "AIR";
+                    break;
+                  case french:
+                    textToWrite = "AIR";
+                    break;
+                  case portuguese:
+                    textToWrite = "AR";
+                    break;
+                }
+                tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
+              }
+              else {
+                switch (language) {
+                  case spanish:
+                    textToWrite = "PIEL";
+                    break;
+                  case english:
+                    textToWrite = "SKIN";
+                    break;
+                  case french:
+                    textToWrite = "PEAU";
+                    break;
+                  case portuguese:
+                    textToWrite = "PELE";
+                    break;
+                }
+                tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
+              }
+              break;
             case temperatureGraphicPosition:
               drawTemperatureUnits();
               tft.drawRightString(initialSensorsValue, initialSensorPosition, temperatureY, textFontSize);
@@ -76,7 +112,7 @@ void graphics() {
                     textToWrite = "OUI";
                     break;
                   case portuguese:
-                    textToWrite = "Nao";
+                    textToWrite = "SIM";
                     break;
                 }
               }
@@ -92,7 +128,7 @@ void graphics() {
                     textToWrite = "PAS";
                     break;
                   case portuguese:
-                    textToWrite = "SIM";
+                    textToWrite = "NAO";
                     break;
                 }
               }
@@ -115,8 +151,8 @@ void graphics() {
               }
               tft.drawRightString(textToWrite, unitPosition, ypos, textFontSize);
               break;
-            case controlModeGraphicPosition:
-              if (controlMode) {
+            case controlAlgorithmGraphicPosition:
+              if (controlAlgorithm) {
                 textToWrite = "PID";
               }
               else {
@@ -187,7 +223,7 @@ void setSensorsGraphicPosition() {
 
 void drawHeading() {
   tft.fillRect(0, 0, tft.width(), height_heading, COLOR_HEADING);
-  if (page != mainMenuPage && page != askSuccessPage) {
+  if (page != mainMenuPage && page != askSuccessPage && page != advancedModePage) {
     drawBack();
   }
   tft.setTextColor(COLOR_MENU);
@@ -366,12 +402,48 @@ int graphicHeight(int position) {
   return ((tft.height() - height_heading) / (2 * rectangles) + position * (tft.height() - height_heading) / (rectangles) + letter_height);
 }
 
-void drawBabyTemperature() {
+void drawSelectedTemperature() {
+  float temperatureToDraw, previousTemperatureDrawn;
+  if (controlMode) {
+    previousTemperatureDrawn = previousTemperature[airNTC];
+    temperatureToDraw = temperature[airNTC];
+  }
+  else {
+    previousTemperatureDrawn = previousTemperature[babyNTC];
+    temperatureToDraw = temperature[babyNTC];
+  }
   tft.setTextColor(COLOR_MENU);
-  tft.drawFloat(previousTemperature[babyNTC], 1, temperatureX, temperatureY, textFontSize);
+  tft.drawFloat(previousTemperatureDrawn, 1, temperatureX, temperatureY, textFontSize);
   tft.setTextColor(COLOR_MENU_TEXT);
-  previousTemperature[babyNTC] = temperature[babyNTC];
-  tft.drawFloat(previousTemperature[babyNTC], 1, temperatureX, temperatureY, textFontSize);
+  tft.drawFloat(temperatureToDraw, 1, temperatureX, temperatureY, textFontSize);
+  if (controlMode) {
+    previousTemperature[airNTC] = temperatureToDraw;
+  }
+  else {
+    previousTemperature[babyNTC] = temperatureToDraw;
+  }
+}
+
+void drawUnselectedTemperature() {
+  float temperatureToDraw, previousTemperatureDrawn;
+  if (!controlMode) {
+    previousTemperatureDrawn = previousTemperature[airNTC];
+    temperatureToDraw = temperature[airNTC];
+  }
+  else {
+    previousTemperatureDrawn = previousTemperature[babyNTC];
+    temperatureToDraw = temperature[babyNTC];
+  }
+  tft.setTextColor(COLOR_MENU);
+  tft.drawFloat(previousTemperatureDrawn, 1, tft.width() / 2 - 20, tft.height() / 2 + 10, textFontSize);
+  tft.setTextColor(COLOR_MENU_TEXT);
+  tft.drawFloat(temperatureToDraw, 1, tft.width() / 2 - 20, tft.height() / 2 + 10, textFontSize);
+  if (!controlMode) {
+    previousTemperature[airNTC] = temperatureToDraw;
+  }
+  else {
+    previousTemperature[babyNTC] = temperatureToDraw;
+  }
 }
 
 void drawHumidity() {

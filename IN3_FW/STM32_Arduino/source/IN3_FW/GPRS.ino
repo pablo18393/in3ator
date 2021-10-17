@@ -717,6 +717,7 @@ bool GPRSLoadVariables() {
     if (GPRS.comment.length() < 20) {
       GPRS.comment += "Baby Tmax/Tmin " + String (temperatureMax[babyNTC], 2) + "/" + String (temperatureMin[babyNTC], 2);
       GPRS.comment += ";Air Tmax/Tmin " + String (temperatureMax[airNTC], 2) + "/" + String (temperatureMin[airNTC], 2);
+      GPRS.comment += "CM:" + String(controlMode);
       temperatureMax[babyNTC] = temperatureMaxReset;
       temperatureMin[babyNTC] = temperatureMinReset;
       temperatureMax[airNTC] = temperatureMaxReset;

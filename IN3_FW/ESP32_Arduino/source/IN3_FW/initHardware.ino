@@ -71,7 +71,7 @@ void initHardware() {
   initInterrupts();
   initPowerEn();
   initActuators();
-  //initGPRS();
+  initGPRS();
   if (!HW_error) {
     logln("[HW] -> HARDWARE OK");
     GPRSSetPostVariables(NULL, "HW OK");

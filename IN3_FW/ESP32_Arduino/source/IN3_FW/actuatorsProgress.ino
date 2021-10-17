@@ -24,18 +24,78 @@ void actuatorsProgress() {
   if (controlTemperature) {
     printLoadingTemperatureBar();
   }
-  temperatureAtStart = temperature[babyNTC];
-  switch (language) {
-    case spanish:
-    case portuguese:
-      textToWrite = "Temperatura";
-      break;
-    case english:
-    case french:
-      textToWrite = "Temperature";
-      break;
+  if (controlMode) {
+    temperatureAtStart = temperature[airNTC];
+  }
+  else {
+    temperatureAtStart = temperature[babyNTC];
+  }
+  if (controlMode) {
+    switch (language) {
+      case spanish:
+        textToWrite = "Temperatura aire";
+        break;
+      case portuguese:
+        textToWrite = "Temperatura do ar";
+        break;
+      case english:
+        textToWrite = "Air temperature";
+        break;
+      case french:
+        textToWrite = "Temperature de l'air";
+        break;
+    }
+  }
+  else {
+    switch (language) {
+      case spanish:
+        textToWrite = "Temperatura piel";
+        break;
+      case portuguese:
+        textToWrite = "temperatura da pele";
+        break;
+      case english:
+        textToWrite = "Skin temperature";
+        break;
+      case french:
+        textToWrite = "TempÃ©rature de la peau";
+        break;
+    }
   }
   drawCentreString(textToWrite, tft.width() / 2, tempBarPosY - 4 * letter_height / 3, textFontSize);
+  if (!controlMode) {
+    switch (language) {
+      case spanish:
+        textToWrite = "Temperatura aire";
+        break;
+      case portuguese:
+        textToWrite = "Temperatura do ar";
+        break;
+      case english:
+        textToWrite = "Air temperature";
+        break;
+      case french:
+        textToWrite = "Temperature de l'air";
+        break;
+    }
+  }
+  else {
+    switch (language) {
+      case spanish:
+        textToWrite = "Temperatura piel";
+        break;
+      case portuguese:
+        textToWrite = "temperatura da pele";
+        break;
+      case english:
+        textToWrite = "Skin temperature";
+        break;
+      case french:
+        textToWrite = "TempÃ©rature de la peau";
+        break;
+    }
+  }
+  drawCentreString(textToWrite, tft.width() / 2, tft.height() / 2 - letter_height, textFontSize);
   if (controlHumidity) {
     printLoadingHumidityBar();
   }
@@ -62,10 +122,7 @@ void actuatorsProgress() {
     updateData();
   }
   turnFans(ON);
-  if (temperatureAtStart > temperature[babyNTC]) {
-    temperatureAtStart = temperature[babyNTC];
-  }
-  if (controlMode == PID_CONTROL) {
+  if (controlAlgorithm == PID_CONTROL) {
     if (controlTemperature) {
       startTemperaturePID();
     }
@@ -73,11 +130,18 @@ void actuatorsProgress() {
       startHumidityPID();
     }
   }
+  updateDisplaySensors();
   alarmTimerStart();
   while (1) {
     updateData();
     if (controlTemperature) {
-      if (checkAlarms(desiredSkinTemp, temperature[babyNTC], temperatureError, temperatureAlarmTime)) {
+      if (controlMode) {
+        alarmSensedValue = temperature[airNTC];
+      }
+      else {
+        alarmSensedValue = temperature[babyNTC];
+      }
+      if (checkAlarms(desiredSkinTemp, alarmSensedValue, temperatureError, temperatureAlarmTime)) {
         if (!alarmOnGoing[temperatureAlarm]) {
           alarmOnGoing[temperatureAlarm] = true;
           buzzerConstantTone(buzzerAlarmTone);
@@ -91,7 +155,7 @@ void actuatorsProgress() {
           drawAlarmMessage(ERASE, temperatureAlarm);
         }
       }
-      if (controlMode == BASIC_CONTROL) {
+      if (controlAlgorithm == BASIC_CONTROL) {
         basictemperatureControl();
       }
       else {
@@ -99,7 +163,7 @@ void actuatorsProgress() {
       }
     }
     if (controlHumidity) {
-      if (controlMode == BASIC_CONTROL) {
+      if (controlAlgorithm == BASIC_CONTROL) {
         basicHumidityControl();
       }
       else {
@@ -136,7 +200,14 @@ void actuatorsProgress() {
 
 
 void basictemperatureControl() {
-  if (temperature[babyNTC] < desiredSkinTemp) {
+  float temperatureToControl;
+  if (controlMode) {
+    temperatureToControl = temperature[airNTC];
+  }
+  else {
+    temperatureToControl = temperature[babyNTC];
+  }
+  if (temperatureToControl < desiredSkinTemp) {
     heatUp();
   }
   else {

@@ -1,3 +1,5 @@
+float alarmSensedValue;
+
 void alarmTimerStart() {
   temperatureAlarmTime = millis();
   humidityAlarmTime = millis();
@@ -25,10 +27,10 @@ void resetHumidityAlarm() {
   drawAlarmMessage(ERASE, humidityAlarm);
 }
 
-bool checkAlarms(float setValue, float measuredValue, int errorMargin, long alarmTime) {
+bool checkAlarms(float setPoint, float measuredValue, int errorMargin, long alarmTime) {
   if (alarmsEnable) {
     if (millis() - alarmTime > alarmTimeDelay * 60 * 1000) { // min to millis
-      if (abs(setValue - measuredValue) > errorMargin) {
+      if (abs(setPoint - measuredValue) > errorMargin) {
         return true;
       }
     }

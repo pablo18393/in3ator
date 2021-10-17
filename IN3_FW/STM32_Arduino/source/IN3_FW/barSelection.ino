@@ -51,7 +51,7 @@ void barSelection() {
       while (!digitalRead(ENC_SWITCH)) {
         updateData();
         checkEncoderPress();
-        if (page != mainMenuPage && page != askSuccessPage) {
+        if (page != mainMenuPage && page != askSuccessPage && page != advancedModePage) {
           back_mode();
         }
       }
@@ -82,27 +82,27 @@ void barSelection() {
               advancedMode();
               break;
             case LEDGraphicPosition:
-                  jaundiceEnable = !jaundiceEnable;
-                  tft.setTextColor(COLOR_MENU);
-                  if (jaundiceEnable) {
-                    tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
-                  }
-                  else {
-                    tft.drawRightString("ON", unitPosition, ypos, textFontSize);
-                  }
-                  tft.setTextColor(COLOR_MENU_TEXT);
-                  if (jaundiceEnable) {
-                    tft.drawRightString("ON", unitPosition, ypos, textFontSize);
-                    GPRSSetPostVariables(jaundiceLEDON, "");
-                    setGPRSPostPeriod(jaundiceGPRSPostPeriod);
-                  }
-                  else {
-                    tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
-                    GPRSSetPostVariables(jaundiceLEDOFF, "");
-                    GPRSSetPostVariables(jaundiceLEDOFF, "");
-                    setGPRSPostPeriod(standByGPRSPostPeriod);
-                  }
-                  digitalWrite(PHOTOTHERAPY, jaundiceEnable);
+              jaundiceEnable = !jaundiceEnable;
+              tft.setTextColor(COLOR_MENU);
+              if (jaundiceEnable) {
+                tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
+              }
+              else {
+                tft.drawRightString("ON", unitPosition, ypos, textFontSize);
+              }
+              tft.setTextColor(COLOR_MENU_TEXT);
+              if (jaundiceEnable) {
+                tft.drawRightString("ON", unitPosition, ypos, textFontSize);
+                GPRSSetPostVariables(jaundiceLEDON, "");
+                setGPRSPostPeriod(jaundiceGPRSPostPeriod);
+              }
+              else {
+                tft.drawRightString("OFF", unitPosition, ypos, textFontSize);
+                GPRSSetPostVariables(jaundiceLEDOFF, "");
+                GPRSSetPostVariables(jaundiceLEDOFF, "");
+                setGPRSPostPeriod(standByGPRSPostPeriod);
+              }
+              digitalWrite(PHOTOTHERAPY, jaundiceEnable);
               break;
             case settingsGraphicPosition:
               settings();
@@ -114,6 +114,11 @@ void barSelection() {
           break;
         case advancedModePage:
           switch (bar_pos - graphicTextOffset ) {
+            case controlModeGraphicPosition:
+              controlMode = !controlMode;
+              EEPROM.write(EEPROM_controlMode, controlMode);
+              advancedMode();
+              break;
             case temperatureGraphicPosition:
               while (digitalRead(ENC_SWITCH)) {
                 updateData();
@@ -192,7 +197,7 @@ void barSelection() {
               GPRSSetPostVariables(actuatorsModeOFF, "Baby didn't survive");
               break;
           }
-          mainMenu();
+          advancedMode();
           break;
         case settingsPage:
           switch (bar_pos - graphicTextOffset ) {
@@ -317,22 +322,22 @@ void barSelection() {
               }
               settings();
               break;
-            case controlModeGraphicPosition:
-              controlMode = !controlMode;
-              EEPROM.write(EEPROM_controlMode, controlMode);
+            case controlAlgorithmGraphicPosition:
+              controlAlgorithm = !controlAlgorithm;
+              EEPROM.write(EEPROM_controlAlgorithm, controlAlgorithm);
               tft.setTextColor(COLOR_MENU);
-              if (controlMode) {
-                tft.drawRightString("BASIC", unitPosition, ypos, textFontSize);
+              if (controlAlgorithm) {
+                tft.drawRightString("BASIC", unitPosition + 10, ypos, textFontSize);
               }
               else {
                 tft.drawRightString("PID", unitPosition, ypos, textFontSize);
               }
               tft.setTextColor(COLOR_MENU_TEXT);
-              if (controlMode) {
+              if (controlAlgorithm) {
                 tft.drawRightString("PID", unitPosition, ypos, textFontSize);
               }
               else {
-                tft.drawRightString("BASIC", unitPosition, ypos, textFontSize);
+                tft.drawRightString("BASIC", unitPosition + 10, ypos, textFontSize);
               }
               break;
             case heaterPowerGraphicPosition:
@@ -424,7 +429,7 @@ void barSelection() {
       while (!digitalRead(ENC_SWITCH)) {
         updateData();
         checkEncoderPress();
-        if (page != mainMenuPage && page != askSuccessPage) {
+        if (page != mainMenuPage && page != askSuccessPage && page != advancedModePage) {
           back_mode();
         }
       }
@@ -435,7 +440,7 @@ void barSelection() {
 
 void checkEncoderPress() {
   updateData();
-  if (page == mainMenuPage) {
+  if (page == mainMenuPage || page == advancedModePage) {
     long timePressed = millis();
     while (!digitalRead(ENC_SWITCH)) {
       updateData();
@@ -487,16 +492,16 @@ void checkSetMessage() {
     else if (page == advancedModePage) {
       switch (language) {
         case english:
-          helpMessage = "Set desired temperature";
+          helpMessage = "Set desired parameters";
           break;
         case spanish:
-          helpMessage = "Introduce temperatura";
+          helpMessage = "Introduce parametros";
           break;
         case french:
-          helpMessage = "Regler temperature desiree";
+          helpMessage = "Entrer parametres";
           break;
         case portuguese:
-          helpMessage = "Insira a temperatura";
+          helpMessage = "Insira os parametros";
           break;
       }
     }
@@ -544,7 +549,7 @@ void back_mode() {
         askSuccess();
       }
       else {
-        mainMenu();
+        advancedMode();
       }
     }
     delay((time_back_draw + time_back_wait) / width_back);

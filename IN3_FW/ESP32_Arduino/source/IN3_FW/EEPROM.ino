@@ -12,6 +12,8 @@
 #define EEPROM_alarmsEnable 8
 #define EEPROM_diffHumidity 9
 #define EEPROM_diffTemperature 10
+#define EEPROM_controlAlgorithm 0x11
+
 
 bool firstTurnOn;
 
@@ -48,16 +50,18 @@ void initEEPROM() {
 
 void loaddefaultValues() {
   autoLock = defaultAutoLock;
-  EEPROM.write(EEPROM_autoLock, autoLock);
   HeaterPower = defaultHeaterPower;
-  EEPROM.write(EEPROM_HeaterPower, HeaterPower);
+  controlMode = defaultcontrolMode;
   UARTDebug = defaultUARTDebug;
-  EEPROM.write(EEPROM_UARTDebug, UARTDebug);
   language = defaultLanguage;
-  EEPROM.write(EEPROM_language, language);
-  controlMode = defaultControlMode;
-  EEPROM.write(EEPROM_controlMode, controlMode);
+  controlAlgorithm = defaultcontrolAlgorithm;
   alarmsEnable = defaultAlarmsEnable;
+  EEPROM.write(EEPROM_autoLock, autoLock);
+  EEPROM.write(EEPROM_HeaterPower, HeaterPower);
+  EEPROM.write(EEPROM_UARTDebug, UARTDebug);
+  EEPROM.write(EEPROM_language, language);
+  EEPROM.write(EEPROM_controlAlgorithm, controlAlgorithm);
+  EEPROM.write(EEPROM_controlMode, controlMode);
   EEPROM.write(EEPROM_alarmsEnable, alarmsEnable);
   EEPROM.commit();
 }
@@ -75,8 +79,9 @@ void recapVariables() {
   }
   HeaterPower = EEPROM.read(EEPROM_HeaterPower);
   UARTDebug = EEPROM.read(EEPROM_UARTDebug);
-  controlMode = EEPROM.read(EEPROM_controlMode);
+  controlAlgorithm = EEPROM.read(EEPROM_controlAlgorithm);
   alarmsEnable = EEPROM.read(EEPROM_alarmsEnable);
+  controlMode = EEPROM.read(EEPROM_controlMode);
 }
 
 long EEPROMReadLong(int p_address)

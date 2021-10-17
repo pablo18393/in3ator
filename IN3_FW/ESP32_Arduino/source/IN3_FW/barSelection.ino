@@ -51,7 +51,7 @@ void barSelection() {
       while (!GPIORead(ENC_SWITCH)) {
         updateData();
         checkEncoderPress();
-        if (page != mainMenuPage && page != askSuccessPage) {
+        if (page != mainMenuPage && page != askSuccessPage && page != advancedModePage) {
           back_mode();
         }
       }
@@ -83,14 +83,14 @@ void barSelection() {
               break;
             case LEDGraphicPosition:
               jaundiceEnable = !jaundiceEnable;
-              setTextColor(COLOR_MENU);
+              tft.setTextColor(COLOR_MENU);
               if (jaundiceEnable) {
                 drawRightString("OFF", unitPosition, ypos, textFontSize);
               }
               else {
                 drawRightString("ON", unitPosition, ypos, textFontSize);
               }
-              setTextColor(COLOR_MENU_TEXT);
+              tft.setTextColor(COLOR_MENU_TEXT);
               if (jaundiceEnable) {
                 drawRightString("ON", unitPosition, ypos, textFontSize);
                 GPRSSetPostVariables(jaundiceLEDON, "");
@@ -102,7 +102,7 @@ void barSelection() {
                 GPRSSetPostVariables(jaundiceLEDOFF, "");
                 setGPRSPostPeriod(standByGPRSPostPeriod);
               }
-              GPIOWrite(PHOTOTHERAPY, jaundiceEnable);
+              digitalWrite(PHOTOTHERAPY, jaundiceEnable);
               break;
             case settingsGraphicPosition:
               settings();
@@ -114,6 +114,11 @@ void barSelection() {
           break;
         case advancedModePage:
           switch (bar_pos - graphicTextOffset ) {
+            case controlModeGraphicPosition:
+              controlMode = !controlMode;
+              EEPROM.write(EEPROM_controlMode, controlMode);
+              advancedMode();
+              break;
             case temperatureGraphicPosition:
               while (GPIORead(ENC_SWITCH)) {
                 updateData();
@@ -192,7 +197,7 @@ void barSelection() {
               GPRSSetPostVariables(actuatorsModeOFF, "Baby didn't survive");
               break;
           }
-          mainMenu();
+          advancedMode();
           break;
         case settingsPage:
           switch (bar_pos - graphicTextOffset ) {
@@ -319,23 +324,23 @@ void barSelection() {
               }
               settings();
               break;
-            case controlModeGraphicPosition:
-              controlMode = !controlMode;
-              EEPROM.write(EEPROM_controlMode, controlMode);
+            case controlAlgorithmGraphicPosition:
+              controlAlgorithm = !controlAlgorithm;
+              EEPROM.write(EEPROM_controlAlgorithm, controlAlgorithm);
               EEPROM.commit();
               setTextColor(COLOR_MENU);
-              if (controlMode) {
-                drawRightString("BASIC", unitPosition, ypos, textFontSize);
+           if (controlAlgorithm) {
+             drawRightString("BASIC", unitPosition + 10, ypos, textFontSize);
               }
               else {
                 drawRightString("PID", unitPosition, ypos, textFontSize);
               }
               setTextColor(COLOR_MENU_TEXT);
-              if (controlMode) {
+              if ((controlAlgorithm)) {
                 drawRightString("PID", unitPosition, ypos, textFontSize);
               }
               else {
-                drawRightString("BASIC", unitPosition, ypos, textFontSize);
+                drawRightString("BASIC", unitPosition + 10, ypos, textFontSize);
               }
               break;
             case heaterPowerGraphicPosition:
@@ -432,7 +437,7 @@ void barSelection() {
       while (!GPIORead(ENC_SWITCH)) {
         updateData();
         checkEncoderPress();
-        if (page != mainMenuPage && page != askSuccessPage) {
+        if (page != mainMenuPage && page != askSuccessPage && page != advancedModePage) {
           back_mode();
         }
       }
@@ -443,7 +448,7 @@ void barSelection() {
 
 void checkEncoderPress() {
   updateData();
-  if (page == mainMenuPage) {
+  if (page == mainMenuPage || page == advancedModePage) {
     long timePressed = millis();
     while (!GPIORead(ENC_SWITCH)) {
       updateData();
@@ -495,16 +500,16 @@ void checkSetMessage() {
     else if (page == advancedModePage) {
       switch (language) {
         case english:
-          helpMessage = "Set desired temperature";
+          helpMessage = "Set desired parameters";
           break;
         case spanish:
-          helpMessage = "Introduce temperatura";
+          helpMessage = "Introduce parametros";
           break;
         case french:
-          helpMessage = "Regler temperature desiree";
+          helpMessage = "Entrer parametres";
           break;
         case portuguese:
-          helpMessage = "Insira a temperatura";
+          helpMessage = "Insira os parametros";
           break;
       }
     }
@@ -552,7 +557,7 @@ void back_mode() {
         askSuccess();
       }
       else {
-        mainMenu();
+        advancedMode();
       }
     }
     delay((time_back_draw + time_back_wait) / width_back);

@@ -36,18 +36,26 @@ int updateData() {
 }
 
 void updateDisplaySensors() {
+  float temperatureToUpdate;
   if (page == advancedModePage || (page == actuatorsProgressPage)) {
-    drawBabyTemperature();
+    drawSelectedTemperature();
     drawHumidity();
   }
   if (page == actuatorsProgressPage) {
+    drawUnselectedTemperature();
     tft.setTextColor(COLOR_MENU_TEXT);
     if (controlTemperature) {
       float previousTemperaturePercentage = temperaturePercentage;
       if (displayProcessPercentage) {
         drawRightNumber(temperaturePercentage, tft.width() / 2, temperatureY);
       }
-      temperaturePercentage = 100 - ((desiredSkinTemp - temperature[babyNTC]) * 100 / (desiredSkinTemp - temperatureAtStart));
+      if (controlMode) {
+        temperatureToUpdate = temperature[airNTC];
+      }
+      else {
+        temperatureToUpdate = temperature[babyNTC];
+      }
+      temperaturePercentage = 100 - ((desiredSkinTemp - temperatureToUpdate) * 100 / (desiredSkinTemp - temperatureAtStart));
       if (temperaturePercentage > 99) {
         temperaturePercentage = 100;
       }

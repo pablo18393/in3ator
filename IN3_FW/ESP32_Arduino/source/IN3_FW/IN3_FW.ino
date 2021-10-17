@@ -33,6 +33,8 @@ String serialNumber = "in3000032";
 #define OFF false
 #define BASIC_CONTROL false
 #define PID_CONTROL true
+#define BABY_CONTROL false
+#define AIR_CONTROL true
 
 //buzzer variables
 #define buzzerStandbyPeriod 10000 //in millis, there will be a periodic tone when regulating baby's constants
@@ -66,7 +68,7 @@ float alarmTimeDelay = 30; //in mins, time to check alarm
 #define mosfet_switch_time 100   //delay to wait for mosfet to switch (in millis), oversized
 #define timePressToSettings 5000 //in millis, time to press to go to settings window in UI
 #define debugUpdatePeriod 1000 //in millis, 
-bool UARTDebug=1;
+bool UARTDebug = 1;
 bool defaultUARTDebug = ON;
 long lastDebugUpdate;
 long loopCounts;
@@ -132,7 +134,7 @@ volatile bool statusEncSwitch;
 
 //WIFI
 #define WIFI_connection_try 60000 //in millis
-bool WIFI_connection_status=false;
+bool WIFI_connection_status = false;
 
 //GPRS variables to transmit
 #define turnedOn 0 //transmit first turned ON with hardware verification
@@ -171,7 +173,9 @@ String RPD; //(Raw Pulsioximeter Data)
 
 //room variables
 bool controlMode;
-bool defaultControlMode = PID_CONTROL;
+bool defaultcontrolMode = AIR_CONTROL;
+bool controlAlgorithm;
+bool defaultcontrolAlgorithm = PID_CONTROL;
 double desiredSkinTemp = 34; //preset baby skin temperature
 double desiredRoomHum = 75; //preset enviromental humidity
 bool jaundiceEnable; //PWM that controls jaundice LED intensity
@@ -297,15 +301,16 @@ byte goToProcessRow;
 #define LEDGraphicPosition 2
 #define startGraphicPosition 3
 //Advanced mode
-#define temperatureGraphicPosition 0
-#define humidityGraphicPosition 1
-#define LEDGraphicPosition 2
-#define settingsGraphicPosition 4
-#define startGraphicPosition 3
+#define controlModeGraphicPosition 0
+#define temperatureGraphicPosition 1
+#define humidityGraphicPosition 2
+#define LEDGraphicPosition 3
+#define settingsGraphicPosition 5
+#define startGraphicPosition 4
 //settings
 #define autoLockGraphicPosition 0
 #define languageGraphicPosition 1
-#define controlModeGraphicPosition 2
+#define controlAlgorithmGraphicPosition 2
 #define heaterPowerGraphicPosition 3
 #define DebugENGraphicPosition 4
 #define calibrateGraphicPosition 5
@@ -369,7 +374,7 @@ int hardwareComponents;
 
 void setup() {
   initBoard();
-  mainMenu();
+  advancedMode();
 }
 
 void loop() {

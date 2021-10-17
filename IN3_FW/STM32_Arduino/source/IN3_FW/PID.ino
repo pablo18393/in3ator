@@ -3,16 +3,23 @@
 #define humidityCTL 1
 #define numPID 2
 
-double Kp[numPID] = {30000, 200}, Ki[numPID] = {50, 2} , Kd[numPID] = {10000, 20};
+double Kp[numPID] = {30000, 200}, Ki[numPID] = {300, 2} , Kd[numPID] = {3000, 20};
 double PIDOutput;
+double temperaturePIDInput;
 double humidityPIDOutput;
 int WindowSize = 5000;
 unsigned long windowStartTime;
-PID temperaturePID(&temperature[babyNTC], &PIDOutput, &desiredSkinTemp, Kp[tempCTL], Ki[tempCTL], Kd[tempCTL], P_ON_E, DIRECT);
+PID temperaturePID(&temperaturePIDInput, &PIDOutput, &desiredSkinTemp, Kp[tempCTL], Ki[tempCTL], Kd[tempCTL], P_ON_E, DIRECT);
 PID humidityPID(&humidity, &humidityPIDOutput, &desiredRoomHum, Kp[humidityCTL], Ki[humidityCTL], Kd[humidityCTL], P_ON_E, DIRECT);
 
 void PIDISR() {
   if (temperaturePID.GetMode() == AUTOMATIC) {
+    if (controlMode) {
+      temperaturePIDInput = temperature[airNTC];
+    }
+    else {
+      temperaturePIDInput = temperature[babyNTC];
+    }
     temperaturePID.Compute();
     pwmWrite(HEATER, PIDOutput);
   }
@@ -45,7 +52,6 @@ void configPIDTimer(int freq) {
 void startTemperaturePID() {
   temperaturePID.SetOutputLimits(heaterMaxPWM * heaterPowerMin / 100, heaterMaxPWM * heaterPowerMax / 100);
   temperaturePID.SetTunings(Kp[tempCTL], Ki[tempCTL], Kd[tempCTL]);
-  temperaturePID.SetSampleTime(PIDISRPeriod * 200); // in millis
   temperaturePID.SetControllerDirection(DIRECT);
   temperaturePID.SetMode(AUTOMATIC);
   configPIDTimer(PIDISRPeriod); //in micros

@@ -1,7 +1,7 @@
 
 void advancedMode() {
   page = advancedModePage;
-  byte numWords = 4;
+  byte numWords = 5;
   print_text = true;
   tft.setTextSize(1);
   tft.setTextColor(COLOR_MENU_TEXT);
@@ -11,22 +11,46 @@ void advancedMode() {
   pos_text[startGraphicPosition] = centered;
   switch (language) {
     case spanish:
-      words[temperatureGraphicPosition]  = "Temperatura";
+      words[controlModeGraphicPosition]  = "Modo de control";
+      if (controlMode) {
+        words[temperatureGraphicPosition]  = "Temp aire";
+      }
+      else {
+        words[temperatureGraphicPosition]  = "Temp piel";
+      }
       words[humidityGraphicPosition] = "Humedad";
       words[LEDGraphicPosition] = "Fototerapia";
       break;
     case english:
-      words[temperatureGraphicPosition]  = "Temperature";
+      words[controlModeGraphicPosition]  = "Control mode";
+      if (controlMode) {
+        words[temperatureGraphicPosition]  = "Air temp";
+      }
+      else {
+        words[temperatureGraphicPosition]  = "Skin temp";
+      }
       words[humidityGraphicPosition] = "Humidity";
       words[LEDGraphicPosition] = "Phototherapy";
       break;
     case french:
-      words[temperatureGraphicPosition]  = "Temperature";
+      words[controlModeGraphicPosition]  = "Mode de controle";
+      if (controlMode) {
+        words[temperatureGraphicPosition]  = "Temp air";
+      }
+      else {
+        words[temperatureGraphicPosition]  = "Temp peau";
+      }
       words[humidityGraphicPosition] = "Humidite";
       words[LEDGraphicPosition] = "Phototherapie";
       break;
     case portuguese:
-      words[temperatureGraphicPosition]  = "Temperatura";
+      words[controlModeGraphicPosition]  = "Modo de controle";
+      if (controlMode) {
+        words[temperatureGraphicPosition]  = "Temp do ar";
+      }
+      else {
+        words[temperatureGraphicPosition]  = "Temp pele";
+      }
       words[humidityGraphicPosition] = "Umidade";
       words[LEDGraphicPosition] = "Fototerapia";
       break;

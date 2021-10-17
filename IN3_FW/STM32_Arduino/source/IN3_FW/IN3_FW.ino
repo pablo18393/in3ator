@@ -1,6 +1,6 @@
 //Firmware version and head title of UI screen
-#define FWversion "v6.0"
-String serialNumber = "in3000025";
+#define FWversion "v6.B"
+String serialNumber = "in3000032";
 #define headingTitle "in3ator"
 
 //include libraries
@@ -52,6 +52,8 @@ typedef struct iwdg_reg_map {
 #define OFF false
 #define BASIC_CONTROL false
 #define PID_CONTROL true
+#define BABY_CONTROL false
+#define AIR_CONTROL true
 
 //buzzer variables
 #define buzzerStandbyPeriod 10000 //in millis, there will be a periodic tone when regulating baby's constants
@@ -180,7 +182,9 @@ String RPD; //(Raw Pulsioximeter Data)
 
 //room variables
 bool controlMode;
-bool defaultControlMode = PID_CONTROL;
+bool defaultcontrolMode = AIR_CONTROL;
+bool controlAlgorithm;
+bool defaultcontrolAlgorithm = PID_CONTROL;
 double desiredSkinTemp = 34; //preset baby skin temperature
 double desiredRoomHum = 75; //preset enviromental humidity
 bool jaundiceEnable; //PWM that controls jaundice LED intensity
@@ -305,15 +309,17 @@ byte goToProcessRow;
 #define LEDGraphicPosition 2
 #define startGraphicPosition 3
 //Advanced mode
-#define temperatureGraphicPosition 0
-#define humidityGraphicPosition 1
-#define LEDGraphicPosition 2
-#define settingsGraphicPosition 4
-#define startGraphicPosition 3
+
+#define controlModeGraphicPosition 0
+#define temperatureGraphicPosition 1
+#define humidityGraphicPosition 2
+#define LEDGraphicPosition 3
+#define settingsGraphicPosition 5
+#define startGraphicPosition 4
 //settings
 #define autoLockGraphicPosition 0
 #define languageGraphicPosition 1
-#define controlModeGraphicPosition 2
+#define controlAlgorithmGraphicPosition 2
 #define heaterPowerGraphicPosition 3
 #define DebugENGraphicPosition 4
 #define calibrateGraphicPosition 5
@@ -388,7 +394,7 @@ int hardwareComponents;
 
 void setup() {
   initBoard();
-  mainMenu();
+  advancedMode();
 }
 
 void loop() {
