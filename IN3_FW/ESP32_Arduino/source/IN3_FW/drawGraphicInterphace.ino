@@ -177,7 +177,10 @@ void graphics() {
           break;
         case calibrateSensorsPage:
           switch (i) {
-            case temperatureCalibrationGraphicPosition:
+            case airTemperatureCalibrationGraphicPosition:
+              drawFloat(previousTemperature[airNTC], 1, valuePosition, ypos, textFontSize);
+              break;
+            case skinTemperatureCalibrationGraphicPosition:
               drawFloat(previousTemperature[babyNTC], 1, valuePosition, ypos, textFontSize);
               break;
             case humidityCalibrationGraphicPosition:

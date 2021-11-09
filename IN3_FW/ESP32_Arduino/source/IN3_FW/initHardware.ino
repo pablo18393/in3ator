@@ -135,7 +135,6 @@ void initPin(uint8_t GPIO, uint8_t Mode) {
 }
 
 void initPowerAlarm() {
-  pinMode(PWR_ALERT, INPUT);
 }
 
 void GPIOWrite(uint8_t GPIO, uint8_t Mode) {
@@ -168,11 +167,9 @@ void initGPRS()
 }
 
 void initSenseCircuit() {
-  /*
     initPin(SYSTEM_SHUNT, INPUT);
     standByCurrentTest();
     measureOffsetConsumption();
-  */
 }
 
 void initSensors() {

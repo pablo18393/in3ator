@@ -14,7 +14,6 @@ void initDebug() {
 }
 
 void initInterrupts() {
-  //attachInterrupt(PWR_ALERT, powerAlertISR, RISING);
   attachInterrupt(ENC_SWITCH, encSwitchISR, CHANGE);
   attachInterrupt(ENC_A, encoderISR, CHANGE);
   attachInterrupt(ENC_B, encoderISR, CHANGE);

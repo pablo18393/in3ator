@@ -20,7 +20,7 @@ long lastGPRSRoutine;
 String user = "admin@admin.com";
 String password = "admin";
 String server = "pub.scar.io";
-char GPRSRXBuffer[1024];
+#define RX_BUFFER_LENGTH 2048
 
 String databaseLogin[] = {
   "POST /In3/public/api/v1/auth/login?c=1 HTTP/1.1\n",
@@ -67,7 +67,7 @@ struct GPRSstruct {
   bool postComment;
   int sendPeriod;
   long lastSent;
-  char buffer[1024];
+  char buffer[RX_BUFFER_LENGTH];
   int charToRead;
   int bufferPos;
   int bufferWritePos;
@@ -489,8 +489,8 @@ void GPRSPost() {
 
 void readGPRSData() {
   while (Serial2.available()) {
-    if (GPRS.bufferWritePos > 1023) {
-      GPRS.bufferWritePos -= 1024;
+    if (GPRS.bufferWritePos >= RX_BUFFER_LENGTH) {
+      GPRS.bufferWritePos = 0;
       logln("[GPRS] -> Buffer overflow");
     }
     GPRS.buffer[GPRS.bufferWritePos] = Serial2.read();

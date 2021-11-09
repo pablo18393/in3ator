@@ -3,7 +3,7 @@
 */
 
 //Firmware version and head title of UI screen
-#define FWversion "v6.1"
+#define FWversion "v6.3"
 String serialNumber = "in3000032";
 #define headingTitle "in3ator"
 
@@ -98,9 +98,9 @@ byte language;
 
 #define numNTC 2 //number of NTC
 #define numTempSensors 3 //number of total temperature sensors in system
-#define temperature_fraction 50 //amount of temperature samples to filter
+#define temperature_filter 4000 //amount of temperature samples to filter
 
-#define NTCMeasurementPeriod 10 //in millis
+#define NTCMeasurementPeriod 1000 //in millis
 #define CurrentMeasurementPeriod 1000 //in millis
 long lastNTCmeasurement, lastCurrentMeasurement;
 
@@ -110,8 +110,8 @@ double temperatureMaxReset = -1000;
 double temperatureMinReset = 1000;
 double temperatureMax[numTempSensors], temperatureMin[numTempSensors];
 double previousTemperature[numTempSensors];
-int temperatureArray [numNTC][temperature_fraction]; //variable to handle each NTC with the array of last samples (only for NTC)
-byte temperature_measured; //temperature sensor number turn to measure
+int temperatureArray [numNTC][temperature_filter]; //variable to handle each NTC with the array of last samples (only for NTC)
+int temperature_measured; //temperature sensor number turn to measure
 float diffTemperature[numTempSensors]; //difference between measured temperature and user input real temperature
 bool faultNTC[numNTC]; //variable to control a failure in NTC
 byte numSensors; //number of total sensors
@@ -316,9 +316,11 @@ byte goToProcessRow;
 #define calibrateGraphicPosition 5
 #define setdefaultValuesGraphicPosition 6
 //calibration
-#define temperatureCalibrationGraphicPosition 0
-#define humidityCalibrationGraphicPosition 1
-#define restartCalibrationValuesTempGraphicPosition 2
+#define airTemperatureCalibrationGraphicPosition 0
+#define skinTemperatureCalibrationGraphicPosition 1
+#define humidityCalibrationGraphicPosition 2
+#define autoCalibrationGraphicPosition 3
+#define restartCalibrationGraphicPosition 4
 //askSuccess
 #define successQuestionGraphicPosition 0
 #define afirmativeGraphicPosition 1

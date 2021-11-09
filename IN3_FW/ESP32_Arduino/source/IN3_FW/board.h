@@ -31,31 +31,30 @@
 #define UNUSED_GPIO_EXP2 GPIO_EXP_14
 #define UNUSED_GPIO_EXP3 GPIO_EXP_15
 
-#define SYSTEM_SHUNT 2
-#define HEATER 27
-#define SD_CS GPIO_EXP_2
 
-#define PHOTOTHERAPY GPIO_EXP_7
-#define PWR_ALERT 2
-#define SCREENBACKLIGHT 0
-#define HUMIDIFIER GPIO_EXP_6
 #define TFT_DC 4
-#define TOUCH_CS GPIO_EXP_11
-#define POWER_EN GPIO_EXP_0
-#define GPRS_EN GPIO_EXP_1
-
+#define BUZZER 5
+#define ENC_A 25
+#define ENC_SWITCH 26
+#define HEATER 27
+#define ENC_B 32
+#define SCREENBACKLIGHT 33
 #define BABY_NTC_PIN 34
 #define AIR_NTC_PIN 35
-#define ENC_SWITCH 33
-#define BUZZER 5
-#define FAN GPIO_EXP_4
-#define ENC_A 25
-#define ENC_B 32
-#define TFT_CS GPIO_EXP_9
-#define GPRS_PWRKEY GPIO_EXP_8
-#define TOUCH_IRQ GPIO_EXP_10
+#define SYSTEM_SHUNT 36
 
+#define POWER_EN GPIO_EXP_0
+#define GPRS_EN GPIO_EXP_1
+#define SD_CS GPIO_EXP_2
+#define FAN GPIO_EXP_3
+#define HUMIDIFIER GPIO_EXP_6
+#define PHOTOTHERAPY GPIO_EXP_7
+#define GPRS_PWRKEY GPIO_EXP_8
+#define TFT_CS GPIO_EXP_9
+#define TOUCH_IRQ GPIO_EXP_10
+#define TOUCH_CS GPIO_EXP_11
 #define TFT_RST GPIO_EXP_13
+
 #endif
 
 #define SCREENBACKLIGHT_PWM_CHANNEL 0
@@ -70,6 +69,9 @@ int maxPWMvalue = pow(2,PWM_RESOLUTION) - 1;
 
 #define BL_NORMAL 0
 #define BL_POWERSAVE 1
+
+#define ANALOG_CURRENT_SENSOR true // analog current sensing circuit is present
+#define DIGITAL_CURRENT_SENSOR false
 
 int ScreenBacklightMode;
 float backlightPower;

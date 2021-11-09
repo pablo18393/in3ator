@@ -1,8 +1,8 @@
 #define consumptionMeanSamples 1000
 
 void sensorsISR() {
-  if (millis() - lastNTCmeasurement > NTCMeasurementPeriod) {
-    lastNTCmeasurement = millis();
+  if (float(micros() - lastNTCmeasurement) / 1000 > float(NTCMeasurementPeriod / temperature_filter)) {
+    lastNTCmeasurement = micros();
     measurenumNTC();
   }
   if (millis() - lastCurrentMeasurement > CurrentMeasurementPeriod) {
@@ -35,10 +35,15 @@ float measureConsumptionForTime (long testTimeout) {
 }
 
 float measureConsumption() {
-  if (PAC.UpdateCurrent()) {
-    Serial.println("[SENSORS] -> Current sensing returned zero");
+  if (DIGITAL_CURRENT_SENSOR) {
+    if (PAC.UpdateCurrent()) {
+      Serial.println("[SENSORS] -> Current sensing returned zero");
+      return (PAC.Current / 1000); //Amperes
+    }
   }
-  return (PAC.Current / 1000); //Amperes
+  if (ANALOG_CURRENT_SENSOR) {
+    return (analogRead(SYSTEM_SHUNT));
+  }
 }
 
 void checkNewPulsioximeterData() {
@@ -82,7 +87,7 @@ bool measurenumNTC() {
     temperatureArray[i][temperature_measured] = analogRead(NTC_PIN[i]);
   }
   temperature_measured++;
-  if (temperature_measured == temperature_fraction) {
+  if (temperature_measured >= temperature_filter) {
     updateTemp(numNTC);
     temperature_measured = false;
     return true;
@@ -122,10 +127,10 @@ void updateTemp(byte sensor) {
     float vm = 0.0;
     float rntc = 0.0;
     temperatureMean = false;
-    for (int j = false; j < temperature_fraction; j++) {
+    for (int j = false; j < temperature_filter; j++) {
       temperatureMean += temperatureArray[i][j];
     }
-    temperatureMean /= temperature_fraction;
+    temperatureMean /= temperature_filter;
     vm = (vcc) * ( temperatureMean / maxADCvalue );          //Calcular tensión en la entrada
     rntc = rAux / ((vcc / vm) - 1);                   //Calcular la resistencia de la NTC
     temperature[i] = beta / (log(rntc / r0) + (beta / temp0)) - 273; //Calcular la temperatura en Celsius

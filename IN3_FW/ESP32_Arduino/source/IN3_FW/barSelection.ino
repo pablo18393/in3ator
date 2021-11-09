@@ -329,8 +329,8 @@ void barSelection() {
               EEPROM.write(EEPROM_controlAlgorithm, controlAlgorithm);
               EEPROM.commit();
               setTextColor(COLOR_MENU);
-           if (controlAlgorithm) {
-             drawRightString("BASIC", unitPosition + 10, ypos, textFontSize);
+              if (controlAlgorithm) {
+                drawRightString("BASIC", unitPosition + 10, ypos, textFontSize);
               }
               else {
                 drawRightString("PID", unitPosition, ypos, textFontSize);
@@ -388,7 +388,24 @@ void barSelection() {
           break;
         case calibrateSensorsPage:
           switch (bar_pos - graphicTextOffset ) {
-            case temperatureCalibrationGraphicPosition:
+            case airTemperatureCalibrationGraphicPosition:
+              while (GPIORead(ENC_SWITCH)) {
+                updateData();
+                if (EncMove) {
+                  setTextColor(COLOR_MENU);
+                  drawFloat(previousTemperature[airNTC], 1, valuePosition, ypos, textFontSize);
+                  setTextColor(COLOR_MENU_TEXT);
+                  diffTemperature[airNTC] += EncMove * (0.1);
+                  temperature[airNTC] += EncMove * (0.1);
+                  drawFloat(temperature[airNTC], 1, valuePosition, ypos, textFontSize);
+                  previousTemperature[airNTC] = temperature[airNTC];
+                  EncMove = false;
+                  EEPROM.writeFloat(EEPROM_diffAirTemperature, diffTemperature[airNTC]);
+                }
+              }
+              EEPROM.commit();
+              break;
+            case skinTemperatureCalibrationGraphicPosition:
               while (GPIORead(ENC_SWITCH)) {
                 updateData();
                 if (EncMove) {
@@ -400,10 +417,10 @@ void barSelection() {
                   drawFloat(temperature[babyNTC], 1, valuePosition, ypos, textFontSize);
                   previousTemperature[babyNTC] = temperature[babyNTC];
                   EncMove = false;
-                  EEPROM.writeFloat(EEPROM_diffTemperature, diffTemperature[babyNTC]);
-                  EEPROM.commit();
+                  EEPROM.writeFloat(EEPROM_diffSkinTemperature, diffTemperature[babyNTC]);
                 }
               }
+              EEPROM.commit();
               break;
             case humidityCalibrationGraphicPosition:
               while (GPIORead(ENC_SWITCH)) {
@@ -417,15 +434,25 @@ void barSelection() {
                   drawFloat(humidity, 0, valuePosition, ypos, textFontSize);
                   EncMove = false;
                   EEPROM.write(EEPROM_diffHumidity, diffHumidity );
-                  EEPROM.commit();
                 }
               }
+              EEPROM.commit();
               break;
-            case restartCalibrationValuesTempGraphicPosition:
+            case restartCalibrationGraphicPosition:
               diffTemperature[babyNTC] = false;
+              diffTemperature[airNTC] = false;
               diffHumidity = false;
-              EEPROM.writeFloat(EEPROM_diffTemperature, diffTemperature[babyNTC]);
+              EEPROM.writeFloat(EEPROM_diffAirTemperature, diffTemperature[airNTC]);
+              EEPROM.writeFloat(EEPROM_diffSkinTemperature, diffTemperature[babyNTC]);
               EEPROM.write(EEPROM_diffHumidity, diffHumidity);
+              EEPROM.commit();
+              calibrateSensors();
+              break;
+            case autoCalibrationGraphicPosition:
+              diffTemperature[babyNTC] = temperature[digitalTempSensor] - temperature[babyNTC];
+              diffTemperature[airNTC] = temperature[digitalTempSensor] - temperature[airNTC];
+              EEPROM.writeFloat(EEPROM_diffAirTemperature, diffTemperature[airNTC]);
+              EEPROM.writeFloat(EEPROM_diffSkinTemperature, diffTemperature[babyNTC]);
               EEPROM.commit();
               calibrateSensors();
               break;

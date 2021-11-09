@@ -2,23 +2,27 @@
 
 //EEPROM variables
 #define EEPROM_checkStatus 0
-#define EEPROM_firstTurnOn 1
-#define EEPROM_autoLock 2
-#define EEPROM_language 3
-#define EEPROM_HeaterPower 4
-#define EEPROM_UARTDebug 5
-#define EEPROM_usedGenericMosfet 6
-#define EEPROM_controlMode 7
-#define EEPROM_alarmsEnable 8
-#define EEPROM_diffHumidity 9
-#define EEPROM_diffTemperature 10
-#define EEPROM_controlAlgorithm 0x11
+#define EEPROM_firstTurnOn 10
+#define EEPROM_autoLock 20
+#define EEPROM_language 30
+#define EEPROM_HeaterPower 40
+#define EEPROM_UARTDebug 50
+#define EEPROM_usedGenericMosfet 60
+#define EEPROM_controlMode 70
+#define EEPROM_alarmsEnable 80
+#define EEPROM_diffHumidity 90
+#define EEPROM_diffSkinTemperature 100
+#define EEPROM_diffAirTemperature 110
+#define EEPROM_controlAlgorithm 120
 
 
 bool firstTurnOn;
 
 void initEEPROM() {
-  EEPROM.begin(EEPROM_SIZE);
+  if (!EEPROM.begin(EEPROM_SIZE))
+  {
+    Serial.println("failed to initialise EEPROM");
+  }
   if (EEPROM.read(EEPROM_checkStatus)) {
     EEPROM.write(EEPROM_checkStatus, 0);
     EEPROM.commit();
@@ -69,9 +73,13 @@ void loaddefaultValues() {
 void recapVariables() {
   autoLock = EEPROM.read(EEPROM_autoLock);
   language = EEPROM.read(EEPROM_language);
-  diffTemperature[babyNTC] = EEPROM.readFloat(EEPROM_diffTemperature);
+  diffTemperature[babyNTC] = EEPROM.readFloat(EEPROM_diffSkinTemperature);
   if (diffTemperature[babyNTC] > 100) {
     diffTemperature[babyNTC] = false;
+  }
+  diffTemperature[airNTC] = EEPROM.readFloat(EEPROM_diffAirTemperature);
+  if (diffTemperature[babyNTC] > 100) {
+    diffTemperature[airNTC] = false;
   }
   diffHumidity = EEPROM.read(EEPROM_diffHumidity);
   if (diffHumidity > 100) {
