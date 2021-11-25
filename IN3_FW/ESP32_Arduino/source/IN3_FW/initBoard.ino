@@ -1,5 +1,5 @@
 void initBoard() {
-  //watchdogInit();
+  watchdogInit();
   initDebug();
   initEEPROM();
   initHardware();

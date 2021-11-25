@@ -117,6 +117,7 @@ void barSelection() {
             case controlModeGraphicPosition:
               controlMode = !controlMode;
               EEPROM.write(EEPROM_controlMode, controlMode);
+              EEPROM.commit();
               advancedMode();
               break;
             case temperatureGraphicPosition:
@@ -330,7 +331,7 @@ void barSelection() {
               EEPROM.commit();
               setTextColor(COLOR_MENU);
               if (controlAlgorithm) {
-                drawRightString("BASIC", unitPosition + 10, ypos, textFontSize);
+                drawRightString("BASIC", unitPosition, ypos, textFontSize);
               }
               else {
                 drawRightString("PID", unitPosition, ypos, textFontSize);
@@ -340,7 +341,7 @@ void barSelection() {
                 drawRightString("PID", unitPosition, ypos, textFontSize);
               }
               else {
-                drawRightString("BASIC", unitPosition + 10, ypos, textFontSize);
+                drawRightString("BASIC", unitPosition, ypos, textFontSize);
               }
               break;
             case heaterPowerGraphicPosition:

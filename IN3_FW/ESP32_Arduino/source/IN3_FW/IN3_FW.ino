@@ -3,10 +3,11 @@
 */
 
 //Firmware version and head title of UI screen
-#define FWversion "v6.3"
-String serialNumber = "in3000032";
+#define FWversion "v6.4"
+String serialNumber = "in3000034";
 #define headingTitle "in3ator"
 
+#include <esp_task_wdt.h>
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include <WebServer.h>
@@ -29,11 +30,14 @@ String serialNumber = "in3000032";
 #include <Microchip_PAC193x.h>
 #include "ESP32TimerInterrupt.h"
 
+#define WDT_TIMEOUT 3
+
+
 #define ON true
 #define OFF false
 #define BASIC_CONTROL false
 #define PID_CONTROL true
-#define BABY_CONTROL false
+#define SKIN_CONTROL false
 #define AIR_CONTROL true
 
 //buzzer variables
@@ -99,10 +103,12 @@ byte language;
 #define numNTC 2 //number of NTC
 #define numTempSensors 3 //number of total temperature sensors in system
 #define temperature_filter 4000 //amount of temperature samples to filter
+#define current_filter 1000 //amount of temperature samples to filter
 
 #define NTCMeasurementPeriod 1000 //in millis
-#define CurrentMeasurementPeriod 1000 //in millis
-long lastNTCmeasurement, lastCurrentMeasurement;
+#define CurrentMeasurementPeriod 2 //in millis
+#define CurrentUpdatePeriod 1000 //in millis
+long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
 
 int NTC_PIN[numNTC] = {BABY_NTC_PIN, AIR_NTC_PIN};
 double temperature[numTempSensors];
@@ -111,7 +117,7 @@ double temperatureMinReset = 1000;
 double temperatureMax[numTempSensors], temperatureMin[numTempSensors];
 double previousTemperature[numTempSensors];
 int temperatureArray [numNTC][temperature_filter]; //variable to handle each NTC with the array of last samples (only for NTC)
-int temperature_measured; //temperature sensor number turn to measure
+int temperature_array_pos; //temperature sensor number turn to measure
 float diffTemperature[numTempSensors]; //difference between measured temperature and user input real temperature
 bool faultNTC[numNTC]; //variable to control a failure in NTC
 byte numSensors; //number of total sensors
@@ -148,11 +154,11 @@ bool roomSensorPresent;
 byte roomSensorAddress = 112;
 int pulsioximeterMean;
 const int maxPulsioximeterSamples = 320; //(tft width).
-float currentConsumption, currentConsumtionStacker;
-float currentOffset = 110;
-float correctionCurrentFactor = 0.0038;
+int instantCurrent[current_filter];
+int instantCurrent_array_pos = false;
+float currentConsumption;
+float CurrentToAmpFactor = 0.0045;
 int currentConsumptionPos = false;
-float currentConsumptionFactor = 2.685; //factor to translate current consumtion in mA
 int pulsioximeterSample[maxPulsioximeterSamples][2]; //0 is previous data, 1 is actual data
 int pulsioximeterPeakThreshold;
 int pulsioximeterMaxPeak;
@@ -173,7 +179,7 @@ String RPD; //(Raw Pulsioximeter Data)
 
 //room variables
 bool controlMode;
-bool defaultcontrolMode = AIR_CONTROL;
+bool defaultcontrolMode = SKIN_CONTROL;
 bool controlAlgorithm;
 bool defaultcontrolAlgorithm = PID_CONTROL;
 double desiredSkinTemp = 34; //preset baby skin temperature

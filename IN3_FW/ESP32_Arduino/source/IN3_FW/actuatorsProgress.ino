@@ -58,7 +58,7 @@ void actuatorsProgress() {
         textToWrite = "Skin temperature";
         break;
       case french:
-        textToWrite = "TempÃ©rature de la peau";
+        textToWrite = "Temperature de la peau";
         break;
     }
   }
@@ -91,7 +91,7 @@ void actuatorsProgress() {
         textToWrite = "Skin temperature";
         break;
       case french:
-        textToWrite = "TempÃ©rature de la peau";
+        textToWrite = "Temperature de la peau";
         break;
     }
   }

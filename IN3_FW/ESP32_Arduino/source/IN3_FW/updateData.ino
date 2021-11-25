@@ -1,6 +1,9 @@
+long lastHumToggle;
+bool humToggle;
+
 int updateData() {
   loopCounts++;
-  watchdogReload();
+  watchdogReload();    
   OTAHandler();
   sensorsISR();
   userInteraction();
@@ -21,7 +24,7 @@ int updateData() {
     if (humidityPID.GetMode() == AUTOMATIC) {
       logln("[PID] -> Humidifier output is: " + String (100 * humidityPIDOutput / WindowSize) + "%");
     }
-    //logln("[SENSORS] -> Current consumption is: " + String (analogRead(SYSTEM_SHUNT)) + " Amps");
+    logln("[SENSORS] -> Current consumption is: " + String (analogRead(SYSTEM_SHUNT)) + "," + String (currentConsumption) + " Amps");
     logln("[SENSORS] -> Baby temperature: " + String(temperature[babyNTC]) + "ºC");
     logln("[SENSORS] -> Air temperature: " + String(temperature[airNTC]) + "ºC");
     logln("[SENSORS] -> Floor temperature: " + String(temperature[digitalTempSensor]) + "ºC");

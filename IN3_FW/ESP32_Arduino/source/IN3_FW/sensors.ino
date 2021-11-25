@@ -1,18 +1,32 @@
-#define consumptionMeanSamples 1000
 
 void sensorsISR() {
   if (float(micros() - lastNTCmeasurement) / 1000 > float(NTCMeasurementPeriod / temperature_filter)) {
     lastNTCmeasurement = micros();
     measurenumNTC();
   }
-  if (millis() - lastCurrentMeasurement > CurrentMeasurementPeriod) {
-    lastCurrentMeasurement = millis();
+  if (millis() - lastCurrentUpdate > CurrentUpdatePeriod) {
+    lastCurrentUpdate = millis();
     currentConsumption = measureConsumption();
+  }
+  if (ANALOG_CURRENT_SENSOR) {
+    analogCurrentMonitor();
   }
 }
 
 void measureOffsetConsumption() {
 
+}
+
+float analogCurrentMonitor() {
+  if (millis() - lastCurrentMeasurement > CurrentMeasurementPeriod ) {
+    if (instantCurrent_array_pos < current_filter) {
+      instantCurrent_array_pos++;
+    }
+    else {
+      instantCurrent_array_pos = 0;
+    }
+    instantCurrent[instantCurrent_array_pos] = analogRead(SYSTEM_SHUNT);
+  }
 }
 
 float measureConsumptionForTime (long testTimeout) {
@@ -28,13 +42,24 @@ float measureConsumptionForTime (long testTimeout) {
     }
   }
   if (measuredTimes) {
-    return averageConsumption / measuredTimes;
+    averageConsumption / measuredTimes;
+    averageConsumption = ADCScale(averageConsumption);
+    return ADCToAmp(averageConsumption);
   } else {
     return false;
   }
 }
 
+float ADCToAmp(float var) {
+  return (var * CurrentToAmpFactor);
+}
+
+float ADCScale (float var) {
+  return (map (var, 0, 3000, 150, 2450));
+}
+
 float measureConsumption() {
+  float currentMean;
   if (DIGITAL_CURRENT_SENSOR) {
     if (PAC.UpdateCurrent()) {
       Serial.println("[SENSORS] -> Current sensing returned zero");
@@ -42,7 +67,13 @@ float measureConsumption() {
     }
   }
   if (ANALOG_CURRENT_SENSOR) {
-    return (analogRead(SYSTEM_SHUNT));
+    for (int i = 0; i < instantCurrent_array_pos; i++) {
+      currentMean += instantCurrent[i];
+      instantCurrent[i] = 0;
+    }
+    currentMean /= instantCurrent_array_pos;
+    currentMean *= CurrentToAmpFactor;
+    return (currentMean);
   }
 }
 
@@ -84,12 +115,12 @@ void calculatePulsioximeterValues() {
 
 bool measurenumNTC() {
   for (int i = false; i < numNTC; i++) {
-    temperatureArray[i][temperature_measured] = analogRead(NTC_PIN[i]);
+    temperatureArray[i][temperature_array_pos] = analogRead(NTC_PIN[i]);
   }
-  temperature_measured++;
-  if (temperature_measured >= temperature_filter) {
+  temperature_array_pos++;
+  if (temperature_array_pos >= temperature_filter) {
     updateTemp(numNTC);
-    temperature_measured = false;
+    temperature_array_pos = false;
     return true;
   }
   return false;
@@ -131,6 +162,7 @@ void updateTemp(byte sensor) {
       temperatureMean += temperatureArray[i][j];
     }
     temperatureMean /= temperature_filter;
+
     vm = (vcc) * ( temperatureMean / maxADCvalue );          //Calcular tensión en la entrada
     rntc = rAux / ((vcc / vm) - 1);                   //Calcular la resistencia de la NTC
     temperature[i] = beta / (log(rntc / r0) + (beta / temp0)) - 273; //Calcular la temperatura en Celsius

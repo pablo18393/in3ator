@@ -64,7 +64,6 @@ void stopTemperaturePID() {
 void startHumidityPID() {
   windowStartTime = millis();
   humidityPID.SetOutputLimits(0, WindowSize);
-  humidityPID.SetSampleTime(PIDISRPeriod * 200); // in millis
   humidityPID.SetMode(AUTOMATIC);
 }
 
