@@ -72,8 +72,8 @@ float alarmTimeDelay = 30; //in mins, time to check alarm
 #define mosfet_switch_time 100   //delay to wait for mosfet to switch (in millis), oversized
 #define timePressToSettings 5000 //in millis, time to press to go to settings window in UI
 #define debugUpdatePeriod 1000 //in millis, 
-bool UARTDebug = 1;
-bool defaultUARTDebug = ON;
+bool UARTDebug = 0;
+bool defaultUARTDebug = OFF;
 long lastDebugUpdate;
 long loopCounts;
 //pages number in UI. Configuration and information will be displayed depending on the page number

@@ -26,6 +26,7 @@ float analogCurrentMonitor() {
       instantCurrent_array_pos = 0;
     }
     instantCurrent[instantCurrent_array_pos] = analogRead(SYSTEM_SHUNT);
+    lastCurrentMeasurement = millis();
   }
 }
 

@@ -489,10 +489,6 @@ void GPRSPost() {
 
 void readGPRSData() {
   while (Serial2.available()) {
-    if (GPRS.bufferWritePos >= RX_BUFFER_LENGTH) {
-      GPRS.bufferWritePos = 0;
-      logln("[GPRS] -> Buffer overflow");
-    }
     GPRS.buffer[GPRS.bufferWritePos] = Serial2.read();
     log(String(GPRS.buffer[GPRS.bufferWritePos]));
     if (GPRS.post) {
@@ -559,6 +555,10 @@ void readGPRSData() {
       }
     }
     GPRS.bufferWritePos++;
+    if (GPRS.bufferWritePos >= RX_BUFFER_LENGTH) {
+      GPRS.bufferWritePos = 0;
+      logln("[GPRS] -> Buffer overflow");
+    }
     GPRS.charToRead++;
   }
 }
