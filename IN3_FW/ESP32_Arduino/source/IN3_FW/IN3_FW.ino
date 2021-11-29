@@ -3,8 +3,8 @@
 */
 
 //Firmware version and head title of UI screen
-#define FWversion "v6.4"
-String serialNumber = "in3000034";
+#define FWversion "v6.5"
+String serialNumber = "in3000016A";
 #define headingTitle "in3ator"
 
 #include <esp_task_wdt.h>
@@ -62,7 +62,7 @@ bool powerAlert;
 bool alarmsEnable;
 bool defaultAlarmsEnable = true;
 bool alarmOnGoing[2];
-int temperatureError = 2; // 2 degrees in
+int temperatureError = 1; // 1 degrees difference to trigger alarm
 int humidityError = 12; //12 %RH to trigger alarm
 long temperatureAlarmTime, humidityAlarmTime;
 float alarmTimeDelay = 30; //in mins, time to check alarm
