@@ -3,8 +3,8 @@
 */
 
 //Firmware version and head title of UI screen
-#define FWversion "v6.5"
-String serialNumber = "in3000016C";
+#define FWversion "v6.6"
+String serialNumber = "in3000036";
 #define headingTitle "in3ator"
 
 #include <esp_task_wdt.h>
