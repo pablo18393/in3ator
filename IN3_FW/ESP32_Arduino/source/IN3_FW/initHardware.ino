@@ -62,10 +62,12 @@ void initHardware() {
   initI2CBus();
   initGPIOExpander();
   initCurrentSensor();
+  initPin(PHOTOTHERAPY,OUTPUT);
+  GPIOWrite(PHOTOTHERAPY, HIGH);
   initPWMGPIO();
   initPowerAlarm();
   initSensors();
-  //initSenseCircuit();
+  initSenseCircuit();
   initTFT();
   initBuzzer();
   initInterrupts();
@@ -278,7 +280,6 @@ void initTFT() {
   for (int i = maxPWMvalue; i >= backlightPower; i--) {
     ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, i);
     delayMicroseconds(brightenRate);
-    updateData();
   }
   testCurrent = measureConsumptionForTime(testTime) - offsetCurrent;
   if (testCurrent < SCREEN_CONSUMPTION_MIN) {

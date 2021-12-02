@@ -4,7 +4,7 @@
 
 //Firmware version and head title of UI screen
 #define FWversion "v6.5"
-String serialNumber = "in3000016A";
+String serialNumber = "in3000016C";
 #define headingTitle "in3ator"
 
 #include <esp_task_wdt.h>
@@ -72,8 +72,8 @@ float alarmTimeDelay = 30; //in mins, time to check alarm
 #define mosfet_switch_time 100   //delay to wait for mosfet to switch (in millis), oversized
 #define timePressToSettings 5000 //in millis, time to press to go to settings window in UI
 #define debugUpdatePeriod 1000 //in millis, 
-bool UARTDebug = 0;
-bool defaultUARTDebug = OFF;
+bool UARTDebug = 1;
+bool defaultUARTDebug = ON;
 long lastDebugUpdate;
 long loopCounts;
 //pages number in UI. Configuration and information will be displayed depending on the page number
@@ -157,7 +157,7 @@ const int maxPulsioximeterSamples = 320; //(tft width).
 int instantCurrent[current_filter];
 int instantCurrent_array_pos = false;
 float currentConsumption;
-float CurrentToAmpFactor = 0.0045;
+float CurrentToAmpFactor = 0.00045;
 int currentConsumptionPos = false;
 int pulsioximeterSample[maxPulsioximeterSamples][2]; //0 is previous data, 1 is actual data
 int pulsioximeterPeakThreshold;

@@ -168,3 +168,26 @@ void GPRSLocalLog() {
     */
   }
 }
+
+void userInteraction() {
+  if (autoLock) {
+    if (millis() - lastUserInteraction > time_lock) {
+      if (ScreenBacklightMode != BL_POWERSAVE) {
+        ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, backlightPowerSafe);
+        ScreenBacklightMode = BL_POWERSAVE;
+      }
+    }
+    else {
+      if (ScreenBacklightMode != BL_NORMAL) {
+        ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, backlightPower);
+        ScreenBacklightMode = BL_NORMAL;
+      }
+    }
+  }
+  else {
+    if (ScreenBacklightMode != BL_NORMAL) {
+      ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, backlightPower);
+      ScreenBacklightMode = BL_NORMAL;
+    }
+  }
+}

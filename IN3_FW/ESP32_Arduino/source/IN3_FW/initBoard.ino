@@ -1,10 +1,10 @@
 void initBoard() {
-  watchdogInit();
   initDebug();
   initEEPROM();
   initHardware();
   //initSD();
   initTimers();
+  watchdogInit();
 }
 
 void initDebug() {
@@ -22,11 +22,11 @@ void initInterrupts() {
 void initTimers() {
   // Interval in microsecs
   /*
-  if (ITimer0.attachInterruptInterval(peripheralsISRPeriod, peripheralsISR)) {
+    if (ITimer0.attachInterruptInterval(peripheralsISRPeriod, peripheralsISR)) {
     Serial.print(F("Starting  ITimer0 OK, millis() = ")); Serial.println(millis());
-  }
-  else {
+    }
+    else {
     Serial.println(F("Can't set ITimer0. Select another freq. or timer"));
-  }
+    }
   */
 }

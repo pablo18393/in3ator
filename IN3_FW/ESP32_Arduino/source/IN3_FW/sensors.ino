@@ -6,18 +6,16 @@ void sensorsISR() {
   }
   if (millis() - lastCurrentUpdate > CurrentUpdatePeriod) {
     lastCurrentUpdate = millis();
-    currentConsumption = measureConsumption();
+    currentConsumption = measureMeanConsumption();
   }
-  if (ANALOG_CURRENT_SENSOR) {
-    analogCurrentMonitor();
-  }
+  currentMonitor();
 }
 
 void measureOffsetConsumption() {
 
 }
 
-float analogCurrentMonitor() {
+float currentMonitor() {
   if (millis() - lastCurrentMeasurement > CurrentMeasurementPeriod ) {
     if (instantCurrent_array_pos < current_filter) {
       instantCurrent_array_pos++;
@@ -25,7 +23,7 @@ float analogCurrentMonitor() {
     else {
       instantCurrent_array_pos = 0;
     }
-    instantCurrent[instantCurrent_array_pos] = analogRead(SYSTEM_SHUNT);
+    instantCurrent[instantCurrent_array_pos] = measureInstantConsumption();
     lastCurrentMeasurement = millis();
   }
 }
@@ -36,7 +34,7 @@ float measureConsumptionForTime (long testTimeout) {
   float averageConsumption = 0;
   long measuredTimes = 0;
   while (millis() - ongoingTestTime < testTimeout) {
-    instantCurrent = measureConsumption();
+    instantCurrent = measureInstantConsumption();
     if (instantCurrent) {
       averageConsumption += instantCurrent;
       measuredTimes++;
@@ -45,6 +43,8 @@ float measureConsumptionForTime (long testTimeout) {
   if (measuredTimes) {
     averageConsumption / measuredTimes;
     averageConsumption = ADCScale(averageConsumption);
+    logln("[TEST] -> tested " + String(measuredTimes) + " times");
+    logln("[TEST] -> Current " + String(averageConsumption));
     return ADCToAmp(averageConsumption);
   } else {
     return false;
@@ -59,7 +59,19 @@ float ADCScale (float var) {
   return (map (var, 0, 3000, 150, 2450));
 }
 
-float measureConsumption() {
+float measureInstantConsumption() {
+  if (DIGITAL_CURRENT_SENSOR) {
+    if (PAC.UpdateCurrent()) {
+      Serial.println("[SENSORS] -> Current sensing returned zero");
+      return (PAC.Current / 1000); //Amperes
+    }
+  }
+  if (ANALOG_CURRENT_SENSOR) {
+    return (analogRead(SYSTEM_SHUNT));
+  }
+}
+
+float measureMeanConsumption() {
   float currentMean;
   if (DIGITAL_CURRENT_SENSOR) {
     if (PAC.UpdateCurrent()) {
@@ -77,42 +89,6 @@ float measureConsumption() {
     return (currentMean);
   }
 }
-
-void checkNewPulsioximeterData() {
-  if (pulsioximeterCounter[pulsioximeterDrawn] = !pulsioximeterCounter[pulsioximeterSampled]) {
-    drawPulsioximeter();
-    if (pulsioximeterCounter[pulsioximeterDrawn] == maxPulsioximeterSamples) {
-      pulsioximeterCounter[pulsioximeterDrawn] = false;
-    }
-    else {
-      pulsioximeterCounter[pulsioximeterDrawn]++;
-    }
-  }
-}
-
-void readPulsioximeter() {
-  //pulsioximeterInterSamples[pulsioximeterCount] = analogRead(PULSIOXIMETER);
-  pulsioximeterMean *= (pulsioximeterMultiplierFilterFactor - pulsioximeterRestFilterFactor) / pulsioximeterMultiplierFilterFactor;
-  pulsioximeterMean +=  pulsioximeterInterSamples[pulsioximeterCount] * pulsioximeterRestFilterFactor / pulsioximeterMultiplierFilterFactor;
-}
-
-void calculatePulsioximeterValues() {
-  int meanPulsioximeterSamples;
-  int pulsioximeterInterMean;
-  for (int i = false; i < pulsioximeterRate; i++) {
-    pulsioximeterInterMean += pulsioximeterInterSamples[i] - pulsioximeterMean;
-  }
-  pulsioximeterInterMean /= pulsioximeterRate;
-  pulsioximeterSample[pulsioximeterCounter[pulsioximeterSampled]][pulsioximeterSampled] = pulsioximeterInterMean;
-
-  if (pulsioximeterCounter[pulsioximeterSampled] == maxPulsioximeterSamples) {
-    pulsioximeterCounter[pulsioximeterSampled] = false;
-  }
-  else {
-    pulsioximeterCounter[pulsioximeterSampled]++;
-  }
-}
-
 
 bool measurenumNTC() {
   for (int i = false; i < numNTC; i++) {
@@ -187,29 +163,6 @@ bool updateRoomSensor() {
     }
     else {
       return false;
-    }
-  }
-}
-
-void userInteraction() {
-  if (autoLock) {
-    if (millis() - lastUserInteraction > time_lock) {
-      if (ScreenBacklightMode != BL_POWERSAVE) {
-        ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, backlightPowerSafe);
-        ScreenBacklightMode = BL_POWERSAVE;
-      }
-    }
-    else {
-      if (ScreenBacklightMode != BL_NORMAL) {
-        ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, backlightPower);
-        ScreenBacklightMode = BL_NORMAL;
-      }
-    }
-  }
-  else {
-    if (ScreenBacklightMode != BL_NORMAL) {
-      ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, backlightPower);
-      ScreenBacklightMode = BL_NORMAL;
     }
   }
 }
