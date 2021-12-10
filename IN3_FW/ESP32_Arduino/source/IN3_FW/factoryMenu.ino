@@ -6,7 +6,7 @@ void factoryMenu() {
   drawIntroMessage();
   setTextColor(introTextColor);
   for (int i = false; i < numWords; i++) {
-    pos_text[i] = leftMargin;
+    pos_text[i] = LEFT_MARGIN;
   }
   if (!language) {
     words[0]  = "Hello";
@@ -38,10 +38,10 @@ void helpingmainMenu() {
   tft.setTextSize(1);
   setTextColor(COLOR_MENU_TEXT);
   for (int i = false; i < numWords; i++) {
-    pos_text[i] = leftMargin;
+    pos_text[i] = LEFT_MARGIN;
   }
-  pos_text[2] = centered;
-  pos_text[3] = centered;
+  pos_text[2] = CENTER;
+  pos_text[3] = CENTER;
   if (language) {
     words[0]  = "Temperatura";
     words[1] = "LEDS";

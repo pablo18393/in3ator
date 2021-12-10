@@ -6,9 +6,9 @@ void advancedMode() {
   tft.setTextSize(1);
   tft.setTextColor(COLOR_MENU_TEXT);
   for (int i = false; i < numWords; i++) {
-    pos_text[i] = leftMargin;
+    pos_text[i] = LEFT_MARGIN;
   }
-  pos_text[startGraphicPosition] = centered;
+  pos_text[startGraphicPosition] = CENTER;
   switch (language) {
     case spanish:
       words[controlModeGraphicPosition]  = "Modo de control";

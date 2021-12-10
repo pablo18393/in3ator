@@ -5,10 +5,10 @@ void settings() {
   tft.setTextSize(1);
   setTextColor(COLOR_MENU_TEXT);
   for (int i = false; i < numWords; i++) {
-    pos_text[i] = leftMargin;
+    pos_text[i] = LEFT_MARGIN;
   }
-  pos_text[setdefaultValuesGraphicPosition] = centered;
-  pos_text[calibrateGraphicPosition] = centered;
+  pos_text[setdefaultValuesGraphicPosition] = CENTER;
+  pos_text[calibrateGraphicPosition] = CENTER;
   switch (language) {
     case english:
       words[autoLockGraphicPosition]  = "Auto lock";

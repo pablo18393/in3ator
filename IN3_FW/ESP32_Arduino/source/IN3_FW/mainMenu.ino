@@ -6,10 +6,10 @@ void mainMenu() {
   tft.setTextSize(1);
   setTextColor(COLOR_MENU_TEXT);
   for (int i = false; i < numWords; i++) {
-    pos_text[i] = leftMargin;
+    pos_text[i] = LEFT_MARGIN;
   }
-  pos_text[advancedModeGraphicPosition] = centered;
-  pos_text[startGraphicPosition] = centered;
+  pos_text[advancedModeGraphicPosition] = CENTER;
+  pos_text[startGraphicPosition] = CENTER;
   switch (language) {
     case spanish:
       words[gestationGraphicPosition]  = "Semanas gestacion";
@@ -65,10 +65,10 @@ void askSuccess() {
   tft.setTextSize(1);
   setTextColor(COLOR_MENU_TEXT);
   for (int i = false; i < numWords; i++) {
-    pos_text[i] = leftMargin;
+    pos_text[i] = LEFT_MARGIN;
   }
-  pos_text[afirmativeGraphicPosition] = centered;
-  pos_text[negativeGraphicPosition] = centered;
+  pos_text[afirmativeGraphicPosition] = CENTER;
+  pos_text[negativeGraphicPosition] = CENTER;
   switch (language) {
     case english:
       words[successQuestionGraphicPosition] = "IS THE BABY ALIVE?";

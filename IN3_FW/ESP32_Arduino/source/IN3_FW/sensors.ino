@@ -143,7 +143,9 @@ void updateTemp(byte sensor) {
     vm = (vcc) * ( temperatureMean / maxADCvalue );          //Calcular tensión en la entrada
     rntc = rAux / ((vcc / vm) - 1);                   //Calcular la resistencia de la NTC
     temperature[i] = beta / (log(rntc / r0) + (beta / temp0)) - 273; //Calcular la temperatura en Celsius
-    temperature[i] += diffTemperature[i];
+
+    temperature[i] -= temperature[i] * temperatureCalibrationFactor [i] + temperatureCalibrationOffset [i];
+
     if (temperature[i] > temperatureMax[i]) {
       temperatureMax[i] = temperature[i];
     }
@@ -157,7 +159,7 @@ bool updateRoomSensor() {
   if (roomSensorPresent == true) {
     mySHTC3.update();
     temperature[digitalTempSensor] =  mySHTC3.toDegC(); //Add here measurement to temp array
-    humidity = int(mySHTC3.toPercent()) + diffHumidity;
+    humidity = mySHTC3.toPercent();
     if (temperature[digitalTempSensor]) {
       return true;
     }

@@ -11,9 +11,13 @@
 #define EEPROM_controlMode 70
 #define EEPROM_alarmsEnable 80
 #define EEPROM_diffHumidity 90
-#define EEPROM_diffSkinTemperature 100
-#define EEPROM_diffAirTemperature 110
-#define EEPROM_controlAlgorithm 120
+#define EEPROM_errorSkinTemperatureFactor 100
+#define EEPROM_errorSkinTemperatureOffset 110
+#define EEPROM_errorAirTemperatureFactor 120
+#define EEPROM_errorAirTemperatureOffset 130
+#define EEPROM_errorDigitalTemperatureFactor 140
+#define EEPROM_errorDigitalTemperatureOffset 150
+#define EEPROM_controlAlgorithm 160
 
 
 bool firstTurnOn;
@@ -73,13 +77,23 @@ void loaddefaultValues() {
 void recapVariables() {
   autoLock = EEPROM.read(EEPROM_autoLock);
   language = EEPROM.read(EEPROM_language);
-  diffTemperature[babyNTC] = EEPROM.readFloat(EEPROM_diffSkinTemperature);
-  if (diffTemperature[babyNTC] > 100) {
-    diffTemperature[babyNTC] = false;
+
+  temperatureCalibrationFactor[babyNTC] = EEPROM.readFloat(EEPROM_errorSkinTemperatureFactor);
+  temperatureCalibrationOffset[babyNTC] = EEPROM.readFloat(EEPROM_errorSkinTemperatureOffset);
+  temperatureCalibrationFactor[airNTC] = EEPROM.readFloat(EEPROM_errorAirTemperatureFactor);
+  temperatureCalibrationOffset[airNTC] = EEPROM.readFloat(EEPROM_errorAirTemperatureOffset);
+  temperatureCalibrationFactor[digitalTempSensor] = EEPROM.readFloat(EEPROM_errorDigitalTemperatureFactor);
+  temperatureCalibrationOffset[digitalTempSensor] = EEPROM.readFloat(EEPROM_errorDigitalTemperatureOffset);
+
+  for (int i = 0; i < numTempSensors; i++) {
+    Serial.println("calibration factors: " + String(temperatureCalibrationFactor [i]) + "x +" + String (temperatureCalibrationOffset [i]));
   }
-  diffTemperature[airNTC] = EEPROM.readFloat(EEPROM_diffAirTemperature);
-  if (diffTemperature[babyNTC] > 100) {
-    diffTemperature[airNTC] = false;
+
+
+  for (int i = 0; i < numTempSensors; i++) {
+    if (temperatureCalibrationFactor[i] > 100) {
+      //critical error
+    }
   }
   diffHumidity = EEPROM.read(EEPROM_diffHumidity);
   if (diffHumidity > 100) {

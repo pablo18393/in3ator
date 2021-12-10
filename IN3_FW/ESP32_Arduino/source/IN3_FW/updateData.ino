@@ -3,7 +3,7 @@ bool humToggle;
 
 int updateData() {
   loopCounts++;
-  watchdogReload();    
+  watchdogReload();
   OTAHandler();
   sensorsISR();
   userInteraction();
@@ -25,11 +25,9 @@ int updateData() {
       logln("[PID] -> Humidifier output is: " + String (100 * humidityPIDOutput / WindowSize) + "%");
     }
     logln("[SENSORS] -> Current consumption is: " + String (analogRead(SYSTEM_SHUNT)) + "," + String (currentConsumption) + " Amps");
-    logln("[SENSORS] -> Baby temperature: " + String(temperature[babyNTC]) + "ºC");
-    logln("[SENSORS] -> Air temperature: " + String(temperature[airNTC]) + "ºC");
-    logln("[SENSORS] -> Floor temperature: " + String(temperature[digitalTempSensor]) + "ºC");
-    logln("[SENSORS] -> Diff Baby temperature: " + String(diffTemperature[babyNTC]) + "ºC");
-    logln("[SENSORS] -> Diff Air temperature: " + String(diffTemperature[airNTC]) + "ºC");
+    logln("[SENSORS] -> Baby temperature: " + String(temperature[babyNTC]) + "ºC, correction error is " + String(temperature[babyNTC]*temperatureCalibrationFactor [babyNTC] + temperatureCalibrationOffset [babyNTC]));
+    logln("[SENSORS] -> Air temperature: " + String(temperature[airNTC]) + "ºC, correction error is " + String(temperature[airNTC]*temperatureCalibrationFactor [airNTC] + temperatureCalibrationOffset [airNTC]));
+    logln("[SENSORS] -> Floor temperature: " + String(temperature[digitalTempSensor]) + "ºC, correction error is " + String(temperature[digitalTempSensor]*temperatureCalibrationFactor [digitalTempSensor] + temperatureCalibrationOffset [digitalTempSensor]));
     if (abs(temperature[digitalTempSensor] - temperature[babyNTC]) > 0.5 || abs(temperature[digitalTempSensor] - temperature[airNTC]) > 0.5) {
       //logln("[ALARM] -> TEMP DEVIATION");
     }

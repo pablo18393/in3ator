@@ -3,7 +3,7 @@
 */
 
 //Firmware version and head title of UI screen
-#define FWversion "v6.6"
+#define FWversion "v7.0"
 String serialNumber = "in3000036";
 #define headingTitle "in3ator"
 
@@ -85,6 +85,8 @@ int page;
 #define calibrateSensorsPage 5
 #define askSuccessPage 6
 #define errorPage 7
+#define firstPointCalibrationPage 8
+#define secondPointCalibrationPage 9
 
 //languages numbers that will be called in language variable
 byte language;
@@ -112,13 +114,15 @@ long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
 
 int NTC_PIN[numNTC] = {BABY_NTC_PIN, AIR_NTC_PIN};
 double temperature[numTempSensors];
+double errorTemperature[numTempSensors], temperatureCalibrationPoint;
+double temperatureCalibrationFactor[numTempSensors], temperatureCalibrationOffset[numTempSensors];
 double temperatureMaxReset = -1000;
 double temperatureMinReset = 1000;
 double temperatureMax[numTempSensors], temperatureMin[numTempSensors];
 double previousTemperature[numTempSensors];
 int temperatureArray [numNTC][temperature_filter]; //variable to handle each NTC with the array of last samples (only for NTC)
 int temperature_array_pos; //temperature sensor number turn to measure
-float diffTemperature[numTempSensors]; //difference between measured temperature and user input real temperature
+float diffTemperature; //difference between measured temperature and user input real temperature
 bool faultNTC[numNTC]; //variable to control a failure in NTC
 byte numSensors; //number of total sensors
 double humidity; // room humidity variable
@@ -297,8 +301,8 @@ byte goToProcessRow;
 
 //graphic text configurations
 #define graphicTextOffset  1                //bar pos is counted from 1, but text from 0
-#define centered 1
-#define leftMargin 0
+#define CENTER true
+#define LEFT_MARGIN false
 
 //below are all the different variables positions that will be displayed in user interface
 //mainMenu
@@ -321,12 +325,14 @@ byte goToProcessRow;
 #define DebugENGraphicPosition 4
 #define calibrateGraphicPosition 5
 #define setdefaultValuesGraphicPosition 6
-//calibration
-#define airTemperatureCalibrationGraphicPosition 0
-#define skinTemperatureCalibrationGraphicPosition 1
-#define humidityCalibrationGraphicPosition 2
-#define autoCalibrationGraphicPosition 3
-#define restartCalibrationGraphicPosition 4
+//calibration menu
+#define twoPointCalibrationGraphicPosition 0
+#define restartCalibrationGraphicPosition 1
+
+//2p calibration
+#define temperatureCalibrationGraphicPosition 0
+#define setCalibrationGraphicPosition 1
+
 //askSuccess
 #define successQuestionGraphicPosition 0
 #define afirmativeGraphicPosition 1

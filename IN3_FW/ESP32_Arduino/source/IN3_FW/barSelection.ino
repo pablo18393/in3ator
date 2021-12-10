@@ -389,73 +389,90 @@ void barSelection() {
           break;
         case calibrateSensorsPage:
           switch (bar_pos - graphicTextOffset ) {
-            case airTemperatureCalibrationGraphicPosition:
-              while (GPIORead(ENC_SWITCH)) {
-                updateData();
-                if (EncMove) {
-                  setTextColor(COLOR_MENU);
-                  drawFloat(previousTemperature[airNTC], 1, valuePosition, ypos, textFontSize);
-                  setTextColor(COLOR_MENU_TEXT);
-                  diffTemperature[airNTC] += EncMove * (0.1);
-                  temperature[airNTC] += EncMove * (0.1);
-                  drawFloat(temperature[airNTC], 1, valuePosition, ypos, textFontSize);
-                  previousTemperature[airNTC] = temperature[airNTC];
-                  EncMove = false;
-                  EEPROM.writeFloat(EEPROM_diffAirTemperature, diffTemperature[airNTC]);
-                }
-              }
-              EEPROM.commit();
-              break;
-            case skinTemperatureCalibrationGraphicPosition:
-              while (GPIORead(ENC_SWITCH)) {
-                updateData();
-                if (EncMove) {
-                  setTextColor(COLOR_MENU);
-                  drawFloat(previousTemperature[babyNTC], 1, valuePosition, ypos, textFontSize);
-                  setTextColor(COLOR_MENU_TEXT);
-                  diffTemperature[babyNTC] += EncMove * (0.1);
-                  temperature[babyNTC] += EncMove * (0.1);
-                  drawFloat(temperature[babyNTC], 1, valuePosition, ypos, textFontSize);
-                  previousTemperature[babyNTC] = temperature[babyNTC];
-                  EncMove = false;
-                  EEPROM.writeFloat(EEPROM_diffSkinTemperature, diffTemperature[babyNTC]);
-                }
-              }
-              EEPROM.commit();
-              break;
-            case humidityCalibrationGraphicPosition:
-              while (GPIORead(ENC_SWITCH)) {
-                updateData();
-                if (EncMove) {
-                  setTextColor(COLOR_MENU);
-                  drawFloat(humidity, 0, valuePosition, ypos, textFontSize);
-                  setTextColor(COLOR_MENU_TEXT);
-                  diffHumidity += EncMove;
-                  humidity += EncMove;
-                  drawFloat(humidity, 0, valuePosition, ypos, textFontSize);
-                  EncMove = false;
-                  EEPROM.write(EEPROM_diffHumidity, diffHumidity );
-                }
-              }
-              EEPROM.commit();
+            case twoPointCalibrationGraphicPosition:
+              firstPointCalibration();
               break;
             case restartCalibrationGraphicPosition:
-              diffTemperature[babyNTC] = false;
-              diffTemperature[airNTC] = false;
+              for (int i = 0; i < numTempSensors; i++) {
+                temperatureCalibrationFactor [i] = false;
+                temperatureCalibrationOffset [i] = false;
+                Serial.println("calibration factors: " + String(temperatureCalibrationFactor [i]) + "x +" + String (temperatureCalibrationOffset [i]));
+              }
               diffHumidity = false;
-              EEPROM.writeFloat(EEPROM_diffAirTemperature, diffTemperature[airNTC]);
-              EEPROM.writeFloat(EEPROM_diffSkinTemperature, diffTemperature[babyNTC]);
+              /*
+                EEPROM.writeFloat(EEPROM_diffAirTemperature, diffTemperature[airNTC]);
+                EEPROM.writeFloat(EEPROM_diffSkinTemperature, diffTemperature[babyNTC]);
+              */
+              EEPROM.writeFloat(EEPROM_errorSkinTemperatureFactor, temperatureCalibrationFactor[babyNTC]);
+              EEPROM.writeFloat(EEPROM_errorSkinTemperatureOffset, temperatureCalibrationOffset[babyNTC]);
+              EEPROM.writeFloat(EEPROM_errorAirTemperatureFactor, temperatureCalibrationFactor[airNTC]);
+              EEPROM.writeFloat(EEPROM_errorAirTemperatureOffset, temperatureCalibrationOffset[airNTC]);
+              EEPROM.writeFloat(EEPROM_errorDigitalTemperatureFactor, temperatureCalibrationFactor[digitalTempSensor]);
+              EEPROM.writeFloat(EEPROM_errorDigitalTemperatureOffset, temperatureCalibrationOffset[digitalTempSensor]);
               EEPROM.write(EEPROM_diffHumidity, diffHumidity);
               EEPROM.commit();
               calibrateSensors();
               break;
-            case autoCalibrationGraphicPosition:
-              diffTemperature[babyNTC] = temperature[digitalTempSensor] - temperature[babyNTC];
-              diffTemperature[airNTC] = temperature[digitalTempSensor] - temperature[airNTC];
-              EEPROM.writeFloat(EEPROM_diffAirTemperature, diffTemperature[airNTC]);
-              EEPROM.writeFloat(EEPROM_diffSkinTemperature, diffTemperature[babyNTC]);
+          }
+          break;
+        case firstPointCalibrationPage:
+          switch (bar_pos - graphicTextOffset ) {
+            case temperatureCalibrationGraphicPosition:
+              for (int i = 0; i < numTempSensors; i++) {
+                errorTemperature[i] = false;
+              }
+              diffTemperature = temperature[babyNTC];
+              while (GPIORead(ENC_SWITCH)) {
+                updateData();
+                if (EncMove) {
+                  setTextColor(COLOR_MENU);
+                  drawFloat(diffTemperature, 1, valuePosition, ypos, textFontSize);
+                  setTextColor(COLOR_MENU_TEXT);
+                  diffTemperature += EncMove * (0.1);
+                  drawFloat(diffTemperature, 1, valuePosition, ypos, textFontSize);
+                  EncMove = false;
+                }
+              }
+              break;
+            case setCalibrationGraphicPosition:
+              for (int i = 0; i < numTempSensors; i++) {
+                errorTemperature[i] = temperature [i] - diffTemperature;
+              }
+              temperatureCalibrationPoint = diffTemperature;
+              secondPointCalibration();
+              break;
+          }
+          break;
+        case secondPointCalibrationPage:
+          switch (bar_pos - graphicTextOffset ) {
+            case temperatureCalibrationGraphicPosition:
+              diffTemperature = temperature[babyNTC];
+              while (GPIORead(ENC_SWITCH)) {
+                updateData();
+                if (EncMove) {
+                  setTextColor(COLOR_MENU);
+                  drawFloat(diffTemperature, 1, valuePosition, ypos, textFontSize);
+                  setTextColor(COLOR_MENU_TEXT);
+                  diffTemperature += EncMove * (0.1);
+                  drawFloat(diffTemperature, 1, valuePosition, ypos, textFontSize);
+                  EncMove = false;
+                }
+              }
+              break;
+            case setCalibrationGraphicPosition:
+              for (int i = 0; i < numTempSensors; i++) {
+                temperatureCalibrationFactor [i] = (errorTemperature[i] - (temperature [i] - diffTemperature)) / (temperatureCalibrationPoint - diffTemperature);
+                temperatureCalibrationOffset [i] = -temperatureCalibrationFactor [i] * diffTemperature + (temperature [i] - diffTemperature);
+                Serial.println("calibration factors: " + String(temperatureCalibrationFactor [i]) + "x +" + String (temperatureCalibrationOffset [i]));
+              }
+              EEPROM.writeFloat(EEPROM_errorSkinTemperatureFactor, temperatureCalibrationFactor[babyNTC]);
+              EEPROM.writeFloat(EEPROM_errorSkinTemperatureOffset, temperatureCalibrationOffset[babyNTC]);
+              EEPROM.writeFloat(EEPROM_errorAirTemperatureFactor, temperatureCalibrationFactor[airNTC]);
+              EEPROM.writeFloat(EEPROM_errorAirTemperatureOffset, temperatureCalibrationOffset[airNTC]);
+              EEPROM.writeFloat(EEPROM_errorDigitalTemperatureFactor, temperatureCalibrationFactor[digitalTempSensor]);
+              EEPROM.writeFloat(EEPROM_errorDigitalTemperatureOffset, temperatureCalibrationOffset[digitalTempSensor]);
               EEPROM.commit();
-              calibrateSensors();
+              settings();
               break;
           }
           break;
