@@ -18,10 +18,8 @@ void measureOffsetConsumption() {
 float currentMonitor() {
   if (millis() - lastCurrentMeasurement > CurrentMeasurementPeriod ) {
     instantCurrent[instantCurrent_array_pos] = measureInstantConsumption();
-    if (instantCurrent_array_pos < current_filter) {
-      instantCurrent_array_pos++;
-    }
-    else {
+    instantCurrent_array_pos++;
+    if (instantCurrent_array_pos >= current_filter) {
       instantCurrent_array_pos = 0;
     }
     lastCurrentMeasurement = millis();
@@ -80,13 +78,13 @@ float measureMeanConsumption() {
     }
   }
   if (ANALOG_CURRENT_SENSOR) {
-      for (int i = 0; i < instantCurrent_array_pos; i++) {
+    for (int i = 0; i < instantCurrent_array_pos; i++) {
       currentMean += instantCurrent[i];
       instantCurrent[i] = 0;
-      }
-      currentMean /= instantCurrent_array_pos;
-      currentMean *= CurrentToAmpFactor;
-      return (currentMean);
+    }
+    currentMean /= instantCurrent_array_pos;
+    currentMean *= CurrentToAmpFactor;
+    return (currentMean);
   }
 }
 

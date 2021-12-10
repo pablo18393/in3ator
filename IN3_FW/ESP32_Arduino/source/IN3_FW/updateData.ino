@@ -37,7 +37,6 @@ int updateData() {
     lastDebugUpdate = millis();
   }
   if (millis() - lastGraphicSensorsUpdate > sensorsUpdatePeriod) {
-    Serial.println("updating sensors" + String(roomSensorPresent));
     updateRoomSensor();
     if (page == advancedModePage || page == actuatorsProgressPage) {
       updateDisplaySensors();
