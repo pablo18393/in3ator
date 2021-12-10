@@ -17,26 +17,26 @@ void measureOffsetConsumption() {
 
 float currentMonitor() {
   if (millis() - lastCurrentMeasurement > CurrentMeasurementPeriod ) {
+    instantCurrent[instantCurrent_array_pos] = measureInstantConsumption();
     if (instantCurrent_array_pos < current_filter) {
       instantCurrent_array_pos++;
     }
     else {
       instantCurrent_array_pos = 0;
     }
-    instantCurrent[instantCurrent_array_pos] = measureInstantConsumption();
     lastCurrentMeasurement = millis();
   }
 }
 
 float measureConsumptionForTime (long testTimeout) {
   long ongoingTestTime = millis();
-  float instantCurrent;
+  float instant_Current;
   float averageConsumption = 0;
   long measuredTimes = 0;
   while (millis() - ongoingTestTime < testTimeout) {
-    instantCurrent = measureInstantConsumption();
-    if (instantCurrent) {
-      averageConsumption += instantCurrent;
+    instant_Current = measureInstantConsumption();
+    if (instant_Current) {
+      averageConsumption += instant_Current;
       measuredTimes++;
     }
   }
@@ -80,13 +80,13 @@ float measureMeanConsumption() {
     }
   }
   if (ANALOG_CURRENT_SENSOR) {
-    for (int i = 0; i < instantCurrent_array_pos; i++) {
+      for (int i = 0; i < instantCurrent_array_pos; i++) {
       currentMean += instantCurrent[i];
       instantCurrent[i] = 0;
-    }
-    currentMean /= instantCurrent_array_pos;
-    currentMean *= CurrentToAmpFactor;
-    return (currentMean);
+      }
+      currentMean /= instantCurrent_array_pos;
+      currentMean *= CurrentToAmpFactor;
+      return (currentMean);
   }
 }
 
@@ -156,11 +156,11 @@ void updateTemp(byte sensor) {
 }
 
 bool updateRoomSensor() {
-  if (roomSensorPresent == true) {
+  if (roomSensorPresent) {
     mySHTC3.update();
-    temperature[digitalTempSensor] =  mySHTC3.toDegC(); //Add here measurement to temp array
-    humidity = mySHTC3.toPercent();
+    temperature[digitalTempSensor] =  int(mySHTC3.toDegC()); //Add here measurement to temp array
     if (temperature[digitalTempSensor]) {
+      humidity = int(mySHTC3.toPercent());
       return true;
     }
     else {

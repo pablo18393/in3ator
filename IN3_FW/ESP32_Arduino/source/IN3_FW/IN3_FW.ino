@@ -4,7 +4,7 @@
 
 //Firmware version and head title of UI screen
 #define FWversion "v7.0"
-String serialNumber = "in3000036";
+String serialNumber = "in3000042";
 #define headingTitle "in3ator"
 
 #include <esp_task_wdt.h>
@@ -105,7 +105,7 @@ byte language;
 #define numNTC 2 //number of NTC
 #define numTempSensors 3 //number of total temperature sensors in system
 #define temperature_filter 4000 //amount of temperature samples to filter
-#define current_filter 1000 //amount of temperature samples to filter
+#define current_filter 100 //amount of temperature samples to filter
 
 #define NTCMeasurementPeriod 1000 //in millis
 #define CurrentMeasurementPeriod 2 //in millis
@@ -158,7 +158,7 @@ bool roomSensorPresent;
 byte roomSensorAddress = 112;
 int pulsioximeterMean;
 const int maxPulsioximeterSamples = 320; //(tft width).
-int instantCurrent[current_filter];
+float instantCurrent[current_filter];
 int instantCurrent_array_pos = false;
 float currentConsumption;
 float CurrentToAmpFactor = 0.00045;
