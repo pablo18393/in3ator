@@ -30,7 +30,7 @@ String serialNumber = "in3000042";
 #include <Microchip_PAC193x.h>
 #include "ESP32TimerInterrupt.h"
 
-#define WDT_TIMEOUT 3
+#define WDT_TIMEOUT 15
 
 
 #define ON true

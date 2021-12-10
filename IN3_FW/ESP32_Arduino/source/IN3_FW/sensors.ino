@@ -156,9 +156,9 @@ void updateTemp(byte sensor) {
 bool updateRoomSensor() {
   if (roomSensorPresent) {
     mySHTC3.update();
-    temperature[digitalTempSensor] =  int(mySHTC3.toDegC()); //Add here measurement to temp array
+    temperature[digitalTempSensor] =  mySHTC3.toDegC(); //Add here measurement to temp array
     if (temperature[digitalTempSensor]) {
-      humidity = int(mySHTC3.toPercent());
+      humidity = mySHTC3.toPercent();
       return true;
     }
     else {
