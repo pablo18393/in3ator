@@ -61,9 +61,6 @@ bool GPIOexpanderStatus[16];
 
 void initHardware() {
   logln("[HW] -> Initialiting hardware");
-  if (WIFI_EN) {
-    wifiInit();
-  }
   initI2CBus();
   initGPIOExpander();
   initCurrentSensor();
@@ -79,6 +76,9 @@ void initHardware() {
   initPowerEn();
   initActuators();
   initGPRS();
+  if (WIFI_EN) {
+    wifiInit();
+  }
   if (!HW_error) {
     logln("[HW] -> HARDWARE OK");
     GPRSSetPostVariables(NULL, "HW OK");
@@ -134,14 +134,25 @@ void initGPIOExpander() {
 }
 
 void GPIOExpander_Handler() {
+  bool restart = false;
   if (millis() - lastGPIOUpdate > GPIOUpdateTime) {
     for (int pin = 0; pin < 16; pin++)
     {
+      Serial.println("Checking EXT GPIO: " + String(pin));
       int val = TCA.digitalRead(pin);
       if (GPIOexpanderStatus[pin] != val && pin != (TOUCH_IRQ - GPIO_EXP_BASE)) {
-        Serial.println("VARIABLE" + String(pin) +  "CHANGED FROM " + String(GPIOexpanderStatus[pin]) + " TO " + String(val));
-        GPIOWrite(pin, GPIOexpanderStatus[pin]);
+        Serial.println("VARIABLE " + String(pin) +  " CHANGED FROM " + String(GPIOexpanderStatus[pin]) + " TO " + String(val));
+        restart = true;
       }
+    }
+    if (restart) {
+      /*
+        TCA.begin();
+        for (int pin = 0; pin < 16; pin++)
+        {
+        GPIOWrite(pin, GPIOexpanderStatus[pin]);
+        }
+      */
     }
     lastGPIOUpdate = millis();
   }
@@ -153,6 +164,7 @@ void initPin(uint8_t GPIO, uint8_t Mode) {
   }
   else {
     TCA.pinMode(GPIO - GPIO_EXP_BASE, Mode);
+    delay(20);
   }
 }
 
@@ -166,7 +178,7 @@ void GPIOWrite(uint8_t GPIO, uint8_t Mode) {
   else {
     GPIOexpanderStatus[GPIO - GPIO_EXP_BASE] = Mode;
     TCA.digitalWrite(GPIO - GPIO_EXP_BASE, Mode);
-    delay(10);
+    delay(20);
   }
 }
 
