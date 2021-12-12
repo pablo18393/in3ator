@@ -359,19 +359,25 @@ void barSelection() {
                 EncMove = false;
               }
               break;
-            case DebugENGraphicPosition:
-              UARTDebug = !UARTDebug;
-              EEPROM.write(EEPROM_UARTDebug, UARTDebug);
+            case WifiENGraphicPosition:
+              WIFI_EN = !WIFI_EN;
+              if (WIFI_EN) {
+                wifiInit();
+              }
+              else {
+                wifiDisable();
+              }
+              EEPROM.write(EEPROM_WIFI_EN, WIFI_EN);
               EEPROM.commit();
               setTextColor(COLOR_MENU);
-              if (UARTDebug) {
+              if (WIFI_EN) {
                 drawRightString("OFF", unitPosition, ypos, textFontSize);
               }
               else {
                 drawRightString("ON", unitPosition, ypos, textFontSize);
               }
               setTextColor(COLOR_MENU_TEXT);
-              if (UARTDebug) {
+              if (WIFI_EN) {
                 drawRightString("ON", unitPosition, ypos, textFontSize);
               }
               else {
@@ -380,6 +386,12 @@ void barSelection() {
               break;
             case setdefaultValuesGraphicPosition:
               loaddefaultValues();
+                if (WIFI_EN) {
+                  wifiInit();
+                }
+                else{
+                  wifiDisable();
+                }
               settings();
               break;
             case calibrateGraphicPosition:

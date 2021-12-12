@@ -166,8 +166,8 @@ void graphics() {
               drawRightNumber(HeaterPower, 280, ypos);
               drawRightString("%", unitPosition, ypos, textFontSize);
               break;
-            case DebugENGraphicPosition:
-              if (UARTDebug) {
+            case WifiENGraphicPosition:
+              if (WIFI_EN) {
                 drawRightString("ON", unitPosition, ypos, textFontSize);
               }
               else {

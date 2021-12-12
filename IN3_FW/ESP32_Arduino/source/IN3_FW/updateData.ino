@@ -9,6 +9,7 @@ int updateData() {
   userInteraction();
   buzzerISR();
   GPRS_Handler();
+  GPIOExpander_Handler();
   if (powerAlert) {
     logln("[ALARM] -> maximum power exceeded");
     powerAlert = false;
@@ -126,9 +127,7 @@ void log(String dataString) {
       GPIOWrite(TFT_CS, LOW);
     */
   }
-  if (UARTDebug) {
     Serial.print(dataString);
-  }
 }
 
 void GPRSLocalLog() {

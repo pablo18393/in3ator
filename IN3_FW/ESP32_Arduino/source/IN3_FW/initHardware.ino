@@ -54,15 +54,20 @@
 
 #define HW_TEST_OVERRIDE true
 
+#define GPIOUpdateTime 1000
 long HW_error = false;
+long lastGPIOUpdate;
+bool GPIOexpanderStatus[16];
 
 void initHardware() {
   logln("[HW] -> Initialiting hardware");
-  wifiInit();
+  if (WIFI_EN) {
+    wifiInit();
+  }
   initI2CBus();
   initGPIOExpander();
   initCurrentSensor();
-  initPin(PHOTOTHERAPY,OUTPUT);
+  initPin(PHOTOTHERAPY, OUTPUT);
   GPIOWrite(PHOTOTHERAPY, HIGH);
   initPWMGPIO();
   initPowerAlarm();
@@ -94,6 +99,7 @@ void initHardware() {
 
 void initI2CBus() {
   Wire.begin();
+  Wire.setClock(10000);
 }
 
 void initCurrentSensor() {
@@ -127,6 +133,20 @@ void initGPIOExpander() {
   GPIOWrite(UNUSED_GPIO_EXP3, HIGH);
 }
 
+void GPIOExpander_Handler() {
+  if (millis() - lastGPIOUpdate > GPIOUpdateTime) {
+    for (int pin = 0; pin < 16; pin++)
+    {
+      int val = TCA.digitalRead(pin);
+      if (GPIOexpanderStatus[pin] != val && pin != (TOUCH_IRQ - GPIO_EXP_BASE)) {
+        Serial.println("VARIABLE" + String(pin) +  "CHANGED FROM " + String(GPIOexpanderStatus[pin]) + " TO " + String(val));
+        GPIOWrite(pin, GPIOexpanderStatus[pin]);
+      }
+    }
+    lastGPIOUpdate = millis();
+  }
+}
+
 void initPin(uint8_t GPIO, uint8_t Mode) {
   if (GPIO < GPIO_EXP_BASE) {
     pinMode(GPIO, Mode);
@@ -144,7 +164,9 @@ void GPIOWrite(uint8_t GPIO, uint8_t Mode) {
     digitalWrite(GPIO, Mode);
   }
   else {
+    GPIOexpanderStatus[GPIO - GPIO_EXP_BASE] = Mode;
     TCA.digitalWrite(GPIO - GPIO_EXP_BASE, Mode);
+    delay(10);
   }
 }
 
@@ -169,9 +191,9 @@ void initGPRS()
 }
 
 void initSenseCircuit() {
-    initPin(SYSTEM_SHUNT, INPUT);
-    standByCurrentTest();
-    measureOffsetConsumption();
+  initPin(SYSTEM_SHUNT, INPUT);
+  standByCurrentTest();
+  measureOffsetConsumption();
 }
 
 void initSensors() {

@@ -100,6 +100,10 @@ void wifiInit(void) {
   WiFi.begin(ssid, wifiPassword);
 }
 
+void wifiDisable() {
+  WiFi.mode(WIFI_OFF);
+}
+
 void configWifiServer() {
   // Wait for connection
   Serial.println("");

@@ -15,7 +15,7 @@ void settings() {
       words[languageGraphicPosition] = "Language";
       words[controlAlgorithmGraphicPosition] = "Control algorithm";
       words[heaterPowerGraphicPosition] = "Heater power";
-      words[DebugENGraphicPosition] = "UART debug";
+      words[WifiENGraphicPosition] = "WIFI";
       words[setdefaultValuesGraphicPosition] = "Set default values";
       words[calibrateGraphicPosition] = "Calibration";
       break;
@@ -24,7 +24,7 @@ void settings() {
       words[languageGraphicPosition] = "Idioma";
       words[controlAlgorithmGraphicPosition] = "Algoritmo control";
       words[heaterPowerGraphicPosition] = "Pot calefactor";
-      words[DebugENGraphicPosition] = "UART debug";
+      words[WifiENGraphicPosition] = "WIFI";
       words[setdefaultValuesGraphicPosition] = "Fijar valores estandar";
       words[calibrateGraphicPosition] = "Calibracion";
       break;
@@ -33,7 +33,7 @@ void settings() {
       words[languageGraphicPosition] = "Langue";
       words[controlAlgorithmGraphicPosition] = "Controle algorithme";
       words[heaterPowerGraphicPosition] = "Pot chauffage";
-      words[DebugENGraphicPosition] = "UART debug";
+      words[WifiENGraphicPosition] = "WIFI";
       words[setdefaultValuesGraphicPosition] = "Definir valeurs default";
       words[calibrateGraphicPosition] = "Etalonner";
       break;
@@ -42,7 +42,7 @@ void settings() {
       words[languageGraphicPosition] = "Idioma";
       words[controlAlgorithmGraphicPosition] = "Algoritmo controle";
       words[heaterPowerGraphicPosition] = "Pot de aquecimento";
-      words[DebugENGraphicPosition] = "UART debug";
+      words[WifiENGraphicPosition] = "WIFI";
       words[setdefaultValuesGraphicPosition] = "Definir valores de fabrica";
       words[calibrateGraphicPosition] = "Calibrar";
       break;

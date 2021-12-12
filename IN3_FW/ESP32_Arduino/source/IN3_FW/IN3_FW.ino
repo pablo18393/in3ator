@@ -4,7 +4,7 @@
 
 //Firmware version and head title of UI screen
 #define FWversion "v7.0"
-String serialNumber = "in3000042";
+String serialNumber = "in3000039";
 #define headingTitle "in3ator"
 
 #include <esp_task_wdt.h>
@@ -72,8 +72,8 @@ float alarmTimeDelay = 30; //in mins, time to check alarm
 #define mosfet_switch_time 100   //delay to wait for mosfet to switch (in millis), oversized
 #define timePressToSettings 5000 //in millis, time to press to go to settings window in UI
 #define debugUpdatePeriod 1000 //in millis, 
-bool UARTDebug = 1;
-bool defaultUARTDebug = ON;
+bool WIFI_EN = false;
+bool defaultWIFI_EN = OFF;
 long lastDebugUpdate;
 long loopCounts;
 //pages number in UI. Configuration and information will be displayed depending on the page number
@@ -322,7 +322,7 @@ byte goToProcessRow;
 #define languageGraphicPosition 1
 #define controlAlgorithmGraphicPosition 2
 #define heaterPowerGraphicPosition 3
-#define DebugENGraphicPosition 4
+#define WifiENGraphicPosition 4
 #define calibrateGraphicPosition 5
 #define setdefaultValuesGraphicPosition 6
 //calibration menu
