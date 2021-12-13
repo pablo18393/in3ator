@@ -1,3 +1,5 @@
+#define enableAlarms false
+
 float alarmSensedValue;
 
 void alarmTimerStart() {
@@ -31,7 +33,12 @@ bool checkAlarms(float setPoint, float measuredValue, int errorMargin, long alar
   if (alarmsEnable) {
     if (millis() - alarmTime > alarmTimeDelay * 60 * 1000) { // min to millis
       if (abs(setPoint - measuredValue) > errorMargin) {
-        return false;
+        if (enableAlarms) {
+          return true;
+        }
+        else {
+          return false;
+        }
       }
     }
   }

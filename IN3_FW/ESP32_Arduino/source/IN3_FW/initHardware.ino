@@ -113,7 +113,6 @@ void initHardware() {
 
 void initI2CBus() {
   Wire.begin();
-  //Wire.setClock(10000);
 }
 
 void initCurrentSensor() {
@@ -193,6 +192,7 @@ bool checkTCAHealth() {
           }
           restart = true;
         }
+        delay(5);
       }
       lastGPIOUpdate = millis();
     }
