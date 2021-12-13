@@ -126,6 +126,7 @@ float diffTemperature; //difference between measured temperature and user input 
 bool faultNTC[numNTC]; //variable to control a failure in NTC
 byte numSensors; //number of total sensors
 double humidity; // room humidity variable
+bool humidifierState, humidifierStateChange;
 int previousHumidity; //previous sampled humidity
 float diffHumidity; //difference between measured humidity and user input real humidity
 

@@ -154,6 +154,7 @@ void updateTemp(byte sensor) {
 }
 
 bool updateRoomSensor() {
+  logln("[SENSORS] -> Updating room humidity");
   if (roomSensorPresent) {
     mySHTC3.update();
     temperature[digitalTempSensor] =  mySHTC3.toDegC(); //Add here measurement to temp array

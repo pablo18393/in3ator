@@ -53,11 +53,12 @@
 #define DEFECTIVE_CURRENT_SENSOR 1<<19
 
 #define HW_TEST_OVERRIDE true
-
+#define MAX_TCA_WRITING_RATE 0
 #define GPIOUpdateTime 1000
 long HW_error = false;
 long lastGPIOUpdate;
 bool GPIOexpanderStatus[16];
+long lastTCAWrite[16];
 
 void initHardware() {
   logln("[HW] -> Initialiting hardware");
@@ -99,12 +100,14 @@ void initHardware() {
 
 void initI2CBus() {
   Wire.begin();
-  Wire.setClock(10000);
+  //Wire.setClock(10000);
 }
 
 void initCurrentSensor() {
-  PAC.begin();
-  PAC.UpdateCurrent();
+  if (DIGITAL_CURRENT_SENSOR) {
+    PAC.begin();
+    PAC.UpdateCurrent();
+  }
 }
 
 void initPWMGPIO() {
@@ -122,40 +125,18 @@ void initPWMGPIO() {
 }
 
 void initGPIOExpander() {
+  logln("[HW] -> Initialiting TCA9355");
   TCA.begin();
-  initPin(UNUSED_GPIO_EXP0, OUTPUT);
-  initPin(UNUSED_GPIO_EXP1, OUTPUT);
-  initPin(UNUSED_GPIO_EXP2, OUTPUT);
-  initPin(UNUSED_GPIO_EXP3, OUTPUT);
-  GPIOWrite(UNUSED_GPIO_EXP0, HIGH);
-  GPIOWrite(UNUSED_GPIO_EXP1, HIGH);
-  GPIOWrite(UNUSED_GPIO_EXP2, HIGH);
-  GPIOWrite(UNUSED_GPIO_EXP3, HIGH);
-}
-
-void GPIOExpander_Handler() {
-  bool restart = false;
-  if (millis() - lastGPIOUpdate > GPIOUpdateTime) {
-    for (int pin = 0; pin < 16; pin++)
-    {
-      Serial.println("Checking EXT GPIO: " + String(pin));
-      int val = TCA.digitalRead(pin);
-      if (GPIOexpanderStatus[pin] != val && pin != (TOUCH_IRQ - GPIO_EXP_BASE)) {
-        Serial.println("VARIABLE " + String(pin) +  " CHANGED FROM " + String(GPIOexpanderStatus[pin]) + " TO " + String(val));
-        restart = true;
-      }
-    }
-    if (restart) {
-      /*
-        TCA.begin();
-        for (int pin = 0; pin < 16; pin++)
-        {
-        GPIOWrite(pin, GPIOexpanderStatus[pin]);
-        }
-      */
-    }
-    lastGPIOUpdate = millis();
-  }
+  /*
+    initPin(UNUSED_GPIO_EXP0, OUTPUT);
+    initPin(UNUSED_GPIO_EXP1, OUTPUT);
+    initPin(UNUSED_GPIO_EXP2, OUTPUT);
+    initPin(UNUSED_GPIO_EXP3, OUTPUT);
+    GPIOWrite(UNUSED_GPIO_EXP0, HIGH);
+    GPIOWrite(UNUSED_GPIO_EXP1, HIGH);
+    GPIOWrite(UNUSED_GPIO_EXP2, HIGH);
+    GPIOWrite(UNUSED_GPIO_EXP3, HIGH);
+  */
 }
 
 void initPin(uint8_t GPIO, uint8_t Mode) {
@@ -164,7 +145,6 @@ void initPin(uint8_t GPIO, uint8_t Mode) {
   }
   else {
     TCA.pinMode(GPIO - GPIO_EXP_BASE, Mode);
-    delay(20);
   }
 }
 
@@ -176,9 +156,15 @@ void GPIOWrite(uint8_t GPIO, uint8_t Mode) {
     digitalWrite(GPIO, Mode);
   }
   else {
-    GPIOexpanderStatus[GPIO - GPIO_EXP_BASE] = Mode;
-    TCA.digitalWrite(GPIO - GPIO_EXP_BASE, Mode);
-    delay(20);
+    if (millis() - lastTCAWrite[GPIO - GPIO_EXP_BASE] > MAX_TCA_WRITING_RATE) {
+      logln("[HW] -> TCA9355 writing pin" + String(GPIO - GPIO_EXP_BASE) + " -> " + String(Mode));
+      GPIOexpanderStatus[GPIO - GPIO_EXP_BASE] = Mode;
+      if (!TCA.digitalWrite(GPIO - GPIO_EXP_BASE, Mode)) {
+        logln("[HW] -> TCA9355 WRITE ERROR");
+      }
+      lastTCAWrite[GPIO - GPIO_EXP_BASE] = millis();
+    }
+    //TCA.digitalWrite(GPIO - GPIO_EXP_BASE, Mode);
   }
 }
 

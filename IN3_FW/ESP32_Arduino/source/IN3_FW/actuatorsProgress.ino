@@ -132,6 +132,7 @@ void actuatorsProgress() {
   }
   updateDisplaySensors();
   alarmTimerStart();
+
   while (1) {
     updateData();
     if (controlTemperature) {
@@ -216,13 +217,32 @@ void basictemperatureControl() {
 }
 
 void basicHumidityControl() {
+  /*
   if (humidity < desiredRoomHum) {
     GPIOWrite(HUMIDIFIER, HIGH);
   }
   else {
     GPIOWrite(HUMIDIFIER, LOW);
   }
+ */
+  
+  if (humidity < desiredRoomHum) {
+    if (!humidifierState || humidifierStateChange) {
+      GPIOWrite(HUMIDIFIER, HIGH);
+      humidifierStateChange = false;
+    }
+    humidifierState = true;
+  }
+  else {
+    if (humidifierState || humidifierStateChange) {
+      GPIOWrite(HUMIDIFIER, LOW);
+      humidifierStateChange = false;
+    }
+    humidifierState = false;
+  }
+  
 }
+
 
 void heatUp() {
   ledcWrite(HEATER_PWM_CHANNEL, heaterMaxPWM * HeaterPower / 100);

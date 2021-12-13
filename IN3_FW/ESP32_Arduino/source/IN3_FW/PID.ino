@@ -30,10 +30,18 @@ void PIDHandler() {
       windowStartTime += WindowSize;
     }
     if (humidityPIDOutput < millis() - windowStartTime) {
-      GPIOWrite(HUMIDIFIER, LOW);
+      if (humidifierState || humidifierStateChange) {
+        GPIOWrite(HUMIDIFIER, LOW);
+        humidifierStateChange = false;
+      }
+      humidifierState = false;
     }
     else {
-      GPIOWrite(HUMIDIFIER, HIGH);
+      if (!humidifierState || humidifierStateChange) {
+        GPIOWrite(HUMIDIFIER, HIGH);
+        humidifierStateChange = false;
+      }
+      humidifierState = true;
     }
   }
 }
@@ -62,6 +70,7 @@ void stopTemperaturePID() {
 }
 
 void startHumidityPID() {
+  humidifierStateChange = true;
   windowStartTime = millis();
   humidityPID.SetOutputLimits(0, WindowSize);
   humidityPID.SetMode(AUTOMATIC);
