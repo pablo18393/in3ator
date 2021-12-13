@@ -22,7 +22,7 @@ int updateData() {
       logln("[PID] -> Heater PWM output is: " + String (100 * PIDOutput / heaterMaxPWM) + "%");
     }
     if (humidityPID.GetMode() == AUTOMATIC) {
-      logln("[PID] -> Humidifier output is: " + String (100 * humidityPIDOutput / WindowSize) + "%");
+      logln("[PID] -> Humidifier output is: " + String (100 * humidityPIDOutput / humidifierTimeCycle) + "%");
     }
     logln("[SENSORS] -> Current consumption is: " + String (analogRead(SYSTEM_SHUNT)) + "," + String (currentConsumption) + " Amps");
     logln("[SENSORS] -> Baby temperature: " + String(temperature[babyNTC]) + "ºC, correction error is " + String(temperature[babyNTC]*temperatureCalibrationFactor [babyNTC] + temperatureCalibrationOffset [babyNTC]));

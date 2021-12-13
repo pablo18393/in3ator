@@ -198,7 +198,9 @@ const byte defaultHeaterPower = 100; //preset max heater temperature in celsious
 
 //constants
 const byte heaterPowerMax = 100; //maximum temperature in heater to be set
-const byte heaterPowerMin = false; //maximum temperature in heater to be set
+const byte heaterPowerMin = 0; //minimum temperature in heater to be set
+const byte humidifierDutyCycleMax = 90; //maximum humidity cycle in heater to be set
+const byte humidifierDutyCycleMin = 0; //minimum humidity cycle in heater to be set
 const byte minTemp = 15; //minimum allowed temperature to be set
 const byte maxTemp = 45; //maximum allowed temperature to be set
 const byte maxHum = 100; //maximum allowed humidity to be set

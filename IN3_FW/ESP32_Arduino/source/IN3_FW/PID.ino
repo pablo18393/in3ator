@@ -7,7 +7,7 @@ double Kp[numPID] = {30000, 200}, Ki[numPID] = {300, 2} , Kd[numPID] = {3000, 20
 double PIDOutput;
 double temperaturePIDInput;
 double humidityPIDOutput;
-int WindowSize = 3000;
+int humidifierTimeCycle = 1500;
 unsigned long windowStartTime;
 PID temperaturePID(&temperaturePIDInput, &PIDOutput, &desiredSkinTemp, Kp[tempCTL], Ki[tempCTL], Kd[tempCTL], P_ON_E, DIRECT);
 PID humidityPID(&humidity, &humidityPIDOutput, &desiredRoomHum, Kp[humidityCTL], Ki[humidityCTL], Kd[humidityCTL], P_ON_E, DIRECT);
@@ -25,9 +25,9 @@ void PIDHandler() {
   }
   if (humidityPID.GetMode() == AUTOMATIC) {
     humidityPID.Compute();
-    if (millis() - windowStartTime > WindowSize)
+    if (millis() - windowStartTime > humidifierTimeCycle)
     { //time to shift the Relay Window
-      windowStartTime += WindowSize;
+      windowStartTime += humidifierTimeCycle;
     }
     if (humidityPIDOutput < millis() - windowStartTime) {
       if (humidifierState || humidifierStateChange) {
@@ -72,7 +72,7 @@ void stopTemperaturePID() {
 void startHumidityPID() {
   humidifierStateChange = true;
   windowStartTime = millis();
-  humidityPID.SetOutputLimits(0, WindowSize);
+  humidityPID.SetOutputLimits(humidifierTimeCycle * humidifierDutyCycleMin / 100, humidifierTimeCycle * humidifierDutyCycleMax / 100);
   humidityPID.SetMode(AUTOMATIC);
 }
 
