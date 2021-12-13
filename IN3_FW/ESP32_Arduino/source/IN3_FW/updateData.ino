@@ -9,6 +9,7 @@ int updateData() {
   userInteraction();
   buzzerISR();
   GPRS_Handler();
+  checkTCAHealth();
   if (powerAlert) {
     logln("[ALARM] -> maximum power exceeded");
     powerAlert = false;

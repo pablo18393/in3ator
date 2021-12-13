@@ -53,12 +53,25 @@
 #define DEFECTIVE_CURRENT_SENSOR 1<<19
 
 #define HW_TEST_OVERRIDE true
-#define MAX_TCA_WRITING_RATE 5
 #define GPIOUpdateTime 1000
 long HW_error = false;
 long lastGPIOUpdate;
+bool GPIOexpanderPinToCheck[16] = {1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0};
 bool GPIOexpanderStatus[16];
 long lastTCAWrite[16];
+long lastBugSimulation;
+
+#define POWER_EN GPIO_EXP_0
+#define GPRS_EN GPIO_EXP_1
+#define SD_CS GPIO_EXP_2
+#define FAN GPIO_EXP_3
+#define HUMIDIFIER GPIO_EXP_6
+#define PHOTOTHERAPY GPIO_EXP_7
+#define GPRS_PWRKEY GPIO_EXP_8
+#define TFT_CS GPIO_EXP_9
+#define TOUCH_IRQ GPIO_EXP_10
+#define TOUCH_CS GPIO_EXP_11
+#define TFT_RST GPIO_EXP_13
 
 void initHardware() {
   logln("[HW] -> Initialiting hardware");
@@ -67,11 +80,11 @@ void initHardware() {
   initCurrentSensor();
   initPin(PHOTOTHERAPY, OUTPUT);
   GPIOWrite(PHOTOTHERAPY, HIGH);
-  initPWMGPIO();
-  initPowerAlarm();
   initSensors();
   initSenseCircuit();
+  initPWMGPIO();
   initTFT();
+  initPowerAlarm();
   initBuzzer();
   initInterrupts();
   initPowerEn();
@@ -127,16 +140,19 @@ void initPWMGPIO() {
 void initGPIOExpander() {
   logln("[HW] -> Initialiting TCA9355");
   TCA.begin();
-  /*
-    initPin(UNUSED_GPIO_EXP0, OUTPUT);
-    initPin(UNUSED_GPIO_EXP1, OUTPUT);
-    initPin(UNUSED_GPIO_EXP2, OUTPUT);
-    initPin(UNUSED_GPIO_EXP3, OUTPUT);
-    GPIOWrite(UNUSED_GPIO_EXP0, HIGH);
-    GPIOWrite(UNUSED_GPIO_EXP1, HIGH);
-    GPIOWrite(UNUSED_GPIO_EXP2, HIGH);
-    GPIOWrite(UNUSED_GPIO_EXP3, HIGH);
-  */
+  for (int pin = 0; pin < 16; pin++)
+  {
+    TCA.setPolarity(pin, false);
+    GPIOexpanderStatus[pin] = false;
+  }
+  initPin(UNUSED_GPIO_EXP0, OUTPUT);
+  initPin(UNUSED_GPIO_EXP1, OUTPUT);
+  initPin(UNUSED_GPIO_EXP2, OUTPUT);
+  initPin(UNUSED_GPIO_EXP3, OUTPUT);
+  GPIOWrite(UNUSED_GPIO_EXP0, HIGH);
+  GPIOWrite(UNUSED_GPIO_EXP1, HIGH);
+  GPIOWrite(UNUSED_GPIO_EXP2, HIGH);
+  GPIOWrite(UNUSED_GPIO_EXP3, HIGH);
 }
 
 void initPin(uint8_t GPIO, uint8_t Mode) {
@@ -149,6 +165,65 @@ void initPin(uint8_t GPIO, uint8_t Mode) {
 }
 
 void initPowerAlarm() {
+
+}
+
+bool checkTCAHealth() {
+  bool restart = false;
+  bool TFTRestart = false;
+
+  if (millis() - lastGPIOUpdate > GPIOUpdateTime) {
+    /*
+    if (millis() - lastBugSimulation > 10 * GPIOUpdateTime) {
+      logln("[DEBUG] -> FAKING TCA ERROR");
+      TCA.digitalWrite(7, HIGH);
+      TCA.digitalWrite(13, LOW);
+      lastBugSimulation = millis();
+    }
+    */
+    for (int pin = 0; pin < 16; pin++)
+    {
+      if (GPIOexpanderPinToCheck[pin]) {
+        int val = TCA.digitalRead(pin);
+        Serial.println("Checking EXT GPIO: " + String(pin) + "->" + String (val) + String(GPIOexpanderStatus[pin]) + ", polarity: " + String(TCA.getPolarity(pin)));
+        if (GPIOexpanderStatus[pin] != val) {
+          logln("[HW] -> TCA9355 pin " + String(pin) +  " CHANGED RANDOMLY FROM " + String(GPIOexpanderStatus[pin]) + " TO " + String(val));
+          if (pin == 13) {
+            TFTRestart = true;
+          }
+          restart = true;
+        }
+      }
+      lastGPIOUpdate = millis();
+    }
+    if (restart) {
+      TCARestore();
+    }
+    if(TFTRestart){
+      TFTRestore();
+    }
+  }
+}
+
+void TCARestore() {
+  logln("[HW] -> restoring TCA9355 previous status");
+  while (!TCA.begin());
+
+  initPin(POWER_EN, OUTPUT);
+  initPin(GPRS_EN, OUTPUT);
+  initPin(SD_CS, INPUT);
+  initPin(FAN, OUTPUT);
+  initPin(HUMIDIFIER, OUTPUT);
+  initPin(PHOTOTHERAPY, OUTPUT);
+  initPin(TFT_CS, INPUT);
+  initPin(TOUCH_IRQ, INPUT);
+  initPin(TOUCH_CS, INPUT);
+
+  for (int pin = 0; pin < 16; pin++)
+  {
+    TCA.setPolarity(pin, false);
+    GPIOWrite(GPIO_EXP_BASE + pin, GPIOexpanderStatus[pin]);
+  }
 }
 
 void GPIOWrite(uint8_t GPIO, uint8_t Mode) {
@@ -156,14 +231,13 @@ void GPIOWrite(uint8_t GPIO, uint8_t Mode) {
     digitalWrite(GPIO, Mode);
   }
   else {
-    if (millis() - lastTCAWrite[GPIO - GPIO_EXP_BASE] > MAX_TCA_WRITING_RATE) {
-      logln("[HW] -> TCA9355 writing pin" + String(GPIO - GPIO_EXP_BASE) + " -> " + String(Mode));
-      GPIOexpanderStatus[GPIO - GPIO_EXP_BASE] = Mode;
-      if (!TCA.digitalWrite(GPIO - GPIO_EXP_BASE, Mode)) {
-        logln("[HW] -> TCA9355 WRITE ERROR");
-      }
-      lastTCAWrite[GPIO - GPIO_EXP_BASE] = millis();
+    logln("[HW] -> TCA9355 writing pin" + String(GPIO - GPIO_EXP_BASE) + " -> " + String(Mode));
+    GPIOexpanderStatus[GPIO - GPIO_EXP_BASE] = Mode;
+    if (!TCA.digitalWrite(GPIO - GPIO_EXP_BASE, Mode)) {
+      logln("[HW] -> TCA9355 WRITE ERROR");
     }
+    lastTCAWrite[GPIO - GPIO_EXP_BASE] = millis();
+    delay(5);
     //TCA.digitalWrite(GPIO - GPIO_EXP_BASE, Mode);
   }
 }
@@ -291,7 +365,6 @@ void initTFT() {
   GPIOWrite(SD_CS, HIGH);
   GPIOWrite(TFT_CS, LOW);
   GPIOWrite(TFT_RST, LOW);  // alternating HIGH/LOW
-  delay(10);
   GPIOWrite(TFT_RST, HIGH);  // alternating HIGH/LOW
   tft.begin();
   tft.setRotation(3);
@@ -317,6 +390,30 @@ void initTFT() {
     logln("[HW] -> Fail -> test current is " + String (testCurrent) + " Amps");
   }
   GPRSSetPostVariables(NULL, ",TFT:" + String (testCurrent));
+}
+
+void TFTRestore() {
+  logln("[HW] -> restoring TFT previous status");
+  initPin(TOUCH_CS, OUTPUT);
+  initPin(SD_CS, OUTPUT);
+  initPin(TFT_CS, OUTPUT);
+  initPin(TFT_RST, OUTPUT);
+  GPIOWrite(TOUCH_CS, HIGH);
+  GPIOWrite(SD_CS, HIGH);
+  GPIOWrite(TFT_CS, LOW);
+  GPIOWrite(TFT_RST, LOW);  // alternating HIGH/LOW
+  GPIOWrite(TFT_RST, HIGH);  // alternating HIGH/LOW
+  tft.begin();
+  tft.setRotation(3);
+  switch (page) {
+    case actuatorsProgressPage:
+      actuatorsProgress();
+      break;
+    case advancedModePage:
+    default:
+      advancedMode();
+      break;
+  }
 }
 
 void initActuators() {
