@@ -53,7 +53,7 @@
 #define DEFECTIVE_CURRENT_SENSOR 1<<19
 
 #define HW_TEST_OVERRIDE true
-#define MAX_TCA_WRITING_RATE 0
+#define MAX_TCA_WRITING_RATE 5
 #define GPIOUpdateTime 1000
 long HW_error = false;
 long lastGPIOUpdate;
