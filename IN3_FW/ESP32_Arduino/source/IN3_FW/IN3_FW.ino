@@ -4,7 +4,7 @@
 
 //Firmware version and head title of UI screen
 #define FWversion "v7.0"
-String serialNumber = "in3000039";
+String serialNumber = "in3000042";
 #define headingTitle "in3ator"
 
 #include <esp_task_wdt.h>
@@ -199,7 +199,7 @@ const byte defaultHeaterPower = 100; //preset max heater temperature in celsious
 //constants
 const byte heaterPowerMax = 100; //maximum temperature in heater to be set
 const byte heaterPowerMin = 0; //minimum temperature in heater to be set
-const byte humidifierDutyCycleMax = 90; //maximum humidity cycle in heater to be set
+const byte humidifierDutyCycleMax = 100; //maximum humidity cycle in heater to be set
 const byte humidifierDutyCycleMin = 0; //minimum humidity cycle in heater to be set
 const byte minTemp = 15; //minimum allowed temperature to be set
 const byte maxTemp = 45; //maximum allowed temperature to be set

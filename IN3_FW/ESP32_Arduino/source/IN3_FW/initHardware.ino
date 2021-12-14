@@ -53,10 +53,11 @@
 #define DEFECTIVE_CURRENT_SENSOR 1<<19
 
 #define HW_TEST_OVERRIDE true
-#define GPIOUpdateTime 1000
+#define TCACheckPeriod 6000
+#define TFTCheckPeriod 60000
 long HW_error = false;
-long lastGPIOUpdate;
-bool GPIOexpanderPinToCheck[16] = {1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0};
+long lastTCACheck, lastTFTCheck;
+bool GPIOexpanderPinToCheck[16] = {1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0};
 bool GPIOexpanderStatus[16];
 long lastTCAWrite[16];
 long lastBugSimulation;
@@ -169,17 +170,7 @@ void initPowerAlarm() {
 
 bool checkTCAHealth() {
   bool restart = false;
-  bool TFTRestart = false;
-
-  if (millis() - lastGPIOUpdate > GPIOUpdateTime) {
-    /*
-    if (millis() - lastBugSimulation > 10 * GPIOUpdateTime) {
-      logln("[DEBUG] -> FAKING TCA ERROR");
-      TCA.digitalWrite(7, HIGH);
-      TCA.digitalWrite(13, LOW);
-      lastBugSimulation = millis();
-    }
-    */
+  if (millis() - lastTCACheck > TCACheckPeriod) {
     for (int pin = 0; pin < 16; pin++)
     {
       if (GPIOexpanderPinToCheck[pin]) {
@@ -187,19 +178,32 @@ bool checkTCAHealth() {
         Serial.println("Checking EXT GPIO: " + String(pin) + "->" + String (val) + String(GPIOexpanderStatus[pin]) + ", polarity: " + String(TCA.getPolarity(pin)));
         if (GPIOexpanderStatus[pin] != val) {
           logln("[HW] -> TCA9355 pin " + String(pin) +  " CHANGED RANDOMLY FROM " + String(GPIOexpanderStatus[pin]) + " TO " + String(val));
-          if (pin == 13) {
-            TFTRestart = true;
-          }
           restart = true;
         }
         delay(5);
       }
-      lastGPIOUpdate = millis();
+      lastTCACheck = millis();
     }
     if (restart) {
       TCARestore();
     }
-    if(TFTRestart){
+    /*
+      if (millis() - lastBugSimulation > 10 * TCACheckPeriod) {
+      logln("[DEBUG] -> FAKING TCA ERROR");
+      // read diagnostics (optional but can help debug problems)
+      TCA.digitalWrite(7, HIGH);
+      TCA.digitalWrite(13, LOW);
+      lastBugSimulation = millis();
+      }
+    */
+  }
+}
+
+void checkTFTHealth() {
+  if (millis() - lastTFTCheck > TFTCheckPeriod) {
+    lastTFTCheck = millis();
+    logln("[HW] -> TFT display status is: " + String(tft.readcommand8(ILI9341_RDSELFDIAG)));
+    if (!tft.readcommand8(ILI9341_RDMODE) && !tft.readcommand8(ILI9341_RDSELFDIAG)) {
       TFTRestore();
     }
   }
@@ -221,8 +225,10 @@ void TCARestore() {
 
   for (int pin = 0; pin < 16; pin++)
   {
-    TCA.setPolarity(pin, false);
-    GPIOWrite(GPIO_EXP_BASE + pin, GPIOexpanderStatus[pin]);
+    if (GPIOexpanderPinToCheck[pin]) {
+      TCA.setPolarity(pin, false);
+      GPIOWrite(GPIO_EXP_BASE + pin, GPIOexpanderStatus[pin]);
+    }
   }
 }
 

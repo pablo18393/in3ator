@@ -164,6 +164,8 @@ void actuatorsProgress() {
       }
     }
     if (controlHumidity) {
+      checkTCAHealth();
+      checkTFTHealth();
       if (controlAlgorithm == BASIC_CONTROL) {
         basicHumidityControl();
       }
@@ -218,14 +220,14 @@ void basictemperatureControl() {
 
 void basicHumidityControl() {
   /*
-  if (humidity < desiredRoomHum) {
+    if (humidity < desiredRoomHum) {
     GPIOWrite(HUMIDIFIER, HIGH);
-  }
-  else {
+    }
+    else {
     GPIOWrite(HUMIDIFIER, LOW);
-  }
- */
-  
+    }
+  */
+
   if (humidity < desiredRoomHum) {
     if (!humidifierState || humidifierStateChange) {
       GPIOWrite(HUMIDIFIER, HIGH);
@@ -240,7 +242,7 @@ void basicHumidityControl() {
     }
     humidifierState = false;
   }
-  
+
 }
 
 

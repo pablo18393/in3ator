@@ -1,4 +1,4 @@
-#define enableAlarms false
+#define enableAlarms true
 
 float alarmSensedValue;
 
