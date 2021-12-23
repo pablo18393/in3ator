@@ -53,8 +53,8 @@
 #define DEFECTIVE_CURRENT_SENSOR 1<<19
 
 #define HW_TEST_OVERRIDE true
-#define TCACheckPeriod 1000
-#define TFTCheckPeriod 1000
+#define TCACheckPeriod 10000
+#define TFTCheckPeriod 10000
 long HW_error = false;
 long lastTCACheck, lastTFTCheck;
 bool GPIOexpanderPinToCheck[16] = {1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0};
@@ -187,13 +187,15 @@ bool checkTCAHealth() {
     if (restart) {
       TCARestore();
     }
-    if (millis() - lastBugSimulation > 10 * TCACheckPeriod) {
+    /*
+      if (millis() - lastBugSimulation > 10 * TCACheckPeriod) {
       logln("[DEBUG] -> FAKING TCA ERROR");
       // read diagnostics (optional but can help debug problems)
       TCA.digitalWrite(7, HIGH);
       TCA.digitalWrite(9, HIGH);
       lastBugSimulation = millis();
-    }
+      }
+    */
   }
 }
 
@@ -209,7 +211,7 @@ void checkTFTHealth() {
     if (!powerMode && !MADCTL && !pixelFormat && !imageFormat && !selfDiag) {
       TFTRestore();
     }
-    //lastTFTCheck=millis();
+    lastTFTCheck=millis();
   }
 }
 
