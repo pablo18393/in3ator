@@ -525,5 +525,6 @@ bool back_mode() {
   if (millis() - last_encPulsed > time_back_wait) {
     drawBack();
   }
+  delay(10);
   return (false);
 }
