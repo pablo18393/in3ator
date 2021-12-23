@@ -28,9 +28,10 @@ void firstPointCalibration() {
       break;
   }
   rectangles = numWords;
-  bar_pos = true;
   graphics();
   drawHeading();
+  bar_pos = true;
+  ypos = graphicHeight(bar_pos - 1);
   while (!GPIORead(ENC_SWITCH)) {
     updateData();
   }
@@ -66,10 +67,10 @@ void secondPointCalibration() {
       break;
   }
   rectangles = numWords;
-  ypos = (tft.height() - height_heading) / (2 * rectangles) + letter_height;
-  bar_pos = true;
   graphics();
   drawHeading();
+  bar_pos = true;
+  ypos = graphicHeight(bar_pos - 1);
   while (!GPIORead(ENC_SWITCH)) {
     updateData();
   }

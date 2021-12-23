@@ -29,6 +29,8 @@ void calibrateSensors() {
   rectangles = numWords;
   graphics();
   drawHeading();
+  bar_pos = true;
+  ypos = graphicHeight(bar_pos - 1);
   while (!GPIORead(ENC_SWITCH)) {
     updateData();
   }

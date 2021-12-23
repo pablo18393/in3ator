@@ -65,8 +65,8 @@ void advancedMode() {
   controlTemperature = false;
   controlHumidity = false;
   enableSet = false;
-  ypos = (tft.height() - height_heading) / (2 * rectangles) + letter_height;
   bar_pos = true;
+  ypos = graphicHeight(bar_pos - 1);
   while (!GPIORead(ENC_SWITCH)) {
     updateData();
   }

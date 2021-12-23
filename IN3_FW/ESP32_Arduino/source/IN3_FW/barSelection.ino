@@ -124,6 +124,7 @@ void barSelection() {
             break;
         }
         break;
+      case settingsPage:
         switch (bar_pos - graphicTextOffset ) {
           case autoLockGraphicPosition:
             setTextColor(COLOR_MENU);
