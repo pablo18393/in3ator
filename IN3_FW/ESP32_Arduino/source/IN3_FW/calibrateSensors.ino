@@ -33,5 +33,4 @@ void calibrateSensors() {
     updateData();
   }
   delay(debounceTime);
-  barSelection();
 }

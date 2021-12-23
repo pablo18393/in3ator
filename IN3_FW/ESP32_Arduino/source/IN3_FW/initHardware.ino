@@ -53,14 +53,14 @@
 #define DEFECTIVE_CURRENT_SENSOR 1<<19
 
 #define HW_TEST_OVERRIDE true
-#define TCACheckPeriod 6000
-#define TFTCheckPeriod 60000
+#define TCACheckPeriod 1000
+#define TFTCheckPeriod 1000
 long HW_error = false;
 long lastTCACheck, lastTFTCheck;
 bool GPIOexpanderPinToCheck[16] = {1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0};
 bool GPIOexpanderStatus[16];
 long lastTCAWrite[16];
-long lastBugSimulation;
+long lastBugSimulation = false;
 
 #define POWER_EN GPIO_EXP_0
 #define GPRS_EN GPIO_EXP_1
@@ -187,25 +187,29 @@ bool checkTCAHealth() {
     if (restart) {
       TCARestore();
     }
-    /*
-      if (millis() - lastBugSimulation > 10 * TCACheckPeriod) {
+    if (millis() - lastBugSimulation > 10 * TCACheckPeriod) {
       logln("[DEBUG] -> FAKING TCA ERROR");
       // read diagnostics (optional but can help debug problems)
       TCA.digitalWrite(7, HIGH);
-      TCA.digitalWrite(13, LOW);
+      TCA.digitalWrite(9, HIGH);
       lastBugSimulation = millis();
-      }
-    */
+    }
   }
 }
 
 void checkTFTHealth() {
   if (millis() - lastTFTCheck > TFTCheckPeriod) {
-    lastTFTCheck = millis();
-    logln("[HW] -> TFT display status is: " + String(tft.readcommand8(ILI9341_RDSELFDIAG)));
-    if (!tft.readcommand8(ILI9341_RDMODE) && !tft.readcommand8(ILI9341_RDSELFDIAG)) {
+    tft.setRotation(3);
+    uint8_t powerMode = tft.readcommand8(ILI9341_RDMODE);
+    uint8_t MADCTL = tft.readcommand8(ILI9341_RDMADCTL);
+    uint8_t pixelFormat = tft.readcommand8(ILI9341_RDPIXFMT);
+    uint8_t imageFormat = tft.readcommand8(ILI9341_RDIMGFMT);
+    uint8_t selfDiag = tft.readcommand8(ILI9341_RDSELFDIAG);
+    logln("[HW] -> TFT display status is: " + String(powerMode, HEX) + String(MADCTL, HEX) + String(pixelFormat, HEX) + String(imageFormat, HEX) + String(selfDiag, HEX));
+    if (!powerMode && !MADCTL && !pixelFormat && !imageFormat && !selfDiag) {
       TFTRestore();
     }
+    //lastTFTCheck=millis();
   }
 }
 
@@ -219,9 +223,6 @@ void TCARestore() {
   initPin(FAN, OUTPUT);
   initPin(HUMIDIFIER, OUTPUT);
   initPin(PHOTOTHERAPY, OUTPUT);
-  initPin(TFT_CS, INPUT);
-  initPin(TOUCH_IRQ, INPUT);
-  initPin(TOUCH_CS, INPUT);
 
   for (int pin = 0; pin < 16; pin++)
   {
@@ -404,6 +405,8 @@ void TFTRestore() {
   initPin(SD_CS, OUTPUT);
   initPin(TFT_CS, OUTPUT);
   initPin(TFT_RST, OUTPUT);
+  initPin(TOUCH_IRQ, INPUT);
+  initPin(TOUCH_CS, INPUT);
   GPIOWrite(TOUCH_CS, HIGH);
   GPIOWrite(SD_CS, HIGH);
   GPIOWrite(TFT_CS, LOW);

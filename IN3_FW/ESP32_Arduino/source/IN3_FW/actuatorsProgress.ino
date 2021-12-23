@@ -1,9 +1,7 @@
 void actuatorsProgress() {
+  bool exitActuation = false;
   if (page == errorPage) {
     GPRSSetPostVariables(NULL, "ALARM");
-  }
-  else if (page == mainMenuPage) {
-    GPRSSetPostVariables(actuatorsModeON, "ON, wks:" + String(gestationWeeks) + "," + String (desiredSkinTemp, 1) + "," + String (desiredRoomHum));
   }
   else {
     GPRSSetPostVariables(actuatorsModeON, "ON:" + String (desiredSkinTemp, 1) + "," + String (desiredRoomHum));
@@ -133,7 +131,7 @@ void actuatorsProgress() {
   updateDisplaySensors();
   alarmTimerStart();
 
-  while (1) {
+  while (!exitActuation) {
     updateData();
     if (controlTemperature) {
       if (controlMode) {
@@ -195,7 +193,7 @@ void actuatorsProgress() {
     }
     while (!GPIORead(ENC_SWITCH)) {
       updateData();
-      back_mode();
+      exitActuation = back_mode();
     }
     blinkGoBackMessage();
   }

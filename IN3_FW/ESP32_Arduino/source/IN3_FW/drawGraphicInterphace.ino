@@ -1,5 +1,3 @@
-#define mainMenuTextSize 2
-
 void graphics() {
   setTextColor(COLOR_MENU_TEXT);
   if (!page) {
@@ -28,21 +26,6 @@ void graphics() {
         drawCentreString(words[i], width_select + (tft.width() - width_select) / 2, ypos, textFontSize);
       }
       switch (page) {
-        case mainMenuPage:
-          switch (i) {
-            case gestationGraphicPosition:
-              drawRightString(initialSensorsValue, gestationWeeksXPos, ypos, textFontSize);
-              break;
-            case LEDGraphicPosition:
-              if (jaundiceEnable) {
-                drawRightString("ON", unitPosition, ypos, textFontSize);
-              }
-              else {
-                drawRightString("OFF", unitPosition, ypos, textFontSize);
-              }
-              break;
-          }
-          break;
         case advancedModePage:
           switch (i) {
             case controlModeGraphicPosition:
@@ -182,10 +165,6 @@ void graphics() {
 
 void setSensorsGraphicPosition() {
   switch (page) {
-    case mainMenuPage:
-      gestationWeeksXPos = tft.width() - letter_width;
-      LEDXPos = tft.width() - letter_width * 2;
-      break;
     case advancedModePage:
       humidityX = tft.width() - 50;
       humidityY = graphicHeight(humidityGraphicPosition);
@@ -215,7 +194,7 @@ void setSensorsGraphicPosition() {
 
 void drawHeading() {
   tft.fillRect(0, 0, tft.width(), height_heading, COLOR_HEADING);
-  if (page != mainMenuPage && page != askSuccessPage && page != advancedModePage) {
+  if (page != advancedModePage) {
     drawBack();
   }
   setTextColor(COLOR_MENU);
@@ -232,10 +211,6 @@ void updateBar() {
   for (int i = 2; i <= rectangles; i++) {
     tft.fillRect(0, (tft.height() - height_heading) * (i - 1) / rectangles + height_heading - 1, tft.height(), width_indentation, WHITE); //mejorable
   }
-}
-
-void clearmainMenu() {
-  tft.fillRect(0, height_heading, tft.width(), tft.height() - height_heading, BLACK);
 }
 
 void drawBack() {

@@ -3,7 +3,7 @@
 */
 
 //Firmware version and head title of UI screen
-#define FWversion "v7.0"
+#define FWversion "v7.1"
 String serialNumber = "in3000042";
 #define headingTitle "in3ator"
 
@@ -31,7 +31,6 @@ String serialNumber = "in3000042";
 #include "ESP32TimerInterrupt.h"
 
 #define WDT_TIMEOUT 15
-
 
 #define ON true
 #define OFF false
@@ -78,15 +77,13 @@ long lastDebugUpdate;
 long loopCounts;
 //pages number in UI. Configuration and information will be displayed depending on the page number
 int page;
-#define mainMenuPage 1
-#define advancedModePage 2
-#define actuatorsProgressPage 3
-#define settingsPage 4
-#define calibrateSensorsPage 5
-#define askSuccessPage 6
-#define errorPage 7
-#define firstPointCalibrationPage 8
-#define secondPointCalibrationPage 9
+#define advancedModePage 1
+#define actuatorsProgressPage 2
+#define settingsPage 3
+#define calibrateSensorsPage 4
+#define errorPage 5
+#define firstPointCalibrationPage 6
+#define secondPointCalibrationPage 7
 
 //languages numbers that will be called in language variable
 byte language;
@@ -290,7 +287,7 @@ bool selected;
 char* textToWrite;
 char* words[8];
 char* helpMessage;
-byte bar_pos;
+byte bar_pos=true;
 byte rectangles;
 byte length;
 long lastGraphicSensorsUpdate;
@@ -335,11 +332,6 @@ byte goToProcessRow;
 //2p calibration
 #define temperatureCalibrationGraphicPosition 0
 #define setCalibrationGraphicPosition 1
-
-//askSuccess
-#define successQuestionGraphicPosition 0
-#define afirmativeGraphicPosition 1
-#define negativeGraphicPosition 2
 
 //color options
 #define BLACK 0x0000
@@ -395,5 +387,6 @@ void setup() {
 }
 
 void loop() {
-
+  barSelection();
+  updateData();
 }

@@ -48,11 +48,12 @@ void settings() {
       break;
   }
   rectangles = numWords;
+  ypos = (tft.height() - height_heading) / (2 * rectangles) + letter_height;
+  bar_pos = true;
   graphics();
   drawHeading();
   while (!GPIORead(ENC_SWITCH)) {
     updateData();
   }
   delay(debounceTime);
-  barSelection();
 }

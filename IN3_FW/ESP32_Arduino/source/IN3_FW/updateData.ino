@@ -43,7 +43,7 @@ int updateData() {
     }
     lastGraphicSensorsUpdate = millis();
   }
-  if ((page == mainMenuPage || page == advancedModePage) && !enableSet) {
+  if ((page == advancedModePage) && !enableSet) {
     checkSetMessage();
   }
 }
