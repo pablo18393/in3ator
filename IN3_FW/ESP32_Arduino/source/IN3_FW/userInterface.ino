@@ -401,18 +401,23 @@ bool userInterfaceHandler() {
             }
             break;
           case setCalibrationGraphicPosition:
-            for (int i = 0; i < numTempSensors; i++) {
-              temperatureCalibrationFactor [i] = (errorTemperature[i] - (temperature [i] - diffTemperature)) / (temperatureCalibrationPoint - diffTemperature);
-              temperatureCalibrationOffset [i] = -temperatureCalibrationFactor [i] * diffTemperature + (temperature [i] - diffTemperature);
-              Serial.println("calibration factors: " + String(temperatureCalibrationFactor [i]) + "x +" + String (temperatureCalibrationOffset [i]));
+            if (temperatureCalibrationPoint != diffTemperature) {
+              for (int i = 0; i < numTempSensors; i++) {
+                temperatureCalibrationFactor [i] = (errorTemperature[i] - (temperature [i] - diffTemperature)) / (temperatureCalibrationPoint - diffTemperature);
+                temperatureCalibrationOffset [i] = -temperatureCalibrationFactor [i] * diffTemperature + (temperature [i] - diffTemperature);
+                Serial.println("calibration factors: " + String(temperatureCalibrationFactor [i]) + "x +" + String (temperatureCalibrationOffset [i]));
+              }
+              EEPROM.writeFloat(EEPROM_errorSkinTemperatureFactor, temperatureCalibrationFactor[babyNTC]);
+              EEPROM.writeFloat(EEPROM_errorSkinTemperatureOffset, temperatureCalibrationOffset[babyNTC]);
+              EEPROM.writeFloat(EEPROM_errorAirTemperatureFactor, temperatureCalibrationFactor[airNTC]);
+              EEPROM.writeFloat(EEPROM_errorAirTemperatureOffset, temperatureCalibrationOffset[airNTC]);
+              EEPROM.writeFloat(EEPROM_errorDigitalTemperatureFactor, temperatureCalibrationFactor[digitalTempSensor]);
+              EEPROM.writeFloat(EEPROM_errorDigitalTemperatureOffset, temperatureCalibrationOffset[digitalTempSensor]);
+              EEPROM.commit();
             }
-            EEPROM.writeFloat(EEPROM_errorSkinTemperatureFactor, temperatureCalibrationFactor[babyNTC]);
-            EEPROM.writeFloat(EEPROM_errorSkinTemperatureOffset, temperatureCalibrationOffset[babyNTC]);
-            EEPROM.writeFloat(EEPROM_errorAirTemperatureFactor, temperatureCalibrationFactor[airNTC]);
-            EEPROM.writeFloat(EEPROM_errorAirTemperatureOffset, temperatureCalibrationOffset[airNTC]);
-            EEPROM.writeFloat(EEPROM_errorDigitalTemperatureFactor, temperatureCalibrationFactor[digitalTempSensor]);
-            EEPROM.writeFloat(EEPROM_errorDigitalTemperatureOffset, temperatureCalibrationOffset[digitalTempSensor]);
-            EEPROM.commit();
+            else {
+              logln("[CALIBRATION] -> ERROR -> DIVIDE BY ZERO");
+            }
             settings();
             break;
         }
