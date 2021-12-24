@@ -5,7 +5,7 @@ void encSwitchISR() {
     if (statusEncSwitch) {
       encPulseDetected = true;
       buzzerTone(buzzerStandbyToneTimes, buzzerSwitchDuration, buzzerRotaryEncoderTone);
-      lastUserInteraction = millis();
+      lastbacklightHandler = millis();
       if (alarmOnGoing[temperatureAlarm] || alarmOnGoing[humidityAlarm]) {
         resetAlarms();
       }
@@ -18,7 +18,7 @@ void encoderISR() {
   int newPos;
   encoder.tick(); // just call tick() to check the state.
   newPos = encoder.getPosition();
-  lastUserInteraction = millis();
+  lastbacklightHandler = millis();
   EncMove = EncMoveOrientation * int(encoder.getDirection());
   last_encoder_move = newPos;
 }

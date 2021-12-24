@@ -74,8 +74,16 @@ long lastBugSimulation = false;
 #define TOUCH_CS GPIO_EXP_11
 #define TFT_RST GPIO_EXP_13
 
+void initDebug() {
+  Serial.begin(115200);
+  delay(100);
+  logln("in3ator debug uart, version " + String (FWversion) + ", SN: " + String (serialNumber));
+}
+
 void initHardware() {
+  initDebug();
   logln("[HW] -> Initialiting hardware");
+  initEEPROM();
   initI2CBus();
   initGPIOExpander();
   initCurrentSensor();
@@ -110,6 +118,13 @@ void initHardware() {
     }
   }
   buzzerTone(2, buzzerStandbyToneDuration, buzzerStandbyTone);
+  watchdogInit();
+}
+
+void initInterrupts() {
+  attachInterrupt(ENC_SWITCH, encSwitchISR, CHANGE);
+  attachInterrupt(ENC_A, encoderISR, CHANGE);
+  attachInterrupt(ENC_B, encoderISR, CHANGE);
 }
 
 void initI2CBus() {
@@ -211,7 +226,7 @@ void checkTFTHealth() {
     if (!powerMode && !MADCTL && !pixelFormat && !imageFormat && !selfDiag) {
       TFTRestore();
     }
-    lastTFTCheck=millis();
+    lastTFTCheck = millis();
   }
 }
 
@@ -469,7 +484,7 @@ void initBuzzer() {
   GPRSSetPostVariables(NULL, ",Buz:" + String (testCurrent));
 }
 
-void buzzerISR() {
+void buzzerHandler() {
   if (millis() - buzzerTime > buzzerToneTime && buzzerBeeps) {
     buzzerBeeps -= buzzerBuzzing;
     buzzerBuzzing = !buzzerBuzzing;
@@ -477,7 +492,7 @@ void buzzerISR() {
     buzzerTime = millis();
   }
   if (page == actuatorsProgressPage) {
-    buzzerStandbyTime = max(lastUserInteraction, buzzerStandbyTime);
+    buzzerStandbyTime = max(lastbacklightHandler, buzzerStandbyTime);
   }
 }
 

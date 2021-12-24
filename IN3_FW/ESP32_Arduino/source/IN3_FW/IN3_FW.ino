@@ -4,7 +4,7 @@
 
 //Firmware version and head title of UI screen
 #define FWversion "v7.1"
-String serialNumber = "in3000042";
+String serialNumber = "in3000041";
 #define headingTitle "in3ator"
 
 #include <esp_task_wdt.h>
@@ -279,7 +279,7 @@ bool defaultAutoLock = ON; //setting that enables backlight switch OFF after a g
 int time_lock = 16000; //time to lock screen if no user actions
 const byte time_back_draw = 255;
 const byte time_back_wait = 255;
-long lastUserInteraction; //last time there was a encoder movement or pulse
+long lastbacklightHandler; //last time there was a encoder movement or pulse
 long sensorsUpdatePeriod = 4000;
 int blinkTimeON = 1000; //displayed text ON time
 int blinkTimeOFF = 100; //displayed text OFF time
@@ -287,7 +287,7 @@ bool selected;
 char* textToWrite;
 char* words[8];
 char* helpMessage;
-byte bar_pos=true;
+byte bar_pos = true;
 byte rectangles;
 byte length;
 long lastGraphicSensorsUpdate;
@@ -382,11 +382,11 @@ ESP32Timer ITimer0(0);
 int hardwareComponents;
 
 void setup() {
-  initBoard();
+  initHardware();
   advancedMode();
 }
 
 void loop() {
-  barSelection();
+  userInterfaceHandler();
   updateData();
 }

@@ -3,11 +3,10 @@ bool humToggle;
 
 int updateData() {
   loopCounts++;
+  buzzerHandler();
   watchdogReload();
   OTAHandler();
-  sensorsISR();
-  userInteraction();
-  buzzerISR();
+  sensorsHandler();
   GPRS_Handler();
   if (powerAlert) {
     logln("[ALARM] -> maximum power exceeded");
@@ -165,9 +164,9 @@ void GPRSLocalLog() {
   }
 }
 
-void userInteraction() {
+void backlightHandler() {
   if (autoLock) {
-    if (millis() - lastUserInteraction > time_lock) {
+    if (millis() - lastbacklightHandler > time_lock) {
       if (ScreenBacklightMode != BL_POWERSAVE) {
         ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, backlightPowerSafe);
         ScreenBacklightMode = BL_POWERSAVE;

@@ -1,5 +1,5 @@
 
-void sensorsISR() {
+void sensorsHandler() {
   if (float(micros() - lastNTCmeasurement) / 1000 > float(NTCMeasurementPeriod / temperature_filter)) {
     lastNTCmeasurement = micros();
     measurenumNTC();

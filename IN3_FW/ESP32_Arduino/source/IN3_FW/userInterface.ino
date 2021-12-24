@@ -1,5 +1,6 @@
 
-void barSelection() {
+bool userInterfaceHandler() {
+  backlightHandler();
   if (EncMove) {
     if (!selected) {
       if (EncMove < 0) {
@@ -40,9 +41,13 @@ void barSelection() {
     }
     while (!GPIORead(ENC_SWITCH)) {
       updateData();
-      checkEncoderPress();
+      if (checkEncoderPress()) {
+        return true;
+      }
       if (page != advancedModePage) {
-        back_mode();
+        if (back_mode()) {
+          return true;
+        }
       }
     }
     delay(debounceTime);
@@ -426,7 +431,7 @@ void barSelection() {
   }
 }
 
-void checkEncoderPress() {
+bool checkEncoderPress() {
   updateData();
   if (page == advancedModePage) {
     long timePressed = millis();
@@ -434,9 +439,11 @@ void checkEncoderPress() {
       updateData();
       if (millis() - timePressed > timePressToSettings) {
         settings();
+        return (true);
       }
     }
   }
+  return false;
 }
 
 int getYpos(byte row) {
