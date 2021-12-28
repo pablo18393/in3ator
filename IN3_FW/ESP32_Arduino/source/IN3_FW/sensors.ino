@@ -141,8 +141,11 @@ void updateTemp(byte sensor) {
     vm = (vcc) * ( temperatureMean / maxADCvalue );          //Calcular tensión en la entrada
     rntc = rAux / ((vcc / vm) - 1);                   //Calcular la resistencia de la NTC
     temperature[i] = beta / (log(rntc / r0) + (beta / temp0)) - 273; //Calcular la temperatura en Celsius
-
-    temperature[i] -= temperature[i] * temperatureCalibrationFactor [i] + temperatureCalibrationOffset [i];
+    errorTemperature[i] = temperature[i];
+    if (RawTemperatureRange[i]) {
+      temperature[i] = (((temperature[i] - RawTemperatureLow[i]) * ReferenceTemperatureRange) / RawTemperatureRange[i]) + ReferenceTemperatureLow;
+    }
+    errorTemperature[i] -= temperature[i];
 
     if (temperature[i] > temperatureMax[i]) {
       temperatureMax[i] = temperature[i];

@@ -11,13 +11,16 @@
 #define EEPROM_controlMode 70
 #define EEPROM_alarmsEnable 80
 #define EEPROM_diffHumidity 90
-#define EEPROM_errorSkinTemperatureFactor 100
-#define EEPROM_errorSkinTemperatureOffset 110
-#define EEPROM_errorAirTemperatureFactor 120
-#define EEPROM_errorAirTemperatureOffset 130
-#define EEPROM_errorDigitalTemperatureFactor 140
-#define EEPROM_errorDigitalTemperatureOffset 150
+#define EEPROM_RawSkinTemperatureLowCorrection 100
+#define EEPROM_RawSkinTemperatureRangeCorrection 110
+#define EEPROM_RawAirTemperatureLowCorrection 120
+#define EEPROM_RawAirTemperatureRangeCorrection 130
+#define EEPROM_RawDigitalTemperatureLowCorrection 140
+#define EEPROM_RawDigitalTemperatureRangeCorrection 150
 #define EEPROM_controlAlgorithm 160
+#define EEPROM_ReferenceTemperatureRange 170
+#define EEPROM_ReferenceTemperatureLow 180
+
 
 
 bool firstTurnOn;
@@ -78,20 +81,22 @@ void recapVariables() {
   autoLock = EEPROM.read(EEPROM_autoLock);
   language = EEPROM.read(EEPROM_language);
 
-  temperatureCalibrationFactor[babyNTC] = EEPROM.readFloat(EEPROM_errorSkinTemperatureFactor);
-  temperatureCalibrationOffset[babyNTC] = EEPROM.readFloat(EEPROM_errorSkinTemperatureOffset);
-  temperatureCalibrationFactor[airNTC] = EEPROM.readFloat(EEPROM_errorAirTemperatureFactor);
-  temperatureCalibrationOffset[airNTC] = EEPROM.readFloat(EEPROM_errorAirTemperatureOffset);
-  temperatureCalibrationFactor[digitalTempSensor] = EEPROM.readFloat(EEPROM_errorDigitalTemperatureFactor);
-  temperatureCalibrationOffset[digitalTempSensor] = EEPROM.readFloat(EEPROM_errorDigitalTemperatureOffset);
+  RawTemperatureLow[babyNTC] = EEPROM.readFloat(EEPROM_RawSkinTemperatureLowCorrection);
+  RawTemperatureRange[babyNTC] = EEPROM.readFloat(EEPROM_RawSkinTemperatureRangeCorrection);
+  RawTemperatureLow[airNTC] = EEPROM.readFloat(EEPROM_RawAirTemperatureLowCorrection);
+  RawTemperatureRange[airNTC] = EEPROM.readFloat(EEPROM_RawAirTemperatureRangeCorrection);
+  RawTemperatureLow[digitalTempSensor] = EEPROM.readFloat(EEPROM_RawDigitalTemperatureLowCorrection);
+  RawTemperatureRange[digitalTempSensor] = EEPROM.readFloat(EEPROM_RawDigitalTemperatureRangeCorrection);
+  ReferenceTemperatureRange = EEPROM.readFloat(EEPROM_ReferenceTemperatureRange);
+  ReferenceTemperatureLow = EEPROM.readFloat(EEPROM_ReferenceTemperatureLow);
 
   for (int i = 0; i < numTempSensors; i++) {
-    Serial.println("calibration factors: " + String(temperatureCalibrationFactor [i]) + "x +" + String (temperatureCalibrationOffset [i]));
+    Serial.println("calibration factors: " + String(RawTemperatureLow [i]) + "," + String (RawTemperatureRange [i]) + "," + String (ReferenceTemperatureRange) + "," + String (ReferenceTemperatureLow));
   }
 
 
   for (int i = 0; i < numTempSensors; i++) {
-    if (temperatureCalibrationFactor[i] > 100) {
+    if (RawTemperatureLow[i] > 100) {
       //critical error
     }
   }

@@ -71,8 +71,8 @@ float alarmTimeDelay = 30; //in mins, time to check alarm
 #define mosfet_switch_time 100   //delay to wait for mosfet to switch (in millis), oversized
 #define timePressToSettings 5000 //in millis, time to press to go to settings window in UI
 #define debugUpdatePeriod 1000 //in millis, 
-bool WIFI_EN = false;
-bool defaultWIFI_EN = OFF;
+bool WIFI_EN = true;
+bool defaultWIFI_EN = ON;
 long lastDebugUpdate;
 long loopCounts;
 //pages number in UI. Configuration and information will be displayed depending on the page number
@@ -112,7 +112,8 @@ long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
 int NTC_PIN[numNTC] = {BABY_NTC_PIN, AIR_NTC_PIN};
 double temperature[numTempSensors];
 double errorTemperature[numTempSensors], temperatureCalibrationPoint;
-double temperatureCalibrationFactor[numTempSensors], temperatureCalibrationOffset[numTempSensors];
+double ReferenceTemperatureRange, ReferenceTemperatureLow;
+double RawTemperatureLow[numTempSensors], RawTemperatureRange[numTempSensors];
 double temperatureMaxReset = -1000;
 double temperatureMinReset = 1000;
 double temperatureMax[numTempSensors], temperatureMin[numTempSensors];
