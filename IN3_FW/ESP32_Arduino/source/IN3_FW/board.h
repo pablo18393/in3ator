@@ -8,52 +8,23 @@
 
 #ifdef v6Board
 
-#define GPIO_EXP_BASE 100 //To differentiate with ESP32 GPIO
-#define GPIO_EXP_0 0 + GPIO_EXP_BASE
-#define GPIO_EXP_1 1 + GPIO_EXP_BASE
-#define GPIO_EXP_2 2 + GPIO_EXP_BASE
-#define GPIO_EXP_3 3 + GPIO_EXP_BASE
-#define GPIO_EXP_4 4 + GPIO_EXP_BASE
-#define GPIO_EXP_5 5 + GPIO_EXP_BASE
-#define GPIO_EXP_6 6 + GPIO_EXP_BASE
-#define GPIO_EXP_7 7 + GPIO_EXP_BASE
-#define GPIO_EXP_8 8 + GPIO_EXP_BASE
-#define GPIO_EXP_9 9 + GPIO_EXP_BASE
-#define GPIO_EXP_10 10 + GPIO_EXP_BASE
-#define GPIO_EXP_11 11 + GPIO_EXP_BASE
-#define GPIO_EXP_12 12 + GPIO_EXP_BASE
-#define GPIO_EXP_13 13 + GPIO_EXP_BASE
-#define GPIO_EXP_14 14 + GPIO_EXP_BASE
-#define GPIO_EXP_15 15 + GPIO_EXP_BASE
-
-#define UNUSED_GPIO_EXP0 GPIO_EXP_5
-#define UNUSED_GPIO_EXP1 GPIO_EXP_12
-#define UNUSED_GPIO_EXP2 GPIO_EXP_14
-#define UNUSED_GPIO_EXP3 GPIO_EXP_15
-
-
-#define TFT_DC 4
+#define TFT_DC 0
+#define POWER_EN 2
+#define ADC_READY 3
 #define BUZZER 5
+#define FAN 12
+#define PHOTOTHERAPY 13
+#define HUMIDIFIER 14
+#define TFT_CS 15
 #define ENC_A 25
-#define ENC_SWITCH 26
+#define GPRS_PWRKEY 26
 #define HEATER 27
 #define ENC_B 32
 #define SCREENBACKLIGHT 33
 #define BABY_NTC_PIN 34
 #define AIR_NTC_PIN 35
+#define ENC_SWITCH 39
 #define SYSTEM_SHUNT 36
-
-#define POWER_EN GPIO_EXP_0
-#define GPRS_EN GPIO_EXP_1
-#define SD_CS GPIO_EXP_2
-#define FAN GPIO_EXP_3
-#define HUMIDIFIER GPIO_EXP_6
-#define PHOTOTHERAPY GPIO_EXP_7
-#define GPRS_PWRKEY GPIO_EXP_8
-#define TFT_CS GPIO_EXP_9
-#define TOUCH_IRQ GPIO_EXP_10
-#define TOUCH_CS GPIO_EXP_11
-#define TFT_RST GPIO_EXP_13
 
 #endif
 

@@ -3,7 +3,7 @@
 */
 
 //Firmware version and head title of UI screen
-#define FWversion "v7.3"
+#define FWversion "v8.1"
 String serialNumber = "in3000041";
 #define headingTitle "in3ator"
 

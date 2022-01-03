@@ -62,18 +62,6 @@ bool GPIOexpanderStatus[16];
 long lastTCAWrite[16];
 long lastBugSimulation = false;
 
-#define POWER_EN GPIO_EXP_0
-#define GPRS_EN GPIO_EXP_1
-#define SD_CS GPIO_EXP_2
-#define FAN GPIO_EXP_3
-#define HUMIDIFIER GPIO_EXP_6
-#define PHOTOTHERAPY GPIO_EXP_7
-#define GPRS_PWRKEY GPIO_EXP_8
-#define TFT_CS GPIO_EXP_9
-#define TOUCH_IRQ GPIO_EXP_10
-#define TOUCH_CS GPIO_EXP_11
-#define TFT_RST GPIO_EXP_13
-
 void initDebug() {
   Serial.begin(115200);
   delay(100);
@@ -234,9 +222,6 @@ void TCARestore() {
   logln("[HW] -> restoring TCA9355 previous status");
   while (!TCA.begin());
 
-  initPin(POWER_EN, OUTPUT);
-  initPin(GPRS_EN, OUTPUT);
-  initPin(SD_CS, INPUT);
   initPin(FAN, OUTPUT);
   initPin(HUMIDIFIER, OUTPUT);
   initPin(PHOTOTHERAPY, OUTPUT);
@@ -381,15 +366,8 @@ void initTFT() {
   backlightPower = maxPWMvalue / screenBrightnessFactor;
   backlightPowerSafe = maxPWMvalue * backlightPowerSafePercentage;
   offsetCurrent = measureConsumptionForTime(testTime);
-  initPin(TOUCH_CS, OUTPUT);
-  initPin(SD_CS, OUTPUT);
   initPin(TFT_CS, OUTPUT);
-  initPin(TFT_RST, OUTPUT);
-  GPIOWrite(TOUCH_CS, HIGH);
-  GPIOWrite(SD_CS, HIGH);
   GPIOWrite(TFT_CS, LOW);
-  GPIOWrite(TFT_RST, LOW);  // alternating HIGH/LOW
-  GPIOWrite(TFT_RST, HIGH);  // alternating HIGH/LOW
   tft.begin();
   tft.setRotation(3);
   loadlogo();
@@ -418,17 +396,8 @@ void initTFT() {
 
 void TFTRestore() {
   logln("[HW] -> restoring TFT previous status");
-  initPin(TOUCH_CS, OUTPUT);
-  initPin(SD_CS, OUTPUT);
   initPin(TFT_CS, OUTPUT);
-  initPin(TFT_RST, OUTPUT);
-  initPin(TOUCH_IRQ, INPUT);
-  initPin(TOUCH_CS, INPUT);
-  GPIOWrite(TOUCH_CS, HIGH);
-  GPIOWrite(SD_CS, HIGH);
   GPIOWrite(TFT_CS, LOW);
-  GPIOWrite(TFT_RST, LOW);  // alternating HIGH/LOW
-  GPIOWrite(TFT_RST, HIGH);  // alternating HIGH/LOW
   tft.begin();
   tft.setRotation(3);
   switch (page) {
@@ -519,8 +488,6 @@ void initPowerEn() {
   logln("[HW] -> Checking power enable circuit...");
   initPin(POWER_EN, OUTPUT);
   GPIOWrite(POWER_EN, HIGH);
-  initPin(GPRS_EN, OUTPUT);
-  GPIOWrite(GPRS_EN, HIGH);
 
   testCurrent = measureConsumptionForTime(testTime) - offsetCurrent;
   if (testCurrent > STANDBY_CONSUMPTION_MAX) {
