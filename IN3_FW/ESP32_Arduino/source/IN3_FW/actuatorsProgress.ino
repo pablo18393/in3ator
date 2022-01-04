@@ -162,7 +162,6 @@ void actuatorsProgress() {
       }
     }
     if (controlHumidity) {
-      checkTCAHealth();
       checkTFTHealth();
       if (controlAlgorithm == BASIC_CONTROL) {
         basicHumidityControl();

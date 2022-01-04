@@ -73,7 +73,6 @@ void initHardware() {
   logln("[HW] -> Initialiting hardware");
   initEEPROM();
   initI2CBus();
-  initGPIOExpander();
   initCurrentSensor();
   initPin(PHOTOTHERAPY, OUTPUT);
   GPIOWrite(PHOTOTHERAPY, HIGH);
@@ -140,66 +139,12 @@ void initPWMGPIO() {
   ledcWrite(BUZZER_PWM_CHANNEL, false);
 }
 
-void initGPIOExpander() {
-  logln("[HW] -> Initialiting TCA9355");
-  TCA.begin();
-  for (int pin = 0; pin < 16; pin++)
-  {
-    TCA.setPolarity(pin, false);
-    GPIOexpanderStatus[pin] = false;
-  }
-  initPin(UNUSED_GPIO_EXP0, OUTPUT);
-  initPin(UNUSED_GPIO_EXP1, OUTPUT);
-  initPin(UNUSED_GPIO_EXP2, OUTPUT);
-  initPin(UNUSED_GPIO_EXP3, OUTPUT);
-  GPIOWrite(UNUSED_GPIO_EXP0, HIGH);
-  GPIOWrite(UNUSED_GPIO_EXP1, HIGH);
-  GPIOWrite(UNUSED_GPIO_EXP2, HIGH);
-  GPIOWrite(UNUSED_GPIO_EXP3, HIGH);
-}
-
 void initPin(uint8_t GPIO, uint8_t Mode) {
-  if (GPIO < GPIO_EXP_BASE) {
     pinMode(GPIO, Mode);
-  }
-  else {
-    TCA.pinMode(GPIO - GPIO_EXP_BASE, Mode);
-  }
 }
 
 void initPowerAlarm() {
 
-}
-
-bool checkTCAHealth() {
-  bool restart = false;
-  if (millis() - lastTCACheck > TCACheckPeriod) {
-    for (int pin = 0; pin < 16; pin++)
-    {
-      if (GPIOexpanderPinToCheck[pin]) {
-        int val = TCA.digitalRead(pin);
-        Serial.println("Checking EXT GPIO: " + String(pin) + "->" + String (val) + String(GPIOexpanderStatus[pin]) + ", polarity: " + String(TCA.getPolarity(pin)));
-        if (GPIOexpanderStatus[pin] != val) {
-          logln("[HW] -> TCA9355 pin " + String(pin) +  " CHANGED RANDOMLY FROM " + String(GPIOexpanderStatus[pin]) + " TO " + String(val));
-          restart = true;
-        }
-        delay(5);
-      }
-      lastTCACheck = millis();
-    }
-    if (restart) {
-      TCARestore();
-    }
-    /*
-      if (millis() - lastBugSimulation > 10 * TCACheckPeriod) {
-      logln("[DEBUG] -> FAKING TCA ERROR");
-      // read diagnostics (optional but can help debug problems)
-      TCA.digitalWrite(7, HIGH);
-      TCA.digitalWrite(9, HIGH);
-      lastBugSimulation = millis();
-      }
-    */
-  }
 }
 
 void checkTFTHealth() {
@@ -218,46 +163,12 @@ void checkTFTHealth() {
   }
 }
 
-void TCARestore() {
-  logln("[HW] -> restoring TCA9355 previous status");
-  while (!TCA.begin());
-
-  initPin(FAN, OUTPUT);
-  initPin(HUMIDIFIER, OUTPUT);
-  initPin(PHOTOTHERAPY, OUTPUT);
-
-  for (int pin = 0; pin < 16; pin++)
-  {
-    if (GPIOexpanderPinToCheck[pin]) {
-      TCA.setPolarity(pin, false);
-      GPIOWrite(GPIO_EXP_BASE + pin, GPIOexpanderStatus[pin]);
-    }
-  }
-}
-
 void GPIOWrite(uint8_t GPIO, uint8_t Mode) {
-  if (GPIO < GPIO_EXP_BASE) {
     digitalWrite(GPIO, Mode);
-  }
-  else {
-    logln("[HW] -> TCA9355 writing pin" + String(GPIO - GPIO_EXP_BASE) + " -> " + String(Mode));
-    GPIOexpanderStatus[GPIO - GPIO_EXP_BASE] = Mode;
-    if (!TCA.digitalWrite(GPIO - GPIO_EXP_BASE, Mode)) {
-      logln("[HW] -> TCA9355 WRITE ERROR");
-    }
-    lastTCAWrite[GPIO - GPIO_EXP_BASE] = millis();
-    delay(5);
-    //TCA.digitalWrite(GPIO - GPIO_EXP_BASE, Mode);
-  }
 }
 
 bool GPIORead(uint8_t GPIO) {
-  if (GPIO < GPIO_EXP_BASE) {
     return (digitalRead(GPIO));
-  }
-  else {
-    return (TCA.digitalRead(GPIO - GPIO_EXP_BASE));
-  }
 }
 
 void initGPRS()

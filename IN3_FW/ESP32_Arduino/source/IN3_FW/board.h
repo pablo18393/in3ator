@@ -4,8 +4,7 @@
 //#define maplemini
 
 //Hardware
-#define SDCard 0
-
+#define SDCard false
 #ifdef v6Board
 
 #define TFT_DC 0
@@ -36,7 +35,7 @@
 
 #define maxADCvalue 4095
 #define maxDACvalue 4095         //for STM32F103RE with arduino IDE
-int maxPWMvalue = pow(2,PWM_RESOLUTION) - 1;
+int maxPWMvalue = pow(2, PWM_RESOLUTION) - 1;
 
 #define BL_NORMAL 0
 #define BL_POWERSAVE 1
@@ -47,7 +46,7 @@ int maxPWMvalue = pow(2,PWM_RESOLUTION) - 1;
 int ScreenBacklightMode;
 float backlightPower;
 float backlightPowerSafe;
-float backlightPowerSafePercentage=0.98; //2% screen bright
+float backlightPowerSafePercentage = 0.98; //2% screen bright
 
 int heaterMaxPWM = maxPWMvalue;
 int buzzerMaxPWM = maxPWMvalue;
