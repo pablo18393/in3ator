@@ -53,14 +53,9 @@
 #define DEFECTIVE_CURRENT_SENSOR 1<<19
 
 #define HW_TEST_OVERRIDE true
-#define TCACheckPeriod 10000
 #define TFTCheckPeriod 10000
 long HW_error = false;
-long lastTCACheck, lastTFTCheck;
-bool GPIOexpanderPinToCheck[16] = {1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0};
-bool GPIOexpanderStatus[16];
-long lastTCAWrite[16];
-long lastBugSimulation = false;
+long lastTFTCheck;
 
 void initDebug() {
   Serial.begin(115200);
@@ -74,6 +69,7 @@ void initHardware() {
   initEEPROM();
   initI2CBus();
   initCurrentSensor();
+  initExternalADC();
   initPin(PHOTOTHERAPY, OUTPUT);
   GPIOWrite(PHOTOTHERAPY, HIGH);
   initSensors();
@@ -119,12 +115,69 @@ void initI2CBus() {
 }
 
 void initCurrentSensor() {
-  if (DIGITAL_CURRENT_SENSOR) {
+  digitalCurrentSensorPresent = false;
+  Wire.beginTransmission(digitalCurrentSensor_i2c_address);
+  if (!Wire.endTransmission()) {
+    digitalCurrentSensorPresent = true;
+    temperature_filter = digital_temperature_filter;
     PAC.begin();
+    PAC.setSampleRate(1024);
     PAC.UpdateCurrent();
+    logln("[HW] -> digital sensor detected, current consumption is " + String(float(PAC.Current / 1000), 2) + " Amperes");
   }
 }
 
+void initExternalADC() {
+  externalADCpresent = false;
+  long conversionTime;
+  Wire.beginTransmission(digitalCurrentSensor_i2c_address);
+  if (!Wire.endTransmission()) {
+    logln("[HW] -> external ADC detected");
+    externalADCpresent = true;
+    mySensor.begin(externalADC_i2c_address);
+    mySensor.setInputMultiplexer(ADS122C04_MUX_AIN0_AVSS); // Route AIN1 and AIN0 to AINP and AINN
+    mySensor.setGain(ADS122C04_GAIN_1); // Set the gain to 1
+    mySensor.enablePGA(ADS122C04_PGA_DISABLED); // Disable the Programmable Gain Amplifier
+    mySensor.setDataRate(ADS122C04_DATA_RATE_1000SPS); // Set the data rate (samples per second) to 1000
+    mySensor.setOperatingMode(ADS122C04_OP_MODE_NORMAL); // Disable turbo mode
+    mySensor.setConversionMode(ADS122C04_CONVERSION_MODE_CONTINUOUS); // Use single shot mode
+    mySensor.setVoltageReference(ADS122C04_VREF_INTERNAL); // Use the internal 2.048V reference
+    mySensor.enableInternalTempSensor(ADS122C04_TEMP_SENSOR_OFF); // Disable the temperature sensor
+    mySensor.setDataCounter(ADS122C04_DCNT_DISABLE); // Disable the data counter (Note: the library does not currently support the data count)
+    mySensor.setDataIntegrityCheck(ADS122C04_CRC_DISABLED); // Disable CRC checking (Note: the library does not currently support data integrity checking)
+    mySensor.setBurnOutCurrent(ADS122C04_BURN_OUT_CURRENT_OFF); // Disable the burn-out current
+    mySensor.setIDACcurrent(ADS122C04_IDAC_CURRENT_OFF); // Disable the IDAC current
+    mySensor.setIDAC1mux(ADS122C04_IDAC1_DISABLED); // Disable IDAC1
+    mySensor.setIDAC2mux(ADS122C04_IDAC2_DISABLED); // Disable IDAC2
+  }
+  conversionTime = micros();
+  mySensor.start(); // Start the conversion
+  while (!mySensor.checkDataReady()) {
+    delayMicroseconds(10);
+  }
+  logln("[HW] -> Baby NTC voltage is: " + String(float(mySensor.readADC()) / 4096000, 4) + ", conversion made in " + String(micros() - conversionTime) + " us");
+  conversionTime = micros();
+  mySensor.setInputMultiplexer(ADS122C04_MUX_AIN1_AVSS); // Route AIN1 and AIN0 to AINP and AINN
+  mySensor.start(); // Start the conversion
+  while (!mySensor.checkDataReady()) {
+    delayMicroseconds(10);
+  }
+  logln("[HW] -> Air NTC voltage is: " + String(float(mySensor.readADC()) / 4096000, 4) + ", conversion made in " + String(micros() - conversionTime) + " us");
+  conversionTime = micros();
+  mySensor.setInputMultiplexer(ADS122C04_MUX_AIN2_AVSS); // Route AIN1 and AIN0 to AINP and AINN
+  mySensor.start(); // Start the conversion
+  while (!mySensor.checkDataReady()) {
+    delayMicroseconds(10);
+  }
+  logln("[HW] -> Vin voltage is: " + String(float(mySensor.readADC()) / 4096000, 4) + ", conversion made in " + String(micros() - conversionTime) + " us");
+  conversionTime = micros();
+  mySensor.setInputMultiplexer(ADS122C04_MUX_AIN3_AVSS); // Route AIN1 and AIN0 to AINP and AINN
+  mySensor.start(); // Start the conversion
+  while (!mySensor.checkDataReady()) {
+    delayMicroseconds(10);
+  }
+  logln("[HW] -> System current voltage is: " + String(float(mySensor.readADC()) / 4096000, 4) + ", conversion made in " + String(micros() - conversionTime) + " us");
+}
 void initPWMGPIO() {
   ledcSetup(SCREENBACKLIGHT_PWM_CHANNEL, PWM_FREQUENCY, PWM_RESOLUTION);
   ledcSetup(HEATER_PWM_CHANNEL, PWM_FREQUENCY, PWM_RESOLUTION);
@@ -140,7 +193,7 @@ void initPWMGPIO() {
 }
 
 void initPin(uint8_t GPIO, uint8_t Mode) {
-    pinMode(GPIO, Mode);
+  pinMode(GPIO, Mode);
 }
 
 void initPowerAlarm() {
@@ -149,7 +202,6 @@ void initPowerAlarm() {
 
 void checkTFTHealth() {
   if (millis() - lastTFTCheck > TFTCheckPeriod) {
-    tft.setRotation(3);
     uint8_t powerMode = tft.readcommand8(ILI9341_RDMODE);
     uint8_t MADCTL = tft.readcommand8(ILI9341_RDMADCTL);
     uint8_t pixelFormat = tft.readcommand8(ILI9341_RDPIXFMT);
@@ -164,11 +216,11 @@ void checkTFTHealth() {
 }
 
 void GPIOWrite(uint8_t GPIO, uint8_t Mode) {
-    digitalWrite(GPIO, Mode);
+  digitalWrite(GPIO, Mode);
 }
 
 bool GPIORead(uint8_t GPIO) {
-    return (digitalRead(GPIO));
+  return (digitalRead(GPIO));
 }
 
 void initGPRS()
@@ -269,6 +321,11 @@ void standByCurrentTest() {
   GPRSSetPostVariables(NULL, ",CT:" + String (testCurrent));
 }
 
+void initializeTFT() {
+  tft.begin(DISPLAY_CONTROLLER_IC);
+  tft.setRotation(DISPLAY_DEFAULT_ROTATION);
+}
+
 void initTFT() {
   long error = HW_error;
   float testCurrent, offsetCurrent;
@@ -279,8 +336,7 @@ void initTFT() {
   offsetCurrent = measureConsumptionForTime(testTime);
   initPin(TFT_CS, OUTPUT);
   GPIOWrite(TFT_CS, LOW);
-  tft.begin();
-  tft.setRotation(3);
+  initializeTFT();
   loadlogo();
   ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, maxPWMvalue);
   for (int i = maxPWMvalue; i >= backlightPower; i--) {
@@ -309,8 +365,7 @@ void TFTRestore() {
   logln("[HW] -> restoring TFT previous status");
   initPin(TFT_CS, OUTPUT);
   GPIOWrite(TFT_CS, LOW);
-  tft.begin();
-  tft.setRotation(3);
+  initializeTFT();
   switch (page) {
     case actuatorsProgressPage:
       actuatorsProgress();
@@ -331,14 +386,6 @@ void initActuators() {
 }
 
 void initHeater() {
-
-}
-
-void configheaterTimer(int freq) {
-
-}
-
-void configbuzzerTimer(int freq) {
 
 }
 
@@ -377,7 +424,6 @@ void buzzerHandler() {
 }
 
 void buzzerConstantTone (int freq) {
-  configbuzzerTimer(freq);
   ledcWrite(BUZZER_PWM_CHANNEL, buzzerMaxPWM / 2);
 }
 
@@ -386,7 +432,6 @@ void shutBuzzer () {
 }
 
 void buzzerTone (int beepTimes, int timeDelay, int freq) {
-  configbuzzerTimer(freq);
   buzzerBeeps += beepTimes;
   buzzerToneTime = timeDelay;
 }

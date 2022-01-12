@@ -193,6 +193,10 @@ void actuatorsProgress() {
     while (!GPIORead(ENC_SWITCH)) {
       updateData();
       exitActuation = back_mode();
+      if (exitActuation) {
+        Serial.println("exiting.......................");
+        stopActuation();
+      }
     }
     blinkGoBackMessage();
   }
@@ -247,9 +251,16 @@ void heatUp() {
   ledcWrite(HEATER_PWM_CHANNEL, heaterMaxPWM * HeaterPower / 100);
 }
 
+void stopActuation() {
+  stopTemperaturePID();
+  stopHumidityPID();
+  turnActuators(OFF);
+}
+
 void turnActuators(bool mode) {
   ledcWrite(HEATER_PWM_CHANNEL, mode * heaterMaxPWM * HeaterPower / 100 );
   GPIOWrite(HUMIDIFIER, mode);
+  turnFans(mode);
 }
 
 void turnFans(bool mode) {

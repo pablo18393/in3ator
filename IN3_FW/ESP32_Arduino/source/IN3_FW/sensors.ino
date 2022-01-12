@@ -58,26 +58,30 @@ float ADCScale (float var) {
 }
 
 float measureInstantConsumption() {
-  if (DIGITAL_CURRENT_SENSOR) {
-    if (PAC.UpdateCurrent()) {
-      Serial.println("[SENSORS] -> Current sensing returned zero");
-      return (PAC.Current / 1000); //Amperes
-    }
+  if (digitalCurrentSensorPresent) {
+    PAC.UpdateCurrent();
+    return (PAC.Current / 1000); //Amperes
   }
-  if (ANALOG_CURRENT_SENSOR) {
+  else {
     return (analogRead(SYSTEM_SHUNT));
   }
 }
 
+long ADCmeasurements;
+long sensorMeasurements;
+
+
 float measureMeanConsumption() {
   float currentMean;
-  if (DIGITAL_CURRENT_SENSOR) {
-    if (PAC.UpdateCurrent()) {
-      Serial.println("[SENSORS] -> Current sensing returned zero");
+  if (digitalCurrentSensorPresent) {
+    if (millis() - lastDigitalCurrentSensorRead > digitalCurrentSensorReadPeriod) {
+      lastDigitalCurrentSensorRead = millis();
+      sensorMeasurements++;
+      PAC.UpdateCurrent();
       return (PAC.Current / 1000); //Amperes
     }
   }
-  if (ANALOG_CURRENT_SENSOR) {
+  else {
     for (int i = 0; i < instantCurrent_array_pos; i++) {
       currentMean += instantCurrent[i];
       instantCurrent[i] = 0;
@@ -86,13 +90,42 @@ float measureMeanConsumption() {
     currentMean *= CurrentToAmpFactor;
     return (currentMean);
   }
+  return (false);
 }
-
 bool measurenumNTC() {
-  for (int i = false; i < numNTC; i++) {
-    temperatureArray[i][temperature_array_pos] = analogRead(NTC_PIN[i]);
+  float analogMeasurement;
+  unsigned long start_time = millis(); // Record the start time so we can timeout
+  if (externalADCpresent) {
+    if (millis() - lastexternalADCRead > externalADCReadPeriod) {
+      lastexternalADCRead=millis();
+      ADCmeasurements++;
+      if (mySensor.checkDataReady()) {
+        analogMeasurement = mySensor.readADC() / 3300;
+        switch (mySensor.getInputMultiplexer()) {
+          case ADS122C04_MUX_AIN0_AVSS:
+            temperatureArray[babyNTC][temperature_array_pos] = analogMeasurement;
+            mySensor.setInputMultiplexer(ADS122C04_MUX_AIN1_AVSS);
+            break;
+          case ADS122C04_MUX_AIN1_AVSS:
+            temperatureArray[airNTC][temperature_array_pos] = analogMeasurement;
+            mySensor.setInputMultiplexer(ADS122C04_MUX_AIN0_AVSS);
+            temperature_array_pos++;
+            break;
+          default:
+            mySensor.setInputMultiplexer(ADS122C04_MUX_AIN1_AVSS);
+            break;
+        }
+        mySensor.start(); // Start the conversion
+      }
+    }
   }
-  temperature_array_pos++;
+  else {
+    for (int i = false; i < numNTC; i++) {
+      analogMeasurement = analogRead(NTC_PIN[i]);
+      temperatureArray[i][temperature_array_pos] = analogMeasurement;
+    }
+    temperature_array_pos++;
+  }
   if (temperature_array_pos >= temperature_filter) {
     updateTemp(numNTC);
     temperature_array_pos = false;

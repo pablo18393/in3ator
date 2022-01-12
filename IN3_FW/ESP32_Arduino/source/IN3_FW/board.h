@@ -1,11 +1,8 @@
-//Select board
-#define v6Board
-//#define v4Board
-//#define maplemini
-
 //Hardware
 #define SDCard false
-#ifdef v6Board
+
+#define DISPLAY_CONTROLLER_IC ST7789V_CONTROLLER
+#define DISPLAY_DEFAULT_ROTATION 3
 
 #define TFT_DC 0
 #define POWER_EN 2
@@ -25,8 +22,6 @@
 #define ENC_SWITCH 39
 #define SYSTEM_SHUNT 36
 
-#endif
-
 #define SCREENBACKLIGHT_PWM_CHANNEL 0
 #define HEATER_PWM_CHANNEL 1
 #define BUZZER_PWM_CHANNEL 2
@@ -39,9 +34,6 @@ int maxPWMvalue = pow(2, PWM_RESOLUTION) - 1;
 
 #define BL_NORMAL 0
 #define BL_POWERSAVE 1
-
-#define ANALOG_CURRENT_SENSOR true // analog current sensing circuit is present
-#define DIGITAL_CURRENT_SENSOR false
 
 int ScreenBacklightMode;
 float backlightPower;

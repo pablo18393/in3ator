@@ -23,7 +23,13 @@ int updateData() {
     if (humidityPID.GetMode() == AUTOMATIC) {
       logln("[PID] -> Humidifier output is: " + String (100 * humidityPIDOutput / humidifierTimeCycle) + "%");
     }
-    logln("[SENSORS] -> Current consumption is: " + String (analogRead(SYSTEM_SHUNT)) + "," + String (currentConsumption) + " Amps");
+    
+    //logln("[SENSORS] -> Current consumption is: " + String (analogRead(SYSTEM_SHUNT)) + "," + String (currentConsumption) + " Amps");
+    logln("[DEBUG] -> Current measurements " + String (sensorMeasurements) + " times");
+    logln("[DEBUG] -> ADC measurements " + String (ADCmeasurements) + " times");
+    sensorMeasurements=0;
+    ADCmeasurements=0;
+    logln("[SENSORS] -> Current consumption is: " + String (measureMeanConsumption()) + " Amps");
     logln("[SENSORS] -> Baby temperature: " + String(temperature[babyNTC]) + "ºC, correction error is " + String(errorTemperature[babyNTC]));
     logln("[SENSORS] -> Air temperature: " + String(temperature[airNTC]) + "ºC, correction error is " + String(errorTemperature[airNTC]));
     logln("[SENSORS] -> Floor temperature: " + String(temperature[digitalTempSensor]) + "ºC, correction error is " + String(errorTemperature[digitalTempSensor]));

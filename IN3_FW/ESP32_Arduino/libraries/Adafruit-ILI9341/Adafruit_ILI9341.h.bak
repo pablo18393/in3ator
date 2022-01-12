@@ -147,7 +147,7 @@ public:
   Adafruit_ILI9341(tftBusWidth busWidth, int8_t d0, int8_t wr, int8_t dc,
                    int8_t cs = -1, int8_t rst = -1, int8_t rd = -1);
 
-  void begin(uint32_t freq = 0);
+  void begin(uint32_t freq = 0, uint8_t DISPLAY_CONTROLLER = 0);
   void setRotation(uint8_t r);
   void invertDisplay(bool i);
   void scrollTo(uint16_t y);

@@ -4,7 +4,7 @@
 
 //Firmware version and head title of UI screen
 #define FWversion "v8.1"
-String serialNumber = "in3000041";
+String serialNumber = "in3000045";
 #define headingTitle "in3ator"
 
 #include <esp_task_wdt.h>
@@ -26,9 +26,18 @@ String serialNumber = "in3000041";
 //#include <SD.h>
 #include "SparkFun_SHTC3.h" // Click here to get the library: http://librarymanager/All#SparkFun_SHTC3
 #include <RotaryEncoder.h>
-#include "TCA9555.h"
 #include <Microchip_PAC193x.h>
-#include "ESP32TimerInterrupt.h"
+#include <SparkFun_ADS122C04_ADC_Arduino_Library.h> // Click here to get the library: http://librarymanager/All#SparkFun_ADS122C0
+
+
+Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
+SHTC3 mySHTC3;              // Declare an instance of the SHTC3 class
+RotaryEncoder encoder(ENC_A, ENC_B, RotaryEncoder::LatchMode::TWO03);
+#define Rsense 3000 //3 microohm as shunt resistor
+Microchip_PAC193x PAC(Rsense);
+SFE_ADS122C04 mySensor;
+#define externalADC_i2c_address 64
+#define digitalCurrentSensor_i2c_address 23
 
 #define WDT_TIMEOUT 15
 
@@ -101,8 +110,10 @@ byte language;
 
 #define numNTC 2 //number of NTC
 #define numTempSensors 3 //number of total temperature sensors in system
-#define temperature_filter 4000 //amount of temperature samples to filter
 #define current_filter 100 //amount of temperature samples to filter
+#define analog_temperature_filter 4000 //amount of temperature samples to filter
+#define digital_temperature_filter 10 //amount of temperature samples to filter
+int temperature_filter = analog_temperature_filter; //amount of temperature samples to filter
 
 #define NTCMeasurementPeriod 1000 //in millis
 #define CurrentMeasurementPeriod 2 //in millis
@@ -118,7 +129,7 @@ double temperatureMaxReset = -1000;
 double temperatureMinReset = 1000;
 double temperatureMax[numTempSensors], temperatureMin[numTempSensors];
 double previousTemperature[numTempSensors];
-int temperatureArray [numNTC][temperature_filter]; //variable to handle each NTC with the array of last samples (only for NTC)
+float temperatureArray [numNTC][analog_temperature_filter]; //variable to handle each NTC with the array of last samples (only for NTC)
 int temperature_array_pos; //temperature sensor number turn to measure
 float diffTemperature; //difference between measured temperature and user input real temperature
 bool faultNTC[numNTC]; //variable to control a failure in NTC
@@ -152,15 +163,22 @@ bool WIFI_connection_status = false;
 #define pulsioximeterSensorRaw 3 //transmit raw pulsioximeter signal
 #define aliveRefresh 4 //message to let know that incubator is still ON
 
+#define digitalCurrentSensorReadPeriod 500
+#define externalADCReadPeriod 30
+
 //sensor variables
 bool roomSensorPresent;
+bool externalADCpresent;
+bool digitalCurrentSensorPresent;
+long lastDigitalCurrentSensorRead;
+long lastexternalADCRead;
 byte roomSensorAddress = 112;
 int pulsioximeterMean;
 const int maxPulsioximeterSamples = 320; //(tft width).
 float instantCurrent[current_filter];
 int instantCurrent_array_pos = false;
 float currentConsumption;
-float CurrentToAmpFactor = 0.00045;
+float CurrentToAmpFactor = 0.00255;
 int currentConsumptionPos = false;
 int pulsioximeterSample[maxPulsioximeterSamples][2]; //0 is previous data, 1 is actual data
 int pulsioximeterPeakThreshold;
@@ -360,22 +378,6 @@ byte goToProcessRow;
 #define introBackColor WHITE
 #define introTextColor BLACK
 #define transitionEffect BLACK
-
-
-Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
-SHTC3 mySHTC3;              // Declare an instance of the SHTC3 class
-RotaryEncoder encoder(ENC_A, ENC_B, RotaryEncoder::LatchMode::TWO03);
-TCA9555 TCA(0x20);
-Microchip_PAC193x PAC;
-ESP32Timer ITimer0(0);
-
-/*
-  HardwareTimer //buzzerTimer(8);
-  HardwareTimer //TFTbacklightTimer(4);
-  HardwareTimer //PIDTimer(3);
-  HardwareTimer //encoderTimer(2);
-  HardwareTimer //heaterTimer(1);
-*/
 
 #define PIDISRPeriod 1000    // in msecs
 #define peripheralsISRPeriod 100000    // in milliseconds

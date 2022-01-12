@@ -177,7 +177,7 @@ static const uint8_t PROGMEM initcmd[] = {
 };
 // clang-format on
 
-uint8_t DISPLAY_CONTROLLER;
+uint8_t DISPLAY_CONTROLLER_CONFIG;
 
 /**************************************************************************/
 /*!
@@ -223,7 +223,7 @@ void Adafruit_ILI9341::begin(uint32_t freq) {
 /**************************************************************************/
 void Adafruit_ILI9341::setRotation(uint8_t m) {
   rotation = m % 4; // can't be higher than 3
-  switch(DISPLAY_CONTROLLER){
+  switch(DISPLAY_CONTROLLER_CONFIG){
 	  case ST7789V_CONTROLLER:
 	  switch (rotation) {
 	  //other options not yet tested

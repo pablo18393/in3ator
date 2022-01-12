@@ -46,27 +46,11 @@ void PIDHandler() {
   }
 }
 
-void configPIDTimer(int freq) {
-  //PID timer configuration:
-  //PIDTimer.pause();
-  //PIDTimer.setPeriod(freq); // in microseconds
-  //PIDTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
-  //PIDTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
-  //PIDTimer.attachCompare1Interrupt(PIDISR);
-  //PIDTimer.refresh();
-  //PIDTimer.resume();
-}
-
 void startTemperaturePID() {
   temperaturePID.SetOutputLimits(heaterMaxPWM * heaterPowerMin / 100, heaterMaxPWM * heaterPowerMax / 100);
   temperaturePID.SetTunings(Kp[tempCTL], Ki[tempCTL], Kd[tempCTL]);
   temperaturePID.SetControllerDirection(DIRECT);
   temperaturePID.SetMode(AUTOMATIC);
-}
-
-void stopTemperaturePID() {
-  temperaturePID.SetMode(MANUAL);
-  ledcWrite(HEATER_PWM_CHANNEL, LOW);
 }
 
 void startHumidityPID() {
@@ -76,7 +60,11 @@ void startHumidityPID() {
   humidityPID.SetMode(AUTOMATIC);
 }
 
+
+void stopTemperaturePID() {
+  temperaturePID.SetMode(MANUAL);
+}
+
 void stopHumidityPID() {
   humidityPID.SetMode(MANUAL);
-  GPIOWrite(HUMIDIFIER, LOW);
 }
