@@ -97,10 +97,10 @@ bool measurenumNTC() {
   unsigned long start_time = millis(); // Record the start time so we can timeout
   if (externalADCpresent) {
     if (millis() - lastexternalADCRead > externalADCReadPeriod) {
-      lastexternalADCRead=millis();
-      ADCmeasurements++;
-      if (mySensor.checkDataReady()) {
-        analogMeasurement = mySensor.readADC() / 3300;
+      lastexternalADCRead = millis();
+      if (ADCConversionReady()) {
+        ADCmeasurements++;
+        analogMeasurement = readExternalADC() / 3300;
         switch (mySensor.getInputMultiplexer()) {
           case ADS122C04_MUX_AIN0_AVSS:
             temperatureArray[babyNTC][temperature_array_pos] = analogMeasurement;

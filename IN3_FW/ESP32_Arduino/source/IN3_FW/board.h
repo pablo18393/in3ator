@@ -6,7 +6,7 @@
 
 #define TFT_DC 0
 #define POWER_EN 2
-#define ADC_READY 3
+#define ADC_READY 4
 #define BUZZER 5
 #define FAN 12
 #define PHOTOTHERAPY 13

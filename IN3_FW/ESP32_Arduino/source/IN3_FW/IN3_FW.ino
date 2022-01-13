@@ -111,7 +111,7 @@ byte language;
 #define numNTC 2 //number of NTC
 #define numTempSensors 3 //number of total temperature sensors in system
 #define current_filter 100 //amount of temperature samples to filter
-#define analog_temperature_filter 4000 //amount of temperature samples to filter
+#define analog_temperature_filter 10 //amount of temperature samples to filter
 #define digital_temperature_filter 10 //amount of temperature samples to filter
 int temperature_filter = analog_temperature_filter; //amount of temperature samples to filter
 

@@ -110,6 +110,14 @@ void initInterrupts() {
   attachInterrupt(ENC_B, encoderISR, CHANGE);
 }
 
+float readExternalADC() {
+  return (mySensor.readADC());
+}
+
+bool ADCConversionReady (){
+  return(!digitalRead(ADC_READY));
+}
+
 void initI2CBus() {
   Wire.begin();
 }
@@ -132,6 +140,7 @@ void initExternalADC() {
   long conversionTime;
   Wire.beginTransmission(digitalCurrentSensor_i2c_address);
   if (!Wire.endTransmission()) {
+    pinMode(ADC_READY, INPUT_PULLUP);
     logln("[HW] -> external ADC detected");
     externalADCpresent = true;
     mySensor.begin(externalADC_i2c_address);
@@ -149,35 +158,28 @@ void initExternalADC() {
     mySensor.setIDACcurrent(ADS122C04_IDAC_CURRENT_OFF); // Disable the IDAC current
     mySensor.setIDAC1mux(ADS122C04_IDAC1_DISABLED); // Disable IDAC1
     mySensor.setIDAC2mux(ADS122C04_IDAC2_DISABLED); // Disable IDAC2
+    conversionTime = micros();
+    mySensor.start(); // Start the conversion
+    while (!ADCConversionReady());
+    logln("[HW] -> Baby NTC voltage is: " + String(float(readExternalADC()) / 4096000, 4) + ", conversion made in " + String(micros() - conversionTime) + " us");
+    conversionTime = micros();
+    mySensor.setInputMultiplexer(ADS122C04_MUX_AIN1_AVSS); // Route AIN1 and AIN0 to AINP and AINN
+    mySensor.start(); // Start the conversion
+    while (!ADCConversionReady());
+    logln("[HW] -> Air NTC voltage is: " + String(float(readExternalADC()) / 4096000, 4) + ", conversion made in " + String(micros() - conversionTime) + " us");
+    conversionTime = micros();
+    mySensor.setInputMultiplexer(ADS122C04_MUX_AIN2_AVSS); // Route AIN1 and AIN0 to AINP and AINN
+    mySensor.start(); // Start the conversion
+    while (!ADCConversionReady());
+    logln("[HW] -> Vin voltage is: " + String(float(readExternalADC()) / 4096000, 4) + ", conversion made in " + String(micros() - conversionTime) + " us");
+    conversionTime = micros();
+    mySensor.setInputMultiplexer(ADS122C04_MUX_AIN3_AVSS); // Route AIN1 and AIN0 to AINP and AINN
+    mySensor.start(); // Start the conversion
+    while (!ADCConversionReady());
+    logln("[HW] -> System current voltage is: " + String(float(readExternalADC()) / 4096000, 4) + ", conversion made in " + String(micros() - conversionTime) + " us");
   }
-  conversionTime = micros();
-  mySensor.start(); // Start the conversion
-  while (!mySensor.checkDataReady()) {
-    delayMicroseconds(10);
-  }
-  logln("[HW] -> Baby NTC voltage is: " + String(float(mySensor.readADC()) / 4096000, 4) + ", conversion made in " + String(micros() - conversionTime) + " us");
-  conversionTime = micros();
-  mySensor.setInputMultiplexer(ADS122C04_MUX_AIN1_AVSS); // Route AIN1 and AIN0 to AINP and AINN
-  mySensor.start(); // Start the conversion
-  while (!mySensor.checkDataReady()) {
-    delayMicroseconds(10);
-  }
-  logln("[HW] -> Air NTC voltage is: " + String(float(mySensor.readADC()) / 4096000, 4) + ", conversion made in " + String(micros() - conversionTime) + " us");
-  conversionTime = micros();
-  mySensor.setInputMultiplexer(ADS122C04_MUX_AIN2_AVSS); // Route AIN1 and AIN0 to AINP and AINN
-  mySensor.start(); // Start the conversion
-  while (!mySensor.checkDataReady()) {
-    delayMicroseconds(10);
-  }
-  logln("[HW] -> Vin voltage is: " + String(float(mySensor.readADC()) / 4096000, 4) + ", conversion made in " + String(micros() - conversionTime) + " us");
-  conversionTime = micros();
-  mySensor.setInputMultiplexer(ADS122C04_MUX_AIN3_AVSS); // Route AIN1 and AIN0 to AINP and AINN
-  mySensor.start(); // Start the conversion
-  while (!mySensor.checkDataReady()) {
-    delayMicroseconds(10);
-  }
-  logln("[HW] -> System current voltage is: " + String(float(mySensor.readADC()) / 4096000, 4) + ", conversion made in " + String(micros() - conversionTime) + " us");
 }
+
 void initPWMGPIO() {
   ledcSetup(SCREENBACKLIGHT_PWM_CHANNEL, PWM_FREQUENCY, PWM_RESOLUTION);
   ledcSetup(HEATER_PWM_CHANNEL, PWM_FREQUENCY, PWM_RESOLUTION);
