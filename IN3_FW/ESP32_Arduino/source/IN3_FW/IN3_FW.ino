@@ -3,8 +3,8 @@
 */
 
 //Firmware version and head title of UI screen
-#define FWversion "v8.1"
-String serialNumber = "in3000045";
+#define FWversion "v8.2"
+String serialNumber = "in30000test";
 #define headingTitle "in3ator"
 
 #include <esp_task_wdt.h>
@@ -149,7 +149,7 @@ byte encoderRate = true;
 byte encoderCount = false;
 bool encPulseDetected;
 volatile long lastEncPulse;
-#define encPulseDebounce 10
+#define encPulseDebounce 50
 volatile bool statusEncSwitch;
 
 //WIFI

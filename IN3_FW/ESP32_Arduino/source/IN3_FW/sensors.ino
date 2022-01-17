@@ -179,7 +179,9 @@ void updateTemp(byte sensor) {
       temperature[i] = (((temperature[i] - RawTemperatureLow[i]) * ReferenceTemperatureRange) / RawTemperatureRange[i]) + ReferenceTemperatureLow;
     }
     errorTemperature[i] -= temperature[i];
-
+    if (temperature[i] < 0) {
+      temperature[i] = 0;
+    }
     if (temperature[i] > temperatureMax[i]) {
       temperatureMax[i] = temperature[i];
     }

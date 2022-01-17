@@ -1,17 +1,19 @@
 
 void encSwitchISR() {
-  if (millis() - lastEncPulse > encPulseDebounce) {
-    statusEncSwitch = !statusEncSwitch;
-    if (statusEncSwitch) {
-      encPulseDetected = true;
-      buzzerTone(buzzerStandbyToneTimes, buzzerSwitchDuration, buzzerRotaryEncoderTone);
-      lastbacklightHandler = millis();
-      if (alarmOnGoing[temperatureAlarm] || alarmOnGoing[humidityAlarm]) {
-        resetAlarms();
+  if (!digitalRead(ENC_SWITCH)) {
+    if (millis() - lastEncPulse > encPulseDebounce) {
+      //statusEncSwitch = !statusEncSwitch;
+      //if (statusEncSwitch) {
+        encPulseDetected = true;
+        buzzerTone(buzzerStandbyToneTimes, buzzerSwitchDuration, buzzerRotaryEncoderTone);
+        lastbacklightHandler = millis();
+        if (alarmOnGoing[temperatureAlarm] || alarmOnGoing[humidityAlarm]) {
+          resetAlarms();
+        }
       }
-    }
+    //}
+    lastEncPulse = millis();
   }
-  lastEncPulse = millis();
 }
 
 void encoderISR() {

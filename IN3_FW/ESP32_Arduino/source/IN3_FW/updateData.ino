@@ -8,6 +8,7 @@ int updateData() {
   OTAHandler();
   sensorsHandler();
   GPRS_Handler();
+  encSwitchISR();
   if (powerAlert) {
     logln("[ALARM] -> maximum power exceeded");
     powerAlert = false;
