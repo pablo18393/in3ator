@@ -5,7 +5,7 @@
 #define EEPROM_firstTurnOn 10
 #define EEPROM_autoLock 20
 #define EEPROM_language 30
-#define EEPROM_HeaterPower 40
+#define EEPROM_SerialNumber 40
 #define EEPROM_WIFI_EN 50
 #define EEPROM_usedGenericMosfet 60
 #define EEPROM_controlMode 70
@@ -61,14 +61,12 @@ void initEEPROM() {
 
 void loaddefaultValues() {
   autoLock = defaultAutoLock;
-  HeaterPower = defaultHeaterPower;
   controlMode = defaultcontrolMode;
   WIFI_EN = defaultWIFI_EN;
   language = defaultLanguage;
   controlAlgorithm = defaultcontrolAlgorithm;
   alarmsEnable = defaultAlarmsEnable;
   EEPROM.write(EEPROM_autoLock, autoLock);
-  EEPROM.write(EEPROM_HeaterPower, HeaterPower);
   EEPROM.write(EEPROM_WIFI_EN, WIFI_EN);
   EEPROM.write(EEPROM_language, language);
   EEPROM.write(EEPROM_controlAlgorithm, controlAlgorithm);
@@ -104,7 +102,7 @@ void recapVariables() {
   if (diffHumidity > 100) {
     diffHumidity = false;
   }
-  HeaterPower = EEPROM.read(EEPROM_HeaterPower);
+  serialNumber = EEPROM.read(EEPROM_SerialNumber);
   WIFI_EN = EEPROM.read(EEPROM_WIFI_EN);
   controlAlgorithm = EEPROM.read(EEPROM_controlAlgorithm);
   alarmsEnable = EEPROM.read(EEPROM_alarmsEnable);

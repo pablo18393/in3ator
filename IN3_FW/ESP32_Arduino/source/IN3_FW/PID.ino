@@ -47,7 +47,7 @@ void PIDHandler() {
 }
 
 void startTemperaturePID() {
-  temperaturePID.SetOutputLimits(heaterMaxPWM * heaterPowerMin / 100, heaterMaxPWM * heaterPowerMax / 100);
+  temperaturePID.SetOutputLimits(heaterMaxPWM, heaterMaxPWM);
   temperaturePID.SetTunings(Kp[tempCTL], Ki[tempCTL], Kd[tempCTL]);
   temperaturePID.SetControllerDirection(DIRECT);
   temperaturePID.SetMode(AUTOMATIC);

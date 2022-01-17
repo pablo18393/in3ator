@@ -3,8 +3,7 @@
 */
 
 //Firmware version and head title of UI screen
-#define FWversion "v8.2"
-String serialNumber = "in30000test";
+#define FWversion "v8.3/7.A"
 #define headingTitle "in3ator"
 
 #include <esp_task_wdt.h>
@@ -39,6 +38,7 @@ SFE_ADS122C04 mySensor;
 #define externalADC_i2c_address 64
 #define digitalCurrentSensor_i2c_address 23
 
+int serialNumber=45;
 #define WDT_TIMEOUT 15
 
 #define ON true
@@ -111,7 +111,7 @@ byte language;
 #define numNTC 2 //number of NTC
 #define numTempSensors 3 //number of total temperature sensors in system
 #define current_filter 100 //amount of temperature samples to filter
-#define analog_temperature_filter 10 //amount of temperature samples to filter
+#define analog_temperature_filter 500 //amount of temperature samples to filter
 #define digital_temperature_filter 10 //amount of temperature samples to filter
 int temperature_filter = analog_temperature_filter; //amount of temperature samples to filter
 
@@ -129,7 +129,7 @@ double temperatureMaxReset = -1000;
 double temperatureMinReset = 1000;
 double temperatureMax[numTempSensors], temperatureMin[numTempSensors];
 double previousTemperature[numTempSensors];
-float temperatureArray [numNTC][analog_temperature_filter]; //variable to handle each NTC with the array of last samples (only for NTC)
+int temperatureArray [numNTC][analog_temperature_filter]; //variable to handle each NTC with the array of last samples (only for NTC)
 int temperature_array_pos; //temperature sensor number turn to measure
 float diffTemperature; //difference between measured temperature and user input real temperature
 bool faultNTC[numNTC]; //variable to control a failure in NTC
@@ -138,9 +138,6 @@ double humidity; // room humidity variable
 bool humidifierState, humidifierStateChange;
 int previousHumidity; //previous sampled humidity
 float diffHumidity; //difference between measured humidity and user input real humidity
-
-int gestationWeeks = 28; //preterm baby gestation time in weeks
-int heaterPower; //duty cycle of control signal of system heater
 
 //Sensor check rate (in ms). Both sensors are checked in same interrupt and they have different check rates
 const byte pulsioximeterRate = 5;
@@ -167,9 +164,9 @@ bool WIFI_connection_status = false;
 #define externalADCReadPeriod 30
 
 //sensor variables
-bool roomSensorPresent;
-bool externalADCpresent;
-bool digitalCurrentSensorPresent;
+bool roomSensorPresent=false;
+bool externalADCpresent=false;
+bool digitalCurrentSensorPresent=false;
 long lastDigitalCurrentSensorRead;
 long lastexternalADCRead;
 byte roomSensorAddress = 112;
@@ -206,23 +203,15 @@ bool defaultcontrolAlgorithm = PID_CONTROL;
 double desiredSkinTemp = 34; //preset baby skin temperature
 double desiredRoomHum = 75; //preset enviromental humidity
 bool jaundiceEnable; //PWM that controls jaundice LED intensity
-byte HeaterPower; //maximum heater power
 double desiredHeaterTemp; //desired temperature in heater
 
-//preset room variables
-const byte defaultHeaterPower = 100; //preset max heater temperature in celsious
-
 //constants
-const byte heaterPowerMax = 100; //maximum temperature in heater to be set
-const byte heaterPowerMin = 0; //minimum temperature in heater to be set
 const byte humidifierDutyCycleMax = 100; //maximum humidity cycle in heater to be set
 const byte humidifierDutyCycleMin = 0; //minimum humidity cycle in heater to be set
 const byte minTemp = 15; //minimum allowed temperature to be set
 const byte maxTemp = 45; //maximum allowed temperature to be set
 const byte maxHum = 100; //maximum allowed humidity to be set
 const byte minHum = 20; //minimum allowed humidity to be set
-const byte maxGestation = 99; //maximum gestation weeks to be set
-const byte minGestation = true; //minimum gestation weeks to be set
 const byte LEDMaxIntensity = 100; //max LED intensity to be set
 const byte fanMaxSpeed = 100; //max fan speed (percentage) to be set
 const float screenBrightnessFactor = 2.5; //Max brightness will be divided by this constant
@@ -260,7 +249,6 @@ long last_encPulsed; //last time encoder was pulsed
 #define arrow_tail  5
 
 //Text Graphic position variables
-int gestationWeeksXPos;
 int LEDXPos;
 int humidityX;
 int humidityY;
@@ -325,7 +313,6 @@ byte goToProcessRow;
 
 //below are all the different variables positions that will be displayed in user interface
 //mainMenu
-#define gestationGraphicPosition 0
 #define advancedModeGraphicPosition 1
 #define LEDGraphicPosition 2
 #define startGraphicPosition 3
@@ -340,7 +327,7 @@ byte goToProcessRow;
 #define autoLockGraphicPosition 0
 #define languageGraphicPosition 1
 #define controlAlgorithmGraphicPosition 2
-#define heaterPowerGraphicPosition 3
+#define serialNumberGraphicPosition 3
 #define WifiENGraphicPosition 4
 #define calibrateGraphicPosition 5
 #define setdefaultValuesGraphicPosition 6

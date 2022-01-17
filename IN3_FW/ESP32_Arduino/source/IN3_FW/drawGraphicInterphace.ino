@@ -145,9 +145,8 @@ void graphics() {
               }
               drawRightString(textToWrite, unitPosition, ypos, textFontSize);
               break;
-            case heaterPowerGraphicPosition:
-              drawRightNumber(HeaterPower, 280, ypos);
-              drawRightString("%", unitPosition, ypos, textFontSize);
+            case serialNumberGraphicPosition:
+              drawRightNumber(serialNumber, 280, ypos);
               break;
             case WifiENGraphicPosition:
               if (WIFI_EN) {
@@ -198,8 +197,9 @@ void drawHeading() {
     drawBack();
   }
   setTextColor(COLOR_MENU);
-  drawCentreString(headingTitle, tft.width() / 2, height_heading / 5, textFontSize);
-  drawCentreString(FWversion, tft.width() - 3 * letter_width, height_heading / 5, textFontSize);
+  drawCentreString("in3", tft.width() / 2 - 2 * letter_width - 5, height_heading / 5, textFontSize);
+  drawCentreNumber(serialNumber, tft.width() / 2, height_heading / 5);
+  drawCentreString(FWversion, tft.width() - 4 * letter_width, height_heading / 5, textFontSize);
 }
 
 void eraseBar() {

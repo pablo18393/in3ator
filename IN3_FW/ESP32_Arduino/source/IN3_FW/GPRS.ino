@@ -670,7 +670,7 @@ void setGPRSPostPeriod (long seconds) {
 
 bool GPRSLoadVariables() {
   databasePost[7] = "{";
-  databasePost[7] += "\"sn\":\"" + serialNumber + "\"";
+  databasePost[7] += "\"sn\":\"" + String(serialNumber) + "\"";
   if (GPRS.postBabyTemp) {
     databasePost[7] += ",\"baby_temp\":\"" + String(temperature[babyNTC], 2) + "\"";
   }

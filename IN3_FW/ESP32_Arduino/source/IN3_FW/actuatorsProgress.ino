@@ -248,7 +248,7 @@ void basicHumidityControl() {
 
 
 void heatUp() {
-  ledcWrite(HEATER_PWM_CHANNEL, heaterMaxPWM * HeaterPower / 100);
+  ledcWrite(HEATER_PWM_CHANNEL, heaterMaxPWM);
 }
 
 void stopActuation() {
@@ -258,7 +258,7 @@ void stopActuation() {
 }
 
 void turnActuators(bool mode) {
-  ledcWrite(HEATER_PWM_CHANNEL, mode * heaterMaxPWM * HeaterPower / 100 );
+  ledcWrite(HEATER_PWM_CHANNEL, mode * heaterMaxPWM);
   GPIOWrite(HUMIDIFIER, mode);
   turnFans(mode);
 }

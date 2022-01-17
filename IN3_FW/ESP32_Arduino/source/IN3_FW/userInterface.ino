@@ -247,11 +247,11 @@ bool userInterfaceHandler() {
                     break;
                 }
                 drawRightString(textToWrite, unitPosition, ypos, textFontSize);
-                EEPROM.write(EEPROM_language, language);
-                EEPROM.commit();
                 EncMove = false;
               }
             }
+            EEPROM.write(EEPROM_language, language);
+            EEPROM.commit();
             settings();
             break;
           case controlAlgorithmGraphicPosition:
@@ -273,20 +273,20 @@ bool userInterfaceHandler() {
               drawRightString("BASIC", unitPosition, ypos, textFontSize);
             }
             break;
-          case heaterPowerGraphicPosition:
+          case serialNumberGraphicPosition:
             while (GPIORead(ENC_SWITCH) ) {
               updateData();
-              if (EncMove && -EncMove + HeaterPower >= heaterPowerMin && -EncMove + HeaterPower <= heaterPowerMax) {
+              if (EncMove) {
                 setTextColor(COLOR_MENU);
-                drawRightNumber(HeaterPower, 280, ypos);
-                HeaterPower -= 10 * EncMove;
-                EEPROM.write(EEPROM_HeaterPower, HeaterPower);
-                EEPROM.commit();
+                drawRightNumber(serialNumber, 280, ypos);
+                serialNumber -= EncMove;
+                EEPROM.write(EEPROM_SerialNumber, serialNumber);
                 setTextColor(COLOR_MENU_TEXT);
-                drawRightNumber(HeaterPower, 280, ypos);
+                drawRightNumber(serialNumber, 280, ypos);
               }
               EncMove = false;
             }
+            EEPROM.commit();
             break;
           case WifiENGraphicPosition:
             WIFI_EN = !WIFI_EN;
@@ -497,30 +497,6 @@ void checkSetMessage() {
     }
     drawCentreString(helpMessage, width_select + (tft.width() - width_select) / 2, getYpos(goToProcessRow), textFontSize);
 
-  }
-}
-
-void setPresetRoomValues() {
-  if (gestationWeeks <= 29) {
-    desiredSkinTemp = 36;
-  }
-  else {
-    desiredSkinTemp = 36.5;
-  }
-  if (gestationWeeks <= 28) {
-    desiredRoomHum = 80;
-  }
-  else if (gestationWeeks <= 32) {
-    desiredRoomHum = 75;
-  }
-  else if (gestationWeeks <= 34) {
-    desiredRoomHum = 55;
-  }
-  else if (gestationWeeks <= 35) {
-    desiredRoomHum = 50;
-  }
-  else {
-    desiredRoomHum = 30;
   }
 }
 

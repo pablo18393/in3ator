@@ -68,8 +68,8 @@ void initHardware() {
   logln("[HW] -> Initialiting hardware");
   initEEPROM();
   initI2CBus();
-  initCurrentSensor();
-  initExternalADC();
+  //initCurrentSensor();
+  //initExternalADC();
   initPin(PHOTOTHERAPY, OUTPUT);
   GPIOWrite(PHOTOTHERAPY, HIGH);
   initSensors();
@@ -114,8 +114,8 @@ float readExternalADC() {
   return (mySensor.readADC());
 }
 
-bool ADCConversionReady (){
-  return(!digitalRead(ADC_READY));
+bool ADCConversionReady () {
+  return (!digitalRead(ADC_READY));
 }
 
 void initI2CBus() {
@@ -123,10 +123,9 @@ void initI2CBus() {
 }
 
 void initCurrentSensor() {
-  digitalCurrentSensorPresent = false;
   Wire.beginTransmission(digitalCurrentSensor_i2c_address);
-  if (!Wire.endTransmission()) {
-    digitalCurrentSensorPresent = true;
+  digitalCurrentSensorPresent = !(Wire.endTransmission());
+  if (digitalCurrentSensorPresent) {
     temperature_filter = digital_temperature_filter;
     PAC.begin();
     PAC.setSampleRate(1024);
@@ -136,13 +135,12 @@ void initCurrentSensor() {
 }
 
 void initExternalADC() {
-  externalADCpresent = false;
   long conversionTime;
   Wire.beginTransmission(digitalCurrentSensor_i2c_address);
-  if (!Wire.endTransmission()) {
+  externalADCpresent = !(Wire.endTransmission());
+  if (externalADCpresent) {
     pinMode(ADC_READY, INPUT_PULLUP);
     logln("[HW] -> external ADC detected");
-    externalADCpresent = true;
     mySensor.begin(externalADC_i2c_address);
     mySensor.setInputMultiplexer(ADS122C04_MUX_AIN0_AVSS); // Route AIN1 and AIN0 to AINP and AINN
     mySensor.setGain(ADS122C04_GAIN_1); // Set the gain to 1

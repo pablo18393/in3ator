@@ -14,7 +14,7 @@ void settings() {
       words[autoLockGraphicPosition]  = "Auto lock";
       words[languageGraphicPosition] = "Language";
       words[controlAlgorithmGraphicPosition] = "Control algorithm";
-      words[heaterPowerGraphicPosition] = "Heater power";
+      words[serialNumberGraphicPosition] = "Serial number";
       words[WifiENGraphicPosition] = "WIFI";
       words[setdefaultValuesGraphicPosition] = "Set default values";
       words[calibrateGraphicPosition] = "Calibration";
@@ -23,7 +23,7 @@ void settings() {
       words[autoLockGraphicPosition]  = "Auto bloqueo";
       words[languageGraphicPosition] = "Idioma";
       words[controlAlgorithmGraphicPosition] = "Algoritmo control";
-      words[heaterPowerGraphicPosition] = "Pot calefactor";
+      words[serialNumberGraphicPosition] = "Serial number";
       words[WifiENGraphicPosition] = "WIFI";
       words[setdefaultValuesGraphicPosition] = "Fijar valores estandar";
       words[calibrateGraphicPosition] = "Calibracion";
@@ -32,7 +32,7 @@ void settings() {
       words[autoLockGraphicPosition]  = "Verrouillage auto";
       words[languageGraphicPosition] = "Langue";
       words[controlAlgorithmGraphicPosition] = "Controle algorithme";
-      words[heaterPowerGraphicPosition] = "Pot chauffage";
+      words[serialNumberGraphicPosition] = "Serial number";
       words[WifiENGraphicPosition] = "WIFI";
       words[setdefaultValuesGraphicPosition] = "Definir valeurs default";
       words[calibrateGraphicPosition] = "Etalonner";
@@ -41,7 +41,7 @@ void settings() {
       words[autoLockGraphicPosition]  = "Bloqueio automatico";
       words[languageGraphicPosition] = "Idioma";
       words[controlAlgorithmGraphicPosition] = "Algoritmo controle";
-      words[heaterPowerGraphicPosition] = "Pot de aquecimento";
+      words[serialNumberGraphicPosition] = "Serial number";
       words[WifiENGraphicPosition] = "WIFI";
       words[setdefaultValuesGraphicPosition] = "Definir valores de fabrica";
       words[calibrateGraphicPosition] = "Calibrar";
