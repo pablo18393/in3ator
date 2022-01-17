@@ -197,7 +197,7 @@ void drawHeading() {
     drawBack();
   }
   setTextColor(COLOR_MENU);
-  drawCentreString("in3", tft.width() / 2 - 2 * letter_width - 5, height_heading / 5, textFontSize);
+  drawCentreString("in3_", tft.width() / 2 - 2 * letter_width - 5, height_heading / 5, textFontSize);
   drawCentreNumber(serialNumber, tft.width() / 2, height_heading / 5);
   drawCentreString(FWversion, tft.width() - 4 * letter_width, height_heading / 5, textFontSize);
 }
