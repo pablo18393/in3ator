@@ -49,7 +49,7 @@ void initEEPROM() {
     for (int i = false; i < EEPROM_SIZE; i++) {
       EEPROM.write(i, 0);
     }
-    EEPROM.commit();
+    loadDefaultCalibration();
     loaddefaultValues();
     logln("[FLASH] -> First turn on, loading default values");
   }
@@ -75,10 +75,21 @@ void loaddefaultValues() {
   EEPROM.commit();
 }
 
+void loadDefaultCalibration(){
+    EEPROM.writeFloat(EEPROM_RawSkinTemperatureLowCorrection, 23.22);
+    EEPROM.writeFloat(EEPROM_RawSkinTemperatureRangeCorrection, 22.71);
+    EEPROM.writeFloat(EEPROM_RawAirTemperatureLowCorrection, 22.65);
+    EEPROM.writeFloat(EEPROM_RawAirTemperatureRangeCorrection, 22.63);
+    EEPROM.writeFloat(EEPROM_RawDigitalTemperatureLowCorrection, 18.43);
+    EEPROM.writeFloat(EEPROM_RawDigitalTemperatureRangeCorrection, 0.16);
+    EEPROM.writeFloat(EEPROM_ReferenceTemperatureRange, 22.06);
+    EEPROM.writeFloat(EEPROM_ReferenceTemperatureLow, 18.98);
+    EEPROM.commit();
+}
+
 void recapVariables() {
   autoLock = EEPROM.read(EEPROM_autoLock);
   language = EEPROM.read(EEPROM_language);
-
   RawTemperatureLow[babyNTC] = EEPROM.readFloat(EEPROM_RawSkinTemperatureLowCorrection);
   RawTemperatureRange[babyNTC] = EEPROM.readFloat(EEPROM_RawSkinTemperatureRangeCorrection);
   RawTemperatureLow[airNTC] = EEPROM.readFloat(EEPROM_RawAirTemperatureLowCorrection);
