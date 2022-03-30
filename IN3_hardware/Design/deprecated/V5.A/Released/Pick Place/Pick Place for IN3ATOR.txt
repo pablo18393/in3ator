@@ -1,0 +1,113 @@
+Designator Footprint               Mid X         Mid Y         Ref X         Ref Y         Pad X         Pad Y TB      Rotation Comment        
+
+R53        RESC1609X55X30ML10T20       2055mil       1805mil       2055mil       1805mil   2077.967mil   1782.033mil  T        135.00 0R 0603 0.1W 1%
+C33        CAPC1608X60X35NL10T15       2110mil       1715mil       2110mil       1715mil   2091.209mil   1696.209mil  T         45.00 100nF 0603 X7R 50V
+C26        CAPC1608X60X35NL10T15         50mil       -310mil         50mil       -310mil         50mil   -283.425mil  T        270.00 100nF 0603 X7R 100V
+U7         DFN4_2x2_+_EP          125mil   -301.969mil        125mil       -300mil    105.315mil   -347.244mil  T          0.00 Sensirion SHTC3
+J11        PCB-2exqb8kt510pgx9iz0yo-1       3690mil       -305mil       3690mil       -305mil       3690mil    -423.11mil  B        270.00 Molex 52418-0410
+R38        RESC1609X55X30ML10T20       3300mil       1270mil       3300mil       1270mil    3267.52mil       1270mil  T        360.00 10K 0603 0.1W 1%
+R37        RESC1609X55X30ML10T20       3300mil       1180mil       3300mil       1180mil    3267.52mil       1180mil  T        360.00 10K 0603 0.1W 1%
+R17        RESC1609X55X30ML10T20       3300mil       1005mil       3300mil       1005mil    3332.48mil       1005mil  T        180.00 100R 0603 0.1W 1%
+R16        RESC1609X55X30ML10T20       3300mil        920mil       3300mil        920mil    3332.48mil        920mil  T        180.00 100R 0603 0.1W 1%
+U1         STM-LQFP64_L          1455mil        935mil       1455mil        935mil    1672.52mil    787.362mil  T        180.00 STM32F103RET6  
+J2         PCB-tt6oa92k1i3euqam155k-1       1240mil        490mil       1240mil        490mil       1240mil        640mil  T        270.00 Harwin M20-7820446
+D5         MF06A_N               3690mil        665mil       3690mil        665mil   3652.598mil    617.756mil  T         90.00 ESDA6V1-5SC6   
+D4         MF06A_N               3690mil        935mil       3690mil        935mil   3652.598mil    887.756mil  T         90.00 ESDA6V1-5SC6   
+R30        RESC1609X55X30ML10T20    2667.48mil        160mil    2667.48mil        160mil   2699.961mil        160mil  T        180.00 1K 0603 0.1W 1%
+U10        SOT-23A-CB3_L     1740.315mil       1465mil   1740.315mil       1465mil   1702.913mil   1421.693mil  T         90.00 MCP1703T-3302E/CB
+U9         SOT-23A-CB3_L     1895.315mil       1465mil   1895.315mil       1465mil   1857.913mil   1421.693mil  T         90.00 MCP1703T-3302E/CB
+R51        RESC1609X55X30ML10T20       1010mil       2130mil       1010mil       2130mil     977.52mil       2130mil  T        360.00 2K 0603 0.1W 1%
+R50        RESC1609X55X30ML10T20       1010mil       2045mil       1010mil       2045mil     977.52mil       2045mil  T        360.00 5k1 0603 0.1W 1%
+R49        RESC1609X55X30ML10T20        795mil       1255mil        795mil       1255mil     762.52mil       1255mil  T        360.00 10K 0603 0.1W 1%
+R48        RESC1609X55X30ML10T20        795mil       1340mil        795mil       1340mil     827.48mil       1340mil  T        180.00 1K 0603 0.1W 1%
+R47        RESC1609X55X30ML10T20        795mil       1425mil        795mil       1425mil     762.52mil       1425mil  T          0.00 10K 0603 0.1W 1%
+R46        RESC1609X55X30ML10T20       3350mil        400mil       3350mil        400mil       3350mil     367.52mil  T         90.00 100R 0603 0.1W 1%
+R45        RESC1609X55X30ML10T20   3270.445mil    403.324mil   3270.445mil    403.324mil   3270.445mil    370.844mil  T         90.00 10K 0603 0.1W 1%
+R18        RESC1609X55X30ML10T20       3300mil       1090mil       3300mil       1090mil    3332.48mil       1090mil  T        180.00 100R 0603 0.1W 1%
+R15        RESC1609X55X30ML10T20       2205mil       1660mil       2205mil       1660mil   2227.967mil   1637.033mil  T        135.00 0R 0603 0.1W 1%
+R14        RESC1609X55X30ML10T20       2300mil     846.89mil       2300mil     846.89mil    2267.52mil     846.89mil  T        360.00 30K 0603 0.1W 1%
+R13        RESC1609X55X30ML10T20       2300mil     751.89mil       2300mil     751.89mil    2267.52mil     751.89mil  T        360.00 2K 0603 0.1W 1%
+R12        RESC1609X55X30ML10T20       2665mil        420mil       2665mil        420mil    2632.52mil        420mil  T        360.00 1K 0603 0.1W 1%
+R11        RESC1609X55X30ML10T20       2665mil        515mil       2665mil        515mil    2697.48mil        515mil  T        180.00 10K 0603 0.1W 1%
+R10        RESC1609X55X30ML10T20       2665mil        600mil       2665mil        600mil    2632.52mil        600mil  T        360.00 1K 0603 0.1W 1%
+R9         RESC1609X55X30ML10T20       2820mil        515mil       2820mil        515mil    2787.52mil        515mil  T        360.00 0R 0603 0.1W 1%
+Q10        PCB-856332-1           795mil       1545mil        795mil       1545mil    757.598mil    1505.63mil  T        360.00 BC817-16       
+Q1         PCB-856332-1          2300mil     976.89mil       2300mil     976.89mil   2262.598mil     937.52mil  T        360.00 BC817-16       
+FB1        MURA-BLM18-F-H1-CHIP-2_V    591.465mil       2245mil    591.465mil       2245mil    591.465mil    2277.48mil  T        270.00 BLM18HG601SN1D 
+C30        CAPC1608X60X35NL10T15       1280mil       2050mil       1280mil       2050mil   1306.575mil       2050mil  T        180.00 100nF 0603 X7R 50V
+C28        CAPC1608X60X35NL10T15   1740.315mil   1348.071mil   1740.315mil   1348.071mil    1713.74mil   1348.071mil  T        360.00 10uF 0603 X5R 6.3V
+C27        CAPC1608X60X35NL10T15       1895mil       1350mil       1895mil       1350mil   1868.425mil       1350mil  T        360.00 10uF 0603 X5R 6.3V
+C12        CAPC1608X60X35NL10T15       3290mil        845mil       3290mil        845mil   3316.575mil        845mil  T        180.00 18pF 0603 NPO 5% 50V
+C11        CAPC1608X60X35NL10T15       3445mil        870mil       3445mil        870mil   3418.425mil        870mil  T        360.00 100nF 0603 X7R 50V
+C10        CAPC1608X60X35NL10T15       1955mil       1865mil       1955mil       1865mil   1936.209mil   1846.209mil  T         45.00 100nF 0603 X7R 50V
+C9         CAPC1608X60X35NL10T15       2265mil       1565mil       2265mil       1565mil   2246.209mil   1546.209mil  T         45.00 100nF 0603 X7R 50V
+C8         CAPC1608X60X35NL10T15       2370mil       1155mil       2370mil       1155mil       2370mil   1128.425mil  T         90.00 100nF 0603 X7R 50V
+J6         PCB-pp1at3pfx7vls1ur72ey-1       3060mil        145mil       3010mil        145mil       3010mil        145mil  T        360.00 JST B2B-XH-A   
+Y1         PCB-mm1uo60gbc5oxcl0fq61-1       2010mil     896.26mil       2010mil     896.26mil       2010mil    976.968mil  T        270.00 CX5032GB08000H0HPQZ1
+U11        TI-KTT5_N             1095mil   1710.354mil       1095mil       1670mil   1228.858mil   1918.032mil  T        270.00 Micrel MIC29302WU
+U4         PCB-e8n0jpjj0ctkgxf737qv-1       2470mil        280mil       2470mil        280mil   2387.323mil    318.386mil  T        360.00 MCP6L02T-E/MS  
+U3         SON127P600X95_HS-9N       3400mil        685mil       3400mil        685mil   3294.685mil        760mil  T        360.00 MFF2           
+RF_CON1    PCB-ci0d6ius1xp1vci7q9ug-1   2406.423mil   1535.822mil       2370mil       1650mil   2375.912mil   1535.822mil  T        270.00 U.FL-R-SMT(01) 
+R44        RESC1609X55X30ML10T20       1115mil       2240mil       1115mil       2240mil    1082.52mil       2240mil  T          0.00 100R 0603 0.1W 1%
+R43        RESC1609X55X30ML10T20       1165mil       2130mil       1165mil       2130mil    1197.48mil       2130mil  T        180.00 1K 0603 0.1W 1%
+R31        RESC1609X55X30ML10T20    2667.48mil         70mil    2667.48mil         70mil   2699.961mil         70mil  T        180.00 1K 0603 0.1W 1%
+R29        RESC1609X55X30ML10T20    2667.48mil     246.26mil    2667.48mil     246.26mil       2635mil     246.26mil  T        360.00 30K 0603 0.1W 1%
+R28        RESC1609X55X30ML10T20    2817.48mil     246.26mil    2817.48mil     246.26mil   2849.961mil     246.26mil  T        180.00 30K 0603 0.1W 1%
+R27        RESC1609X55X30ML10T20    2512.48mil        160mil    2512.48mil        160mil       2480mil        160mil  T        360.00 30K 0603 0.1W 1%
+R26        RESC1609X55X30ML10T20    2512.48mil         70mil    2512.48mil         70mil   2544.961mil         70mil  T        180.00 10K 0603 0.1W 1%
+R25        RESC1609X55X30ML10T20    2817.48mil        160mil    2817.48mil        160mil       2785mil        160mil  T        360.00 10K 0603 0.1W 1%
+R24        RESC1609X55X30ML10T20       1000mil        615mil       1000mil        615mil    1032.48mil        615mil  T        180.00 10K 0603 0.1W 1%
+R23        RESC1609X55X30ML10T20       1000mil        535mil       1000mil        535mil    1032.48mil        535mil  T        180.00 10K 0603 0.1W 1%
+R21        RESC1609X55X30ML10T20        795mil        915mil        795mil        915mil     827.48mil        915mil  T        180.00 10K 0603 0.1W 1%
+R19        RESC1609X55X30ML10T20        795mil       1085mil        795mil       1085mil     827.48mil       1085mil  T        180.00 10K 0603 0.1W 1%
+R8         RESC1609X55X30ML10T20       1000mil        455mil       1000mil        455mil     967.52mil        455mil  T        360.00 100R 0603 0.1W 1%
+R7         RESC1609X55X30ML10T20       2820mil        420mil       2820mil        420mil    2852.48mil        420mil  T        180.00 10K 0603 0.1W 1%
+R6         RESC1609X55X30ML10T20        795mil       1000mil        795mil       1000mil     762.52mil       1000mil  T          0.00 100R 0603 0.1W 1%
+R5         RESC1609X55X30ML10T20       1790mil        565mil       1790mil        565mil    1822.48mil        565mil  T        180.00 100R 0603 0.1W 1%
+R4         RESC1609X55X30ML10T20        795mil       1170mil        795mil       1170mil     762.52mil       1170mil  T          0.00 100R 0603 0.1W 1%
+R3         RESC1609X55X30ML10T20       1855mil        885mil       1855mil        885mil    1887.48mil        885mil  T        180.00 2K 0603 0.1W 1%
+R2         RESC1609X55X30ML10T20       1790mil        650mil       1790mil        650mil    1757.52mil        650mil  T        360.00 10K 0603 0.1W 1%
+R1         CAPC3216X180X55ML20T25        510mil       2245mil        510mil       2245mil        510mil   2186.929mil  T         90.00 0.005R 1206 0.5W 1%
+Q8         ONSC-SOT-23-3-318-08_V       3460mil        400mil       3460mil        400mil    3420.63mil    437.402mil  T          0.00 NTR1P02LT1G    
+Q7         PCB-856332-1          1115mil       2355mil       1115mil       2355mil   1077.598mil    2315.63mil  T          0.00 BC817-16       
+Q5         PCB-s29nlaacffy4qzcyhtz9-1        885mil        215mil        885mil        215mil        885mil        115mil  T        180.00 Infineon IRLB8314PBF
+Q4         PCB-s29nlaacffy4qzcyhtz9-1        595mil       1340mil        595mil       1340mil        595mil       1240mil  T        180.00 Infineon IRLB8314PBF
+Q2         PCB-s29nlaacffy4qzcyhtz9-1        360mil       1340mil        360mil       1340mil        360mil       1240mil  T        180.00 Infineon IRLB8314PBF
+J5         PCB-so191l03tuzsl9xcnbls-1       1795mil        125mil       1795mil        125mil    1755.63mil        125mil  T        180.00 JST B2B-PH-K-S(LF)(SN)
+J3         PCB-tt6oa92k1i3euqam155k-1       1130mil        490mil       1130mil        490mil       1130mil        640mil  T        270.00 Harwin M20-7820446
+F2         CAPC1608X60X35NL10T15        420mil       2245mil        420mil       2245mil        420mil   2271.575mil  T        270.00 CG0603MLA-18KE 
+D2         MF06A_N               3445mil       1000mil       3445mil       1000mil   3407.598mil    952.756mil  T         90.00 ESDA6V1-5SC6   
+D1         PCB-acsqsz06h0bi34fqghyj-1        310mil       2205mil        310mil       2205mil        310mil   2301.457mil  T        270.00 SMBJ15CA       
+C29        PCB-5eg0a5nygcrzw5ibm1j9-1       1445mil       1515mil       1445mil       1515mil       1445mil   1609.744mil  T         90.00 100uF 25V 105º SMD 6.6x6.6mm D=6.3mm
+C20        CAPC1608X60X35NL10T15        585mil        960mil        585mil        960mil    611.575mil        960mil  T        180.00 100nF 0603 X7R 100V
+C19        CAPC1608X60X35NL10T15        625mil        655mil        625mil        655mil        625mil    681.575mil  T        270.00 100nF 0603 X7R 100V
+C18        CAPC1608X60X35NL10T15        680mil        655mil        680mil        655mil        680mil    681.575mil  T        270.00 100nF 0603 X7R 100V
+C17        CAPC1608X60X35NL10T15    2817.48mil         70mil    2817.48mil         70mil   2844.055mil         70mil  T        180.00 1uF 0603 X5R 16V
+C16        CAPC1608X60X35NL10T15       2455mil        390mil       2455mil        390mil   2428.425mil        390mil  T        360.00 100nF 0603 X7R 100V
+C7         CAPC1608X60X35NL10T15       1890mil        985mil       1890mil        985mil       1890mil    958.425mil  T         90.00 18pF 0603 NPO 5% 50V
+C6         CAPC1608X60X35ML10T15       1755mil        995mil       1755mil        995mil       1755mil   1023.543mil  T        270.00 1uF 0603 X5R 16V
+C5         CAPC1608X60X35NL10T15       1890mil        775mil       1890mil        775mil       1890mil    801.575mil  T        270.00 18pF 0603 NPO 5% 50V
+C4         CAPC1608X60X35NL10T15       1590mil       1230mil       1590mil       1230mil   1563.425mil       1230mil  T          0.00 1uF 0603 X5R 16V
+C3         CAPC1608X60X35NL10T15       1305mil       1240mil       1305mil       1240mil   1278.425mil       1240mil  T          0.00 1uF 0603 X5R 16V
+C2         CAPC1608X60X35NL10T15       1605mil        635mil       1605mil        635mil   1631.575mil        635mil  T        180.00 1uF 0603 X5R 16V
+C1         CAPC1608X60X35NL10T15       1145mil        780mil       1145mil        780mil       1145mil    753.425mil  T         90.00 1uF 0603 X5R 16V
+J4         PCB-9bbxoaz61thsmuxn7f5e-1         70mil        835mil         70mil        135mil         70mil        135mil  T         90.00 Amphenol TBP01R2-508-08BE
+Q9         DPAK_IPD90P03P404ATMA1    581.496mil       1790mil        550mil       1790mil    723.228mil   1699.842mil  T        180.00 IPD90P03P404ATMA1
+U2         SIM800C           2818.189mil   1029.055mil       2580mil        720mil       2580mil        720mil  T         90.00 Simcom SIM800C 
+J10        PCB-az7j7v00du7ll54n3o04-1       3600mil    1301.26mil       3600mil    1301.26mil       3600mil    1419.37mil  T         90.00 Molex 53290-0480
+Q6         PCB-s29nlaacffy4qzcyhtz9-1        680mil        215mil        680mil        215mil        680mil        115mil  T        180.00 Infineon IRLB8314PBF
+C32        CAPC1608X60X35NL10T15       1155mil       2050mil       1155mil       2050mil   1181.575mil       2050mil  T        180.00 10uF 0603 X5R 6.3V
+C13        PCB-5eg0a5nygcrzw5ibm1j9-1        150mil       1860mil        150mil       1860mil        150mil   1765.256mil  T        270.00 100uF 25V 105º SMD 6.6x6.6mm D=6.3mm
+C31        PCB-5eg0a5nygcrzw5ibm1j9-1       2175mil       1300mil       2175mil       1300mil       2175mil   1205.256mil  T        270.00 100uF 25V 105º SMD 6.6x6.6mm D=6.3mm
+F1         PCB-m5opblue4hjll7k5rrhf-1    618.425mil       2000mil        520mil       2000mil        520mil       2000mil  T        360.00 Eaton PTR016V1000-BK
+R42        RESC1609X55X30ML10T20        545mil        650mil        545mil        650mil        545mil     617.52mil  T         90.00 0R 0603 0.1W 1%
+U8         PCB-0iq7iyy8nrzrpmpo9lhg-1   2431.732mil    842.913mil       3960mil       1695mil       3875mil   1492.913mil  B        270.00 2.2 / 2.4 tft compatible (touch / no touch)
+BUZ1       BUZZER-12MM-NS    1104.976mil       2210mil       1105mil       2210mil        977mil       2210mil  B        180.00 CUI CMT-1285C-035
+J1         PCB-h4cyb3wxd4gf7j132tzl-1        175mil       2205mil        175mil       2205mil        175mil       2105mil  B         90.00 Degson 2EDGK-5.08-02P-14-00AH
+SW1        BOUR-PEC11R-4XXXF-SXXXX_V        580mil    775.158mil        580mil        785mil    678.425mil   1060.591mil  B        180.00 Bourns PEC11R-4215F-S0024
+RF_PCB1    PCB-k9titb4465gfk1ijwrnj-1       1795mil       1975mil       1620mil       1940mil       1935mil       1975mil  B        180.00 Planar Inverted-F Antenna
+R52        RESC1609X55X30ML10T20       2565mil       1475mil       2565mil       1475mil   2587.967mil   1452.033mil  T        135.00 0R 0603 0.1W 1%
+C34        CAPC1608X60X35NL10T15       2815mil        335mil       2815mil        335mil   2788.425mil        335mil  T        360.00 1uF 0603 X5R 16V
+J12        PCB-pp1at3pfx7vls1ur72ey-1       3060mil        390mil       3010mil        390mil       3010mil        390mil  T        360.00 JST B2B-XH-A   
+R54        RESC1609X55X30ML10T20       2665mil        335mil       2665mil        335mil    2632.52mil        335mil  T          0.00 10K 0603 0.1W 1%
+
