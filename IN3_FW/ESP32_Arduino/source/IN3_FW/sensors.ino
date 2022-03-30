@@ -103,11 +103,11 @@ bool measurenumNTC() {
         analogMeasurement = readExternalADC() / 3300;
         switch (mySensor.getInputMultiplexer()) {
           case ADS122C04_MUX_AIN0_AVSS:
-            temperatureArray[babyNTC][temperature_array_pos] = analogMeasurement;
+            temperatureArray[babySensor][temperature_array_pos] = analogMeasurement;
             mySensor.setInputMultiplexer(ADS122C04_MUX_AIN1_AVSS);
             break;
           case ADS122C04_MUX_AIN1_AVSS:
-            temperatureArray[airNTC][temperature_array_pos] = analogMeasurement;
+            temperatureArray[airSensor][temperature_array_pos] = analogMeasurement;
             mySensor.setInputMultiplexer(ADS122C04_MUX_AIN0_AVSS);
             temperature_array_pos++;
             break;
@@ -120,14 +120,12 @@ bool measurenumNTC() {
     }
   }
   else {
-    for (int i = false; i < numNTC; i++) {
-      analogMeasurement = analogRead(NTC_PIN[i]);
-      temperatureArray[i][temperature_array_pos] = analogMeasurement;
-    }
+    analogMeasurement = analogRead(NTC_PIN[babySensor]);
+    temperatureArray[babySensor][temperature_array_pos] = analogMeasurement;
     temperature_array_pos++;
   }
   if (temperature_array_pos >= temperature_filter) {
-    updateTemp(numNTC);
+    updateTemp(babySensor);
     temperature_array_pos = false;
     return true;
   }
@@ -145,62 +143,58 @@ void updateTemp(byte sensor) {
   byte startSensor;
   byte endSensor;
 
-  switch (sensor) {
-    case babyNTC:
-      startSensor = babyNTC;
-      endSensor = babyNTC;
-      break;
-    case airNTC:
-      startSensor = airNTC;
-      endSensor = airNTC;
-      break;
-    case numNTC:
-      startSensor = babyNTC;
-      endSensor = airNTC;
-      break;
-  }
-
   //Bloque de cálculo
-  for (int i = startSensor; i <= endSensor; i++) {
-    //Variables used in calculus
-    float vm = 0.0;
-    float rntc = 0.0;
-    temperatureMean = false;
-    for (int j = false; j < temperature_filter; j++) {
-      temperatureMean += temperatureArray[i][j];
-    }
-    temperatureMean /= temperature_filter;
+  //Variables used in calculus
+  float vm = 0.0;
+  float rntc = 0.0;
+  temperatureMean = false;
+  for (int j = false; j < temperature_filter; j++) {
+    temperatureMean += temperatureArray[sensor][j];
+  }
+  temperatureMean /= temperature_filter;
 
-    vm = (vcc) * ( temperatureMean / maxADCvalue );          //Calcular tensión en la entrada
-    rntc = rAux / ((vcc / vm) - 1);                   //Calcular la resistencia de la NTC
-    temperature[i] = beta / (log(rntc / r0) + (beta / temp0)) - 273; //Calcular la temperatura en Celsius
-    errorTemperature[i] = temperature[i];
-    if (RawTemperatureRange[i]) {
-      temperature[i] = (((temperature[i] - RawTemperatureLow[i]) * ReferenceTemperatureRange) / RawTemperatureRange[i]) + ReferenceTemperatureLow;
-    }
-    errorTemperature[i] -= temperature[i];
-    if (temperature[i] < 0) {
-      temperature[i] = 0;
-    }
-    if (temperature[i] > temperatureMax[i]) {
-      temperatureMax[i] = temperature[i];
-    }
-    if (temperature[i] < temperatureMin[i]) {
-      temperatureMin[i] = temperature[i];
-    }
+  vm = (vcc) * ( temperatureMean / maxADCvalue );          //Calcular tensión en la entrada
+  rntc = rAux / ((vcc / vm) - 1);                   //Calcular la resistencia de la NTC
+  temperature[sensor] = beta / (log(rntc / r0) + (beta / temp0)) - 273; //Calcular la temperatura en Celsius
+  errorTemperature[sensor] = temperature[sensor];
+  if (RawTemperatureRange[sensor]) {
+    temperature[sensor] = (((temperature[sensor] - RawTemperatureLow[sensor]) * ReferenceTemperatureRange) / RawTemperatureRange[sensor]) + ReferenceTemperatureLow;
+  }
+  errorTemperature[sensor] -= temperature[sensor];
+  if (temperature[sensor] < 0) {
+    temperature[sensor] = 0;
+  }
+  if (temperature[sensor] > temperatureMax[sensor]) {
+    temperatureMax[sensor] = temperature[sensor];
+  }
+  if (temperature[sensor] < temperatureMin[sensor]) {
+    temperatureMin[sensor] = temperature[sensor];
   }
 }
 
 bool updateRoomSensor() {
-  logln("[SENSORS] -> Updating room humidity");
   if (roomSensorPresent) {
-    if (!mySHTC3.update()) {
-      temperature[digitalTempSensor] =  mySHTC3.toDegC(); //Add here measurement to temp array
+    bool sensorState = mySHTC3.update();
+    logln("[SENSORS] -> Updating room humidity: state is " + String(sensorState));
+    if (!sensorState) {
+      temperature[airSensor] =  mySHTC3.toDegC(); //Add here measurement to temp array
       humidity = mySHTC3.toPercent();
+      if (temperature[airSensor] > temperatureMax[airSensor]) {
+        temperatureMax[airSensor] = temperature[airSensor];
+      }
+      if (temperature[airSensor] < temperatureMin[airSensor]) {
+        temperatureMin[airSensor] = temperature[airSensor];
+      }
       return true;
     }
     else {
+      initRoomSensor();
       return false;
     }
   }
+  else {
+    initRoomSensor();
+    return false;
+  }
+  return false;
 }

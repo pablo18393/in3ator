@@ -3,7 +3,7 @@
 #define humidityCTL 1
 #define numPID 2
 
-double Kp[numPID] = {30000, 200}, Ki[numPID] = {300, 2} , Kd[numPID] = {3000, 20};
+double Kp[numPID] = {200, 200}, Ki[numPID] = {1, 2} , Kd[numPID] = {500, 20};
 double PIDOutput;
 double temperaturePIDInput;
 double humidityPIDOutput;
@@ -15,10 +15,10 @@ PID humidityPID(&humidity, &humidityPIDOutput, &desiredRoomHum, Kp[humidityCTL],
 void PIDHandler() {
   if (temperaturePID.GetMode() == AUTOMATIC) {
     if (controlMode) {
-      temperaturePIDInput = temperature[airNTC];
+      temperaturePIDInput = temperature[airSensor];
     }
     else {
-      temperaturePIDInput = temperature[babyNTC];
+      temperaturePIDInput = temperature[babySensor];
     }
     temperaturePID.Compute();
     ledcWrite(HEATER_PWM_CHANNEL, PIDOutput);
@@ -31,14 +31,24 @@ void PIDHandler() {
     }
     if (humidityPIDOutput < millis() - windowStartTime) {
       if (humidifierState || humidifierStateChange) {
-        GPIOWrite(HUMIDIFIER, LOW);
+        if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
+          ledcWrite(HUMIDIFIER_PWM_CHANNEL, false);
+        }
+        else {
+          GPIOWrite(HUMIDIFIER, LOW);
+        }
         humidifierStateChange = false;
       }
       humidifierState = false;
     }
     else {
       if (!humidifierState || humidifierStateChange) {
-        GPIOWrite(HUMIDIFIER, HIGH);
+        if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
+          ledcWrite(HUMIDIFIER_PWM_CHANNEL, PWM_MAX_VALUE / 2);
+        }
+        else {
+          GPIOWrite(HUMIDIFIER, HIGH);
+        }
         humidifierStateChange = false;
       }
       humidifierState = true;
@@ -47,7 +57,7 @@ void PIDHandler() {
 }
 
 void startTemperaturePID() {
-  temperaturePID.SetOutputLimits(heaterMaxPWM, heaterMaxPWM);
+  temperaturePID.SetOutputLimits(false, heaterMaxPWM);
   temperaturePID.SetTunings(Kp[tempCTL], Ki[tempCTL], Kd[tempCTL]);
   temperaturePID.SetControllerDirection(DIRECT);
   temperaturePID.SetMode(AUTOMATIC);

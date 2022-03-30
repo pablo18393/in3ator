@@ -47,7 +47,7 @@
 #define HUMIDIFIER_CONSUMPTION_MAX_ERROR  1<<14
 
 #define STANDBY_CONSUMPTION_MAX_ERROR 1<<15
-#define DEFECTIVE_POWER_EN 1<<16
+
 #define DEFECTIVE_SCREEN 1<<17
 #define DEFECTIVE_BUZZER 1<<18
 #define DEFECTIVE_CURRENT_SENSOR 1<<19
@@ -79,7 +79,6 @@ void initHardware() {
   initPowerAlarm();
   initBuzzer();
   initInterrupts();
-  initPowerEn();
   initActuators();
   initGPRS();
   if (WIFI_EN) {
@@ -126,7 +125,6 @@ void initCurrentSensor() {
   Wire.beginTransmission(digitalCurrentSensor_i2c_address);
   digitalCurrentSensorPresent = !(Wire.endTransmission());
   if (digitalCurrentSensorPresent) {
-    temperature_filter = digital_temperature_filter;
     PAC.begin();
     PAC.setSampleRate(1024);
     PAC.UpdateCurrent();
@@ -179,14 +177,23 @@ void initExternalADC() {
 }
 
 void initPWMGPIO() {
-  ledcSetup(SCREENBACKLIGHT_PWM_CHANNEL, PWM_FREQUENCY, PWM_RESOLUTION);
-  ledcSetup(HEATER_PWM_CHANNEL, PWM_FREQUENCY, PWM_RESOLUTION);
-  ledcSetup(BUZZER_PWM_CHANNEL, PWM_FREQUENCY, PWM_RESOLUTION);
-
+  ledcSetup(SCREENBACKLIGHT_PWM_CHANNEL, DEFAULT_PWM_FREQUENCY, DEFAULT_PWM_RESOLUTION);
+  ledcSetup(HEATER_PWM_CHANNEL, DEFAULT_PWM_FREQUENCY, DEFAULT_PWM_RESOLUTION);
+  ledcSetup(BUZZER_PWM_CHANNEL, DEFAULT_PWM_FREQUENCY, DEFAULT_PWM_RESOLUTION);
+  if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
+    ledcSetup(HUMIDIFIER_PWM_CHANNEL, HUMIDIFIER_PWM_FREQUENCY, DEFAULT_PWM_RESOLUTION);
+  }
+  pinMode(SCREENBACKLIGHT, OUTPUT);
+  pinMode(HEATER, OUTPUT);
+  pinMode(BUZZER, OUTPUT);
   ledcAttachPin(SCREENBACKLIGHT, SCREENBACKLIGHT_PWM_CHANNEL);
   ledcAttachPin(HEATER, HEATER_PWM_CHANNEL);
   ledcAttachPin(BUZZER, BUZZER_PWM_CHANNEL);
-
+  if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
+    pinMode(HUMIDIFIER, OUTPUT);
+    ledcAttachPin(HUMIDIFIER, HUMIDIFIER_PWM_CHANNEL);
+    ledcWrite(HUMIDIFIER_PWM_CHANNEL, false);
+  }
   ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, false);
   ledcWrite(HEATER_PWM_CHANNEL, false);
   ledcWrite(BUZZER_PWM_CHANNEL, false);
@@ -247,20 +254,20 @@ void initSensors() {
   initEncoder();
   //sensors verification
   while (!measurenumNTC());
-  if (temperature[babyNTC] < NTC_BABY_MIN) {
+  if (temperature[babySensor] < NTC_BABY_MIN) {
     logln("[HW] -> Fail -> NTC temperature is lower than expected");
     HW_error += NTC_BABY_MIN_ERROR;
   }
-  if (temperature[babyNTC] > NTC_BABY_MAX) {
+  if (temperature[babySensor] > NTC_BABY_MAX) {
     logln("[HW] -> Fail -> NTC temperature is higher than expected");
     HW_error += NTC_BABY_MAX_ERROR;
   }
   if (updateRoomSensor()) {
-    if (temperature[digitalTempSensor] < DIG_TEMP_ROOM_MIN) {
+    if (temperature[airSensor] < DIG_TEMP_ROOM_MIN) {
       logln("[HW] -> Fail -> Room temperature is lower than expected");
       HW_error += DIG_TEMP_ROOM_MIN_ERROR;
     }
-    if (temperature[digitalTempSensor] > DIG_TEMP_ROOM_MAX) {
+    if (temperature[airSensor] > DIG_TEMP_ROOM_MAX) {
       logln("[HW] -> Fail -> Room temperature is higher than expected");
       HW_error += DIG_TEMP_ROOM_MAX_ERROR;
     }
@@ -331,15 +338,15 @@ void initTFT() {
   float testCurrent, offsetCurrent;
   int  timeOut = 4000;
   long processTime = millis();
-  backlightPower = maxPWMvalue / screenBrightnessFactor;
-  backlightPowerSafe = maxPWMvalue * backlightPowerSafePercentage;
+  backlightPower = PWM_MAX_VALUE / screenBrightnessFactor;
+  backlightPowerSafe = PWM_MAX_VALUE * backlightPowerSafePercentage;
   offsetCurrent = measureConsumptionForTime(testTime);
   initPin(TFT_CS, OUTPUT);
   GPIOWrite(TFT_CS, LOW);
   initializeTFT();
   loadlogo();
-  ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, maxPWMvalue);
-  for (int i = maxPWMvalue; i >= backlightPower; i--) {
+  ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, PWM_MAX_VALUE);
+  for (int i = PWM_MAX_VALUE; i >= backlightPower; i--) {
     ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, i);
     delayMicroseconds(brightenRate);
   }
@@ -436,29 +443,6 @@ void buzzerTone (int beepTimes, int timeDelay, int freq) {
   buzzerToneTime = timeDelay;
 }
 
-void initPowerEn() {
-  long error = HW_error;
-  float testCurrent, offsetCurrent;
-
-  offsetCurrent = measureConsumptionForTime(testTime);
-  logln("[HW] -> Checking power enable circuit...");
-  initPin(POWER_EN, OUTPUT);
-  GPIOWrite(POWER_EN, HIGH);
-
-  testCurrent = measureConsumptionForTime(testTime) - offsetCurrent;
-  if (testCurrent > STANDBY_CONSUMPTION_MAX) {
-    HW_error += DEFECTIVE_POWER_EN;
-    logln("[HW] -> Fail -> Defective power enable circuit");
-  }
-  if (error == HW_error) {
-    logln("[HW] -> OK -> Power enable is working as expected: " + String (testCurrent) + " Amps");
-  }
-  else {
-    logln("[HW] -> Fail -> test current is " + String (testCurrent) + " Amps");
-  }
-  GPRSSetPostVariables(NULL, ",PWEN:" + String (testCurrent));
-}
-
 void actuatorsTest() {
   long error = HW_error;
   float testCurrent, offsetCurrent;
@@ -480,7 +464,12 @@ void actuatorsTest() {
   }
   GPIOWrite(PHOTOTHERAPY, LOW);
 
-  GPIOWrite(HUMIDIFIER, HIGH);
+  if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
+    ledcWrite(HUMIDIFIER_PWM_CHANNEL, PWM_MAX_VALUE / 2);
+  }
+  else {
+    GPIOWrite(HUMIDIFIER, HIGH);
+  }
   testCurrent = measureConsumptionForTime(testTime) - offsetCurrent;
   logln("[HW] -> Humidifier current consumption: " + String (testCurrent) + " Amps");
   GPRSSetPostVariables(NULL, ",Hum:" + String (testCurrent));
@@ -492,8 +481,12 @@ void actuatorsTest() {
     HW_error += HUMIDIFIER_CONSUMPTION_MAX_ERROR;
     logln("[HW] -> Fail -> HUMIDIFIER current consumption is too high");
   }
-  GPIOWrite(HUMIDIFIER, LOW);
-
+  if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
+    ledcWrite(HUMIDIFIER_PWM_CHANNEL, false);
+  }
+  else {
+    GPIOWrite(HUMIDIFIER, LOW);
+  }
   GPIOWrite(FAN, HIGH);
   testCurrent = measureConsumptionForTime(testTime) - offsetCurrent;
   logln("[HW] -> FAN consumption: " + String (testCurrent) + " Amps");
@@ -508,7 +501,7 @@ void actuatorsTest() {
   }
   GPIOWrite(FAN, LOW);
 
-  ledcWrite(HEATER_PWM_CHANNEL, maxPWMvalue);
+  ledcWrite(HEATER_PWM_CHANNEL, PWM_MAX_VALUE);
   testCurrent = measureConsumptionForTime(testTime) - offsetCurrent;
   logln("[HW] -> Heater current consumption: " + String (testCurrent) + " Amps");
   GPRSSetPostVariables(NULL, ",Hea:" + String (testCurrent));

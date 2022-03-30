@@ -21,8 +21,10 @@ void encoderISR() {
   encoder.tick(); // just call tick() to check the state.
   newPos = encoder.getPosition();
   lastbacklightHandler = millis();
-  EncMove = EncMoveOrientation * int(encoder.getDirection());
-  last_encoder_move = newPos;
+  if (abs(lastEncMove - newPos) > ENCODER_TICKS_DIV) {
+    EncMove = EncMoveOrientation * int(encoder.getDirection());
+    lastEncMove = newPos;
+  }
 }
 
 void powerAlertISR() {

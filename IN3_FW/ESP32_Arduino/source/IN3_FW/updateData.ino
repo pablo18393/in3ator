@@ -24,19 +24,25 @@ int updateData() {
     if (humidityPID.GetMode() == AUTOMATIC) {
       logln("[PID] -> Humidifier output is: " + String (100 * humidityPIDOutput / humidifierTimeCycle) + "%");
     }
-    
+
     //logln("[SENSORS] -> Current consumption is: " + String (analogRead(SYSTEM_SHUNT)) + "," + String (currentConsumption) + " Amps");
     logln("[DEBUG] -> Current measurements " + String (sensorMeasurements) + " times");
     logln("[DEBUG] -> ADC measurements " + String (ADCmeasurements) + " times");
-    sensorMeasurements=0;
-    ADCmeasurements=0;
+    sensorMeasurements = 0;
+    ADCmeasurements = 0;
     logln("[SENSORS] -> Current consumption is: " + String (measureMeanConsumption()) + " Amps");
-    logln("[SENSORS] -> Baby temperature: " + String(temperature[babyNTC]) + "ºC, correction error is " + String(errorTemperature[babyNTC]));
-    logln("[SENSORS] -> Air temperature: " + String(temperature[airNTC]) + "ºC, correction error is " + String(errorTemperature[airNTC]));
-    logln("[SENSORS] -> Floor temperature: " + String(temperature[digitalTempSensor]) + "ºC, correction error is " + String(errorTemperature[digitalTempSensor]));
-    if (abs(temperature[digitalTempSensor] - temperature[babyNTC]) > 0.5 || abs(temperature[digitalTempSensor] - temperature[airNTC]) > 0.5) {
-      //logln("[ALARM] -> TEMP DEVIATION");
-    }
+    logln("[SENSORS] -> Baby temperature: " + String(temperature[babySensor]) + "ºC, correction error is " + String(errorTemperature[babySensor]));
+    /*
+    Serial.print(String(desiredSkinTemp));
+    Serial.print(",");
+    Serial.print(String(temperature[babySensor]));
+    Serial.print(",");
+    Serial.print(String(temperature[airSensor]));
+    Serial.print(",");
+    Serial.println(String(measureMeanConsumption()));
+    */            
+    logln("[SENSORS] -> Air temperature: " + String(temperature[airSensor]) + "ºC, correction error is " + String(errorTemperature[airSensor]));
+    logln("[SENSORS] -> Digital Temp: " + String(temperature[airSensor], 2) + "ºC");
     logln("[SENSORS] -> Humidity: " + String(humidity) + "%");
     logln("[LATENCY] -> Looped " + String(loopCounts * 1000 / (millis() - lastDebugUpdate)) + " Times per second");
     loopCounts = 0;
@@ -69,10 +75,10 @@ void updateDisplaySensors() {
         drawRightNumber(temperaturePercentage, tft.width() / 2, temperatureY);
       }
       if (controlMode) {
-        temperatureToUpdate = temperature[airNTC];
+        temperatureToUpdate = temperature[airSensor];
       }
       else {
-        temperatureToUpdate = temperature[babyNTC];
+        temperatureToUpdate = temperature[babySensor];
       }
       temperaturePercentage = 100 - ((desiredSkinTemp - temperatureToUpdate) * 100 / (desiredSkinTemp - temperatureAtStart));
       if (temperaturePercentage > 99) {
@@ -141,7 +147,7 @@ void GPRSLocalLog() {
       GPIOWrite(SD_CS, LOW);
       GPIOWrite(TFT_CS, HIGH);
       String dataString;
-      dataString += temperature[babyNTC];
+      dataString += temperature[babySensor];
       dataString += ";";
       dataString += humidity;
       dataString += ";";

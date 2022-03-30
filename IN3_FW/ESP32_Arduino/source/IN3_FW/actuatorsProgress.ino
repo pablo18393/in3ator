@@ -23,10 +23,10 @@ void actuatorsProgress() {
     printLoadingTemperatureBar();
   }
   if (controlMode) {
-    temperatureAtStart = temperature[airNTC];
+    temperatureAtStart = temperature[airSensor];
   }
   else {
-    temperatureAtStart = temperature[babyNTC];
+    temperatureAtStart = temperature[babySensor];
   }
   if (controlMode) {
     switch (language) {
@@ -135,10 +135,10 @@ void actuatorsProgress() {
     updateData();
     if (controlTemperature) {
       if (controlMode) {
-        alarmSensedValue = temperature[airNTC];
+        alarmSensedValue = temperature[airSensor];
       }
       else {
-        alarmSensedValue = temperature[babyNTC];
+        alarmSensedValue = temperature[babySensor];
       }
       if (checkAlarms(desiredSkinTemp, alarmSensedValue, temperatureError, temperatureAlarmTime)) {
         if (!alarmOnGoing[temperatureAlarm]) {
@@ -162,7 +162,7 @@ void actuatorsProgress() {
       }
     }
     if (controlHumidity) {
-      checkTFTHealth();
+      //checkTFTHealth();
       if (controlAlgorithm == BASIC_CONTROL) {
         basicHumidityControl();
       }
@@ -206,10 +206,10 @@ void actuatorsProgress() {
 void basictemperatureControl() {
   float temperatureToControl;
   if (controlMode) {
-    temperatureToControl = temperature[airNTC];
+    temperatureToControl = temperature[airSensor];
   }
   else {
-    temperatureToControl = temperature[babyNTC];
+    temperatureToControl = temperature[babySensor];
   }
   if (temperatureToControl < desiredSkinTemp) {
     heatUp();
@@ -231,14 +231,24 @@ void basicHumidityControl() {
 
   if (humidity < desiredRoomHum) {
     if (!humidifierState || humidifierStateChange) {
-      GPIOWrite(HUMIDIFIER, HIGH);
+      if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
+        ledcWrite(HUMIDIFIER_PWM_CHANNEL, PWM_MAX_VALUE / 2);
+      }
+      else {
+        GPIOWrite(HUMIDIFIER, HIGH);
+      }
       humidifierStateChange = false;
     }
     humidifierState = true;
   }
   else {
     if (humidifierState || humidifierStateChange) {
-      GPIOWrite(HUMIDIFIER, LOW);
+      if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
+        ledcWrite(HUMIDIFIER_PWM_CHANNEL, false);
+      }
+      else {
+        GPIOWrite(HUMIDIFIER, LOW);
+      }
       humidifierStateChange = false;
     }
     humidifierState = false;
@@ -259,7 +269,12 @@ void stopActuation() {
 
 void turnActuators(bool mode) {
   ledcWrite(HEATER_PWM_CHANNEL, mode * heaterMaxPWM);
-  GPIOWrite(HUMIDIFIER, mode);
+  if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
+    ledcWrite(HUMIDIFIER_PWM_CHANNEL, PWM_MAX_VALUE / 2);
+  }
+  else {
+    GPIOWrite(HUMIDIFIER, mode);
+  }
   turnFans(mode);
 }
 

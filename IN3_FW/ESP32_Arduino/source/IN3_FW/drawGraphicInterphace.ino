@@ -404,44 +404,44 @@ int graphicHeight(int position) {
 void drawSelectedTemperature() {
   float temperatureToDraw, previousTemperatureDrawn;
   if (controlMode) {
-    previousTemperatureDrawn = previousTemperature[airNTC];
-    temperatureToDraw = temperature[airNTC];
+    previousTemperatureDrawn = previousTemperature[airSensor];
+    temperatureToDraw = temperature[airSensor];
   }
   else {
-    previousTemperatureDrawn = previousTemperature[babyNTC];
-    temperatureToDraw = temperature[babyNTC];
+    previousTemperatureDrawn = previousTemperature[babySensor];
+    temperatureToDraw = temperature[babySensor];
   }
   setTextColor(COLOR_MENU);
   drawFloat(previousTemperatureDrawn, 1, temperatureX, temperatureY, textFontSize);
   setTextColor(COLOR_MENU_TEXT);
   drawFloat(temperatureToDraw, 1, temperatureX, temperatureY, textFontSize);
   if (controlMode) {
-    previousTemperature[airNTC] = temperatureToDraw;
+    previousTemperature[airSensor] = temperatureToDraw;
   }
   else {
-    previousTemperature[babyNTC] = temperatureToDraw;
+    previousTemperature[babySensor] = temperatureToDraw;
   }
 }
 
 void drawUnselectedTemperature() {
   float temperatureToDraw, previousTemperatureDrawn;
   if (!controlMode) {
-    previousTemperatureDrawn = previousTemperature[airNTC];
-    temperatureToDraw = temperature[airNTC];
+    previousTemperatureDrawn = previousTemperature[airSensor];
+    temperatureToDraw = temperature[airSensor];
   }
   else {
-    previousTemperatureDrawn = previousTemperature[babyNTC];
-    temperatureToDraw = temperature[babyNTC];
+    previousTemperatureDrawn = previousTemperature[babySensor];
+    temperatureToDraw = temperature[babySensor];
   }
   tft.setTextColor(COLOR_MENU);
   drawFloat(previousTemperatureDrawn, 1, tft.width() / 2 - 20, tft.height() / 2 + 10, textFontSize);
   tft.setTextColor(COLOR_MENU_TEXT);
   drawFloat(temperatureToDraw, 1, tft.width() / 2 - 20, tft.height() / 2 + 10, textFontSize);
   if (!controlMode) {
-    previousTemperature[airNTC] = temperatureToDraw;
+    previousTemperature[airSensor] = temperatureToDraw;
   }
   else {
-    previousTemperature[babyNTC] = temperatureToDraw;
+    previousTemperature[babySensor] = temperatureToDraw;
   }
 }
 

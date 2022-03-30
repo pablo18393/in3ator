@@ -3,7 +3,7 @@
 */
 
 //Firmware version and head title of UI screen
-#define FWversion "v8.3/7.A"
+#define FWversion "v8.3/8.B"
 #define headingTitle "in3ator"
 
 #include <esp_task_wdt.h>
@@ -36,9 +36,9 @@ RotaryEncoder encoder(ENC_A, ENC_B, RotaryEncoder::LatchMode::TWO03);
 Microchip_PAC193x PAC(Rsense);
 SFE_ADS122C04 mySensor;
 #define externalADC_i2c_address 64
-#define digitalCurrentSensor_i2c_address 23
+#define digitalCurrentSensor_i2c_address 112
 
-int serialNumber=45;
+int serialNumber = 45;
 #define WDT_TIMEOUT 15
 
 #define ON true
@@ -104,12 +104,11 @@ byte language;
 #define defaultLanguage english //Preset number configuration when booting for first time
 
 //number assignment of each enviromental sensor for later call in variable
-#define babyNTC 0
-#define airNTC 1
-#define digitalTempSensor 2
+#define babySensor 0
+#define airSensor 1
 
-#define numNTC 2 //number of NTC
-#define numTempSensors 3 //number of total temperature sensors in system
+#define numNTC 1 //number of NTC
+#define numTempSensors 2 //number of total temperature sensors in system
 #define current_filter 100 //amount of temperature samples to filter
 #define analog_temperature_filter 500 //amount of temperature samples to filter
 #define digital_temperature_filter 10 //amount of temperature samples to filter
@@ -120,11 +119,13 @@ int temperature_filter = analog_temperature_filter; //amount of temperature samp
 #define CurrentUpdatePeriod 1000 //in millis
 long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
 
-int NTC_PIN[numNTC] = {BABY_NTC_PIN, AIR_NTC_PIN};
+int NTC_PIN[numNTC] = {BABY_NTC_PIN};
 double temperature[numTempSensors];
 double errorTemperature[numTempSensors], temperatureCalibrationPoint;
 double ReferenceTemperatureRange, ReferenceTemperatureLow;
+double provisionalReferenceTemperatureLow;
 double RawTemperatureLow[numTempSensors], RawTemperatureRange[numTempSensors];
+double provisionalRawTemperatureLow[numTempSensors];
 double temperatureMaxReset = -1000;
 double temperatureMinReset = 1000;
 double temperatureMax[numTempSensors], temperatureMin[numTempSensors];
@@ -164,9 +165,9 @@ bool WIFI_connection_status = false;
 #define externalADCReadPeriod 30
 
 //sensor variables
-bool roomSensorPresent=false;
-bool externalADCpresent=false;
-bool digitalCurrentSensorPresent=false;
+bool roomSensorPresent = false;
+bool externalADCpresent = false;
+bool digitalCurrentSensorPresent = false;
 long lastDigitalCurrentSensorRead;
 long lastexternalADCRead;
 byte roomSensorAddress = 112;
@@ -218,12 +219,14 @@ const float screenBrightnessFactor = 2.5; //Max brightness will be divided by th
 
 //Encoder variables
 #define NUMENCODERS 1 //number of encoders in circuit
+#define ENCODER_TICKS_DIV 0
 boolean A_set;
 boolean B_set;
 int encoderpinA = ENC_A; // pin  encoder A
 int encoderpinB = ENC_B; // pin  encoder B
 bool encPulsed, encPulsedBefore; //encoder switch status
 volatile int EncMove; //moved encoder
+volatile int lastEncMove; //moved last encoder
 volatile int EncMoveOrientation = -1; //set to -1 to increase values clockwise
 volatile int last_encoder_move; //moved encoder
 long encoder_debounce_time = true; //in milliseconds, debounce time in encoder to filter signal bounces

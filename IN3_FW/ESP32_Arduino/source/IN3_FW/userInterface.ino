@@ -334,38 +334,18 @@ bool userInterfaceHandler() {
             firstPointCalibration();
             break;
           case restartCalibrationGraphicPosition:
-            for (int i = 0; i < numTempSensors; i++) {
-              RawTemperatureLow [i] = false;
-              RawTemperatureRange [i] = false;
-            }
-            ReferenceTemperatureRange = false;
-            ReferenceTemperatureLow = false;
-            diffHumidity = false;
-            /*
-              EEPROM.writeFloat(EEPROM_diffAirTemperature, diffTemperature[airNTC]);
-              EEPROM.writeFloat(EEPROM_diffSkinTemperature, diffTemperature[babyNTC]);
-            */
-            EEPROM.writeFloat(EEPROM_RawSkinTemperatureLowCorrection, RawTemperatureLow[babyNTC]);
-            EEPROM.writeFloat(EEPROM_RawSkinTemperatureRangeCorrection, RawTemperatureRange[babyNTC]);
-            EEPROM.writeFloat(EEPROM_RawAirTemperatureLowCorrection, RawTemperatureLow[airNTC]);
-            EEPROM.writeFloat(EEPROM_RawAirTemperatureRangeCorrection, RawTemperatureRange[airNTC]);
-            EEPROM.writeFloat(EEPROM_RawDigitalTemperatureLowCorrection, RawTemperatureLow[digitalTempSensor]);
-            EEPROM.writeFloat(EEPROM_RawDigitalTemperatureRangeCorrection, RawTemperatureRange[digitalTempSensor]);
-            EEPROM.writeFloat(EEPROM_ReferenceTemperatureRange, ReferenceTemperatureRange);
-            EEPROM.writeFloat(EEPROM_ReferenceTemperatureLow, ReferenceTemperatureLow);
-            EEPROM.write(EEPROM_diffHumidity, diffHumidity);
-            EEPROM.commit();
+            loadDefaultCalibration();
+            recapVariables();
             calibrateSensors();
             break;
         }
         break;
       case firstPointCalibrationPage:
+        RawTemperatureRange[babySensor] = false;
         switch (bar_pos - graphicTextOffset ) {
           case temperatureCalibrationGraphicPosition:
-            for (int i = 0; i < numTempSensors; i++) {
-              errorTemperature[i] = false;
-            }
-            diffTemperature = temperature[babyNTC];
+            errorTemperature[babySensor] = false;
+            diffTemperature = temperature[babySensor];
             while (GPIORead(ENC_SWITCH)) {
               updateData();
               if (EncMove) {
@@ -379,10 +359,9 @@ bool userInterfaceHandler() {
             }
             break;
           case setCalibrationGraphicPosition:
-            ReferenceTemperatureLow = diffTemperature;
-            for (int i = 0; i < numTempSensors; i++) {
-              RawTemperatureLow[i] = temperature[i];
-            }
+            provisionalReferenceTemperatureLow = diffTemperature;
+            provisionalRawTemperatureLow[babySensor] = temperature[babySensor];
+            logln("[CALIBRATION] -> Low reference point is " + String(provisionalReferenceTemperatureLow) +  ", low raw skin point is " + String(provisionalRawTemperatureLow[babySensor]));
             secondPointCalibration();
             break;
         }
@@ -390,7 +369,7 @@ bool userInterfaceHandler() {
       case secondPointCalibrationPage:
         switch (bar_pos - graphicTextOffset ) {
           case temperatureCalibrationGraphicPosition:
-            diffTemperature = temperature[babyNTC];
+            diffTemperature = temperature[babySensor];
             while (GPIORead(ENC_SWITCH)) {
               updateData();
               if (EncMove) {
@@ -405,18 +384,16 @@ bool userInterfaceHandler() {
             }
             break;
           case setCalibrationGraphicPosition:
+            ReferenceTemperatureLow = provisionalReferenceTemperatureLow;
+            RawTemperatureLow[babySensor] = provisionalRawTemperatureLow[babySensor];
             ReferenceTemperatureRange = diffTemperature - ReferenceTemperatureLow;
             if (temperatureCalibrationPoint != diffTemperature) {
-              for (int i = 0; i < numTempSensors; i++) {
-                RawTemperatureRange[i] = (temperature[i] - RawTemperatureLow[i]);
-                Serial.println("calibration factors: " + String(RawTemperatureLow [i]) + "," + String (RawTemperatureRange [i]) + "," + String (ReferenceTemperatureRange) + "," + String (ReferenceTemperatureLow));
-              }
-              EEPROM.writeFloat(EEPROM_RawSkinTemperatureLowCorrection, RawTemperatureLow[babyNTC]);
-              EEPROM.writeFloat(EEPROM_RawSkinTemperatureRangeCorrection, RawTemperatureRange[babyNTC]);
-              EEPROM.writeFloat(EEPROM_RawAirTemperatureLowCorrection, RawTemperatureLow[airNTC]);
-              EEPROM.writeFloat(EEPROM_RawAirTemperatureRangeCorrection, RawTemperatureRange[airNTC]);
-              EEPROM.writeFloat(EEPROM_RawDigitalTemperatureLowCorrection, RawTemperatureLow[digitalTempSensor]);
-              EEPROM.writeFloat(EEPROM_RawDigitalTemperatureRangeCorrection, RawTemperatureRange[digitalTempSensor]);
+              RawTemperatureRange[babySensor] = (temperature[babySensor] - RawTemperatureLow[babySensor]);
+              Serial.println("calibration factors: " + String(RawTemperatureLow [babySensor]) + "," + String (RawTemperatureRange [babySensor]) + "," + String (ReferenceTemperatureRange) + "," + String (ReferenceTemperatureLow));
+              EEPROM.writeFloat(EEPROM_RawSkinTemperatureLowCorrection, RawTemperatureLow[babySensor]);
+              EEPROM.writeFloat(EEPROM_RawSkinTemperatureRangeCorrection, RawTemperatureRange[babySensor]);
+              EEPROM.writeFloat(EEPROM_RawDigitalTemperatureLowCorrection, RawTemperatureLow[airSensor]);
+              EEPROM.writeFloat(EEPROM_RawDigitalTemperatureRangeCorrection, RawTemperatureRange[airSensor]);
               EEPROM.writeFloat(EEPROM_ReferenceTemperatureRange, ReferenceTemperatureRange);
               EEPROM.writeFloat(EEPROM_ReferenceTemperatureLow, ReferenceTemperatureLow);
               EEPROM.commit();

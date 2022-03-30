@@ -76,26 +76,24 @@ void loaddefaultValues() {
 }
 
 void loadDefaultCalibration(){
-    EEPROM.writeFloat(EEPROM_RawSkinTemperatureLowCorrection, 23.22);
-    EEPROM.writeFloat(EEPROM_RawSkinTemperatureRangeCorrection, 22.71);
-    EEPROM.writeFloat(EEPROM_RawAirTemperatureLowCorrection, 22.65);
-    EEPROM.writeFloat(EEPROM_RawAirTemperatureRangeCorrection, 22.63);
-    EEPROM.writeFloat(EEPROM_RawDigitalTemperatureLowCorrection, 18.43);
-    EEPROM.writeFloat(EEPROM_RawDigitalTemperatureRangeCorrection, 0.16);
-    EEPROM.writeFloat(EEPROM_ReferenceTemperatureRange, 22.06);
-    EEPROM.writeFloat(EEPROM_ReferenceTemperatureLow, 18.98);
+    EEPROM.writeFloat(EEPROM_RawSkinTemperatureLowCorrection, 20.30);
+    EEPROM.writeFloat(EEPROM_RawSkinTemperatureRangeCorrection, 17.19);
+    EEPROM.writeFloat(EEPROM_RawAirTemperatureLowCorrection, 0);
+    EEPROM.writeFloat(EEPROM_RawAirTemperatureRangeCorrection, 0);
+    EEPROM.writeFloat(EEPROM_RawDigitalTemperatureLowCorrection, 0);
+    EEPROM.writeFloat(EEPROM_RawDigitalTemperatureRangeCorrection, 0);
+    EEPROM.writeFloat(EEPROM_ReferenceTemperatureRange, 13.84);
+    EEPROM.writeFloat(EEPROM_ReferenceTemperatureLow, 19.73);
     EEPROM.commit();
 }
 
 void recapVariables() {
   autoLock = EEPROM.read(EEPROM_autoLock);
   language = EEPROM.read(EEPROM_language);
-  RawTemperatureLow[babyNTC] = EEPROM.readFloat(EEPROM_RawSkinTemperatureLowCorrection);
-  RawTemperatureRange[babyNTC] = EEPROM.readFloat(EEPROM_RawSkinTemperatureRangeCorrection);
-  RawTemperatureLow[airNTC] = EEPROM.readFloat(EEPROM_RawAirTemperatureLowCorrection);
-  RawTemperatureRange[airNTC] = EEPROM.readFloat(EEPROM_RawAirTemperatureRangeCorrection);
-  RawTemperatureLow[digitalTempSensor] = EEPROM.readFloat(EEPROM_RawDigitalTemperatureLowCorrection);
-  RawTemperatureRange[digitalTempSensor] = EEPROM.readFloat(EEPROM_RawDigitalTemperatureRangeCorrection);
+  RawTemperatureLow[babySensor] = EEPROM.readFloat(EEPROM_RawSkinTemperatureLowCorrection);
+  RawTemperatureRange[babySensor] = EEPROM.readFloat(EEPROM_RawSkinTemperatureRangeCorrection);
+  RawTemperatureLow[airSensor] = EEPROM.readFloat(EEPROM_RawDigitalTemperatureLowCorrection);
+  RawTemperatureRange[airSensor] = EEPROM.readFloat(EEPROM_RawDigitalTemperatureRangeCorrection);
   ReferenceTemperatureRange = EEPROM.readFloat(EEPROM_ReferenceTemperatureRange);
   ReferenceTemperatureLow = EEPROM.readFloat(EEPROM_ReferenceTemperatureLow);
 

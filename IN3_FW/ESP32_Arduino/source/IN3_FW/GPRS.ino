@@ -256,6 +256,7 @@ void GPRSPowerUp() {
       break;
     case 2:
       if (millis() - GPRS.packetSentenceTime > 7000) {
+        clearGPRSBuffer();
         logln("[GPRS] -> Sending AT command");
         Serial2.print("AT\n");
         GPRS.packetSentenceTime = millis();
@@ -672,10 +673,10 @@ bool GPRSLoadVariables() {
   databasePost[7] = "{";
   databasePost[7] += "\"sn\":\"" + String(serialNumber) + "\"";
   if (GPRS.postBabyTemp) {
-    databasePost[7] += ",\"baby_temp\":\"" + String(temperature[babyNTC], 2) + "\"";
+    databasePost[7] += ",\"baby_temp\":\"" + String(temperature[babySensor], 1) + "\"";
   }
   if (GPRS.postAirTemp) {
-    databasePost[7] += ",\"heater_temp\":\"" + String(temperature[airNTC], 2) + "\"";
+    databasePost[7] += ",\"heater_temp\":\"" + String(temperature[airSensor], 1) + "\"";
   }
   if (GPRS.postBoardTemp1) {
     //databasePost[7] += ",\"board_temp1\":\"" + String(temperature[inBoardLeftNTC], 2) + "\"";
@@ -684,10 +685,10 @@ bool GPRSLoadVariables() {
     //databasePost[7] += ",\"board_temp2\":\"" + String(temperature[inBoardRightNTC], 2) + "\"";
   }
   if (GPRS.postBoardTemp3) {
-    databasePost[7] += ",\"board_temp3\":\"" + String(temperature[digitalTempSensor], 2) + "\"";
+    //databasePost[7] += ",\"board_temp3\":\"" + String(temperature[airSensor], 1) + "\"";
   }
   if (GPRS.postHumidity) {
-    databasePost[7] += ",\"humidity\":\"" + String(humidity) + "\"";
+    databasePost[7] += ",\"humidity\":\"" + String(humidity, 0) + "\"";
   }
   if (GPRS.postLongitud) {
     databasePost[7] += ",\"long\":\"" + GPRS.longitud + "\"";
@@ -715,13 +716,13 @@ bool GPRSLoadVariables() {
   }
   if (GPRS.postComment) {
     if (GPRS.comment.length() < 20) {
-      GPRS.comment += "Baby " + String (temperatureMax[babyNTC], 2) + "/" + String (temperatureMin[babyNTC], 2);
-      GPRS.comment += ";Air " + String (temperatureMax[airNTC], 2) + "/" + String (temperatureMin[airNTC], 2);
+      GPRS.comment += "Baby " + String (temperatureMax[babySensor], 2) + "/" + String (temperatureMin[babySensor], 2);
+      GPRS.comment += ";Air " + String (temperatureMax[airSensor], 2) + "/" + String (temperatureMin[airSensor], 2);
       GPRS.comment += "CM:" + String(controlMode);
-      temperatureMax[babyNTC] = temperatureMaxReset;
-      temperatureMin[babyNTC] = temperatureMinReset;
-      temperatureMax[airNTC] = temperatureMaxReset;
-      temperatureMin[airNTC] = temperatureMinReset;
+      temperatureMax[babySensor] = temperatureMaxReset;
+      temperatureMin[babySensor] = temperatureMinReset;
+      temperatureMax[airSensor] = temperatureMaxReset;
+      temperatureMin[airSensor] = temperatureMinReset;
     }
     databasePost[7] += ",\"comments\":\"" + GPRS.comment + "\"";
   }
