@@ -194,7 +194,6 @@ void actuatorsProgress() {
       updateData();
       exitActuation = back_mode();
       if (exitActuation) {
-        Serial.println("exiting.......................");
         stopActuation();
       }
     }

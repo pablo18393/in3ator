@@ -6,7 +6,7 @@ void sensorsHandler() {
   }
   if (millis() - lastCurrentUpdate > CurrentUpdatePeriod) {
     lastCurrentUpdate = millis();
-    currentConsumption = measureMeanConsumption(defaultCurrentSamples);
+    currentConsumption = measureMeanConsumption(MAIN_SHUNT, defaultCurrentSamples);
   }
   currentMonitor();
 }
@@ -17,7 +17,7 @@ void measureOffsetConsumption() {
 
 float currentMonitor() {
   if (millis() - lastCurrentMeasurement > CurrentMeasurementPeriod ) {
-    instantCurrent[instantCurrent_array_pos] = measureInstantConsumption();
+    instantCurrent[instantCurrent_array_pos] = measureInstantConsumption(MAIN_SHUNT);
     instantCurrent_array_pos++;
     if (instantCurrent_array_pos >= current_filter) {
       instantCurrent_array_pos = 0;
@@ -26,67 +26,58 @@ float currentMonitor() {
   }
 }
 
-float measureConsumptionForTime (long testTimeout) {
-  long ongoingTestTime = millis();
-  float instant_Current;
-  float averageConsumption = 0;
-  long measuredTimes = 0;
-  while (millis() - ongoingTestTime < testTimeout) {
-    instant_Current = measureInstantConsumption();
-    if (instant_Current) {
-      averageConsumption += instant_Current;
-      measuredTimes++;
-    }
-  }
-  if (measuredTimes) {
-    averageConsumption / measuredTimes;
-    averageConsumption = ADCScale(averageConsumption);
-    logln("[TEST] -> tested " + String(measuredTimes) + " times");
-    logln("[TEST] -> Current " + String(averageConsumption));
-    return ADCToAmp(averageConsumption);
-  } else {
-    return false;
+float ADCToAmp(byte currentSensor, float var) {
+  switch (currentSensor) {
+    case MAIN_SHUNT:
+      return (var * currentToAmpFactor_MAIN);
+      break;
+    case HUMIDIFIER_SHUNT:
+      return (var * currentToAmpFactor_HUMIDIFIER);
+      break;
   }
 }
 
-float ADCToAmp(float var) {
-  return (var * CurrentToAmpFactor);
-}
 
 float ADCScale (float var) {
   return (map (var, 0, 3000, 150, 2450));
 }
 
-float measureInstantConsumption() {
+float measureInstantConsumption(byte currentSensor) {
   if (digitalCurrentSensorPresent) {
     PAC.UpdateCurrent();
     return (PAC.Current / 1000); //Amperes
   }
   else {
-    return (analogRead(SYSTEM_SHUNT));
+    switch (currentSensor) {
+      case MAIN_SHUNT:
+        return (analogRead(SYS_SHUNT));
+        break;
+      case HUMIDIFIER_SHUNT:
+        return (analogRead(USB_SHUNT));
+        break;
+    }
   }
 }
 
 long ADCmeasurements;
 long sensorMeasurements;
 
-
-float measureMeanConsumption(int samples) {
+float measureMeanConsumption(byte currentSensor, int samples) {
   float currentMean = 0;
   if (digitalCurrentSensorPresent) {
-      PAC.UpdateCurrent();
-      return (PAC.Current / 1000); //Amperes
+    PAC.UpdateCurrent();
+    return (PAC.Current / 1000); //Amperes
   }
   else {
     for (int i = 0; i < samples; i++) {
-      currentMean += measureInstantConsumption();
+      currentMean += measureInstantConsumption(currentSensor);
     }
     currentMean /= samples;
-    currentMean *= CurrentToAmpFactor;
-    return (currentMean);
+    return (ADCToAmp(currentSensor, currentMean));
   }
   return (false);
 }
+
 bool measurenumNTC() {
   float analogMeasurement;
   unsigned long start_time = millis(); // Record the start time so we can timeout

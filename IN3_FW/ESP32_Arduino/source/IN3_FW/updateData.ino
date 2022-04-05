@@ -30,7 +30,7 @@ int updateData() {
     logln("[DEBUG] -> ADC measurements " + String (ADCmeasurements) + " times");
     sensorMeasurements = 0;
     ADCmeasurements = 0;
-    logln("[SENSORS] -> Current consumption is: " + String (measureMeanConsumption(defaultCurrentSamples)) + " Amps");
+    logln("[SENSORS] -> Current consumption is: " + String (measureMeanConsumption(MAIN_SHUNT, defaultCurrentSamples)) + " Amps");
     logln("[SENSORS] -> Baby temperature: " + String(temperature[babySensor]) + "ºC, correction error is " + String(errorTemperature[babySensor]));
     /*
     Serial.print(String(desiredSkinTemp));

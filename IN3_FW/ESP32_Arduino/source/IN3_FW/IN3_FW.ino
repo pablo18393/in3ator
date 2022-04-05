@@ -161,17 +161,20 @@ bool WIFI_connection_status = false;
 #define externalADCReadPeriod 30
 
 //sensor variables
+#define defaultCurrentSamples 30
+#define defaultTestingSamples 8000
+
 bool roomSensorPresent = false;
 bool externalADCpresent = false;
 bool digitalCurrentSensorPresent = false;
 long lastDigitalCurrentSensorRead;
 long lastexternalADCRead;
 byte roomSensorAddress = 112;
-const int defaultCurrentSamples = 1000;
 float instantCurrent[current_filter];
 int instantCurrent_array_pos = false;
 float currentConsumption;
-float CurrentToAmpFactor = 0.002;
+float currentToAmpFactor_MAIN = 0.002;
+float currentToAmpFactor_HUMIDIFIER = 0.00013;
 int currentConsumptionPos = false;
 
 //room variables
@@ -187,7 +190,7 @@ double desiredHeaterTemp; //desired temperature in heater
 //constants
 const byte humidifierDutyCycleMax = 100; //maximum humidity cycle in heater to be set
 const byte humidifierDutyCycleMin = 0; //minimum humidity cycle in heater to be set
-const byte minTemp = 15; //minimum allowed temperature to be set
+const byte minTemp = 25; //minimum allowed temperature to be set
 const byte maxTemp = 45; //maximum allowed temperature to be set
 const byte maxHum = 100; //maximum allowed humidity to be set
 const byte minHum = 20; //minimum allowed humidity to be set
