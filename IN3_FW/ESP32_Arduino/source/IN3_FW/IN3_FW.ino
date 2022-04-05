@@ -141,8 +141,6 @@ int previousHumidity; //previous sampled humidity
 float diffHumidity; //difference between measured humidity and user input real humidity
 
 //Sensor check rate (in ms). Both sensors are checked in same interrupt and they have different check rates
-const byte pulsioximeterRate = 5;
-byte pulsioximeterCount = false;
 byte encoderRate = true;
 byte encoderCount = false;
 bool encPulseDetected;
@@ -157,9 +155,7 @@ bool WIFI_connection_status = false;
 //GPRS variables to transmit
 #define turnedOn 0 //transmit first turned ON with hardware verification
 #define room 1 //transmit room variables
-#define pulsioximeterSensorVariables 2 //transmit heart rate between others
-#define pulsioximeterSensorRaw 3 //transmit raw pulsioximeter signal
-#define aliveRefresh 4 //message to let know that incubator is still ON
+#define aliveRefresh 2 //message to let know that incubator is still ON
 
 #define digitalCurrentSensorReadPeriod 500
 #define externalADCReadPeriod 30
@@ -171,30 +167,12 @@ bool digitalCurrentSensorPresent = false;
 long lastDigitalCurrentSensorRead;
 long lastexternalADCRead;
 byte roomSensorAddress = 112;
-int pulsioximeterMean;
-const int maxPulsioximeterSamples = 320; //(tft width).
+const int defaultCurrentSamples = 1000;
 float instantCurrent[current_filter];
 int instantCurrent_array_pos = false;
 float currentConsumption;
-float CurrentToAmpFactor = 0.00255;
+float CurrentToAmpFactor = 0.002;
 int currentConsumptionPos = false;
-int pulsioximeterSample[maxPulsioximeterSamples][2]; //0 is previous data, 1 is actual data
-int pulsioximeterPeakThreshold;
-int pulsioximeterMaxPeak;
-int pulsioximeterMinPeak;
-long pulsioximeterMinPeakTime;
-long pulsioximeterMaxPeakTime;
-int minPulsioximeterCoordinate;
-int maxPulsioximeterCoordinate;
-const bool pulsioximeterDrawn = false;
-const bool pulsioximeterSampled = true;
-int pulsioximeterInterSamples[pulsioximeterRate];
-int pulsioximeterMultiplierFilterFactor = 1000;
-int pulsioximeterRestFilterFactor = true;
-int pulsioximeterAmplitud;
-int pulsioximeterCounter[2];
-int BPM, IBI;
-String RPD; //(Raw Pulsioximeter Data)
 
 //room variables
 bool controlMode;
@@ -259,8 +237,6 @@ int temperatureX;
 int temperatureY;
 int separatorTopYPos;
 int separatorBotYPos;
-int pulsioximeterYPos;
-int pulsioximeterXPos;
 bool controlTemperature;
 bool controlHumidity;
 int ypos;
@@ -364,7 +340,6 @@ byte goToProcessRow;
 #define COLOR_FRAME_BAR WHITE
 #define COLOR_LOADING_BAR RED
 #define COLOR_COMPLETED_BAR GREEN
-#define PULSIOXIMETERCOLOR RED
 #define introBackColor WHITE
 #define introTextColor BLACK
 #define transitionEffect BLACK

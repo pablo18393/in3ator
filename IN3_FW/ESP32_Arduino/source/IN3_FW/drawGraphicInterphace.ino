@@ -184,9 +184,6 @@ void setSensorsGraphicPosition() {
       humidityY = humBarPosY - barHeight / 2;
       separatorTopYPos = tft.height() / 3 + 5;
       separatorBotYPos = tft.height() * 2 / 3 + 10;
-      minPulsioximeterCoordinate = separatorTopYPos + barThickness;
-      maxPulsioximeterCoordinate = separatorBotYPos + barThickness;
-      pulsioximeterYPos = separatorBotYPos - (separatorBotYPos - separatorTopYPos) * 2 / 3;
       break;
   }
 }
@@ -565,11 +562,6 @@ void blinkGoBackMessage() {
     }
     drawStop();
   }
-}
-
-void drawPulsioximeter() {
-  tft.drawPixel(pulsioximeterCounter[pulsioximeterDrawn], 0, PULSIOXIMETERCOLOR);
-  pulsioximeterCounter[pulsioximeterDrawn]++;
 }
 
 int16_t drawString(char *string, int16_t poX, int16_t poY, int16_t size)

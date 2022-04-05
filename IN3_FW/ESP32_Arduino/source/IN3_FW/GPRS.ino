@@ -702,15 +702,6 @@ bool GPRSLoadVariables() {
   if (GPRS.postJaundicePower) {
     databasePost[7] += ",\"jaundice_power\":\"" + String(jaundiceEnable) + "\"";
   }
-  if (GPRS.postBPM) {
-    databasePost[7] += ",\"bpm\":\"" + String(BPM) + "\"";
-  }
-  if (GPRS.postIBI) {
-    databasePost[7] += ",\"ibi\":\"" + String(IBI) + "\"";
-  }
-  if (GPRS.postRPD) {
-    databasePost[7] += ",\"rpd\":\"" + String(IBI) + "\"";
-  }
   if (GPRS.postCurrentConsumption) {
     databasePost[7] += ",\"power\":\"" + String(currentConsumption) + "\"";
   }

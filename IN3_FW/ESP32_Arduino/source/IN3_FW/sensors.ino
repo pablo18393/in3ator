@@ -6,7 +6,7 @@ void sensorsHandler() {
   }
   if (millis() - lastCurrentUpdate > CurrentUpdatePeriod) {
     lastCurrentUpdate = millis();
-    currentConsumption = measureMeanConsumption();
+    currentConsumption = measureMeanConsumption(defaultCurrentSamples);
   }
   currentMonitor();
 }
@@ -71,22 +71,17 @@ long ADCmeasurements;
 long sensorMeasurements;
 
 
-float measureMeanConsumption() {
-  float currentMean;
+float measureMeanConsumption(int samples) {
+  float currentMean = 0;
   if (digitalCurrentSensorPresent) {
-    if (millis() - lastDigitalCurrentSensorRead > digitalCurrentSensorReadPeriod) {
-      lastDigitalCurrentSensorRead = millis();
-      sensorMeasurements++;
       PAC.UpdateCurrent();
       return (PAC.Current / 1000); //Amperes
-    }
   }
   else {
-    for (int i = 0; i < instantCurrent_array_pos; i++) {
-      currentMean += instantCurrent[i];
-      instantCurrent[i] = 0;
+    for (int i = 0; i < samples; i++) {
+      currentMean += measureInstantConsumption();
     }
-    currentMean /= instantCurrent_array_pos;
+    currentMean /= samples;
     currentMean *= CurrentToAmpFactor;
     return (currentMean);
   }
