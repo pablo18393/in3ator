@@ -16,12 +16,14 @@ void measureOffsetConsumption() {
 
 float currentMonitor() {
   if (micros() - lastCurrentMeasurement > CurrentMeasurementPeriod ) {
-    previousCurrent[0] = measureInstantConsumption(MAIN_SHUNT);
-    currentConsumption =  butterworth2(instantCurrent[1], instantCurrent[2], previousCurrent[0] , previousCurrent[1], previousCurrent[2]);
-    instantCurrent[0] = currentConsumption;
-    for (int i = 1; i >= 0; i--) {
-      instantCurrent[i + 1] = instantCurrent[i];
-      previousCurrent[i + 1] = previousCurrent[i];
+    for (int currSensor = MAIN_SHUNT; currSensor < currentSensingNum; currSensor++) {
+      previousCurrent[currSensor][0] = measureInstantConsumption(currSensor);
+      currentConsumption[currSensor] =  butterworth2(instantCurrent[currSensor][1], instantCurrent[currSensor][2], previousCurrent[currSensor][0] , previousCurrent[currSensor][1], previousCurrent[currSensor][2]);
+      instantCurrent[currSensor][0] = currentConsumption[currSensor];
+      for (int i = 1; i >= 0; i--) {
+        instantCurrent[currSensor][i + 1] = instantCurrent[currSensor][i];
+        previousCurrent[currSensor][i + 1] = previousCurrent[currSensor][i];
+      }
     }
     lastCurrentMeasurement = micros();
   }
@@ -124,7 +126,7 @@ bool measureNTCTemperature() {
   return false;
 }
 
-float adcToCelsius(float adcReading,int maxAdcReading) {
+float adcToCelsius(float adcReading, int maxAdcReading) {
   //Valores fijos del circuito
   float rAux = 10000.0;
   float vcc = 3.3;

@@ -169,17 +169,16 @@ bool externalADCpresent = false;
 bool digitalCurrentSensorPresent = false;
 long lastDigitalCurrentSensorRead;
 long lastexternalADCRead;
-float instantCurrent[secondOrder_filter];
-float previousCurrent[secondOrder_filter];
+float instantCurrent[currentSensingNum][secondOrder_filter];
+float previousCurrent[currentSensingNum][secondOrder_filter];
 
 float instantTemperature[secondOrder_filter];
 float previousTemperature[secondOrder_filter];
 
 int instantCurrent_array_pos = false;
-float currentConsumption;
+float currentConsumption[currentSensingNum];
 float currentToAmpFactor_MAIN = 0.002;
 float currentToAmpFactor_HUMIDIFIER = 0.00013;
-int currentConsumptionPos = false;
 
 //room variables
 bool controlMode;
@@ -365,4 +364,14 @@ bool wroteHeater[5];
 void loop() {
   userInterfaceHandler();
   updateData();
+  /*
+  if (millis() > 20000 && !wroteHeater[0]) {
+    ledcWrite(HEATER_PWM_CHANNEL, PWM_MAX_VALUE * 3 / 4);
+    wroteHeater[0] = true;
+  }
+  if (millis() > 50000 && !wroteHeater[1]) {
+    digitalWrite(FAN, HIGH);
+    wroteHeater[1] = true;
+  }
+  */
 }

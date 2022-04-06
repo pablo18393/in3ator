@@ -10,6 +10,7 @@
 
 #define MAIN_SHUNT 0
 #define HUMIDIFIER_SHUNT 1
+#define currentSensingNum 2
 
 #define TFT_DC 0
 #define ADC_READY 2
