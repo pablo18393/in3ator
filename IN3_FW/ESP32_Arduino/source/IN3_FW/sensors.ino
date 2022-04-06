@@ -3,10 +3,10 @@ void sensorsHandler() {
   /*
     if (float(micros() - lastNTCmeasurement) / 1000 > float(NTCMeasurementPeriod / temperature_filter)) {
     lastNTCmeasurement = micros();
-    measurenumNTC();
+    measureNTCTemperature();
     }
   */
-  measurenumNTC();
+  measureNTCTemperature();
   currentMonitor();
 }
 
@@ -20,8 +20,8 @@ float currentMonitor() {
     currentConsumption =  butterworth2(instantCurrent[1], instantCurrent[2], previousCurrent[0] , previousCurrent[1], previousCurrent[2]);
     instantCurrent[0] = currentConsumption;
     for (int i = 1; i >= 0; i--) {
-      instantCurrent[i + 1] = instantCurrent[i]; // store xi
-      previousCurrent[i + 1] = previousCurrent[i]; // store yi
+      instantCurrent[i + 1] = instantCurrent[i];
+      previousCurrent[i + 1] = previousCurrent[i];
     }
     lastCurrentMeasurement = micros();
   }
@@ -79,7 +79,7 @@ float measureMeanConsumption(byte currentSensor, int samples) {
   return (false);
 }
 
-bool measurenumNTC() {
+bool measureNTCTemperature() {
   float analogMeasurement;
   unsigned long start_time = millis(); // Record the start time so we can timeout
   if (externalADCpresent) {
@@ -91,59 +91,53 @@ bool measurenumNTC() {
         mySensor.setInputMultiplexer(ADS122C04_MUX_AIN1_AVSS);
         mySensor.start(); // Start the conversion
       }
+      return true;
     }
   }
   else {
-    analogMeasurement = analogRead(NTC_PIN[babySensor]);
-    temperatureArray[babySensor][temperature_array_pos] = analogMeasurement;
-    temperature_array_pos++;
-  }
-  if (temperature_array_pos >= temperature_filter) {
-    updateTemp(babySensor);
-    temperature_array_pos = false;
+    if (micros() - lastNTCmeasurement > NTCMeasurementPeriod ) {
+      previousTemperature[0] = adcToCelsius(analogRead(NTC_PIN[babySensor]), maxADCvalue);
+      temperature[babySensor] =  butterworth2(instantTemperature[1], instantTemperature[2], previousTemperature[0] , previousTemperature[1], previousTemperature[2]);
+      instantTemperature[0] = temperature[babySensor];
+      for (int i = 1; i >= 0; i--) {
+        instantTemperature[i + 1] = instantTemperature[i];
+        previousTemperature[i + 1] = previousTemperature[i];
+      }
+      errorTemperature[babySensor] = temperature[babySensor];
+      if (RawTemperatureRange[babySensor]) {
+        temperature[babySensor] = (((temperature[babySensor] - RawTemperatureLow[babySensor]) * ReferenceTemperatureRange) / RawTemperatureRange[babySensor]) + ReferenceTemperatureLow;
+      }
+      errorTemperature[babySensor] -= temperature[babySensor];
+      if (temperature[babySensor] < 0) {
+        temperature[babySensor] = 0;
+      }
+      if (temperature[babySensor] > temperatureMax[babySensor]) {
+        temperatureMax[babySensor] = temperature[babySensor];
+      }
+      if (temperature[babySensor] < temperatureMin[babySensor]) {
+        temperatureMin[babySensor] = temperature[babySensor];
+      }
+      lastNTCmeasurement = micros();
+    }
     return true;
   }
   return false;
 }
 
-void updateTemp(byte sensor) {
+float adcToCelsius(float adcReading,int maxAdcReading) {
   //Valores fijos del circuito
   float rAux = 10000.0;
   float vcc = 3.3;
   float beta = 3950.0;
   float temp0 = 298.0;
   float r0 = 10000.0;
-  float temperatureMean;
-  byte startSensor;
-  byte endSensor;
-
   //Bloque de cálculo
   //Variables used in calculus
   float vm = 0.0;
   float rntc = 0.0;
-  temperatureMean = false;
-  for (int j = false; j < temperature_filter; j++) {
-    temperatureMean += temperatureArray[sensor][j];
-  }
-  temperatureMean /= temperature_filter;
-
-  vm = (vcc) * ( temperatureMean / maxADCvalue );          //Calcular tensión en la entrada
+  vm = (vcc) * ( adcReading / maxAdcReading);          //Calcular tensión en la entrada
   rntc = rAux / ((vcc / vm) - 1);                   //Calcular la resistencia de la NTC
-  temperature[sensor] = beta / (log(rntc / r0) + (beta / temp0)) - 273; //Calcular la temperatura en Celsius
-  errorTemperature[sensor] = temperature[sensor];
-  if (RawTemperatureRange[sensor]) {
-    temperature[sensor] = (((temperature[sensor] - RawTemperatureLow[sensor]) * ReferenceTemperatureRange) / RawTemperatureRange[sensor]) + ReferenceTemperatureLow;
-  }
-  errorTemperature[sensor] -= temperature[sensor];
-  if (temperature[sensor] < 0) {
-    temperature[sensor] = 0;
-  }
-  if (temperature[sensor] > temperatureMax[sensor]) {
-    temperatureMax[sensor] = temperature[sensor];
-  }
-  if (temperature[sensor] < temperatureMin[sensor]) {
-    temperatureMin[sensor] = temperature[sensor];
-  }
+  return (beta / (log(rntc / r0) + (beta / temp0)) - 273); //Calcular la temperatura en Celsius
 }
 
 bool updateRoomSensor() {

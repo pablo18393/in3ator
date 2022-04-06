@@ -261,7 +261,7 @@ void initSensors() {
   logln("[HW] -> Initialiting sensors");
   initRoomSensor();
   //sensors verification
-  while (!measurenumNTC());
+  while (!measureNTCTemperature());
   if (temperature[babySensor] < NTC_BABY_MIN) {
     logln("[HW] -> Fail -> NTC temperature is lower than expected");
     HW_error += NTC_BABY_MIN_ERROR;

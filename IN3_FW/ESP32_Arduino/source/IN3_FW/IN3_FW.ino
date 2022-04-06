@@ -37,7 +37,7 @@ Microchip_PAC193x PAC(Rsense);
 SFE_ADS122C04 mySensor;
 #define externalADC_i2c_address 64
 #define digitalCurrentSensor_i2c_address 57
-#define roomSensorAddress = 112;
+#define roomSensorAddress 112
 
 int serialNumber = 45;
 #define WDT_TIMEOUT 15
@@ -110,7 +110,7 @@ byte language;
 
 #define numNTC 1 //number of NTC
 #define numTempSensors 2 //number of total temperature sensors in system
-#define current_filter 3 //amount of temperature samples to filter
+#define secondOrder_filter 3 //amount of temperature samples to filter
 #define analog_temperature_filter 500 //amount of temperature samples to filter
 #define digital_temperature_filter 10 //amount of temperature samples to filter
 int temperature_filter = analog_temperature_filter; //amount of temperature samples to filter
@@ -130,7 +130,6 @@ double provisionalRawTemperatureLow[numTempSensors];
 double temperatureMaxReset = -1000;
 double temperatureMinReset = 1000;
 double temperatureMax[numTempSensors], temperatureMin[numTempSensors];
-double previousTemperature[numTempSensors];
 int temperatureArray [numNTC][analog_temperature_filter]; //variable to handle each NTC with the array of last samples (only for NTC)
 int temperature_array_pos; //temperature sensor number turn to measure
 float diffTemperature; //difference between measured temperature and user input real temperature
@@ -170,8 +169,12 @@ bool externalADCpresent = false;
 bool digitalCurrentSensorPresent = false;
 long lastDigitalCurrentSensorRead;
 long lastexternalADCRead;
-float instantCurrent[current_filter];
-float previousCurrent[current_filter];
+float instantCurrent[secondOrder_filter];
+float previousCurrent[secondOrder_filter];
+
+float instantTemperature[secondOrder_filter];
+float previousTemperature[secondOrder_filter];
+
 int instantCurrent_array_pos = false;
 float currentConsumption;
 float currentToAmpFactor_MAIN = 0.002;
@@ -362,5 +365,4 @@ bool wroteHeater[5];
 void loop() {
   userInterfaceHandler();
   updateData();
-
 }

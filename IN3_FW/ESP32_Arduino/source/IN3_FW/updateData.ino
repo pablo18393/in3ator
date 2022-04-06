@@ -27,6 +27,7 @@ int updateData() {
 
     //logln("[SENSORS] -> Current consumption is: " + String (analogRead(SYSTEM_SHUNT)) + "," + String (currentConsumption) + " Amps");
     logln("[SENSORS] -> System current consumption is: " + String (currentConsumption, 1) + " Amps");
+    logln("[SENSORS] -> USB current consumption is: " + String (measureMeanConsumption(USB_SHUNT, defaultTestingSamples)) + " Amps");
     logln("[SENSORS] -> Baby temperature: " + String(temperature[babySensor]) + "ºC, correction error is " + String(errorTemperature[babySensor]));
     /*
       Serial.print(String(desiredSkinTemp));
