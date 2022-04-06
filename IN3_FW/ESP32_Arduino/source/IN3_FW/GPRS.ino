@@ -703,7 +703,7 @@ bool GPRSLoadVariables() {
     databasePost[7] += ",\"jaundice_power\":\"" + String(jaundiceEnable) + "\"";
   }
   if (GPRS.postCurrentConsumption) {
-    databasePost[7] += ",\"power\":\"" + String(currentConsumption) + "\"";
+    databasePost[7] += ",\"power\":\"" + String(currentConsumption, 1) + "\"";
   }
   if (GPRS.postComment) {
     if (GPRS.comment.length() < 20) {

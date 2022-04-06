@@ -36,7 +36,8 @@ RotaryEncoder encoder(ENC_A, ENC_B, RotaryEncoder::LatchMode::TWO03);
 Microchip_PAC193x PAC(Rsense);
 SFE_ADS122C04 mySensor;
 #define externalADC_i2c_address 64
-#define digitalCurrentSensor_i2c_address 112
+#define digitalCurrentSensor_i2c_address 57
+#define roomSensorAddress = 112;
 
 int serialNumber = 45;
 #define WDT_TIMEOUT 15
@@ -109,13 +110,13 @@ byte language;
 
 #define numNTC 1 //number of NTC
 #define numTempSensors 2 //number of total temperature sensors in system
-#define current_filter 100 //amount of temperature samples to filter
+#define current_filter 3 //amount of temperature samples to filter
 #define analog_temperature_filter 500 //amount of temperature samples to filter
 #define digital_temperature_filter 10 //amount of temperature samples to filter
 int temperature_filter = analog_temperature_filter; //amount of temperature samples to filter
 
 #define NTCMeasurementPeriod 1000 //in millis
-#define CurrentMeasurementPeriod 2 //in millis
+#define CurrentMeasurementPeriod 500 //in micros
 #define CurrentUpdatePeriod 1000 //in millis
 long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
 
@@ -169,8 +170,8 @@ bool externalADCpresent = false;
 bool digitalCurrentSensorPresent = false;
 long lastDigitalCurrentSensorRead;
 long lastexternalADCRead;
-byte roomSensorAddress = 112;
 float instantCurrent[current_filter];
+float previousCurrent[current_filter];
 int instantCurrent_array_pos = false;
 float currentConsumption;
 float currentToAmpFactor_MAIN = 0.002;
@@ -214,13 +215,11 @@ long encoder_debounce_time = true; //in milliseconds, debounce time in encoder t
 long last_encPulsed; //last time encoder was pulsed
 
 //User Interface display constants
-#define introDelay    1500      //initial delay between intro and menu
-#define brightenRate  50        //intro brighten speed (Higher value, slower)
+#define brightenRate  10        //intro brighten speed (Higher value, faster)
 #define valuePosition 245
 #define separatorPosition 240
 #define unitPosition 315
 #define textFontSize 2          //text default size
-#define helpTextMenuCentreX tft.width()/2;
 #define width_select  7
 #define height_heading  34
 #define width_indentation  4
@@ -357,7 +356,11 @@ void setup() {
   advancedMode();
 }
 
+bool wroteHeater[5];
+
+
 void loop() {
   userInterfaceHandler();
   updateData();
+
 }

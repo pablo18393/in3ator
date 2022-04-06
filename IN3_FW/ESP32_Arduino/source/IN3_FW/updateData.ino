@@ -26,23 +26,18 @@ int updateData() {
     }
 
     //logln("[SENSORS] -> Current consumption is: " + String (analogRead(SYSTEM_SHUNT)) + "," + String (currentConsumption) + " Amps");
-    logln("[DEBUG] -> Current measurements " + String (sensorMeasurements) + " times");
-    logln("[DEBUG] -> ADC measurements " + String (ADCmeasurements) + " times");
-    sensorMeasurements = 0;
-    ADCmeasurements = 0;
-    logln("[SENSORS] -> Current consumption is: " + String (measureMeanConsumption(MAIN_SHUNT, defaultCurrentSamples)) + " Amps");
+    logln("[SENSORS] -> System current consumption is: " + String (currentConsumption, 1) + " Amps");
     logln("[SENSORS] -> Baby temperature: " + String(temperature[babySensor]) + "ºC, correction error is " + String(errorTemperature[babySensor]));
     /*
-    Serial.print(String(desiredSkinTemp));
-    Serial.print(",");
-    Serial.print(String(temperature[babySensor]));
-    Serial.print(",");
-    Serial.print(String(temperature[airSensor]));
-    Serial.print(",");
-    Serial.println(String(measureMeanConsumption()));
-    */            
+      Serial.print(String(desiredSkinTemp));
+      Serial.print(",");
+      Serial.print(String(temperature[babySensor]));
+      Serial.print(",");
+      Serial.print(String(temperature[airSensor]));
+      Serial.print(",");
+      Serial.println(String(measureMeanConsumption()));
+    */
     logln("[SENSORS] -> Air temperature: " + String(temperature[airSensor]) + "ºC, correction error is " + String(errorTemperature[airSensor]));
-    logln("[SENSORS] -> Digital Temp: " + String(temperature[airSensor], 2) + "ºC");
     logln("[SENSORS] -> Humidity: " + String(humidity) + "%");
     logln("[LATENCY] -> Looped " + String(loopCounts * 1000 / (millis() - lastDebugUpdate)) + " Times per second");
     loopCounts = 0;

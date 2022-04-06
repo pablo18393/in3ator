@@ -1,13 +1,12 @@
 
 void sensorsHandler() {
-  if (float(micros() - lastNTCmeasurement) / 1000 > float(NTCMeasurementPeriod / temperature_filter)) {
+  /*
+    if (float(micros() - lastNTCmeasurement) / 1000 > float(NTCMeasurementPeriod / temperature_filter)) {
     lastNTCmeasurement = micros();
     measurenumNTC();
-  }
-  if (millis() - lastCurrentUpdate > CurrentUpdatePeriod) {
-    lastCurrentUpdate = millis();
-    currentConsumption = measureMeanConsumption(MAIN_SHUNT, defaultCurrentSamples);
-  }
+    }
+  */
+  measurenumNTC();
   currentMonitor();
 }
 
@@ -16,13 +15,15 @@ void measureOffsetConsumption() {
 }
 
 float currentMonitor() {
-  if (millis() - lastCurrentMeasurement > CurrentMeasurementPeriod ) {
-    instantCurrent[instantCurrent_array_pos] = measureInstantConsumption(MAIN_SHUNT);
-    instantCurrent_array_pos++;
-    if (instantCurrent_array_pos >= current_filter) {
-      instantCurrent_array_pos = 0;
+  if (micros() - lastCurrentMeasurement > CurrentMeasurementPeriod ) {
+    previousCurrent[0] = measureInstantConsumption(MAIN_SHUNT);
+    currentConsumption =  butterworth2(instantCurrent[1], instantCurrent[2], previousCurrent[0] , previousCurrent[1], previousCurrent[2]);
+    instantCurrent[0] = currentConsumption;
+    for (int i = 1; i >= 0; i--) {
+      instantCurrent[i + 1] = instantCurrent[i]; // store xi
+      previousCurrent[i + 1] = previousCurrent[i]; // store yi
     }
-    lastCurrentMeasurement = millis();
+    lastCurrentMeasurement = micros();
   }
 }
 
@@ -50,10 +51,10 @@ float measureInstantConsumption(byte currentSensor) {
   else {
     switch (currentSensor) {
       case MAIN_SHUNT:
-        return (analogRead(SYS_SHUNT));
+        return (ADCToAmp(currentSensor, ADCScale(analogRead(SYS_SHUNT))));
         break;
       case HUMIDIFIER_SHUNT:
-        return (analogRead(USB_SHUNT));
+        return (ADCToAmp(currentSensor, ADCScale(analogRead(USB_SHUNT))));
         break;
     }
   }
@@ -73,7 +74,7 @@ float measureMeanConsumption(byte currentSensor, int samples) {
       currentMean += measureInstantConsumption(currentSensor);
     }
     currentMean /= samples;
-    return (ADCToAmp(currentSensor, currentMean));
+    return (currentMean);
   }
   return (false);
 }
@@ -87,20 +88,7 @@ bool measurenumNTC() {
       if (ADCConversionReady()) {
         ADCmeasurements++;
         analogMeasurement = readExternalADC() / 3300;
-        switch (mySensor.getInputMultiplexer()) {
-          case ADS122C04_MUX_AIN0_AVSS:
-            temperatureArray[babySensor][temperature_array_pos] = analogMeasurement;
-            mySensor.setInputMultiplexer(ADS122C04_MUX_AIN1_AVSS);
-            break;
-          case ADS122C04_MUX_AIN1_AVSS:
-            temperatureArray[airSensor][temperature_array_pos] = analogMeasurement;
-            mySensor.setInputMultiplexer(ADS122C04_MUX_AIN0_AVSS);
-            temperature_array_pos++;
-            break;
-          default:
-            mySensor.setInputMultiplexer(ADS122C04_MUX_AIN1_AVSS);
-            break;
-        }
+        mySensor.setInputMultiplexer(ADS122C04_MUX_AIN1_AVSS);
         mySensor.start(); // Start the conversion
       }
     }
