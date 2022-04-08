@@ -704,7 +704,7 @@ bool GPRSLoadVariables() {
   }
   if (GPRS.postCurrentConsumption) {
     databasePost[7] += ",\"power\":\"" + String(currentConsumption[MAIN_SHUNT], 1) + "\"";
-    databasePost[7] += ",\"powerUSB\":\"" + String(currentConsumption[HUMIDIFIER_SHUNT], 1) + "\"";
+    databasePost[7] += ",\"power_usb\":\"" + String(currentConsumption[HUMIDIFIER_SHUNT], 2) + "\"";
   }
   if (GPRS.postComment) {
     if (GPRS.comment.length() < 20) {
