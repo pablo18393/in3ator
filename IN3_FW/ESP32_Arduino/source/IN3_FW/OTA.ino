@@ -106,17 +106,13 @@ void wifiDisable() {
 
 void configWifiServer() {
   // Wait for connection
-  Serial.println("");
-  Serial.print("Connected to ");
-  Serial.println(ssid);
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
+  logln("Connected to " + String(ssid) + "IP address" + String(WiFi.localIP()));
 
   /*use mdns for wifiHost name resolution*/
   if (!MDNS.begin(wifiHost)) { //http://esp32.local
-    Serial.println("Error setting up MDNS responder!");
+    logln("Error setting up MDNS responder!");
   }
-  Serial.println("mDNS responder started");
+  logln("mDNS responder started");
   /*return index page which is stored in ServerIndex */
   wifiServer.on("/", HTTP_GET, []() {
     wifiServer.sendHeader("Connection", "close");

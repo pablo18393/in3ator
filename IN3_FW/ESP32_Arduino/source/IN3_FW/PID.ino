@@ -44,7 +44,7 @@ void PIDHandler() {
     else {
       if (!humidifierState || humidifierStateChange) {
         if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
-          ledcWrite(HUMIDIFIER_PWM_CHANNEL, PWM_MAX_VALUE / 2);
+          ledcWrite(HUMIDIFIER_PWM_CHANNEL, HUMIDIFIER_DUTY_CYCLE);
         }
         else {
           GPIOWrite(HUMIDIFIER, HIGH);

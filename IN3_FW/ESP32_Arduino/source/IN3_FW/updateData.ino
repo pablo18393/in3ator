@@ -29,15 +29,6 @@ int updateData() {
     logln("[SENSORS] -> System current consumption is: " + String (currentConsumption[MAIN_SHUNT], 1) + " Amps");
     logln("[SENSORS] -> USB current consumption is: " + String (currentConsumption[HUMIDIFIER_SHUNT], 2) + " Amps");
     logln("[SENSORS] -> Baby temperature: " + String(temperature[babySensor]) + "ºC, correction error is " + String(errorTemperature[babySensor]));
-    /*
-      Serial.print(String(desiredSkinTemp));
-      Serial.print(",");
-      Serial.print(String(temperature[babySensor]));
-      Serial.print(",");
-      Serial.print(String(temperature[airSensor]));
-      Serial.print(",");
-      Serial.println(String(measureMeanConsumption()));
-    */
     logln("[SENSORS] -> Air temperature: " + String(temperature[airSensor]) + "ºC, correction error is " + String(errorTemperature[airSensor]));
     logln("[SENSORS] -> Humidity: " + String(humidity) + "%");
     logln("[LATENCY] -> Looped " + String(loopCounts * 1000 / (millis() - lastDebugUpdate)) + " Times per second");

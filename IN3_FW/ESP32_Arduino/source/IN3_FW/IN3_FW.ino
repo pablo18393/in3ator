@@ -94,6 +94,7 @@ int page;
 #define errorPage 5
 #define firstPointCalibrationPage 6
 #define secondPointCalibrationPage 7
+#define autoCalibrationPage 8
 
 //languages numbers that will be called in language variable
 byte language;
@@ -139,6 +140,11 @@ double humidity; // room humidity variable
 bool humidifierState, humidifierStateChange;
 int previousHumidity; //previous sampled humidity
 float diffHumidity; //difference between measured humidity and user input real humidity
+
+byte autoCalibrationProcess;
+#define setupAutoCalibrationPoint 0
+#define firstAutoCalibrationPoint 1
+#define secondAutoCalibrationPoint 2
 
 //Sensor check rate (in ms). Both sensors are checked in same interrupt and they have different check rates
 byte encoderRate = true;
@@ -316,11 +322,15 @@ byte goToProcessRow;
 #define setdefaultValuesGraphicPosition 6
 //calibration menu
 #define twoPointCalibrationGraphicPosition 0
-#define restartCalibrationGraphicPosition 1
+#define autoCalibrationGraphicPosition 1
+#define restartCalibrationGraphicPosition 2
 
 //2p calibration
 #define temperatureCalibrationGraphicPosition 0
 #define setCalibrationGraphicPosition 1
+
+//auto calibration
+#define autoCalibrationMessageGraphicPosition 0
 
 //color options
 #define BLACK 0x0000

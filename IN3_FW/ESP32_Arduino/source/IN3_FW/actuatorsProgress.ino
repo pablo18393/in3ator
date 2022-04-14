@@ -231,7 +231,7 @@ void basicHumidityControl() {
   if (humidity < desiredRoomHum) {
     if (!humidifierState || humidifierStateChange) {
       if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
-        ledcWrite(HUMIDIFIER_PWM_CHANNEL, PWM_MAX_VALUE / 2);
+        ledcWrite(HUMIDIFIER_PWM_CHANNEL, HUMIDIFIER_DUTY_CYCLE);
       }
       else {
         GPIOWrite(HUMIDIFIER, HIGH);
@@ -269,7 +269,7 @@ void stopActuation() {
 void turnActuators(bool mode) {
   ledcWrite(HEATER_PWM_CHANNEL, mode * heaterMaxPWM);
   if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
-    ledcWrite(HUMIDIFIER_PWM_CHANNEL, PWM_MAX_VALUE / 2);
+    ledcWrite(HUMIDIFIER_PWM_CHANNEL, HUMIDIFIER_DUTY_CYCLE * mode);
   }
   else {
     GPIOWrite(HUMIDIFIER, mode);

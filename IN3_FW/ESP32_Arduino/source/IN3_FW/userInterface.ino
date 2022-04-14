@@ -333,6 +333,9 @@ bool userInterfaceHandler() {
           case twoPointCalibrationGraphicPosition:
             firstPointCalibration();
             break;
+          case autoCalibrationGraphicPosition:
+            autoCalibration();
+            break;
           case restartCalibrationGraphicPosition:
             loadDefaultCalibration();
             recapVariables();
@@ -341,7 +344,7 @@ bool userInterfaceHandler() {
         }
         break;
       case firstPointCalibrationPage:
-        RawTemperatureRange[babySensor] = false;
+        clearCalibrationValues();
         switch (bar_pos - graphicTextOffset ) {
           case temperatureCalibrationGraphicPosition:
             errorTemperature[babySensor] = false;
@@ -379,7 +382,7 @@ bool userInterfaceHandler() {
                 diffTemperature += EncMove * (0.1);
                 drawFloat(diffTemperature, 1, valuePosition, ypos, textFontSize);
                 EncMove = false;
-                Serial.println("difTemp: " + String(diffTemperature));
+                logln("difTemp: " + String(diffTemperature));
               }
             }
             break;
@@ -387,16 +390,10 @@ bool userInterfaceHandler() {
             ReferenceTemperatureLow = provisionalReferenceTemperatureLow;
             RawTemperatureLow[babySensor] = provisionalRawTemperatureLow[babySensor];
             ReferenceTemperatureRange = diffTemperature - ReferenceTemperatureLow;
-            if (temperatureCalibrationPoint != diffTemperature) {
+            if (RawTemperatureRange[babySensor]) {
               RawTemperatureRange[babySensor] = (temperature[babySensor] - RawTemperatureLow[babySensor]);
-              Serial.println("calibration factors: " + String(RawTemperatureLow [babySensor]) + "," + String (RawTemperatureRange [babySensor]) + "," + String (ReferenceTemperatureRange) + "," + String (ReferenceTemperatureLow));
-              EEPROM.writeFloat(EEPROM_RawSkinTemperatureLowCorrection, RawTemperatureLow[babySensor]);
-              EEPROM.writeFloat(EEPROM_RawSkinTemperatureRangeCorrection, RawTemperatureRange[babySensor]);
-              EEPROM.writeFloat(EEPROM_RawDigitalTemperatureLowCorrection, RawTemperatureLow[airSensor]);
-              EEPROM.writeFloat(EEPROM_RawDigitalTemperatureRangeCorrection, RawTemperatureRange[airSensor]);
-              EEPROM.writeFloat(EEPROM_ReferenceTemperatureRange, ReferenceTemperatureRange);
-              EEPROM.writeFloat(EEPROM_ReferenceTemperatureLow, ReferenceTemperatureLow);
-              EEPROM.commit();
+              logln("calibration factors: " + String(RawTemperatureLow [babySensor]) + "," + String (RawTemperatureRange [babySensor]) + "," + String (ReferenceTemperatureRange) + "," + String (ReferenceTemperatureLow));
+              saveCalibrationToEEPROM();
             }
             else {
               logln("[CALIBRATION] -> ERROR -> DIVIDE BY ZERO");
@@ -404,6 +401,9 @@ bool userInterfaceHandler() {
             settings();
             break;
         }
+        break;
+      case autoCalibrationPage:
+
         break;
     }
     selected = false;

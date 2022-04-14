@@ -28,7 +28,7 @@ bool firstTurnOn;
 void initEEPROM() {
   if (!EEPROM.begin(EEPROM_SIZE))
   {
-    Serial.println("failed to initialise EEPROM");
+    logln("failed to initialise EEPROM");
   }
   if (EEPROM.read(EEPROM_checkStatus)) {
     EEPROM.write(EEPROM_checkStatus, 0);
@@ -75,16 +75,16 @@ void loaddefaultValues() {
   EEPROM.commit();
 }
 
-void loadDefaultCalibration(){
-    EEPROM.writeFloat(EEPROM_RawSkinTemperatureLowCorrection, 20.30);
-    EEPROM.writeFloat(EEPROM_RawSkinTemperatureRangeCorrection, 17.19);
-    EEPROM.writeFloat(EEPROM_RawAirTemperatureLowCorrection, 0);
-    EEPROM.writeFloat(EEPROM_RawAirTemperatureRangeCorrection, 0);
-    EEPROM.writeFloat(EEPROM_RawDigitalTemperatureLowCorrection, 0);
-    EEPROM.writeFloat(EEPROM_RawDigitalTemperatureRangeCorrection, 0);
-    EEPROM.writeFloat(EEPROM_ReferenceTemperatureRange, 13.84);
-    EEPROM.writeFloat(EEPROM_ReferenceTemperatureLow, 19.73);
-    EEPROM.commit();
+void loadDefaultCalibration() {
+  EEPROM.writeFloat(EEPROM_RawSkinTemperatureLowCorrection, 25.14);
+  EEPROM.writeFloat(EEPROM_RawSkinTemperatureRangeCorrection, 8.59);
+  EEPROM.writeFloat(EEPROM_RawAirTemperatureLowCorrection, 0);
+  EEPROM.writeFloat(EEPROM_RawAirTemperatureRangeCorrection, 0);
+  EEPROM.writeFloat(EEPROM_RawDigitalTemperatureLowCorrection, 0);
+  EEPROM.writeFloat(EEPROM_RawDigitalTemperatureRangeCorrection, 0);
+  EEPROM.writeFloat(EEPROM_ReferenceTemperatureRange, 6.56);
+  EEPROM.writeFloat(EEPROM_ReferenceTemperatureLow, 23.76);
+  EEPROM.commit();
 }
 
 void recapVariables() {
@@ -98,10 +98,9 @@ void recapVariables() {
   ReferenceTemperatureLow = EEPROM.readFloat(EEPROM_ReferenceTemperatureLow);
 
   for (int i = 0; i < numTempSensors; i++) {
-    Serial.println("calibration factors: " + String(RawTemperatureLow [i]) + "," + String (RawTemperatureRange [i]) + "," + String (ReferenceTemperatureRange) + "," + String (ReferenceTemperatureLow));
+    logln("calibration factors: " + String(RawTemperatureLow [i]) + "," + String (RawTemperatureRange [i]) + "," + String (ReferenceTemperatureRange) + "," + String (ReferenceTemperatureLow));
   }
-
-
+  
   for (int i = 0; i < numTempSensors; i++) {
     if (RawTemperatureLow[i] > 100) {
       //critical error
@@ -116,6 +115,17 @@ void recapVariables() {
   controlAlgorithm = EEPROM.read(EEPROM_controlAlgorithm);
   alarmsEnable = EEPROM.read(EEPROM_alarmsEnable);
   controlMode = EEPROM.read(EEPROM_controlMode);
+}
+
+
+void saveCalibrationToEEPROM() {
+  EEPROM.writeFloat(EEPROM_RawSkinTemperatureLowCorrection, RawTemperatureLow[babySensor]);
+  EEPROM.writeFloat(EEPROM_RawSkinTemperatureRangeCorrection, RawTemperatureRange[babySensor]);
+  EEPROM.writeFloat(EEPROM_RawDigitalTemperatureLowCorrection, RawTemperatureLow[airSensor]);
+  EEPROM.writeFloat(EEPROM_RawDigitalTemperatureRangeCorrection, RawTemperatureRange[airSensor]);
+  EEPROM.writeFloat(EEPROM_ReferenceTemperatureRange, ReferenceTemperatureRange);
+  EEPROM.writeFloat(EEPROM_ReferenceTemperatureLow, ReferenceTemperatureLow);
+  EEPROM.commit();
 }
 
 long EEPROMReadLong(int p_address)
