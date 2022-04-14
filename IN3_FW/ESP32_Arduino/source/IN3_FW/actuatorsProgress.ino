@@ -122,10 +122,17 @@ void actuatorsProgress() {
   turnFans(ON);
   if (controlAlgorithm == PID_CONTROL) {
     if (controlTemperature) {
-      startTemperaturePID();
+      switch(controlMode) {
+      case SKIN_CONTROL:
+        startPID(skinPID);
+        break;
+      case AIR_CONTROL:
+        startPID(airPID);
+        break;
+      }
     }
     if (controlHumidity) {
-      startHumidityPID();
+      startPID(humidityPID);
     }
   }
   updateDisplaySensors();
@@ -261,8 +268,9 @@ void heatUp() {
 }
 
 void stopActuation() {
-  stopTemperaturePID();
-  stopHumidityPID();
+  stopPID(airPID);
+  stopPID(skinPID);
+  stopPID(humidityPID);
   turnActuators(OFF);
 }
 

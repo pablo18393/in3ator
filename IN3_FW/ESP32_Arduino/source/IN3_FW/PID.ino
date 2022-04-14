@@ -1,35 +1,32 @@
 //PID VARIABLES
-#define tempCTL 0
-#define humidityCTL 1
-#define numPID 2
+#define airPID 0
+#define skinPID 1
+#define humidityPID 2
+#define numPID 3
 
-double Kp[numPID] = {200, 200}, Ki[numPID] = {1, 2} , Kd[numPID] = {500, 20};
+double Kp[numPID] = {200, 200, 200}, Ki[numPID] = {1, 1, 2} , Kd[numPID] = {500, 500, 20};
 double PIDOutput;
-double temperaturePIDInput;
-double humidityPIDOutput;
+double skinControlPIDInput;
+double airControlPIDInput;
+double humidityControlPIDOutput;
 int humidifierTimeCycle = 5000;
 unsigned long windowStartTime;
-PID temperaturePID(&temperaturePIDInput, &PIDOutput, &desiredSkinTemp, Kp[tempCTL], Ki[tempCTL], Kd[tempCTL], P_ON_E, DIRECT);
-PID humidityPID(&humidity, &humidityPIDOutput, &desiredRoomHum, Kp[humidityCTL], Ki[humidityCTL], Kd[humidityCTL], P_ON_E, DIRECT);
+PID airControlPID(&airControlPIDInput, &PIDOutput, &desiredSkinTemp, Kp[skinPID], Ki[skinPID], Kd[skinPID], P_ON_E, DIRECT);
+PID skinControlPID(&skinControlPIDInput, &PIDOutput, &desiredSkinTemp, Kp[skinPID], Ki[skinPID], Kd[skinPID], P_ON_E, DIRECT);
+PID humidityControlPID(&humidity, &humidityControlPIDOutput, &desiredRoomHum, Kp[humidityPID], Ki[humidityPID], Kd[humidityPID], P_ON_E, DIRECT);
 
 void PIDHandler() {
-  if (temperaturePID.GetMode() == AUTOMATIC) {
-    if (controlMode) {
-      temperaturePIDInput = temperature[airSensor];
-    }
-    else {
-      temperaturePIDInput = temperature[babySensor];
-    }
-    temperaturePID.Compute();
+  if (skinControlPID.GetMode() == AUTOMATIC) {
+    skinControlPID.Compute();
     ledcWrite(HEATER_PWM_CHANNEL, PIDOutput);
   }
-  if (humidityPID.GetMode() == AUTOMATIC) {
-    humidityPID.Compute();
+  if (humidityControlPID.GetMode() == AUTOMATIC) {
+    humidityControlPID.Compute();
     if (millis() - windowStartTime > humidifierTimeCycle)
     { //time to shift the Relay Window
       windowStartTime += humidifierTimeCycle;
     }
-    if (humidityPIDOutput < millis() - windowStartTime) {
+    if (humidityControlPIDOutput < millis() - windowStartTime) {
       if (humidifierState || humidifierStateChange) {
         if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
           ledcWrite(HUMIDIFIER_PWM_CHANNEL, false);
@@ -56,25 +53,42 @@ void PIDHandler() {
   }
 }
 
-void startTemperaturePID() {
-  temperaturePID.SetOutputLimits(false, heaterMaxPWM);
-  temperaturePID.SetTunings(Kp[tempCTL], Ki[tempCTL], Kd[tempCTL]);
-  temperaturePID.SetControllerDirection(DIRECT);
-  temperaturePID.SetMode(AUTOMATIC);
+void startPID(byte var) {
+  switch (var) {
+    case airPID:
+      skinControlPIDInput = temperature[airSensor];
+      skinControlPID.SetOutputLimits(false, heaterMaxPWM);
+      skinControlPID.SetTunings(Kp[airPID], Ki[airPID], Kd[airPID]);
+      skinControlPID.SetControllerDirection(DIRECT);
+      skinControlPID.SetMode(AUTOMATIC);
+      break;
+    case skinPID:
+      skinControlPIDInput = temperature[babySensor];
+      skinControlPID.SetOutputLimits(false, heaterMaxPWM);
+      skinControlPID.SetTunings(Kp[skinPID], Ki[skinPID], Kd[skinPID]);
+      skinControlPID.SetControllerDirection(DIRECT);
+      skinControlPID.SetMode(AUTOMATIC);
+      break;
+    case humidityPID:
+      humidifierStateChange = true;
+      windowStartTime = millis();
+      humidityControlPID.SetOutputLimits(humidifierTimeCycle * humidifierDutyCycleMin / 100, humidifierTimeCycle * humidifierDutyCycleMax / 100);
+      humidityControlPID.SetMode(AUTOMATIC);
+      break;
+  }
+
 }
 
-void startHumidityPID() {
-  humidifierStateChange = true;
-  windowStartTime = millis();
-  humidityPID.SetOutputLimits(humidifierTimeCycle * humidifierDutyCycleMin / 100, humidifierTimeCycle * humidifierDutyCycleMax / 100);
-  humidityPID.SetMode(AUTOMATIC);
-}
+void stopPID(byte var) {
+  switch (var) {
+    case airPID:
+      airControlPID.SetMode(MANUAL);
+      break;
+    case skinPID:
+      skinControlPID.SetMode(MANUAL);
+      break;
+    case humidityPID:
+      humidityControlPID.SetMode(MANUAL);
+  }
 
-
-void stopTemperaturePID() {
-  temperaturePID.SetMode(MANUAL);
-}
-
-void stopHumidityPID() {
-  humidityPID.SetMode(MANUAL);
 }

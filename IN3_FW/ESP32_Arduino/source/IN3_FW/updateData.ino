@@ -18,11 +18,11 @@ int updateData() {
     encPulseDetected = false;
   }
   if (millis() - lastDebugUpdate > debugUpdatePeriod) {
-    if (temperaturePID.GetMode() == AUTOMATIC) {
+    if (skinControlPID.GetMode() == AUTOMATIC) {
       logln("[PID] -> Heater PWM output is: " + String (100 * PIDOutput / heaterMaxPWM) + "%");
     }
-    if (humidityPID.GetMode() == AUTOMATIC) {
-      logln("[PID] -> Humidifier output is: " + String (100 * humidityPIDOutput / humidifierTimeCycle) + "%");
+    if (humidityControlPID.GetMode() == AUTOMATIC) {
+      logln("[PID] -> Humidifier output is: " + String (100 * humidityControlPIDOutput / humidifierTimeCycle) + "%");
     }
 
     //logln("[SENSORS] -> Current consumption is: " + String (analogRead(SYSTEM_SHUNT)) + "," + String (currentConsumption) + " Amps");
