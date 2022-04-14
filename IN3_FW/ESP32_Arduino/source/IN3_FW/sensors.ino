@@ -145,26 +145,28 @@ float adcToCelsius(float adcReading, int maxAdcReading) {
 bool updateRoomSensor() {
   if (roomSensorPresent) {
     bool sensorState = mySHTC3.update();
+    float sensedTemperature;
     logln("[SENSORS] -> Updating room humidity: state is " + String(sensorState));
     if (!sensorState) {
-      temperature[airSensor] =  mySHTC3.toDegC(); //Add here measurement to temp array
-      humidity = mySHTC3.toPercent();
-      if (temperature[airSensor] > temperatureMax[airSensor]) {
-        temperatureMax[airSensor] = temperature[airSensor];
+      sensedTemperature=mySHTC3.toDegC();
+      if (sensedTemperature > minTempToDiscard && sensedTemperature < maxTempToDiscard) {
+        temperature[airSensor] =  sensedTemperature; //Add here measurement to temp array
+        humidity = mySHTC3.toPercent();
+        if (temperature[airSensor] > temperatureMax[airSensor]) {
+          temperatureMax[airSensor] = temperature[airSensor];
+        }
+        if (temperature[airSensor] < temperatureMin[airSensor]) {
+          temperatureMin[airSensor] = temperature[airSensor];
+        }
+        return true;
       }
-      if (temperature[airSensor] < temperatureMin[airSensor]) {
-        temperatureMin[airSensor] = temperature[airSensor];
-      }
-      return true;
     }
     else {
       initRoomSensor();
-      return false;
     }
   }
   else {
     initRoomSensor();
-    return false;
   }
   return false;
 }

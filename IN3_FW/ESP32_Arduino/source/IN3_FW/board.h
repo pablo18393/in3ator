@@ -48,6 +48,9 @@ int HUMIDIFIER_DUTY_CYCLE = 0.40 * PWM_MAX_VALUE;
 #define BL_NORMAL 0
 #define BL_POWERSAVE 1
 
+#define maxTempToDiscard 60
+#define minTempToDiscard 5
+
 int ScreenBacklightMode;
 float backlightPower;
 float backlightPowerSafe;
