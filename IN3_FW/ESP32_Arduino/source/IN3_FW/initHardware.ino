@@ -376,9 +376,9 @@ void TFTRestore() {
     case actuatorsProgressPage:
       actuatorsProgress();
       break;
-    case advancedModePage:
+    case mainMenuPage:
     default:
-      advancedMode();
+      mainMenu();
       break;
   }
 }

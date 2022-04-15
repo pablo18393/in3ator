@@ -87,7 +87,7 @@ long lastDebugUpdate;
 long loopCounts;
 //pages number in UI. Configuration and information will be displayed depending on the page number
 int page;
-#define advancedModePage 1
+#define mainMenuPage 1
 #define actuatorsProgressPage 2
 #define settingsPage 3
 #define calibrateSensorsPage 4
@@ -191,16 +191,18 @@ bool controlMode;
 bool defaultcontrolMode = SKIN_CONTROL;
 bool controlAlgorithm;
 bool defaultcontrolAlgorithm = PID_CONTROL;
-double desiredSkinTemp = 34; //preset baby skin temperature
-double desiredRoomHum = 75; //preset enviromental humidity
+double desiredControlTemp; //preset baby skin temperature
+double desiredRoomHum; //preset enviromental humidity
 bool jaundiceEnable; //PWM that controls jaundice LED intensity
 double desiredHeaterTemp; //desired temperature in heater
 
 //constants
 const byte humidifierDutyCycleMax = 100; //maximum humidity cycle in heater to be set
 const byte humidifierDutyCycleMin = 0; //minimum humidity cycle in heater to be set
-const byte minTemp = 25; //minimum allowed temperature to be set
-const byte maxTemp = 45; //maximum allowed temperature to be set
+const float minTemp[2] = {35, 30}; //minimum allowed temperature to be set
+const float maxTemp[2] = {37.5, 37}; //maximum allowed temperature to be set
+const int presetTemp[2] = {36, 32}; //preset baby skin temperature
+const int presetHumidity = 70; //preset humidity
 const byte maxHum = 100; //maximum allowed humidity to be set
 const byte minHum = 20; //minimum allowed humidity to be set
 const byte LEDMaxIntensity = 100; //max LED intensity to be set
@@ -302,7 +304,7 @@ byte goToProcessRow;
 
 //below are all the different variables positions that will be displayed in user interface
 //mainMenu
-#define advancedModeGraphicPosition 1
+#define mainMenuGraphicPosition 1
 #define LEDGraphicPosition 2
 #define startGraphicPosition 3
 //Advanced mode
@@ -365,7 +367,7 @@ int hardwareComponents;
 
 void setup() {
   initHardware();
-  advancedMode();
+  mainMenu();
 }
 
 bool wroteHeater[5];
@@ -375,13 +377,13 @@ void loop() {
   userInterfaceHandler();
   updateData();
   /*
-  if (millis() > 20000 && !wroteHeater[0]) {
+    if (millis() > 20000 && !wroteHeater[0]) {
     ledcWrite(HEATER_PWM_CHANNEL, PWM_MAX_VALUE * 3 / 4);
     wroteHeater[0] = true;
-  }
-  if (millis() > 50000 && !wroteHeater[1]) {
+    }
+    if (millis() > 50000 && !wroteHeater[1]) {
     digitalWrite(FAN, HIGH);
     wroteHeater[1] = true;
-  }
+    }
   */
 }

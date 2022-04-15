@@ -37,19 +37,19 @@ int updateData() {
   }
   if (millis() - lastGraphicSensorsUpdate > sensorsUpdatePeriod) {
     updateRoomSensor();
-    if (page == advancedModePage || page == actuatorsProgressPage) {
+    if (page == mainMenuPage || page == actuatorsProgressPage) {
       updateDisplaySensors();
     }
     lastGraphicSensorsUpdate = millis();
   }
-  if ((page == advancedModePage) && !enableSet) {
+  if ((page == mainMenuPage) && !enableSet) {
     checkSetMessage();
   }
 }
 
 void updateDisplaySensors() {
   float temperatureToUpdate;
-  if (page == advancedModePage || (page == actuatorsProgressPage)) {
+  if (page == mainMenuPage || (page == actuatorsProgressPage)) {
     drawSelectedTemperature();
     drawHumidity();
   }
@@ -67,7 +67,7 @@ void updateDisplaySensors() {
       else {
         temperatureToUpdate = temperature[babySensor];
       }
-      temperaturePercentage = 100 - ((desiredSkinTemp - temperatureToUpdate) * 100 / (desiredSkinTemp - temperatureAtStart));
+      temperaturePercentage = 100 - ((desiredControlTemp - temperatureToUpdate) * 100 / (desiredControlTemp - temperatureAtStart));
       if (temperaturePercentage > 99) {
         temperaturePercentage = 100;
       }

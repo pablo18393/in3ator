@@ -26,7 +26,7 @@ void graphics() {
         drawCentreString(words[i], width_select + (tft.width() - width_select) / 2, ypos, textFontSize);
       }
       switch (page) {
-        case advancedModePage:
+        case mainMenuPage:
           switch (i) {
             case controlModeGraphicPosition:
               if (controlMode) {
@@ -164,7 +164,7 @@ void graphics() {
 
 void setSensorsGraphicPosition() {
   switch (page) {
-    case advancedModePage:
+    case mainMenuPage:
       humidityX = tft.width() - 50;
       humidityY = graphicHeight(humidityGraphicPosition);
       temperatureX = tft.width() - 79;
@@ -190,7 +190,7 @@ void setSensorsGraphicPosition() {
 
 void drawHeading() {
   tft.fillRect(0, 0, tft.width(), height_heading, COLOR_HEADING);
-  if (page != advancedModePage) {
+  if (page != mainMenuPage) {
     drawBack();
   }
   setTextColor(COLOR_MENU);
@@ -481,7 +481,7 @@ void drawActuatorsSeparators() {
 
 void printLoadingTemperatureBar() {
   barThickness = 3;
-  drawFloat(desiredSkinTemp, 1, tft.width() - 5 * letter_width, temperatureY, textFontSize);
+  drawFloat(desiredControlTemp, 1, tft.width() - 5 * letter_width, temperatureY, textFontSize);
   for (int i = true; i <= barThickness; i++) {
     tft.drawRect(tempBarPosX - barWidth / 2 - i, tempBarPosY - barHeight / 2 - i, barWidth + i * 2, barHeight + i * 2, COLOR_FRAME_BAR);
   }

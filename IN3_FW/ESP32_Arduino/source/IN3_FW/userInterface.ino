@@ -5,7 +5,7 @@ bool userInterfaceHandler() {
     if (!selected) {
       if (EncMove < 0) {
         EncMove++;
-        if (page == advancedModePage) {
+        if (page == mainMenuPage) {
           enableSetProcess = enableSet;
         }
         else {
@@ -44,7 +44,7 @@ bool userInterfaceHandler() {
       if (checkEncoderPress()) {
         return true;
       }
-      if (page != advancedModePage) {
+      if (page != mainMenuPage) {
         if (back_mode()) {
           return true;
         }
@@ -52,27 +52,27 @@ bool userInterfaceHandler() {
     }
     delay(debounceTime);
     switch (page) {
-      case advancedModePage:
+      case mainMenuPage:
         switch (bar_pos - graphicTextOffset ) {
           case controlModeGraphicPosition:
             controlMode = !controlMode;
             EEPROM.write(EEPROM_controlMode, controlMode);
             EEPROM.commit();
-            advancedMode();
+            mainMenu();
             break;
           case temperatureGraphicPosition:
             while (GPIORead(ENC_SWITCH)) {
               updateData();
-              if (EncMove && -EncMove + desiredSkinTemp >= minTemp && -EncMove + desiredSkinTemp <= maxTemp) {
+              if (EncMove && -EncMove + desiredControlTemp >= minTemp[controlMode] && -EncMove + desiredControlTemp <= maxTemp[controlMode]) {
                 setTextColor(COLOR_MENU);
                 if (!controlTemperature) {
                   controlTemperature = true;
                   drawRightString(initialSensorsValue, initialSensorPosition, temperatureY, textFontSize);
                 }
-                drawFloat(desiredSkinTemp, 1, temperatureX - 65, temperatureY, textFontSize);
-                desiredSkinTemp -= float(EncMove) / 10;
+                drawFloat(desiredControlTemp, 1, temperatureX - 65, temperatureY, textFontSize);
+                desiredControlTemp -= float(EncMove) / 10;
                 setTextColor(COLOR_MENU_TEXT);
-                drawFloat(desiredSkinTemp, 1, temperatureX - 65, temperatureY, textFontSize);
+                drawFloat(desiredControlTemp, 1, temperatureX - 65, temperatureY, textFontSize);
                 enableSet = true;
               }
               EncMove = false;
@@ -411,7 +411,7 @@ bool userInterfaceHandler() {
     while (!GPIORead(ENC_SWITCH)) {
       updateData();
       checkEncoderPress();
-      if (page != advancedModePage) {
+      if (page != mainMenuPage) {
         back_mode();
       }
     }
@@ -421,7 +421,7 @@ bool userInterfaceHandler() {
 
 bool checkEncoderPress() {
   updateData();
-  if (page == advancedModePage) {
+  if (page == mainMenuPage) {
     long timePressed = millis();
     while (!GPIORead(ENC_SWITCH)) {
       updateData();
@@ -456,7 +456,7 @@ void checkSetMessage() {
     else {
       setTextColor(COLOR_MENU);
     }
-    if (page == advancedModePage) {
+    if (page == mainMenuPage) {
       switch (language) {
         case english:
           helpMessage = "Set desired parameters";
@@ -488,7 +488,7 @@ bool back_mode() {
       tft.drawLine(width_back - back_bar, 0, width_back - back_bar, height_heading, COLOR_MENU);
     }
     if (back_bar == width_back) {
-      advancedMode();
+      mainMenu();
       return true;
     }
     delay((time_back_draw + time_back_wait) / width_back);

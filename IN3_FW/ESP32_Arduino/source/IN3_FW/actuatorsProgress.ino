@@ -4,7 +4,7 @@ void actuatorsProgress() {
     GPRSSetPostVariables(NULL, "ALARM");
   }
   else {
-    GPRSSetPostVariables(actuatorsModeON, "ON:" + String (desiredSkinTemp, 1) + "," + String (desiredRoomHum));
+    GPRSSetPostVariables(actuatorsModeON, "ON:" + String (desiredControlTemp, 1) + "," + String (desiredRoomHum));
   }
   byte  numWords = false;
   temperaturePercentage = false;
@@ -147,7 +147,7 @@ void actuatorsProgress() {
       else {
         alarmSensedValue = temperature[babySensor];
       }
-      if (checkAlarms(desiredSkinTemp, alarmSensedValue, temperatureError, temperatureAlarmTime)) {
+      if (checkAlarms(desiredControlTemp, alarmSensedValue, temperatureError, temperatureAlarmTime)) {
         if (!alarmOnGoing[temperatureAlarm]) {
           alarmOnGoing[temperatureAlarm] = true;
           buzzerConstantTone(buzzerAlarmTone);
@@ -217,7 +217,7 @@ void basictemperatureControl() {
   else {
     temperatureToControl = temperature[babySensor];
   }
-  if (temperatureToControl < desiredSkinTemp) {
+  if (temperatureToControl < desiredControlTemp) {
     heatUp();
   }
   else {

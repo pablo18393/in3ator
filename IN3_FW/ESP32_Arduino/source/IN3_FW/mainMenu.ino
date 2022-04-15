@@ -1,6 +1,6 @@
 
-void advancedMode() {
-  page = advancedModePage;
+void mainMenu() {
+  page = mainMenuPage;
   byte numWords = 5;
   print_text = true;
   tft.setTextSize(1);
@@ -68,6 +68,8 @@ void advancedMode() {
   bar_pos = true;
   selected = false;
   ypos = graphicHeight(bar_pos - 1);
+  desiredRoomHum = presetHumidity;
+  desiredControlTemp = presetTemp[controlMode];
   while (!GPIORead(ENC_SWITCH)) {
     updateData();
   }
