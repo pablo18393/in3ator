@@ -76,14 +76,14 @@ void loaddefaultValues() {
 }
 
 void loadDefaultCalibration() {
-  EEPROM.writeFloat(EEPROM_RawSkinTemperatureLowCorrection, 25.14);
-  EEPROM.writeFloat(EEPROM_RawSkinTemperatureRangeCorrection, 8.59);
+  EEPROM.writeFloat(EEPROM_RawSkinTemperatureLowCorrection, 22.52);
+  EEPROM.writeFloat(EEPROM_RawSkinTemperatureRangeCorrection, 11.70);
   EEPROM.writeFloat(EEPROM_RawAirTemperatureLowCorrection, 0);
   EEPROM.writeFloat(EEPROM_RawAirTemperatureRangeCorrection, 0);
   EEPROM.writeFloat(EEPROM_RawDigitalTemperatureLowCorrection, 0);
   EEPROM.writeFloat(EEPROM_RawDigitalTemperatureRangeCorrection, 0);
-  EEPROM.writeFloat(EEPROM_ReferenceTemperatureRange, 6.56);
-  EEPROM.writeFloat(EEPROM_ReferenceTemperatureLow, 23.76);
+  EEPROM.writeFloat(EEPROM_ReferenceTemperatureRange, 10.57);
+  EEPROM.writeFloat(EEPROM_ReferenceTemperatureLow, 21.29);
   EEPROM.commit();
 }
 

@@ -403,7 +403,6 @@ bool userInterfaceHandler() {
         }
         break;
       case autoCalibrationPage:
-
         break;
     }
     selected = false;

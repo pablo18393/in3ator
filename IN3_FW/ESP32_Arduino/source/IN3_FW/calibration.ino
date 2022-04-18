@@ -78,7 +78,7 @@ void secondPointCalibration() {
 }
 
 void autoCalibration() {
-  bool exitActuation = false;
+  bool exitCalibrationMenu = false;
   byte numWords = 1;
   page = autoCalibrationPage;
   print_text = true;
@@ -112,7 +112,7 @@ void autoCalibration() {
   }
   delay(debounceTime);
   autoCalibrationProcess = setupAutoCalibrationPoint;
-  while (!exitActuation) {
+  while (!exitCalibrationMenu) {
     updateData();
     switch (autoCalibrationProcess) {
       case setupAutoCalibrationPoint:
@@ -127,7 +127,7 @@ void autoCalibration() {
           delay(debounceTime);
           while (!GPIORead(ENC_SWITCH)) {
             updateData();
-            exitActuation = back_mode();
+            exitCalibrationMenu = back_mode();
           }
           delay(debounceTime);
           ledcWrite(HEATER_PWM_CHANNEL, PWM_MAX_VALUE / 2);
@@ -145,19 +145,14 @@ void autoCalibration() {
           RawTemperatureRange[babySensor] = (temperature[babySensor] - RawTemperatureLow[babySensor]);
           logln("calibration factors: " + String(RawTemperatureLow [babySensor]) + "," + String (RawTemperatureRange [babySensor]) + "," + String (ReferenceTemperatureRange) + "," + String (ReferenceTemperatureLow));
           saveCalibrationToEEPROM();
-          delay(debounceTime);
-          while (!GPIORead(ENC_SWITCH)) {
-            updateData();
-            exitActuation = back_mode();
-          }
-          delay(debounceTime);
           ledcWrite(HEATER_PWM_CHANNEL, false);
           turnFans(OFF);
-          settings();
+          exitCalibrationMenu=true;
         }
         break;
     }
   }
+  mainMenu();
 }
 
 void clearCalibrationValues() {

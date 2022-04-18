@@ -18,6 +18,9 @@ int updateData() {
     encPulseDetected = false;
   }
   if (millis() - lastDebugUpdate > debugUpdatePeriod) {
+    if (airControlPID.GetMode() == AUTOMATIC) {
+      logln("[PID] -> Heater PWM output is: " + String (100 * PIDOutput / heaterMaxPWM) + "%");
+    }
     if (skinControlPID.GetMode() == AUTOMATIC) {
       logln("[PID] -> Heater PWM output is: " + String (100 * PIDOutput / heaterMaxPWM) + "%");
     }
