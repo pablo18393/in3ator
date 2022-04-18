@@ -63,38 +63,64 @@ bool userInterfaceHandler() {
           case temperatureGraphicPosition:
             while (GPIORead(ENC_SWITCH)) {
               updateData();
-              if (EncMove && -EncMove + desiredControlTemp >= minTemp[controlMode] && -EncMove + desiredControlTemp <= maxTemp[controlMode]) {
-                setTextColor(COLOR_MENU);
-                if (!controlTemperature) {
-                  controlTemperature = true;
-                  drawRightString(initialSensorsValue, initialSensorPosition, temperatureY, textFontSize);
+              if (EncMove) {
+                if (EncMove > 0) {
+                  if (desiredControlTemp > minTemp[controlMode]) {
+                    updateUIData = true;
+                  }
                 }
-                drawFloat(desiredControlTemp, 1, temperatureX - 65, temperatureY, textFontSize);
-                desiredControlTemp -= float(EncMove) / 10;
-                setTextColor(COLOR_MENU_TEXT);
-                drawFloat(desiredControlTemp, 1, temperatureX - 65, temperatureY, textFontSize);
-                enableSet = true;
+                else {
+                  if (desiredControlTemp < maxTemp[controlMode]) {
+                    updateUIData = true;
+                  }
+                }
+                if (updateUIData) {
+                  setTextColor(COLOR_MENU);
+                  if (!controlTemperature) {
+                    controlTemperature = true;
+                    drawRightString(initialSensorsValue, initialSensorPosition, temperatureY, textFontSize);
+                  }
+                  drawFloat(desiredControlTemp, 1, temperatureX - 65, temperatureY, textFontSize);
+                  desiredControlTemp -= float(EncMove) * stepTemperatureIncrement;
+                  setTextColor(COLOR_MENU_TEXT);
+                  drawFloat(desiredControlTemp, 1, temperatureX - 65, temperatureY, textFontSize);
+                  enableSet = true;
+                }
+                EncMove = false;
+                updateUIData = false;
               }
-              EncMove = false;
             }
             drawStartMessage();
             break;
           case humidityGraphicPosition:
             while (GPIORead(ENC_SWITCH)) {
               updateData();
-              if (EncMove && -EncMove + desiredRoomHum >= minHum && -EncMove + desiredRoomHum <= maxHum) {
-                setTextColor(COLOR_MENU);
-                if (!controlHumidity) {
-                  controlHumidity = true;
-                  drawRightString(initialSensorsValue, initialSensorPosition, humidityY, textFontSize);
+              if (EncMove ) {
+                if (EncMove > 0) {
+                  if (desiredRoomHum > minHum) {
+                    updateUIData = true;
+                  }
                 }
-                drawCentreNumber(desiredRoomHum, humidityX - 65, humidityY);
-                desiredRoomHum -= (EncMove);
-                setTextColor(COLOR_MENU_TEXT);
-                drawCentreNumber(desiredRoomHum, humidityX - 65, humidityY);
-                enableSet = true;
+                else {
+                  if (desiredRoomHum < maxHum) {
+                    updateUIData = true;
+                  }
+                }
+                if (updateUIData) {
+                  setTextColor(COLOR_MENU);
+                  if (!controlHumidity) {
+                    controlHumidity = true;
+                    drawRightString(initialSensorsValue, initialSensorPosition, humidityY, textFontSize);
+                  }
+                  drawCentreNumber(desiredRoomHum, humidityX - 65, humidityY);
+                  desiredRoomHum -= (EncMove) * stepHumidityIncrement;
+                  setTextColor(COLOR_MENU_TEXT);
+                  drawCentreNumber(desiredRoomHum, humidityX - 65, humidityY);
+                  enableSet = true;
+                }
               }
               EncMove = false;
+              updateUIData = false;
             }
             drawStartMessage();
             break;

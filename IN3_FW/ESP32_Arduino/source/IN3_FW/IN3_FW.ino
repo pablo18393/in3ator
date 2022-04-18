@@ -201,6 +201,8 @@ const byte humidifierDutyCycleMax = 100; //maximum humidity cycle in heater to b
 const byte humidifierDutyCycleMin = 0; //minimum humidity cycle in heater to be set
 const float minTemp[2] = {35, 30}; //minimum allowed temperature to be set
 const float maxTemp[2] = {37.5, 37}; //maximum allowed temperature to be set
+const float stepTemperatureIncrement = 0.1; //maximum allowed temperature to be set
+const float stepHumidityIncrement = 5; //maximum allowed temperature to be set
 const int presetTemp[2] = {36, 32}; //preset baby skin temperature
 const int presetHumidity = 70; //preset humidity
 const byte maxHum = 90; //maximum allowed humidity to be set
@@ -217,6 +219,7 @@ boolean B_set;
 int encoderpinA = ENC_A; // pin  encoder A
 int encoderpinB = ENC_B; // pin  encoder B
 bool encPulsed, encPulsedBefore; //encoder switch status
+bool updateUIData;
 volatile int EncMove; //moved encoder
 volatile int lastEncMove; //moved last encoder
 volatile int EncMoveOrientation = -1; //set to -1 to increase values clockwise
