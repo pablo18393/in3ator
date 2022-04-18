@@ -28,6 +28,8 @@ int updateData() {
       logln("[PID] -> Humidifier output is: " + String (100 * humidityControlPIDOutput / humidifierTimeCycle) + "%");
     }
 
+      logln("[PID] -> Desired temp is: " + String (desiredControlTemp) + "ºC");
+
     //logln("[SENSORS] -> Current consumption is: " + String (analogRead(SYSTEM_SHUNT)) + "," + String (currentConsumption) + " Amps");
     logln("[SENSORS] -> System current consumption is: " + String (currentConsumption[MAIN_SHUNT], 1) + " Amps");
     logln("[SENSORS] -> USB current consumption is: " + String (currentConsumption[HUMIDIFIER_SHUNT], 2) + " Amps");

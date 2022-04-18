@@ -17,10 +17,12 @@ PID humidityControlPID(&humidity, &humidityControlPIDOutput, &desiredRoomHum, Kp
 
 void PIDHandler() {
   if (airControlPID.GetMode() == AUTOMATIC) {
+    airControlPIDInput = temperature[airSensor];
     airControlPID.Compute();
     ledcWrite(HEATER_PWM_CHANNEL, PIDOutput);
   }
   if (skinControlPID.GetMode() == AUTOMATIC) {
+    skinControlPIDInput = temperature[babySensor];
     skinControlPID.Compute();
     ledcWrite(HEATER_PWM_CHANNEL, PIDOutput);
   }
@@ -60,14 +62,12 @@ void PIDHandler() {
 void startPID(byte var) {
   switch (var) {
     case airPID:
-      airControlPIDInput = temperature[airSensor];
       airControlPID.SetOutputLimits(false, heaterMaxPWM);
       airControlPID.SetTunings(Kp[airPID], Ki[airPID], Kd[airPID]);
       airControlPID.SetControllerDirection(DIRECT);
       airControlPID.SetMode(AUTOMATIC);
       break;
     case skinPID:
-      skinControlPIDInput = temperature[babySensor];
       skinControlPID.SetOutputLimits(false, heaterMaxPWM);
       skinControlPID.SetTunings(Kp[skinPID], Ki[skinPID], Kd[skinPID]);
       skinControlPID.SetControllerDirection(DIRECT);
