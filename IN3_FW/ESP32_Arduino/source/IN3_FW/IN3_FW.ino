@@ -176,7 +176,7 @@ float previousTemperature[secondOrder_filter];
 
 int instantCurrent_array_pos = false;
 float currentConsumption[currentSensingNum];
-float currentToAmpFactor_MAIN = 0.002;
+float currentToAmpFactor_MAIN = 0.003;
 float currentToAmpFactor_HUMIDIFIER = 0.00013;
 
 //room variables
