@@ -7,7 +7,7 @@ void encSwitchHandler() {
         encPulseDetected = true;
         buzzerTone(buzzerStandbyToneTimes, buzzerSwitchDuration, buzzerRotaryEncoderTone);
         lastbacklightHandler = millis();
-        if (alarmOnGoing[TEMPERATURE_ALARM] || alarmOnGoing[HUMIDITY_ALARM]) {
+        if (ongoingAlarms()) {
           resetAlarms();
         }
       }

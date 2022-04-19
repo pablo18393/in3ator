@@ -66,10 +66,8 @@ bool buzzerBuzzing;
 
 long lastPowerAlertNotification;
 bool powerAlert;
-bool alarmOnGoing[2];
 
-long temperatureAlarmTime, humidityAlarmTime;
-float alarmTimeDelay = 30; //in mins, time to check alarm
+float alarmTimeDelay = 1; //in mins, time to check alarm
 
 //configuration variables
 #define debounceTime 10         //encoder debouncing time

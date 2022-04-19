@@ -73,12 +73,14 @@ void startPID(byte var) {
       airControlPID.SetTunings(Kp[airPID], Ki[airPID], Kd[airPID]);
       airControlPID.SetControllerDirection(DIRECT);
       airControlPID.SetMode(AUTOMATIC);
+      previousPIDOutput = false;
       break;
     case skinPID:
       skinControlPID.SetOutputLimits(false, heaterMaxPWM);
       skinControlPID.SetTunings(Kp[skinPID], Ki[skinPID], Kd[skinPID]);
       skinControlPID.SetControllerDirection(DIRECT);
       skinControlPID.SetMode(AUTOMATIC);
+      previousPIDOutput = false;
       break;
     case humidityPID:
       humidifierStateChange = true;

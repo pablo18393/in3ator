@@ -5,35 +5,22 @@
 #define HUMIDITY_ALARM 0
 #define TEMPERATURE_ALARM 1
 #define THERMAL_CUTOUT_ALARM 2
+#define NUM_ALARMS 3
 
-#define allAlarms 255
+bool alarmOnGoing[NUM_ALARMS];
+
+long lastAlarmTrigger[NUM_ALARMS];
+
 float alarmSensedValue;
 
-void alarmTimerStart() {
-  temperatureAlarmTime = millis();
-  humidityAlarmTime = millis();
-}
-
-void resetTemperatureAlarm() {
-  alarmOnGoing[TEMPERATURE_ALARM] = false;
-  temperatureAlarmTime = millis();
-  drawAlarmMessage(ERASE, TEMPERATURE_ALARM);
-}
-
-void resetHumidityAlarm() {
-  alarmOnGoing[HUMIDITY_ALARM] = false;
-  humidityAlarmTime = millis();
-  drawAlarmMessage(ERASE, HUMIDITY_ALARM);
-}
-
-bool evaluateAlarm(byte alarmID, float setPoint, float measuredValue, int errorMargin, float hysteresisValue, long alarmTime, bool alarmPriority) {
-  if (millis() - alarmTime > alarmTimeDelay * 60 * 1000 || alarmPriority == CRITICAL_ALARM) { // min to millis
+bool evaluateAlarm(byte alarmID, float setPoint, float measuredValue, int errorMargin, float hysteresisValue, long alarmTime) {
+  if (millis() - alarmTime > alarmTimeDelay * 60 * 1000) { // min to millis
     if (errorMargin) {
-      if (abs(setPoint - measuredValue) > errorMargin) {
+      if (abs(setPoint - measuredValue) + hysteresisValue * alarmOnGoing[alarmID] > errorMargin) {
         if (!alarmOnGoing[alarmID]) {
           setAlarm(alarmID);
+          return true;
         }
-        return true;
       }
       else {
         if (alarmOnGoing[alarmID]) {
@@ -42,11 +29,11 @@ bool evaluateAlarm(byte alarmID, float setPoint, float measuredValue, int errorM
       }
     }
     else {
-      if (measuredValue > setPoint) {
+      if (measuredValue + hysteresisValue * alarmOnGoing[alarmID] > setPoint) {
         if (!alarmOnGoing[alarmID]) {
           setAlarm(alarmID);
+          return true;
         }
-        return true;
       }
       else {
         if (alarmOnGoing[alarmID]) {
@@ -56,6 +43,22 @@ bool evaluateAlarm(byte alarmID, float setPoint, float measuredValue, int errorM
     }
   }
   return false;
+}
+
+void alarmTimerStart() {
+  for (int  i = 0; i < NUM_ALARMS; i++) {
+    lastAlarmTrigger [i] = millis();
+  }
+}
+
+void resetAlarm(byte alarmID) {
+  alarmOnGoing[alarmID] = false;
+  lastAlarmTrigger[alarmID] = millis();
+  drawAlarmMessage(ERASE, alarmID);
+}
+
+bool ongoingAlarms() {
+  return (alarmOnGoing[TEMPERATURE_ALARM] || alarmOnGoing[HUMIDITY_ALARM] || alarmOnGoing[THERMAL_CUTOUT_ALARM]);
 }
 
 void setAlarm (byte alarmID) {
@@ -73,10 +76,12 @@ void disableAlarm (byte alarmID) {
 
 void resetAlarms() {
   if (alarmOnGoing[TEMPERATURE_ALARM]) {
-    resetTemperatureAlarm();
+    resetAlarm(TEMPERATURE_ALARM);
   }
   if (alarmOnGoing[HUMIDITY_ALARM]) {
-    resetHumidityAlarm();
+    resetAlarm(HUMIDITY_ALARM);
   }
-  resetHumidityAlarm();
+  if (alarmOnGoing[THERMAL_CUTOUT_ALARM]) {
+    resetAlarm(THERMAL_CUTOUT_ALARM);
+  }
 }
