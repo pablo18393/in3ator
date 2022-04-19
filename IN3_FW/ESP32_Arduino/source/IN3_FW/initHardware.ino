@@ -139,7 +139,7 @@ void initPWMGPIO() {
 }
 
 void initInterrupts() {
-  //attachInterrupt(ENC_SWITCH, encSwitchISR, CHANGE);
+  //attachInterrupt(ENC_SWITCH, encSwitchHandler, CHANGE);
   attachInterrupt(ENC_A, encoderISR, CHANGE);
   attachInterrupt(ENC_B, encoderISR, CHANGE);
 }
@@ -339,16 +339,20 @@ void initTFT() {
   long error = HW_error;
   float testCurrent, offsetCurrent;
   int  timeOut = 4000;
-  long processTime = millis();
+  long processTime;
   backlightPower = PWM_MAX_VALUE / screenBrightnessFactor;
   backlightPowerSafe = PWM_MAX_VALUE * backlightPowerSafePercentage;
   offsetCurrent = measureMeanConsumption(MAIN_SHUNT, defaultTestingSamples);
   GPIOWrite(TFT_CS, LOW);
   initializeTFT();
   loadlogo();
+  processTime = millis();
   for (int i = PWM_MAX_VALUE; i >= backlightPower; i--) {
     ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, i);
-    delay(i / brightenRate);
+    while (millis() - processTime < i / brightenRate) {
+      sensorsHandler();
+    }
+    processTime = millis();
   }
   testCurrent = measureMeanConsumption(MAIN_SHUNT, defaultTestingSamples) - offsetCurrent;
   if (testCurrent < SCREEN_CONSUMPTION_MIN) {
@@ -420,9 +424,6 @@ void buzzerHandler() {
     buzzerBuzzing = !buzzerBuzzing;
     ledcWrite(BUZZER_PWM_CHANNEL, buzzerMaxPWM / 2 * buzzerBuzzing);
     buzzerTime = millis();
-  }
-  if (page == actuatorsProgressPage) {
-    buzzerStandbyTime = max(lastbacklightHandler, buzzerStandbyTime);
   }
 }
 

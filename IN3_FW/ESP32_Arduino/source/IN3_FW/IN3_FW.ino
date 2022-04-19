@@ -3,7 +3,7 @@
 */
 
 //Firmware version and head title of UI screen
-#define FWversion "v8.3/8.B"
+#define FWversion "v9.0/8.B"
 #define headingTitle "in3ator"
 
 #include <esp_task_wdt.h>
@@ -58,21 +58,16 @@ int serialNumber = 45;
 #define buzzerSwitchDuration 10 //in micros, tone freq
 #define buzzerStandbyToneTimes 1 //in micros, tone freq
 int buzzerBeeps, buzzerToneTime;
-long buzzerTime, buzzerStandbyTime;
+long buzzerTime;
 bool buzzerBuzzing;
 
 //Alarm variables
 #define powerAlertNotificationPeriod 1000
-#define humidityAlarm 0
-#define temperatureAlarm 1
-#define allAlarms 255
+
 long lastPowerAlertNotification;
 bool powerAlert;
-bool alarmsEnable;
-bool defaultAlarmsEnable = true;
 bool alarmOnGoing[2];
-int temperatureError = 1; // 1 degrees difference to trigger alarm
-int humidityError = 12; //12 %RH to trigger alarm
+
 long temperatureAlarmTime, humidityAlarmTime;
 float alarmTimeDelay = 30; //in mins, time to check alarm
 
@@ -379,14 +374,4 @@ bool wroteHeater[5];
 void loop() {
   userInterfaceHandler();
   updateData();
-  /*
-    if (millis() > 20000 && !wroteHeater[0]) {
-    ledcWrite(HEATER_PWM_CHANNEL, PWM_MAX_VALUE * 3 / 4);
-    wroteHeater[0] = true;
-    }
-    if (millis() > 50000 && !wroteHeater[1]) {
-    digitalWrite(FAN, HIGH);
-    wroteHeater[1] = true;
-    }
-  */
 }

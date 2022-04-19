@@ -326,11 +326,11 @@ void drawAlarmMessage(bool write, bool roomVariable) {
     setTextColor(COLOR_MENU);
   }
   switch (roomVariable) {
-    case temperatureAlarm:
+    case TEMPERATURE_ALARM:
       helpMessage = "TEMPERATURE ALARM";
       alarmHeight = 105;
       break;
-    case humidityAlarm:
+    case HUMIDITY_ALARM:
       helpMessage = "HUMIDITY ALARM";
       alarmHeight = 140;
       break;

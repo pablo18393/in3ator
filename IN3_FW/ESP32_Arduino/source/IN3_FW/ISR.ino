@@ -1,5 +1,5 @@
 
-void encSwitchISR() {
+void encSwitchHandler() {
   if (!digitalRead(ENC_SWITCH)) {
     if (millis() - lastEncPulse > encPulseDebounce) {
       //statusEncSwitch = !statusEncSwitch;
@@ -7,7 +7,7 @@ void encSwitchISR() {
         encPulseDetected = true;
         buzzerTone(buzzerStandbyToneTimes, buzzerSwitchDuration, buzzerRotaryEncoderTone);
         lastbacklightHandler = millis();
-        if (alarmOnGoing[temperatureAlarm] || alarmOnGoing[humidityAlarm]) {
+        if (alarmOnGoing[TEMPERATURE_ALARM] || alarmOnGoing[HUMIDITY_ALARM]) {
           resetAlarms();
         }
       }

@@ -122,13 +122,13 @@ void actuatorsProgress() {
   turnFans(ON);
   if (controlAlgorithm == PID_CONTROL) {
     if (controlTemperature) {
-      switch(controlMode) {
-      case SKIN_CONTROL:
-        startPID(skinPID);
-        break;
-      case AIR_CONTROL:
-        startPID(airPID);
-        break;
+      switch (controlMode) {
+        case SKIN_CONTROL:
+          startPID(skinPID);
+          break;
+        case AIR_CONTROL:
+          startPID(airPID);
+          break;
       }
     }
     if (controlHumidity) {
@@ -141,26 +141,6 @@ void actuatorsProgress() {
   while (!exitActuation) {
     updateData();
     if (controlTemperature) {
-      if (controlMode) {
-        alarmSensedValue = temperature[airSensor];
-      }
-      else {
-        alarmSensedValue = temperature[babySensor];
-      }
-      if (checkAlarms(desiredControlTemp, alarmSensedValue, temperatureError, temperatureAlarmTime)) {
-        if (!alarmOnGoing[temperatureAlarm]) {
-          alarmOnGoing[temperatureAlarm] = true;
-          buzzerConstantTone(buzzerAlarmTone);
-          drawAlarmMessage(DRAW, temperatureAlarm);
-        }
-      }
-      else {
-        if (alarmOnGoing[temperatureAlarm]) {
-          alarmOnGoing[temperatureAlarm] = false;
-          shutBuzzer();
-          drawAlarmMessage(ERASE, temperatureAlarm);
-        }
-      }
       if (controlAlgorithm == BASIC_CONTROL) {
         basictemperatureControl();
       }
@@ -175,26 +155,6 @@ void actuatorsProgress() {
       }
       else {
         PIDHandler();
-      }
-      if (checkAlarms(humidity, desiredRoomHum, humidityError, humidityAlarmTime)) {
-        if (!alarmOnGoing[humidityAlarm]) {
-          alarmOnGoing[humidityAlarm] = true;
-          buzzerConstantTone(buzzerAlarmTone);
-          drawAlarmMessage(DRAW, humidityAlarm);
-        }
-      }
-      else {
-        if (alarmOnGoing[humidityAlarm]) {
-          alarmOnGoing[humidityAlarm] = false;
-          shutBuzzer();
-          drawAlarmMessage(ERASE, humidityAlarm);
-        }
-      }
-    }
-    if (!alarmOnGoing[temperatureAlarm] && !alarmOnGoing[humidityAlarm]) {
-      if (millis() - buzzerStandbyTime > buzzerStandbyPeriod) {
-        buzzerStandbyTime = millis();
-        //buzzerTone(buzzerStandbyToneTimes, buzzerStandbyToneDuration, buzzerStandbyTone);
       }
     }
     while (!GPIORead(ENC_SWITCH)) {

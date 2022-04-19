@@ -9,7 +9,6 @@
 #define EEPROM_WIFI_EN 50
 #define EEPROM_usedGenericMosfet 60
 #define EEPROM_controlMode 70
-#define EEPROM_alarmsEnable 80
 #define EEPROM_diffHumidity 90
 #define EEPROM_RawSkinTemperatureLowCorrection 100
 #define EEPROM_RawSkinTemperatureRangeCorrection 110
@@ -65,13 +64,11 @@ void loaddefaultValues() {
   WIFI_EN = defaultWIFI_EN;
   language = defaultLanguage;
   controlAlgorithm = defaultcontrolAlgorithm;
-  alarmsEnable = defaultAlarmsEnable;
   EEPROM.write(EEPROM_autoLock, autoLock);
   EEPROM.write(EEPROM_WIFI_EN, WIFI_EN);
   EEPROM.write(EEPROM_language, language);
   EEPROM.write(EEPROM_controlAlgorithm, controlAlgorithm);
   EEPROM.write(EEPROM_controlMode, controlMode);
-  EEPROM.write(EEPROM_alarmsEnable, alarmsEnable);
   EEPROM.commit();
 }
 
@@ -113,7 +110,6 @@ void recapVariables() {
   serialNumber = EEPROM.read(EEPROM_SerialNumber);
   WIFI_EN = EEPROM.read(EEPROM_WIFI_EN);
   controlAlgorithm = EEPROM.read(EEPROM_controlAlgorithm);
-  alarmsEnable = EEPROM.read(EEPROM_alarmsEnable);
   controlMode = EEPROM.read(EEPROM_controlMode);
 }
 

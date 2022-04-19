@@ -1,4 +1,5 @@
 //butterworth2 0.8hz cutoff frequency, 1khz sampling, 2nd order, low pass
+//site: https://www.meme.net.au/butterworth.html
 
 const double b[] = {0.000006294162241, 0.00001258832448, 0.000006294162241};
 const double a[] = {1.9928914235, -0.9929165938};

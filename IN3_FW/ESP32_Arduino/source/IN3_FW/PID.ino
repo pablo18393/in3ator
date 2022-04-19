@@ -9,6 +9,7 @@ double PIDOutput;
 double skinControlPIDInput;
 double airControlPIDInput;
 double humidityControlPIDOutput;
+double previousPWMOutput;
 int humidifierTimeCycle = 5000;
 unsigned long windowStartTime;
 PID airControlPID(&airControlPIDInput, &PIDOutput, &desiredControlTemp, Kp[airPID], Ki[airPID], Kd[airPID], P_ON_E, DIRECT);
@@ -19,12 +20,18 @@ void PIDHandler() {
   if (airControlPID.GetMode() == AUTOMATIC) {
     airControlPIDInput = temperature[airSensor];
     airControlPID.Compute();
-    ledcWrite(HEATER_PWM_CHANNEL, PIDOutput);
+    if (PIDOutput = !previousPWMOutput) {
+      ledcWrite(HEATER_PWM_CHANNEL, PIDOutput);
+    }
+    previousPWMOutput = PIDOutput;
   }
   if (skinControlPID.GetMode() == AUTOMATIC) {
     skinControlPIDInput = temperature[babySensor];
     skinControlPID.Compute();
-    ledcWrite(HEATER_PWM_CHANNEL, PIDOutput);
+    if (PIDOutput = !previousPWMOutput) {
+      ledcWrite(HEATER_PWM_CHANNEL, PIDOutput);
+    }
+    previousPWMOutput = PIDOutput;
   }
   if (humidityControlPID.GetMode() == AUTOMATIC) {
     humidityControlPID.Compute();
