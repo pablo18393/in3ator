@@ -141,7 +141,7 @@ void actuatorsProgress() {
   while (!exitActuation) {
     updateData();
     if (controlTemperature) {
-      
+
       if (controlAlgorithm == BASIC_CONTROL) {
         basictemperatureControl();
       }
@@ -224,7 +224,7 @@ void basicHumidityControl() {
 
 
 void heatUp() {
-  ledcWrite(HEATER_PWM_CHANNEL, heaterMaxPWM);
+  ledcWrite(HEATER_PWM_CHANNEL, heaterMaxPWM * ongoingThermalCutout());
 }
 
 void stopActuation() {
@@ -235,7 +235,7 @@ void stopActuation() {
 }
 
 void turnActuators(bool mode) {
-  ledcWrite(HEATER_PWM_CHANNEL, mode * heaterMaxPWM);
+  ledcWrite(HEATER_PWM_CHANNEL, mode * heaterMaxPWM * ongoingThermalCutout());
   if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
     ledcWrite(HUMIDIFIER_PWM_CHANNEL, HUMIDIFIER_DUTY_CYCLE * mode);
   }

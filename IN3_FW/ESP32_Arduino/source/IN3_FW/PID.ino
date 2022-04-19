@@ -9,7 +9,6 @@ double HeaterPIDOutput;
 double skinControlPIDInput;
 double airControlPIDInput;
 double humidityControlPIDOutput;
-double previousPIDOutput;
 int humidifierTimeCycle = 5000;
 unsigned long windowStartTime;
 PID airControlPID(&airControlPIDInput, &HeaterPIDOutput, &desiredControlTemp, Kp[airPID], Ki[airPID], Kd[airPID], P_ON_E, DIRECT);
@@ -20,18 +19,12 @@ void PIDHandler() {
   if (airControlPID.GetMode() == AUTOMATIC) {
     airControlPIDInput = temperature[airSensor];
     airControlPID.Compute();
-    if (HeaterPIDOutput != previousPIDOutput) {
-      ledcWrite(HEATER_PWM_CHANNEL, HeaterPIDOutput);
-    }
-    previousPIDOutput = HeaterPIDOutput;
+    ledcWrite(HEATER_PWM_CHANNEL, HeaterPIDOutput * ongoingThermalCutout());
   }
   if (skinControlPID.GetMode() == AUTOMATIC) {
     skinControlPIDInput = temperature[babySensor];
     skinControlPID.Compute();
-    if (HeaterPIDOutput != previousPIDOutput) {
-      ledcWrite(HEATER_PWM_CHANNEL, HeaterPIDOutput);
-    }
-    previousPIDOutput = HeaterPIDOutput;
+    ledcWrite(HEATER_PWM_CHANNEL, HeaterPIDOutput * ongoingThermalCutout());
   }
   if (humidityControlPID.GetMode() == AUTOMATIC) {
     humidityControlPID.Compute();
@@ -73,14 +66,12 @@ void startPID(byte var) {
       airControlPID.SetTunings(Kp[airPID], Ki[airPID], Kd[airPID]);
       airControlPID.SetControllerDirection(DIRECT);
       airControlPID.SetMode(AUTOMATIC);
-      previousPIDOutput = false;
       break;
     case skinPID:
       skinControlPID.SetOutputLimits(false, heaterMaxPWM);
       skinControlPID.SetTunings(Kp[skinPID], Ki[skinPID], Kd[skinPID]);
       skinControlPID.SetControllerDirection(DIRECT);
       skinControlPID.SetMode(AUTOMATIC);
-      previousPIDOutput = false;
       break;
     case humidityPID:
       humidifierStateChange = true;

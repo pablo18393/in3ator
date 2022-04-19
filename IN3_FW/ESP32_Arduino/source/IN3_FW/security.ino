@@ -16,8 +16,8 @@ void securityCheck() {
 }
 
 void checkThermalCutOuts() {
-  evaluateAlarm(THERMAL_CUTOUT_ALARM, AIR_THERMAL_CUTOUT, temperature[airSensor], false, AIR_THERMAL_CUTOUT_HYSTERESIS, lastAlarmTrigger[THERMAL_CUTOUT_ALARM]);
-  evaluateAlarm(THERMAL_CUTOUT_ALARM, SKIN_THERMAL_CUTOUT, temperature[babySensor], false, SKIN_THERMAL_CUTOUT_HYSTERESIS, lastAlarmTrigger[THERMAL_CUTOUT_ALARM]);
+  evaluateAlarm(AIR_THERMAL_CUTOUT_ALARM, AIR_THERMAL_CUTOUT, temperature[airSensor], false, AIR_THERMAL_CUTOUT_HYSTERESIS, lastAlarmTrigger[AIR_THERMAL_CUTOUT_ALARM]);
+  evaluateAlarm(SKIN_THERMAL_CUTOUT_ALARM, SKIN_THERMAL_CUTOUT, temperature[babySensor], false, SKIN_THERMAL_CUTOUT_HYSTERESIS, lastAlarmTrigger[SKIN_THERMAL_CUTOUT_ALARM]);
 }
 
 void checkAlarms() {

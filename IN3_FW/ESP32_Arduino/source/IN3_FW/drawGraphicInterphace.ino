@@ -317,7 +317,7 @@ void drawHardwareErrorMessage(long error) {
   }
 }
 
-void drawAlarmMessage(bool write, bool roomVariable) {
+void drawAlarmMessage(bool write, byte roomVariable) {
   int alarmHeight;
   if (write == DRAW) {
     setTextColor(COLOR_WARNING_TEXT);
@@ -326,6 +326,11 @@ void drawAlarmMessage(bool write, bool roomVariable) {
     setTextColor(COLOR_MENU);
   }
   switch (roomVariable) {
+    case AIR_THERMAL_CUTOUT_ALARM:
+    case SKIN_THERMAL_CUTOUT_ALARM:
+      helpMessage = "THERMAL CUTOUT ALARM";
+      alarmHeight = 105;
+      break;
     case TEMPERATURE_ALARM:
       helpMessage = "TEMPERATURE ALARM";
       alarmHeight = 105;

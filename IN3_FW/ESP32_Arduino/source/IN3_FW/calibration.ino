@@ -130,7 +130,7 @@ void autoCalibration() {
             exitCalibrationMenu = back_mode();
           }
           delay(debounceTime);
-          ledcWrite(HEATER_PWM_CHANNEL, PWM_MAX_VALUE / 2);
+          ledcWrite(HEATER_PWM_CHANNEL, PWM_MAX_VALUE / 2 * ongoingThermalCutout());
           turnFans(ON);
           autoCalibrationProcess = secondAutoCalibrationPoint;
           Serial.println("point 1");
