@@ -14,16 +14,6 @@ void alarmTimerStart() {
   humidityAlarmTime = millis();
 }
 
-void resetAlarms() {
-  if (alarmOnGoing[TEMPERATURE_ALARM]) {
-    resetTemperatureAlarm();
-  }
-  if (alarmOnGoing[HUMIDITY_ALARM]) {
-    resetHumidityAlarm();
-  }
-  resetHumidityAlarm();
-}
-
 void resetTemperatureAlarm() {
   alarmOnGoing[TEMPERATURE_ALARM] = false;
   temperatureAlarmTime = millis();
@@ -46,7 +36,7 @@ bool evaluateAlarm(byte alarmID, float setPoint, float measuredValue, int errorM
         return true;
       }
       else {
-        if (!alarmOnGoing[alarmID]) {
+        if (alarmOnGoing[alarmID]) {
           disableAlarm(alarmID);
         }
       }
@@ -59,7 +49,7 @@ bool evaluateAlarm(byte alarmID, float setPoint, float measuredValue, int errorM
         return true;
       }
       else {
-        if (!alarmOnGoing[alarmID]) {
+        if (alarmOnGoing[alarmID]) {
           disableAlarm(alarmID);
         }
       }
@@ -79,4 +69,14 @@ void disableAlarm (byte alarmID) {
   alarmOnGoing[alarmID] = false;
   shutBuzzer();
   drawAlarmMessage(ERASE, alarmID);
+}
+
+void resetAlarms() {
+  if (alarmOnGoing[TEMPERATURE_ALARM]) {
+    resetTemperatureAlarm();
+  }
+  if (alarmOnGoing[HUMIDITY_ALARM]) {
+    resetHumidityAlarm();
+  }
+  resetHumidityAlarm();
 }

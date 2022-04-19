@@ -141,6 +141,7 @@ void actuatorsProgress() {
   while (!exitActuation) {
     updateData();
     if (controlTemperature) {
+      
       if (controlAlgorithm == BASIC_CONTROL) {
         basictemperatureControl();
       }
@@ -149,7 +150,6 @@ void actuatorsProgress() {
       }
     }
     if (controlHumidity) {
-      //checkTFTHealth();
       if (controlAlgorithm == BASIC_CONTROL) {
         basicHumidityControl();
       }

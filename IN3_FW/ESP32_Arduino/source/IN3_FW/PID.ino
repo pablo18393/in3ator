@@ -5,33 +5,33 @@
 #define numPID 3
 
 double Kp[numPID] = {200, 200, 200}, Ki[numPID] = {1, 1, 2} , Kd[numPID] = {500, 500, 20};
-double PIDOutput;
+double HeaterPIDOutput;
 double skinControlPIDInput;
 double airControlPIDInput;
 double humidityControlPIDOutput;
-double previousPWMOutput;
+double previousPIDOutput;
 int humidifierTimeCycle = 5000;
 unsigned long windowStartTime;
-PID airControlPID(&airControlPIDInput, &PIDOutput, &desiredControlTemp, Kp[airPID], Ki[airPID], Kd[airPID], P_ON_E, DIRECT);
-PID skinControlPID(&skinControlPIDInput, &PIDOutput, &desiredControlTemp, Kp[skinPID], Ki[skinPID], Kd[skinPID], P_ON_E, DIRECT);
+PID airControlPID(&airControlPIDInput, &HeaterPIDOutput, &desiredControlTemp, Kp[airPID], Ki[airPID], Kd[airPID], P_ON_E, DIRECT);
+PID skinControlPID(&skinControlPIDInput, &HeaterPIDOutput, &desiredControlTemp, Kp[skinPID], Ki[skinPID], Kd[skinPID], P_ON_E, DIRECT);
 PID humidityControlPID(&humidity, &humidityControlPIDOutput, &desiredRoomHum, Kp[humidityPID], Ki[humidityPID], Kd[humidityPID], P_ON_E, DIRECT);
 
 void PIDHandler() {
   if (airControlPID.GetMode() == AUTOMATIC) {
     airControlPIDInput = temperature[airSensor];
     airControlPID.Compute();
-    if (PIDOutput = !previousPWMOutput) {
-      ledcWrite(HEATER_PWM_CHANNEL, PIDOutput);
+    if (HeaterPIDOutput != previousPIDOutput) {
+      ledcWrite(HEATER_PWM_CHANNEL, HeaterPIDOutput);
     }
-    previousPWMOutput = PIDOutput;
+    previousPIDOutput = HeaterPIDOutput;
   }
   if (skinControlPID.GetMode() == AUTOMATIC) {
     skinControlPIDInput = temperature[babySensor];
     skinControlPID.Compute();
-    if (PIDOutput = !previousPWMOutput) {
-      ledcWrite(HEATER_PWM_CHANNEL, PIDOutput);
+    if (HeaterPIDOutput != previousPIDOutput) {
+      ledcWrite(HEATER_PWM_CHANNEL, HeaterPIDOutput);
     }
-    previousPWMOutput = PIDOutput;
+    previousPIDOutput = HeaterPIDOutput;
   }
   if (humidityControlPID.GetMode() == AUTOMATIC) {
     humidityControlPID.Compute();
