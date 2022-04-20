@@ -80,6 +80,15 @@ void secondPointCalibration() {
 void autoCalibration() {
   bool exitCalibrationMenu = false;
   byte numWords = 1;
+  long  lastTemperatureMeasurement = millis();
+  float timeBetweenMeasurements = 4; //in minutes
+  double stabilityError = 0.1; //ºC
+  int historyLength = 5;
+  int historyLengthPosition = false;
+  double referenceSensorHistory[historyLength];
+  double sensorToCalibrateHistory[historyLength];
+  referenceSensorHistory[0] = temperature[airSensor];
+  sensorToCalibrateHistory[0] = temperature[babySensor];
   page = autoCalibrationPage;
   print_text = true;
   tft.setTextSize(1);
@@ -116,12 +125,12 @@ void autoCalibration() {
     updateData();
     switch (autoCalibrationProcess) {
       case setupAutoCalibrationPoint:
-        Serial.println("point 0");
+        Serial.println("=================================================point 0");
         clearCalibrationValues();
         autoCalibrationProcess = firstAutoCalibrationPoint;
         break;
       case firstAutoCalibrationPoint:
-        if (!GPIORead(ENC_SWITCH)) {
+        if (!GPIORead(ENC_SWITCH) || checkStableTemperatures(referenceSensorHistory, sensorToCalibrateHistory, historyLength, stabilityError)) {
           provisionalReferenceTemperatureLow = temperature[airSensor];
           provisionalRawTemperatureLow[babySensor] = temperature[babySensor];
           delay(debounceTime);
@@ -133,12 +142,14 @@ void autoCalibration() {
           ledcWrite(HEATER_PWM_CHANNEL, PWM_MAX_VALUE / 2 * ongoingThermalCutout());
           turnFans(ON);
           autoCalibrationProcess = secondAutoCalibrationPoint;
-          Serial.println("point 1");
+          referenceSensorHistory[historyLengthPosition] = false;
+          sensorToCalibrateHistory[historyLengthPosition] = false;
+          Serial.println("=================================================point 1");
         }
         break;
       case secondAutoCalibrationPoint:
-        if (!GPIORead(ENC_SWITCH)) {
-          Serial.println("point 2");
+        if (!GPIORead(ENC_SWITCH) || checkStableTemperatures(referenceSensorHistory, sensorToCalibrateHistory, historyLength, stabilityError)) {
+          Serial.println("=================================================point 2");
           ReferenceTemperatureLow = provisionalReferenceTemperatureLow;
           RawTemperatureLow[babySensor] = provisionalRawTemperatureLow[babySensor];
           ReferenceTemperatureRange = temperature[airSensor] - ReferenceTemperatureLow;
@@ -147,12 +158,38 @@ void autoCalibration() {
           saveCalibrationToEEPROM();
           ledcWrite(HEATER_PWM_CHANNEL, false);
           turnFans(OFF);
-          exitCalibrationMenu=true;
+          exitCalibrationMenu = true;
         }
         break;
     }
+    if (millis() - lastTemperatureMeasurement > timeBetweenMeasurements * 60 * 1000) {
+      lastTemperatureMeasurement = millis();
+      if (historyLengthPosition == historyLength) {
+        historyLengthPosition = false;
+      }
+      referenceSensorHistory[historyLengthPosition] = temperature[airSensor];
+      sensorToCalibrateHistory[historyLengthPosition] = temperature[babySensor];
+      historyLengthPosition++;
+
+      for (int i = 0; i < historyLength; i++) {
+        Serial.println (abs(*referenceSensorHistory  - * (referenceSensorHistory + i)));
+        Serial.println (abs(*sensorToCalibrateHistory  - * (sensorToCalibrateHistory + i)));
+      }
+    }
   }
   mainMenu();
+}
+
+bool checkStableTemperatures(double *referenceSensorHistory, double *sensorToCalibrateHistory, int historyLength, double stabilityError) {
+  for (int i = 0; i < historyLength; i++) {
+    if (abs(*referenceSensorHistory  - * (referenceSensorHistory + i)) > stabilityError) {
+      return false;
+    }
+    if (abs(*sensorToCalibrateHistory - * (sensorToCalibrateHistory + i)) > stabilityError) {
+      return false;
+    }
+  }
+  return true;
 }
 
 void clearCalibrationValues() {
