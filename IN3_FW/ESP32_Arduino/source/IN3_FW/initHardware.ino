@@ -52,7 +52,6 @@
 #define DEFECTIVE_BUZZER 1<<18
 #define DEFECTIVE_CURRENT_SENSOR 1<<19
 
-#define HW_TEST_OVERRIDE true
 #define TFTCheckPeriod 10000
 long HW_error = false;
 long lastTFTCheck;
@@ -63,7 +62,7 @@ void initDebug() {
   logln("in3ator debug uart, version " + String (FWversion) + ", SN: " + String (serialNumber));
 }
 
-void initHardware() {
+void initHardware (bool printOutputTest) {
   initGPIO();
   initDebug();
   logln("[HW] -> Initialiting hardware");
@@ -90,7 +89,7 @@ void initHardware() {
     logln("[HW] -> HARDWARE TEST FAIL");
     logln("[HW] -> HARDWARE ERROR CODE:" + String(HW_error, HEX));
     GPRSSetPostVariables(NULL, "HW FAIL" + String(HW_error, HEX));
-    if (!HW_TEST_OVERRIDE) {
+    if (printOutputTest) {
       drawHardwareErrorMessage(HW_error);
       while (GPIORead(ENC_SWITCH)) {
         updateData();
