@@ -224,7 +224,7 @@ void basicHumidityControl() {
 
 
 void heatUp() {
-  ledcWrite(HEATER_PWM_CHANNEL, heaterMaxPWM * ongoingThermalCutout());
+  ledcWrite(HEATER_PWM_CHANNEL, heaterMaxPWM * ongoingCriticalAlarm());
 }
 
 void stopActuation() {
@@ -235,7 +235,7 @@ void stopActuation() {
 }
 
 void turnActuators(bool mode) {
-  ledcWrite(HEATER_PWM_CHANNEL, mode * heaterMaxPWM * ongoingThermalCutout());
+  ledcWrite(HEATER_PWM_CHANNEL, mode * heaterMaxPWM * ongoingCriticalAlarm());
   if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
     ledcWrite(HUMIDIFIER_PWM_CHANNEL, HUMIDIFIER_DUTY_CYCLE * mode);
   }

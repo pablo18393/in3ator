@@ -19,12 +19,12 @@ void PIDHandler() {
   if (airControlPID.GetMode() == AUTOMATIC) {
     airControlPIDInput = temperature[airSensor];
     airControlPID.Compute();
-    ledcWrite(HEATER_PWM_CHANNEL, HeaterPIDOutput * ongoingThermalCutout());
+    ledcWrite(HEATER_PWM_CHANNEL, HeaterPIDOutput * ongoingCriticalAlarm());
   }
   if (skinControlPID.GetMode() == AUTOMATIC) {
     skinControlPIDInput = temperature[skinSensor];
     skinControlPID.Compute();
-    ledcWrite(HEATER_PWM_CHANNEL, HeaterPIDOutput * ongoingThermalCutout());
+    ledcWrite(HEATER_PWM_CHANNEL, HeaterPIDOutput * ongoingCriticalAlarm());
   }
   if (humidityControlPID.GetMode() == AUTOMATIC) {
     humidityControlPID.Compute();

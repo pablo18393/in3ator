@@ -142,7 +142,7 @@ void autoCalibration() {
           delay(debounceTime);
           desiredControlTemp = 36;
           startPID(airPID);
-          //ledcWrite(HEATER_PWM_CHANNEL, PWM_MAX_VALUE / 2 * ongoingThermalCutout());
+          //ledcWrite(HEATER_PWM_CHANNEL, PWM_MAX_VALUE / 2 * ongoingCriticalAlarm());
           autoCalibrationProcess = secondAutoCalibrationPoint;
           referenceSensorHistory[historyLengthPosition] = false;
           sensorToCalibrateHistory[historyLengthPosition] = false;
