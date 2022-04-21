@@ -84,6 +84,7 @@ float measureMeanConsumption(byte currentSensor, int samples) {
 bool measureNTCTemperature() {
   float analogMeasurement;
   unsigned long start_time = millis(); // Record the start time so we can timeout
+  int NTCmeasurement;
   if (externalADCpresent) {
     if (millis() - lastexternalADCRead > externalADCReadPeriod) {
       lastexternalADCRead = millis();
@@ -98,28 +99,32 @@ bool measureNTCTemperature() {
   }
   else {
     if (micros() - lastNTCmeasurement > NTCMeasurementPeriod ) {
-      previousTemperature[0] = adcToCelsius(analogRead(NTC_PIN[babySensor]), maxADCvalue);
-      temperature[babySensor] =  butterworth2(instantTemperature[1], instantTemperature[2], previousTemperature[0] , previousTemperature[1], previousTemperature[2]);
-      instantTemperature[0] = temperature[babySensor];
-      for (int i = 1; i >= 0; i--) {
-        instantTemperature[i + 1] = instantTemperature[i];
-        previousTemperature[i + 1] = previousTemperature[i];
+      NTCmeasurement = analogRead(NTC_PIN[babySensor]);
+      if (NTCmeasurement > minimumAllowedNTCMeasurement && NTCmeasurement < maximumAllowedNTCMeasurement) {
+        lastSuccesfullSensorUpdate[babySensor] = millis();
+        previousTemperature[0] = adcToCelsius(NTCmeasurement, maxADCvalue);
+        temperature[babySensor] =  butterworth2(instantTemperature[1], instantTemperature[2], previousTemperature[0] , previousTemperature[1], previousTemperature[2]);
+        instantTemperature[0] = temperature[babySensor];
+        for (int i = 1; i >= 0; i--) {
+          instantTemperature[i + 1] = instantTemperature[i];
+          previousTemperature[i + 1] = previousTemperature[i];
+        }
+        errorTemperature[babySensor] = temperature[babySensor];
+        if (RawTemperatureRange[babySensor]) {
+          temperature[babySensor] = (((temperature[babySensor] - RawTemperatureLow[babySensor]) * ReferenceTemperatureRange) / RawTemperatureRange[babySensor]) + ReferenceTemperatureLow;
+        }
+        errorTemperature[babySensor] -= temperature[babySensor];
+        if (temperature[babySensor] < 0) {
+          temperature[babySensor] = 0;
+        }
+        if (temperature[babySensor] > temperatureMax[babySensor]) {
+          temperatureMax[babySensor] = temperature[babySensor];
+        }
+        if (temperature[babySensor] < temperatureMin[babySensor]) {
+          temperatureMin[babySensor] = temperature[babySensor];
+        }
+        lastNTCmeasurement = micros();
       }
-      errorTemperature[babySensor] = temperature[babySensor];
-      if (RawTemperatureRange[babySensor]) {
-        temperature[babySensor] = (((temperature[babySensor] - RawTemperatureLow[babySensor]) * ReferenceTemperatureRange) / RawTemperatureRange[babySensor]) + ReferenceTemperatureLow;
-      }
-      errorTemperature[babySensor] -= temperature[babySensor];
-      if (temperature[babySensor] < 0) {
-        temperature[babySensor] = 0;
-      }
-      if (temperature[babySensor] > temperatureMax[babySensor]) {
-        temperatureMax[babySensor] = temperature[babySensor];
-      }
-      if (temperature[babySensor] < temperatureMin[babySensor]) {
-        temperatureMin[babySensor] = temperature[babySensor];
-      }
-      lastNTCmeasurement = micros();
     }
     return true;
   }
@@ -148,8 +153,9 @@ bool updateRoomSensor() {
     float sensedTemperature;
     logln("[SENSORS] -> Updating room humidity: state is " + String(sensorState));
     if (!sensorState) {
-      sensedTemperature=mySHTC3.toDegC();
+      sensedTemperature = mySHTC3.toDegC();
       if (sensedTemperature > minTempToDiscard && sensedTemperature < maxTempToDiscard) {
+        lastSuccesfullSensorUpdate[airSensor] = millis();
         temperature[airSensor] =  sensedTemperature; //Add here measurement to temp array
         humidity = mySHTC3.toPercent();
         if (temperature[airSensor] > temperatureMax[airSensor]) {

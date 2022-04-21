@@ -194,9 +194,9 @@ void drawHeading() {
     drawBack();
   }
   setTextColor(COLOR_MENU);
-  drawCentreString("in3_", tft.width() / 2 - 2 * letter_width - 10, height_heading / 5, textFontSize);
-  drawCentreNumber(serialNumber, tft.width() / 2, height_heading / 5);
-  drawCentreString(FWversion, tft.width() - 4 * letter_width, height_heading / 5, textFontSize);
+  drawCentreString("in3_", tft.width() / 2 - 2 * letter_width - 10, headint_text_height, textFontSize);
+  drawCentreNumber(serialNumber, tft.width() / 2, headint_text_height);
+  drawCentreString(FWversion, tft.width() - 4 * letter_width, headint_text_height, textFontSize);
 }
 
 void eraseBar() {
@@ -317,31 +317,14 @@ void drawHardwareErrorMessage(long error) {
   }
 }
 
-void drawAlarmMessage(bool write, byte roomVariable) {
-  int alarmHeight;
+void drawAlarmMessage(bool write, char *alertMessage) {
   if (write == DRAW) {
     setTextColor(COLOR_WARNING_TEXT);
+    drawCentreString(alertMessage, width_select + (tft.width() - width_select) / 2, headint_text_height, textFontSize);
   }
   else {
-    setTextColor(COLOR_MENU);
+    drawHeading();
   }
-  switch (roomVariable) {
-    case AIR_THERMAL_CUTOUT_ALARM:
-    case SKIN_THERMAL_CUTOUT_ALARM:
-      helpMessage = "THERMAL CUTOUT ALARM";
-      alarmHeight = 105;
-      break;
-    case TEMPERATURE_ALARM:
-      helpMessage = "TEMPERATURE ALARM";
-      alarmHeight = 105;
-      break;
-    case HUMIDITY_ALARM:
-      helpMessage = "HUMIDITY ALARM";
-      alarmHeight = 140;
-      break;
-  }
-
-  drawCentreString(helpMessage, width_select + (tft.width() - width_select) / 2, alarmHeight, textFontSize);
 }
 
 void drawHumidityUnits() {

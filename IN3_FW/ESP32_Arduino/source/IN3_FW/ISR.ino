@@ -4,13 +4,13 @@ void encSwitchHandler() {
     if (millis() - lastEncPulse > encPulseDebounce) {
       //statusEncSwitch = !statusEncSwitch;
       //if (statusEncSwitch) {
-        encPulseDetected = true;
-        buzzerTone(buzzerStandbyToneTimes, buzzerSwitchDuration, buzzerRotaryEncoderTone);
-        lastbacklightHandler = millis();
-        if (ongoingAlarms()) {
-          resetAlarms();
-        }
+      encPulseDetected = true;
+      buzzerTone(buzzerStandbyToneTimes, buzzerSwitchDuration, buzzerRotaryEncoderTone);
+      lastbacklightHandler = millis();
+      if (ongoingAlarms()) {
+        disableAllAlarms();
       }
+    }
     //}
     lastEncPulse = millis();
   }
@@ -24,6 +24,11 @@ void encoderISR() {
   if (abs(lastEncMove - newPos) > ENCODER_TICKS_DIV) {
     EncMove = EncMoveOrientation * int(encoder.getDirection());
     lastEncMove = newPos;
+  }
+  if (EncMove) {
+    if (ongoingAlarms()) {
+      disableAllAlarms();
+    }
   }
 }
 

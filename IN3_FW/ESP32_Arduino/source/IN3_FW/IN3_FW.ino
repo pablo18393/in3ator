@@ -3,7 +3,7 @@
 */
 
 //Firmware version and head title of UI screen
-#define FWversion "v9.1/8.B"
+#define FWversion "v9.2/8.B"
 #define headingTitle "in3ator"
 
 #include <esp_task_wdt.h>
@@ -39,8 +39,27 @@ SFE_ADS122C04 mySensor;
 #define digitalCurrentSensor_i2c_address 57
 #define roomSensorAddress 112
 
+//security config
 int serialNumber = 45;
 #define WDT_TIMEOUT 15
+#define AIR_THERMAL_CUTOUT 38
+#define SKIN_THERMAL_CUTOUT 40
+#define AIR_THERMAL_CUTOUT_HYSTERESIS 1
+#define SKIN_THERMAL_CUTOUT_HYSTERESIS 1
+#define enableAlarms true
+#define NOT_CRITICAL_ALARM 0
+#define CRITICAL_ALARM 1
+#define HUMIDITY_ALARM 0
+#define TEMPERATURE_ALARM 1
+#define AIR_THERMAL_CUTOUT_ALARM 2
+#define SKIN_THERMAL_CUTOUT_ALARM 3
+#define AIR_SENSOR_ISSUE_ALARM 4
+#define SKIN_SENSOR_ISSUE_ALARM 5
+#define NUM_ALARMS 6
+
+bool alarmOnGoing[NUM_ALARMS];
+long lastAlarmTrigger[NUM_ALARMS];
+float alarmSensedValue;
 
 #define ON true
 #define OFF false
@@ -101,9 +120,9 @@ byte language;
 //number assignment of each enviromental sensor for later call in variable
 #define babySensor 0
 #define airSensor 1
-
 #define numNTC 1 //number of NTC
-#define numTempSensors 2 //number of total temperature sensors in system
+#define numSensors 2 //number of total temperature sensors in system
+
 #define secondOrder_filter 3 //amount of temperature samples to filter
 #define analog_temperature_filter 500 //amount of temperature samples to filter
 #define digital_temperature_filter 10 //amount of temperature samples to filter
@@ -115,24 +134,25 @@ int temperature_filter = analog_temperature_filter; //amount of temperature samp
 long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
 
 int NTC_PIN[numNTC] = {BABY_NTC_PIN};
-double temperature[numTempSensors];
-double errorTemperature[numTempSensors], temperatureCalibrationPoint;
+double temperature[numSensors];
+double errorTemperature[numSensors], temperatureCalibrationPoint;
 double ReferenceTemperatureRange, ReferenceTemperatureLow;
 double provisionalReferenceTemperatureLow;
-double RawTemperatureLow[numTempSensors], RawTemperatureRange[numTempSensors];
-double provisionalRawTemperatureLow[numTempSensors];
+double RawTemperatureLow[numSensors], RawTemperatureRange[numSensors];
+double provisionalRawTemperatureLow[numSensors];
 double temperatureMaxReset = -1000;
 double temperatureMinReset = 1000;
-double temperatureMax[numTempSensors], temperatureMin[numTempSensors];
+double temperatureMax[numSensors], temperatureMin[numSensors];
 int temperatureArray [numNTC][analog_temperature_filter]; //variable to handle each NTC with the array of last samples (only for NTC)
 int temperature_array_pos; //temperature sensor number turn to measure
 float diffTemperature; //difference between measured temperature and user input real temperature
 bool faultNTC[numNTC]; //variable to control a failure in NTC
-byte numSensors; //number of total sensors
 double humidity; // room humidity variable
 bool humidifierState, humidifierStateChange;
 int previousHumidity; //previous sampled humidity
 float diffHumidity; //difference between measured humidity and user input real humidity
+long lastSuccesfullSensorUpdate[numSensors];
+#define minimumSuccesfullSensorUpdate 10000 //in millis
 
 byte autoCalibrationProcess;
 #define setupAutoCalibrationPoint 0
@@ -236,6 +256,7 @@ long last_encPulsed; //last time encoder was pulsed
 #define logo  40
 #define arrow_height  6
 #define arrow_tail  5
+#define headint_text_height height_heading / 5
 
 //Text Graphic position variables
 int LEDXPos;

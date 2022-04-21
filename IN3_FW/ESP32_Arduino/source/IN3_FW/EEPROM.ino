@@ -94,11 +94,11 @@ void recapVariables() {
   ReferenceTemperatureRange = EEPROM.readFloat(EEPROM_ReferenceTemperatureRange);
   ReferenceTemperatureLow = EEPROM.readFloat(EEPROM_ReferenceTemperatureLow);
 
-  for (int i = 0; i < numTempSensors; i++) {
+  for (int i = 0; i < numSensors; i++) {
     logln("calibration factors: " + String(RawTemperatureLow [i]) + "," + String (RawTemperatureRange [i]) + "," + String (ReferenceTemperatureRange) + "," + String (ReferenceTemperatureLow));
   }
   
-  for (int i = 0; i < numTempSensors; i++) {
+  for (int i = 0; i < numSensors; i++) {
     if (RawTemperatureLow[i] > 100) {
       //critical error
     }

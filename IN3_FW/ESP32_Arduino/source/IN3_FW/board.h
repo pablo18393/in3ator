@@ -43,6 +43,9 @@
 #define maxDACvalue 4095
 #define PWM_MAX_VALUE (pow(2, DEFAULT_PWM_RESOLUTION) - 1)
 
+#define minimumAllowedNTCMeasurement maxADCvalue/5
+#define maximumAllowedNTCMeasurement maxADCvalue*4/5
+
 int HUMIDIFIER_DUTY_CYCLE = 0.40 * PWM_MAX_VALUE;
 
 #define BL_NORMAL 0

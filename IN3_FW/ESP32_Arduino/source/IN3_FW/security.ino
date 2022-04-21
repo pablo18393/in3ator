@@ -4,15 +4,12 @@
 #define TEMPERATURE_ERROR_HYSTERESIS  0.05 // 0.05 degrees difference to disable alarm
 #define HUMIDITY_ERROR_HYSTERESIS  5 //5 %RH to disable alarm
 
-#define AIR_THERMAL_CUTOUT 38
-#define SKIN_THERMAL_CUTOUT 40
 
-#define AIR_THERMAL_CUTOUT_HYSTERESIS 1
-#define SKIN_THERMAL_CUTOUT_HYSTERESIS 1
 
 void securityCheck() {
   checkThermalCutOuts();
   checkAlarms();
+  checkSensors();
 }
 
 void checkThermalCutOuts() {
@@ -34,5 +31,121 @@ void checkAlarms() {
     if (controlHumidity) {
       evaluateAlarm(HUMIDITY_ALARM, humidity, desiredRoomHum, HUMIDITY_ERROR, HUMIDITY_ERROR_HYSTERESIS, lastAlarmTrigger[HUMIDITY_ALARM]);
     }
+  }
+}
+
+void checkSensors() {
+  checkStatusOfSensor(airSensor);
+  checkStatusOfSensor(babySensor);
+}
+
+void checkStatusOfSensor(byte sensor) {
+  byte alarmID;
+  switch (sensor) {
+    case airSensor:
+      alarmID = AIR_SENSOR_ISSUE_ALARM;
+      break;
+    case babySensor:
+      alarmID = SKIN_SENSOR_ISSUE_ALARM;
+      break;
+  }
+  if (millis() - lastSuccesfullSensorUpdate[sensor] > minimumSuccesfullSensorUpdate) {
+    if (!alarmOnGoing[alarmID]) {
+      setAlarm(alarmID);
+    }
+  }
+  else {
+    if (alarmOnGoing[alarmID]) {
+      resetAlarm(alarmID);
+    }
+  }
+}
+
+bool evaluateAlarm(byte alarmID, float setPoint, float measuredValue, float errorMargin, float hysteresisValue, long alarmTime) {
+  if (millis() - alarmTime > alarmTimeDelay * 60 * 1000) { // min to millis
+    if (errorMargin) {
+      if ((abs(setPoint - measuredValue) + hysteresisValue * alarmOnGoing[alarmID]) > errorMargin) {
+        if (!alarmOnGoing[alarmID]) {
+          setAlarm(alarmID);
+          return true;
+        }
+      }
+      else {
+        if (alarmOnGoing[alarmID]) {
+          resetAlarm(alarmID);
+        }
+      }
+    }
+    else {
+      if ((measuredValue + hysteresisValue * alarmOnGoing[alarmID]) > setPoint) {
+        if (!alarmOnGoing[alarmID]) {
+          setAlarm(alarmID);
+          return true;
+        }
+      }
+      else {
+        if (alarmOnGoing[alarmID]) {
+          resetAlarm(alarmID);
+        }
+      }
+    }
+  }
+  return false;
+}
+
+void alarmTimerStart() {
+  for (int  i = 0; i < NUM_ALARMS; i++) {
+    lastAlarmTrigger [i] = millis();
+  }
+}
+
+bool ongoingAlarms() {
+  return (alarmOnGoing[TEMPERATURE_ALARM] || alarmOnGoing[HUMIDITY_ALARM] || alarmOnGoing[AIR_THERMAL_CUTOUT_ALARM] || alarmOnGoing[SKIN_THERMAL_CUTOUT_ALARM] || alarmOnGoing[AIR_SENSOR_ISSUE_ALARM] || alarmOnGoing[SKIN_SENSOR_ISSUE_ALARM]);
+}
+
+bool ongoingThermalCutout() {
+  return (!(alarmOnGoing[AIR_THERMAL_CUTOUT_ALARM] || alarmOnGoing[SKIN_THERMAL_CUTOUT_ALARM]));
+}
+
+void setAlarm (byte alarmID) {
+  alarmOnGoing[alarmID] = true;
+  buzzerConstantTone(buzzerAlarmTone);
+  drawAlarmMessage(DRAW, alarmIDtoString(alarmID));
+}
+
+void resetAlarm (byte alarmID) {
+  alarmOnGoing[alarmID] = false;
+  if (!ongoingAlarms()) {
+    shutBuzzer();
+    drawAlarmMessage(ERASE, alarmIDtoString(alarmID));
+  }
+}
+
+void disableAllAlarms() {
+  for (int i = 0; i < NUM_ALARMS; i++) {
+    disableAlarm(i);
+    lastAlarmTrigger[alarmID] = millis();
+  }
+  shutBuzzer();
+}
+
+char* alarmIDtoString (byte alarmID) {
+  switch (alarmID) {
+    case AIR_THERMAL_CUTOUT_ALARM:
+    case SKIN_THERMAL_CUTOUT_ALARM:
+      return ("THERMAL CUTOUT ALARM");
+      break;
+    case TEMPERATURE_ALARM:
+      return ("TEMPERATURE ALARM");
+      break;
+    case HUMIDITY_ALARM:
+      return ("HUMIDITY ALARM");
+      break;
+    case AIR_SENSOR_ISSUE_ALARM:
+      return ("AIR SENSOR ALARM");
+      break;
+    case SKIN_SENSOR_ISSUE_ALARM:
+      return ("SKIN SENSOR ALARM");
+      break;
   }
 }

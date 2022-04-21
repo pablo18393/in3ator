@@ -128,6 +128,7 @@ void autoCalibration() {
         Serial.println("=================================================point 0");
         clearCalibrationValues();
         autoCalibrationProcess = firstAutoCalibrationPoint;
+        turnFans(ON);
         break;
       case firstAutoCalibrationPoint:
         if (!GPIORead(ENC_SWITCH) || checkStableTemperatures(referenceSensorHistory, sensorToCalibrateHistory, historyLength, stabilityError)) {
@@ -139,8 +140,9 @@ void autoCalibration() {
             exitCalibrationMenu = back_mode();
           }
           delay(debounceTime);
-          ledcWrite(HEATER_PWM_CHANNEL, PWM_MAX_VALUE / 2 * ongoingThermalCutout());
-          turnFans(ON);
+          desiredControlTemp = 36;
+          startPID(airPID);
+          //ledcWrite(HEATER_PWM_CHANNEL, PWM_MAX_VALUE / 2 * ongoingThermalCutout());
           autoCalibrationProcess = secondAutoCalibrationPoint;
           referenceSensorHistory[historyLengthPosition] = false;
           sensorToCalibrateHistory[historyLengthPosition] = false;
@@ -148,6 +150,7 @@ void autoCalibration() {
         }
         break;
       case secondAutoCalibrationPoint:
+        PIDHandler();
         if (!GPIORead(ENC_SWITCH) || checkStableTemperatures(referenceSensorHistory, sensorToCalibrateHistory, historyLength, stabilityError)) {
           Serial.println("=================================================point 2");
           ReferenceTemperatureLow = provisionalReferenceTemperatureLow;
@@ -159,6 +162,7 @@ void autoCalibration() {
           ledcWrite(HEATER_PWM_CHANNEL, false);
           turnFans(OFF);
           exitCalibrationMenu = true;
+          stopPID(airPID);
         }
         break;
     }
