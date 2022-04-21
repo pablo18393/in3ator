@@ -118,7 +118,7 @@ byte language;
 #define defaultLanguage english //Preset number configuration when booting for first time
 
 //number assignment of each enviromental sensor for later call in variable
-#define babySensor 0
+#define skinSensor 0
 #define airSensor 1
 #define numNTC 1 //number of NTC
 #define numSensors 2 //number of total temperature sensors in system

@@ -99,29 +99,29 @@ bool measureNTCTemperature() {
   }
   else {
     if (micros() - lastNTCmeasurement > NTCMeasurementPeriod ) {
-      NTCmeasurement = analogRead(NTC_PIN[babySensor]);
+      NTCmeasurement = analogRead(NTC_PIN[skinSensor]);
       if (NTCmeasurement > minimumAllowedNTCMeasurement && NTCmeasurement < maximumAllowedNTCMeasurement) {
-        lastSuccesfullSensorUpdate[babySensor] = millis();
+        lastSuccesfullSensorUpdate[skinSensor] = millis();
         previousTemperature[0] = adcToCelsius(NTCmeasurement, maxADCvalue);
-        temperature[babySensor] =  butterworth2(instantTemperature[1], instantTemperature[2], previousTemperature[0] , previousTemperature[1], previousTemperature[2]);
-        instantTemperature[0] = temperature[babySensor];
+        temperature[skinSensor] =  butterworth2(instantTemperature[1], instantTemperature[2], previousTemperature[0] , previousTemperature[1], previousTemperature[2]);
+        instantTemperature[0] = temperature[skinSensor];
         for (int i = 1; i >= 0; i--) {
           instantTemperature[i + 1] = instantTemperature[i];
           previousTemperature[i + 1] = previousTemperature[i];
         }
-        errorTemperature[babySensor] = temperature[babySensor];
-        if (RawTemperatureRange[babySensor]) {
-          temperature[babySensor] = (((temperature[babySensor] - RawTemperatureLow[babySensor]) * ReferenceTemperatureRange) / RawTemperatureRange[babySensor]) + ReferenceTemperatureLow;
+        errorTemperature[skinSensor] = temperature[skinSensor];
+        if (RawTemperatureRange[skinSensor]) {
+          temperature[skinSensor] = (((temperature[skinSensor] - RawTemperatureLow[skinSensor]) * ReferenceTemperatureRange) / RawTemperatureRange[skinSensor]) + ReferenceTemperatureLow;
         }
-        errorTemperature[babySensor] -= temperature[babySensor];
-        if (temperature[babySensor] < 0) {
-          temperature[babySensor] = 0;
+        errorTemperature[skinSensor] -= temperature[skinSensor];
+        if (temperature[skinSensor] < 0) {
+          temperature[skinSensor] = 0;
         }
-        if (temperature[babySensor] > temperatureMax[babySensor]) {
-          temperatureMax[babySensor] = temperature[babySensor];
+        if (temperature[skinSensor] > temperatureMax[skinSensor]) {
+          temperatureMax[skinSensor] = temperature[skinSensor];
         }
-        if (temperature[babySensor] < temperatureMin[babySensor]) {
-          temperatureMin[babySensor] = temperature[babySensor];
+        if (temperature[skinSensor] < temperatureMin[skinSensor]) {
+          temperatureMin[skinSensor] = temperature[skinSensor];
         }
         lastNTCmeasurement = micros();
       }

@@ -14,7 +14,7 @@ void securityCheck() {
 
 void checkThermalCutOuts() {
   evaluateAlarm(AIR_THERMAL_CUTOUT_ALARM, AIR_THERMAL_CUTOUT, temperature[airSensor], false, AIR_THERMAL_CUTOUT_HYSTERESIS, lastAlarmTrigger[AIR_THERMAL_CUTOUT_ALARM]);
-  evaluateAlarm(SKIN_THERMAL_CUTOUT_ALARM, SKIN_THERMAL_CUTOUT, temperature[babySensor], false, SKIN_THERMAL_CUTOUT_HYSTERESIS, lastAlarmTrigger[SKIN_THERMAL_CUTOUT_ALARM]);
+  evaluateAlarm(SKIN_THERMAL_CUTOUT_ALARM, SKIN_THERMAL_CUTOUT, temperature[skinSensor], false, SKIN_THERMAL_CUTOUT_HYSTERESIS, lastAlarmTrigger[SKIN_THERMAL_CUTOUT_ALARM]);
 }
 
 void checkAlarms() {
@@ -24,7 +24,7 @@ void checkAlarms() {
         alarmSensedValue = temperature[airSensor];
       }
       else {
-        alarmSensedValue = temperature[babySensor];
+        alarmSensedValue = temperature[skinSensor];
       }
       evaluateAlarm(TEMPERATURE_ALARM, desiredControlTemp, alarmSensedValue, TEMPERATURE_ERROR, TEMPERATURE_ERROR_HYSTERESIS , lastAlarmTrigger[TEMPERATURE_ALARM]);
     }
@@ -36,7 +36,7 @@ void checkAlarms() {
 
 void checkSensors() {
   checkStatusOfSensor(airSensor);
-  checkStatusOfSensor(babySensor);
+  checkStatusOfSensor(skinSensor);
 }
 
 void checkStatusOfSensor(byte sensor) {
@@ -45,7 +45,7 @@ void checkStatusOfSensor(byte sensor) {
     case airSensor:
       alarmID = AIR_SENSOR_ISSUE_ALARM;
       break;
-    case babySensor:
+    case skinSensor:
       alarmID = SKIN_SENSOR_ISSUE_ALARM;
       break;
   }
@@ -123,8 +123,7 @@ void resetAlarm (byte alarmID) {
 
 void disableAllAlarms() {
   for (int i = 0; i < NUM_ALARMS; i++) {
-    disableAlarm(i);
-    lastAlarmTrigger[alarmID] = millis();
+    lastAlarmTrigger[i] = millis();
   }
   shutBuzzer();
 }

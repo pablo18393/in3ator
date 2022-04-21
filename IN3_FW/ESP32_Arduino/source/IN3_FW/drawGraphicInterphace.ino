@@ -393,8 +393,8 @@ void drawSelectedTemperature() {
     temperatureToDraw = temperature[airSensor];
   }
   else {
-    previousTemperatureDrawn = previousTemperature[babySensor];
-    temperatureToDraw = temperature[babySensor];
+    previousTemperatureDrawn = previousTemperature[skinSensor];
+    temperatureToDraw = temperature[skinSensor];
   }
   setTextColor(COLOR_MENU);
   drawFloat(previousTemperatureDrawn, 1, temperatureX, temperatureY, textFontSize);
@@ -404,7 +404,7 @@ void drawSelectedTemperature() {
     previousTemperature[airSensor] = temperatureToDraw;
   }
   else {
-    previousTemperature[babySensor] = temperatureToDraw;
+    previousTemperature[skinSensor] = temperatureToDraw;
   }
 }
 
@@ -415,8 +415,8 @@ void drawUnselectedTemperature() {
     temperatureToDraw = temperature[airSensor];
   }
   else {
-    previousTemperatureDrawn = previousTemperature[babySensor];
-    temperatureToDraw = temperature[babySensor];
+    previousTemperatureDrawn = previousTemperature[skinSensor];
+    temperatureToDraw = temperature[skinSensor];
   }
   tft.setTextColor(COLOR_MENU);
   drawFloat(previousTemperatureDrawn, 1, tft.width() / 2 - 20, tft.height() / 2 + 10, textFontSize);
@@ -426,7 +426,7 @@ void drawUnselectedTemperature() {
     previousTemperature[airSensor] = temperatureToDraw;
   }
   else {
-    previousTemperature[babySensor] = temperatureToDraw;
+    previousTemperature[skinSensor] = temperatureToDraw;
   }
 }
 

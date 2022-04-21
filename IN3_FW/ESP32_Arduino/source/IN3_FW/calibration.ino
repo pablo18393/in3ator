@@ -88,7 +88,7 @@ void autoCalibration() {
   double referenceSensorHistory[historyLength];
   double sensorToCalibrateHistory[historyLength];
   referenceSensorHistory[0] = temperature[airSensor];
-  sensorToCalibrateHistory[0] = temperature[babySensor];
+  sensorToCalibrateHistory[0] = temperature[skinSensor];
   page = autoCalibrationPage;
   print_text = true;
   tft.setTextSize(1);
@@ -133,7 +133,7 @@ void autoCalibration() {
       case firstAutoCalibrationPoint:
         if (!GPIORead(ENC_SWITCH) || checkStableTemperatures(referenceSensorHistory, sensorToCalibrateHistory, historyLength, stabilityError)) {
           provisionalReferenceTemperatureLow = temperature[airSensor];
-          provisionalRawTemperatureLow[babySensor] = temperature[babySensor];
+          provisionalRawTemperatureLow[skinSensor] = temperature[skinSensor];
           delay(debounceTime);
           while (!GPIORead(ENC_SWITCH)) {
             updateData();
@@ -154,10 +154,10 @@ void autoCalibration() {
         if (!GPIORead(ENC_SWITCH) || checkStableTemperatures(referenceSensorHistory, sensorToCalibrateHistory, historyLength, stabilityError)) {
           Serial.println("=================================================point 2");
           ReferenceTemperatureLow = provisionalReferenceTemperatureLow;
-          RawTemperatureLow[babySensor] = provisionalRawTemperatureLow[babySensor];
+          RawTemperatureLow[skinSensor] = provisionalRawTemperatureLow[skinSensor];
           ReferenceTemperatureRange = temperature[airSensor] - ReferenceTemperatureLow;
-          RawTemperatureRange[babySensor] = (temperature[babySensor] - RawTemperatureLow[babySensor]);
-          logln("calibration factors: " + String(RawTemperatureLow [babySensor]) + "," + String (RawTemperatureRange [babySensor]) + "," + String (ReferenceTemperatureRange) + "," + String (ReferenceTemperatureLow));
+          RawTemperatureRange[skinSensor] = (temperature[skinSensor] - RawTemperatureLow[skinSensor]);
+          logln("calibration factors: " + String(RawTemperatureLow [skinSensor]) + "," + String (RawTemperatureRange [skinSensor]) + "," + String (ReferenceTemperatureRange) + "," + String (ReferenceTemperatureLow));
           saveCalibrationToEEPROM();
           ledcWrite(HEATER_PWM_CHANNEL, false);
           turnFans(OFF);
@@ -172,7 +172,7 @@ void autoCalibration() {
         historyLengthPosition = false;
       }
       referenceSensorHistory[historyLengthPosition] = temperature[airSensor];
-      sensorToCalibrateHistory[historyLengthPosition] = temperature[babySensor];
+      sensorToCalibrateHistory[historyLengthPosition] = temperature[skinSensor];
       historyLengthPosition++;
 
       for (int i = 0; i < historyLength; i++) {
@@ -197,8 +197,8 @@ bool checkStableTemperatures(double *referenceSensorHistory, double *sensorToCal
 }
 
 void clearCalibrationValues() {
-  RawTemperatureLow[babySensor] = false;
-  RawTemperatureRange[babySensor] = false;
+  RawTemperatureLow[skinSensor] = false;
+  RawTemperatureRange[skinSensor] = false;
   RawTemperatureLow[airSensor] = false;
   RawTemperatureRange[airSensor] = false;
   ReferenceTemperatureRange = false;

@@ -373,8 +373,8 @@ bool userInterfaceHandler() {
         clearCalibrationValues();
         switch (bar_pos - graphicTextOffset ) {
           case temperatureCalibrationGraphicPosition:
-            errorTemperature[babySensor] = false;
-            diffTemperature = temperature[babySensor];
+            errorTemperature[skinSensor] = false;
+            diffTemperature = temperature[skinSensor];
             while (GPIORead(ENC_SWITCH)) {
               updateData();
               if (EncMove) {
@@ -389,8 +389,8 @@ bool userInterfaceHandler() {
             break;
           case setCalibrationGraphicPosition:
             provisionalReferenceTemperatureLow = diffTemperature;
-            provisionalRawTemperatureLow[babySensor] = temperature[babySensor];
-            logln("[CALIBRATION] -> Low reference point is " + String(provisionalReferenceTemperatureLow) +  ", low raw skin point is " + String(provisionalRawTemperatureLow[babySensor]));
+            provisionalRawTemperatureLow[skinSensor] = temperature[skinSensor];
+            logln("[CALIBRATION] -> Low reference point is " + String(provisionalReferenceTemperatureLow) +  ", low raw skin point is " + String(provisionalRawTemperatureLow[skinSensor]));
             secondPointCalibration();
             break;
         }
@@ -398,7 +398,7 @@ bool userInterfaceHandler() {
       case secondPointCalibrationPage:
         switch (bar_pos - graphicTextOffset ) {
           case temperatureCalibrationGraphicPosition:
-            diffTemperature = temperature[babySensor];
+            diffTemperature = temperature[skinSensor];
             while (GPIORead(ENC_SWITCH)) {
               updateData();
               if (EncMove) {
@@ -414,11 +414,11 @@ bool userInterfaceHandler() {
             break;
           case setCalibrationGraphicPosition:
             ReferenceTemperatureLow = provisionalReferenceTemperatureLow;
-            RawTemperatureLow[babySensor] = provisionalRawTemperatureLow[babySensor];
+            RawTemperatureLow[skinSensor] = provisionalRawTemperatureLow[skinSensor];
             ReferenceTemperatureRange = diffTemperature - ReferenceTemperatureLow;
-            if (RawTemperatureRange[babySensor]) {
-              RawTemperatureRange[babySensor] = (temperature[babySensor] - RawTemperatureLow[babySensor]);
-              logln("calibration factors: " + String(RawTemperatureLow [babySensor]) + "," + String (RawTemperatureRange [babySensor]) + "," + String (ReferenceTemperatureRange) + "," + String (ReferenceTemperatureLow));
+            if (RawTemperatureRange[skinSensor]) {
+              RawTemperatureRange[skinSensor] = (temperature[skinSensor] - RawTemperatureLow[skinSensor]);
+              logln("calibration factors: " + String(RawTemperatureLow [skinSensor]) + "," + String (RawTemperatureRange [skinSensor]) + "," + String (ReferenceTemperatureRange) + "," + String (ReferenceTemperatureLow));
               saveCalibrationToEEPROM();
             }
             else {

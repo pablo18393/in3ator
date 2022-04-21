@@ -34,7 +34,7 @@ int updateData() {
     //logln("[SENSORS] -> Current consumption is: " + String (analogRead(SYSTEM_SHUNT)) + "," + String (currentConsumption) + " Amps");
     logln("[SENSORS] -> System current consumption is: " + String (currentConsumption[MAIN_SHUNT], 1) + " Amps");
     logln("[SENSORS] -> USB current consumption is: " + String (currentConsumption[HUMIDIFIER_SHUNT], 2) + " Amps");
-    logln("[SENSORS] -> Baby temperature: " + String(temperature[babySensor]) + "ºC, correction error is " + String(errorTemperature[babySensor]));
+    logln("[SENSORS] -> Baby temperature: " + String(temperature[skinSensor]) + "ºC, correction error is " + String(errorTemperature[skinSensor]));
     logln("[SENSORS] -> Air temperature: " + String(temperature[airSensor]) + "ºC, correction error is " + String(errorTemperature[airSensor]));
     logln("[SENSORS] -> Humidity: " + String(humidity) + "%");
     logln("[LATENCY] -> Looped " + String(loopCounts * 1000 / (millis() - lastDebugUpdate)) + " Times per second");
@@ -71,7 +71,7 @@ void updateDisplaySensors() {
         temperatureToUpdate = temperature[airSensor];
       }
       else {
-        temperatureToUpdate = temperature[babySensor];
+        temperatureToUpdate = temperature[skinSensor];
       }
       temperaturePercentage = 100 - ((desiredControlTemp - temperatureToUpdate) * 100 / (desiredControlTemp - temperatureAtStart));
       if (temperaturePercentage > 99) {
@@ -140,7 +140,7 @@ void GPRSLocalLog() {
       GPIOWrite(SD_CS, LOW);
       GPIOWrite(TFT_CS, HIGH);
       String dataString;
-      dataString += temperature[babySensor];
+      dataString += temperature[skinSensor];
       dataString += ";";
       dataString += humidity;
       dataString += ";";

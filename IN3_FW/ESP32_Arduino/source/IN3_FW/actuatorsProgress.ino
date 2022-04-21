@@ -26,7 +26,7 @@ void actuatorsProgress() {
     temperatureAtStart = temperature[airSensor];
   }
   else {
-    temperatureAtStart = temperature[babySensor];
+    temperatureAtStart = temperature[skinSensor];
   }
   if (controlMode) {
     switch (language) {
@@ -175,7 +175,7 @@ void basictemperatureControl() {
     temperatureToControl = temperature[airSensor];
   }
   else {
-    temperatureToControl = temperature[babySensor];
+    temperatureToControl = temperature[skinSensor];
   }
   if (temperatureToControl < desiredControlTemp) {
     heatUp();

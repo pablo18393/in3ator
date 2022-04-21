@@ -22,7 +22,7 @@ void PIDHandler() {
     ledcWrite(HEATER_PWM_CHANNEL, HeaterPIDOutput * ongoingThermalCutout());
   }
   if (skinControlPID.GetMode() == AUTOMATIC) {
-    skinControlPIDInput = temperature[babySensor];
+    skinControlPIDInput = temperature[skinSensor];
     skinControlPID.Compute();
     ledcWrite(HEATER_PWM_CHANNEL, HeaterPIDOutput * ongoingThermalCutout());
   }

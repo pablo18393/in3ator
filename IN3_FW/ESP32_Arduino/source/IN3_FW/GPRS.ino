@@ -673,7 +673,7 @@ bool GPRSLoadVariables() {
   databasePost[7] = "{";
   databasePost[7] += "\"sn\":\"" + String(serialNumber) + "\"";
   if (GPRS.postBabyTemp) {
-    databasePost[7] += ",\"baby_temp\":\"" + String(temperature[babySensor], 1) + "\"";
+    databasePost[7] += ",\"baby_temp\":\"" + String(temperature[skinSensor], 1) + "\"";
   }
   if (GPRS.postAirTemp) {
     databasePost[7] += ",\"heater_temp\":\"" + String(temperature[airSensor], 1) + "\"";
@@ -708,11 +708,11 @@ bool GPRSLoadVariables() {
   }
   if (GPRS.postComment) {
     if (GPRS.comment.length() < 20) {
-      GPRS.comment += "Baby " + String (temperatureMax[babySensor], 2) + "/" + String (temperatureMin[babySensor], 2);
+      GPRS.comment += "Baby " + String (temperatureMax[skinSensor], 2) + "/" + String (temperatureMin[skinSensor], 2);
       GPRS.comment += ";Air " + String (temperatureMax[airSensor], 2) + "/" + String (temperatureMin[airSensor], 2);
       GPRS.comment += "CM:" + String(controlMode);
-      temperatureMax[babySensor] = temperatureMaxReset;
-      temperatureMin[babySensor] = temperatureMinReset;
+      temperatureMax[skinSensor] = temperatureMaxReset;
+      temperatureMin[skinSensor] = temperatureMinReset;
       temperatureMax[airSensor] = temperatureMaxReset;
       temperatureMin[airSensor] = temperatureMinReset;
     }

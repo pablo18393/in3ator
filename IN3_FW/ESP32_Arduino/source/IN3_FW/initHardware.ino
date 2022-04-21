@@ -261,11 +261,11 @@ void initSensors() {
   initRoomSensor();
   //sensors verification
   while (!measureNTCTemperature());
-  if (temperature[babySensor] < NTC_BABY_MIN) {
+  if (temperature[skinSensor] < NTC_BABY_MIN) {
     logln("[HW] -> Fail -> NTC temperature is lower than expected");
     HW_error += NTC_BABY_MIN_ERROR;
   }
-  if (temperature[babySensor] > NTC_BABY_MAX) {
+  if (temperature[skinSensor] > NTC_BABY_MAX) {
     logln("[HW] -> Fail -> NTC temperature is higher than expected");
     HW_error += NTC_BABY_MAX_ERROR;
   }
