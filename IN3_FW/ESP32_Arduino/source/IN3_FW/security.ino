@@ -4,7 +4,39 @@
 #define TEMPERATURE_ERROR_HYSTERESIS  0.05 // 0.05 degrees difference to disable alarm
 #define HUMIDITY_ERROR_HYSTERESIS  5 //5 %RH to disable alarm
 
+#define FAN_TEST_CURRENTDIF_MIN 0.4 //when the fan is spinning, heater cools down and consume less current
+#define FAN_TEST_PREHEAT_TIME 30000 //when the fan is spinning, heater cools down and consume less current
 
+
+//Alarm variables
+#define powerAlertNotificationPeriod 1000
+
+long lastPowerAlertNotification;
+bool powerAlert;
+
+#define ALARM_TIME_DELAY 30 //in mins, time to check alarm
+//security config
+#define AIR_THERMAL_CUTOUT 38
+#define SKIN_THERMAL_CUTOUT 40
+#define AIR_THERMAL_CUTOUT_HYSTERESIS 1
+#define SKIN_THERMAL_CUTOUT_HYSTERESIS 1
+#define enableAlarms true
+
+#define HUMIDITY_ALARM 0
+#define TEMPERATURE_ALARM 1
+#define AIR_THERMAL_CUTOUT_ALARM 2
+#define SKIN_THERMAL_CUTOUT_ALARM 3
+#define AIR_SENSOR_ISSUE_ALARM 4
+#define SKIN_SENSOR_ISSUE_ALARM 5
+#define FAN_ISSUE_ALARM 6
+#define NUM_ALARMS 7
+
+long lastSuccesfullSensorUpdate[numSensors];
+#define MINIMUM_SUCCESSFULL_SENSOR_UPDATE 30000 //in millis
+
+bool alarmOnGoing[NUM_ALARMS];
+long lastAlarmTrigger[NUM_ALARMS];
+float alarmSensedValue;
 
 void securityCheck() {
   checkThermalCutOuts();
@@ -49,7 +81,7 @@ void checkStatusOfSensor(byte sensor) {
       alarmID = SKIN_SENSOR_ISSUE_ALARM;
       break;
   }
-  if (millis() - lastSuccesfullSensorUpdate[sensor] > minimumSuccesfullSensorUpdate) {
+  if (millis() - lastSuccesfullSensorUpdate[sensor] > MINIMUM_SUCCESSFULL_SENSOR_UPDATE) {
     if (!alarmOnGoing[alarmID]) {
       setAlarm(alarmID);
     }
@@ -62,7 +94,7 @@ void checkStatusOfSensor(byte sensor) {
 }
 
 bool evaluateAlarm(byte alarmID, float setPoint, float measuredValue, float errorMargin, float hysteresisValue, long alarmTime) {
-  if (millis() - alarmTime > alarmTimeDelay * 60 * 1000) { // min to millis
+  if (millis() - alarmTime > ALARM_TIME_DELAY * 60 * 1000) { // min to millis
     if (errorMargin) {
       if ((abs(setPoint - measuredValue) + hysteresisValue * alarmOnGoing[alarmID]) > errorMargin) {
         if (!alarmOnGoing[alarmID]) {
@@ -146,5 +178,42 @@ char* alarmIDtoString (byte alarmID) {
     case SKIN_SENSOR_ISSUE_ALARM:
       return ("SKIN SENSOR ALARM");
       break;
+    case FAN_ISSUE_ALARM:
+      return ("FAN ALARM");
+      break;
+    default:
+      return ("ALARM");
+      break;
   }
+}
+
+bool checkFan() {
+  float offsetCurrent;
+  float testCurrent;
+  long ongoingTest = millis();
+  bool exitTest;
+  ledcWrite(HEATER_PWM_CHANNEL, HEATER_HALF_PWR * ongoingCriticalAlarm());
+  while (millis() - ongoingTest < FAN_TEST_PREHEAT_TIME) {
+    if (back_mode()) {
+      return false;
+    }
+    updateData();
+  }
+  offsetCurrent = measureMeanConsumption(MAIN_SHUNT, defaultTestingSamples);
+  ledcWrite(HEATER_PWM_CHANNEL, false);
+  turnFans(ON);
+  ongoingTest = millis();
+  while (millis() - ongoingTest < FAN_TEST_PREHEAT_TIME) {
+    if (back_mode()) {
+      return false;
+    }
+    updateData();
+  }
+  ledcWrite(HEATER_PWM_CHANNEL, HEATER_HALF_PWR * ongoingCriticalAlarm());
+  testCurrent = measureMeanConsumption(MAIN_SHUNT, defaultTestingSamples);
+  Serial.println("FAN test: " + String(offsetCurrent - testCurrent));
+  if (offsetCurrent - testCurrent < FAN_TEST_CURRENTDIF_MIN) {
+    setAlarm(FAN_ISSUE_ALARM);
+  }
+  ledcWrite(HEATER_PWM_CHANNEL, false);
 }

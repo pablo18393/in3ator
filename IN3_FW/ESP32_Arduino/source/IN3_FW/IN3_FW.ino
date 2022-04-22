@@ -39,27 +39,10 @@ SFE_ADS122C04 mySensor;
 #define digitalCurrentSensor_i2c_address 57
 #define roomSensorAddress 112
 
-//security config
+
 int serialNumber = 45;
 #define WDT_TIMEOUT 15
-#define AIR_THERMAL_CUTOUT 38
-#define SKIN_THERMAL_CUTOUT 40
-#define AIR_THERMAL_CUTOUT_HYSTERESIS 1
-#define SKIN_THERMAL_CUTOUT_HYSTERESIS 1
-#define enableAlarms true
-#define NOT_CRITICAL_ALARM 0
-#define CRITICAL_ALARM 1
-#define HUMIDITY_ALARM 0
-#define TEMPERATURE_ALARM 1
-#define AIR_THERMAL_CUTOUT_ALARM 2
-#define SKIN_THERMAL_CUTOUT_ALARM 3
-#define AIR_SENSOR_ISSUE_ALARM 4
-#define SKIN_SENSOR_ISSUE_ALARM 5
-#define NUM_ALARMS 6
 
-bool alarmOnGoing[NUM_ALARMS];
-long lastAlarmTrigger[NUM_ALARMS];
-float alarmSensedValue;
 
 #define ON true
 #define OFF false
@@ -79,14 +62,6 @@ float alarmSensedValue;
 int buzzerBeeps, buzzerToneTime;
 long buzzerTime;
 bool buzzerBuzzing;
-
-//Alarm variables
-#define powerAlertNotificationPeriod 1000
-
-long lastPowerAlertNotification;
-bool powerAlert;
-
-#define alarmTimeDelay 30 //in mins, time to check alarm
 
 //configuration variables
 #define debounceTime 10         //encoder debouncing time
@@ -151,8 +126,7 @@ double humidity; // room humidity variable
 bool humidifierState, humidifierStateChange;
 int previousHumidity; //previous sampled humidity
 float diffHumidity; //difference between measured humidity and user input real humidity
-long lastSuccesfullSensorUpdate[numSensors];
-#define minimumSuccesfullSensorUpdate 10000 //in millis
+
 
 byte autoCalibrationProcess;
 #define setupAutoCalibrationPoint 0

@@ -20,10 +20,10 @@ int updateData() {
   }
   if (millis() - lastDebugUpdate > debugUpdatePeriod) {
     if (airControlPID.GetMode() == AUTOMATIC) {
-      logln("[PID] -> Heater PWM output is: " + String (100 * HeaterPIDOutput / heaterMaxPWM) + "%");
+      logln("[PID] -> Heater PWM output is: " + String (100 * HeaterPIDOutput / BUZZER_MAX_PWR) + "%");
     }
     if (skinControlPID.GetMode() == AUTOMATIC) {
-      logln("[PID] -> Heater PWM output is: " + String (100 * HeaterPIDOutput / heaterMaxPWM) + "%");
+      logln("[PID] -> Heater PWM output is: " + String (100 * HeaterPIDOutput / BUZZER_MAX_PWR) + "%");
     }
     if (humidityControlPID.GetMode() == AUTOMATIC) {
       logln("[PID] -> Humidifier output is: " + String (100 * humidityControlPIDOutput / humidifierTimeCycle) + "%");

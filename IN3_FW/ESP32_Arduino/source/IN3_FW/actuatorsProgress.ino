@@ -1,5 +1,6 @@
 void actuatorsProgress() {
   bool exitActuation = false;
+  alarmTimerStart();
   if (page == errorPage) {
     GPRSSetPostVariables(NULL, "ALARM");
   }
@@ -19,15 +20,7 @@ void actuatorsProgress() {
   drawActuatorsSeparators();
 
   setGPRSPostPeriod(actuatingGPRSPostPeriod);
-  if (controlTemperature) {
-    printLoadingTemperatureBar();
-  }
-  if (controlMode) {
-    temperatureAtStart = temperature[airSensor];
-  }
-  else {
-    temperatureAtStart = temperature[skinSensor];
-  }
+
   if (controlMode) {
     switch (language) {
       case spanish:
@@ -94,10 +87,7 @@ void actuatorsProgress() {
     }
   }
   drawCentreString(textToWrite, tft.width() / 2, tft.height() / 2 - letter_height, textFontSize);
-  if (controlHumidity) {
-    printLoadingHumidityBar();
-  }
-  humidityAtStart = humidity;
+
   switch (language) {
     case spanish:
       textToWrite = "Humedad";
@@ -119,7 +109,6 @@ void actuatorsProgress() {
   while (!GPIORead(ENC_SWITCH)) {
     updateData();
   }
-  turnFans(ON);
   if (controlAlgorithm == PID_CONTROL) {
     if (controlTemperature) {
       switch (controlMode) {
@@ -136,12 +125,25 @@ void actuatorsProgress() {
     }
   }
   updateDisplaySensors();
-  alarmTimerStart();
-
+  if (controlTemperature) {
+    printLoadingTemperatureBar();
+    if (controlMode) {
+      temperatureAtStart = temperature[airSensor];
+    }
+    else {
+      temperatureAtStart = temperature[skinSensor];
+    }
+    if (!checkFan()) {
+      exitActuation = true;
+    }
+  }
+  if (controlHumidity) {
+    printLoadingHumidityBar();
+  }
+  humidityAtStart = humidity;
   while (!exitActuation) {
     updateData();
     if (controlTemperature) {
-
       if (controlAlgorithm == BASIC_CONTROL) {
         basictemperatureControl();
       }
@@ -160,12 +162,10 @@ void actuatorsProgress() {
     while (!GPIORead(ENC_SWITCH)) {
       updateData();
       exitActuation = back_mode();
-      if (exitActuation) {
-        stopActuation();
-      }
     }
     blinkGoBackMessage();
   }
+  stopActuation();
 }
 
 
@@ -186,15 +186,6 @@ void basictemperatureControl() {
 }
 
 void basicHumidityControl() {
-  /*
-    if (humidity < desiredRoomHum) {
-    GPIOWrite(HUMIDIFIER, HIGH);
-    }
-    else {
-    GPIOWrite(HUMIDIFIER, LOW);
-    }
-  */
-
   if (humidity < desiredRoomHum) {
     if (!humidifierState || humidifierStateChange) {
       if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
@@ -219,12 +210,11 @@ void basicHumidityControl() {
     }
     humidifierState = false;
   }
-
 }
 
 
 void heatUp() {
-  ledcWrite(HEATER_PWM_CHANNEL, heaterMaxPWM * ongoingCriticalAlarm());
+  ledcWrite(HEATER_PWM_CHANNEL, BUZZER_MAX_PWR * ongoingCriticalAlarm());
 }
 
 void stopActuation() {
@@ -235,7 +225,7 @@ void stopActuation() {
 }
 
 void turnActuators(bool mode) {
-  ledcWrite(HEATER_PWM_CHANNEL, mode * heaterMaxPWM * ongoingCriticalAlarm());
+  ledcWrite(HEATER_PWM_CHANNEL, mode * BUZZER_MAX_PWR * ongoingCriticalAlarm());
   if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
     ledcWrite(HUMIDIFIER_PWM_CHANNEL, HUMIDIFIER_DUTY_CYCLE * mode);
   }

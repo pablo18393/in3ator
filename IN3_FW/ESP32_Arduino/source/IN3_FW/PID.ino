@@ -62,13 +62,13 @@ void PIDHandler() {
 void startPID(byte var) {
   switch (var) {
     case airPID:
-      airControlPID.SetOutputLimits(false, heaterMaxPWM);
+      airControlPID.SetOutputLimits(false, BUZZER_MAX_PWR);
       airControlPID.SetTunings(Kp[airPID], Ki[airPID], Kd[airPID]);
       airControlPID.SetControllerDirection(DIRECT);
       airControlPID.SetMode(AUTOMATIC);
       break;
     case skinPID:
-      skinControlPID.SetOutputLimits(false, heaterMaxPWM);
+      skinControlPID.SetOutputLimits(false, BUZZER_MAX_PWR);
       skinControlPID.SetTunings(Kp[skinPID], Ki[skinPID], Kd[skinPID]);
       skinControlPID.SetControllerDirection(DIRECT);
       skinControlPID.SetMode(AUTOMATIC);

@@ -142,7 +142,7 @@ void autoCalibration() {
           delay(debounceTime);
           desiredControlTemp = 36;
           startPID(airPID);
-          //ledcWrite(HEATER_PWM_CHANNEL, PWM_MAX_VALUE / 2 * ongoingCriticalAlarm());
+          //ledcWrite(HEATER_PWM_CHANNEL, HEATER_HALF_PWR * ongoingCriticalAlarm());
           autoCalibrationProcess = secondAutoCalibrationPoint;
           referenceSensorHistory[historyLengthPosition] = false;
           sensorToCalibrateHistory[historyLengthPosition] = false;
@@ -190,6 +190,15 @@ bool checkStableTemperatures(double *referenceSensorHistory, double *sensorToCal
       return false;
     }
     if (abs(*sensorToCalibrateHistory - * (sensorToCalibrateHistory + i)) > stabilityError) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool checkStableCurrentConsumption(double *referenceSensorHistory, int historyLength, double stabilityError) {
+  for (int i = 0; i < historyLength; i++) {
+    if (abs(*referenceSensorHistory  - * (referenceSensorHistory + i)) > stabilityError) {
       return false;
     }
   }

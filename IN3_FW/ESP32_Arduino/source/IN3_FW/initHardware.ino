@@ -400,7 +400,7 @@ void initBuzzer() {
   float testCurrent, offsetCurrent;
 
   offsetCurrent = measureMeanConsumption(MAIN_SHUNT, defaultTestingSamples);
-  ledcWrite(BUZZER_PWM_CHANNEL, buzzerMaxPWM / 2);
+  ledcWrite(BUZZER_PWM_CHANNEL, BUZZER_MAX_PWM / 2);
 
   testCurrent = measureMeanConsumption(MAIN_SHUNT, defaultTestingSamples) - offsetCurrent;
   ledcWrite(BUZZER_PWM_CHANNEL, false);
@@ -421,13 +421,13 @@ void buzzerHandler() {
   if (millis() - buzzerTime > buzzerToneTime && buzzerBeeps) {
     buzzerBeeps -= buzzerBuzzing;
     buzzerBuzzing = !buzzerBuzzing;
-    ledcWrite(BUZZER_PWM_CHANNEL, buzzerMaxPWM / 2 * buzzerBuzzing);
+    ledcWrite(BUZZER_PWM_CHANNEL, BUZZER_MAX_PWM / 2 * buzzerBuzzing);
     buzzerTime = millis();
   }
 }
 
 void buzzerConstantTone (int freq) {
-  ledcWrite(BUZZER_PWM_CHANNEL, buzzerMaxPWM / 2);
+  ledcWrite(BUZZER_PWM_CHANNEL, BUZZER_MAX_PWM / 2);
 }
 
 void shutBuzzer () {
