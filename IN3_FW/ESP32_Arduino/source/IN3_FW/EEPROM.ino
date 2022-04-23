@@ -9,6 +9,7 @@
 #define EEPROM_WIFI_EN 50
 #define EEPROM_usedGenericMosfet 60
 #define EEPROM_controlMode 70
+#define EEPROM_desiredControlMode 80
 #define EEPROM_diffHumidity 90
 #define EEPROM_RawSkinTemperatureLowCorrection 100
 #define EEPROM_RawSkinTemperatureRangeCorrection 110
@@ -60,15 +61,17 @@ void initEEPROM() {
 
 void loaddefaultValues() {
   autoLock = defaultAutoLock;
-  controlMode = defaultcontrolMode;
   WIFI_EN = defaultWIFI_EN;
   language = defaultLanguage;
   controlAlgorithm = defaultcontrolAlgorithm;
+  controlMode = defaultcontrolMode;
+  desiredControlTemp = presetTemp[controlMode];
   EEPROM.write(EEPROM_autoLock, autoLock);
   EEPROM.write(EEPROM_WIFI_EN, WIFI_EN);
   EEPROM.write(EEPROM_language, language);
   EEPROM.write(EEPROM_controlAlgorithm, controlAlgorithm);
   EEPROM.write(EEPROM_controlMode, controlMode);
+  EEPROM.write(EEPROM_desiredControlMode, desiredControlTemp);
   EEPROM.commit();
 }
 
@@ -97,7 +100,7 @@ void recapVariables() {
   for (int i = 0; i < numSensors; i++) {
     logln("calibration factors: " + String(RawTemperatureLow [i]) + "," + String (RawTemperatureRange [i]) + "," + String (ReferenceTemperatureRange) + "," + String (ReferenceTemperatureLow));
   }
-  
+
   for (int i = 0; i < numSensors; i++) {
     if (RawTemperatureLow[i] > 100) {
       //critical error
@@ -111,6 +114,7 @@ void recapVariables() {
   WIFI_EN = EEPROM.read(EEPROM_WIFI_EN);
   controlAlgorithm = EEPROM.read(EEPROM_controlAlgorithm);
   controlMode = EEPROM.read(EEPROM_controlMode);
+  desiredControlTemp = EEPROM.read(EEPROM_desiredControlMode);
 }
 
 

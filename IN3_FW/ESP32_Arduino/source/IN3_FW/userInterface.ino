@@ -65,12 +65,12 @@ bool userInterfaceHandler() {
               updateData();
               if (EncMove) {
                 if (EncMove > 0) {
-                  if (desiredControlTemp > minTemp[controlMode]) {
+                  if (desiredControlTemp > minDesiredTemp[controlMode]) {
                     updateUIData = true;
                   }
                 }
                 else {
-                  if (desiredControlTemp < maxTemp[controlMode]) {
+                  if (desiredControlTemp < maxDesiredTemp[controlMode]) {
                     updateUIData = true;
                   }
                 }
@@ -90,6 +90,8 @@ bool userInterfaceHandler() {
                 updateUIData = false;
               }
             }
+            EEPROM.write(EEPROM_desiredControlMode, desiredControlTemp);
+            EEPROM.commit();
             drawStartMessage();
             break;
           case humidityGraphicPosition:

@@ -186,8 +186,8 @@ double desiredHeaterTemp; //desired temperature in heater
 //constants
 const byte humidifierDutyCycleMax = 100; //maximum humidity cycle in heater to be set
 const byte humidifierDutyCycleMin = 0; //minimum humidity cycle in heater to be set
-const float minTemp[2] = {35, 30}; //minimum allowed temperature to be set
-const float maxTemp[2] = {37.5, 37}; //maximum allowed temperature to be set
+const float minDesiredTemp[2] = {35, 30}; //minimum allowed temperature to be set
+const float maxDesiredTemp[2] = {37.5, 37}; //maximum allowed temperature to be set
 const float stepTemperatureIncrement = 0.1; //maximum allowed temperature to be set
 const float stepHumidityIncrement = 5; //maximum allowed temperature to be set
 const int presetTemp[2] = {36, 32}; //preset baby skin temperature
