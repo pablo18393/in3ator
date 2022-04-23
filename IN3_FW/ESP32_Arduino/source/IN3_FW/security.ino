@@ -140,12 +140,14 @@ bool ongoingCriticalAlarm() {
 }
 
 void setAlarm (byte alarmID) {
+  logln("[ALARM] ->" + String (alarmIDtoString(alarmID)) + " has been triggered");
   alarmOnGoing[alarmID] = true;
   buzzerConstantTone(buzzerAlarmTone);
   drawAlarmMessage(DRAW, alarmIDtoString(alarmID));
 }
 
 void resetAlarm (byte alarmID) {
+  logln("[ALARM] ->" + String (alarmIDtoString(alarmID)) + " has been disable");
   alarmOnGoing[alarmID] = false;
   if (!ongoingAlarms()) {
     shutBuzzer();
@@ -210,12 +212,11 @@ bool checkFan() {
     updateData();
   }
   ledcWrite(HEATER_PWM_CHANNEL, HEATER_HALF_PWR * ongoingCriticalAlarm());
-  Serial.println("point 1");
   testCurrent = measureMeanConsumption(MAIN_SHUNT, defaultTestingSamples);
+  ledcWrite(HEATER_PWM_CHANNEL, false);
   if (offsetCurrent - testCurrent < FAN_TEST_CURRENTDIF_MIN) {
     setAlarm(FAN_ISSUE_ALARM);
+    return false;
   }
-  Serial.println("point 2");
-  ledcWrite(HEATER_PWM_CHANNEL, false);
-  Serial.println("point 3");
+  return true;
 }

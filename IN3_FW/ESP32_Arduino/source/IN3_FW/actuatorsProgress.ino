@@ -133,7 +133,7 @@ void actuatorsProgress() {
     else {
       temperatureAtStart = temperature[skinSensor];
     }
-    checkFan();
+    exitActuation = !checkFan();
   }
   if (controlHumidity) {
     printLoadingHumidityBar();
@@ -188,7 +188,7 @@ void basicHumidityControl() {
   if (humidity < desiredRoomHum) {
     if (!humidifierState || humidifierStateChange) {
       if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
-        ledcWrite(HUMIDIFIER_PWM_CHANNEL, HUMIDIFIER_DUTY_CYCLE);
+        ledcWrite(HUMIDIFIER_PWM_CHANNEL, HUMIDIFIER_DUTY_CYCLE * ongoingCriticalAlarm());
       }
       else {
         GPIOWrite(HUMIDIFIER, HIGH);
@@ -226,7 +226,7 @@ void stopActuation() {
 void turnActuators(bool mode) {
   ledcWrite(HEATER_PWM_CHANNEL, mode * BUZZER_MAX_PWR * ongoingCriticalAlarm());
   if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
-    ledcWrite(HUMIDIFIER_PWM_CHANNEL, HUMIDIFIER_DUTY_CYCLE * mode);
+    ledcWrite(HUMIDIFIER_PWM_CHANNEL, HUMIDIFIER_DUTY_CYCLE * mode * ongoingCriticalAlarm());
   }
   else {
     GPIOWrite(HUMIDIFIER, mode);

@@ -47,7 +47,7 @@ void PIDHandler() {
     else {
       if (!humidifierState || humidifierStateChange) {
         if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
-          ledcWrite(HUMIDIFIER_PWM_CHANNEL, HUMIDIFIER_DUTY_CYCLE);
+          ledcWrite(HUMIDIFIER_PWM_CHANNEL, HUMIDIFIER_DUTY_CYCLE * ongoingCriticalAlarm());
         }
         else {
           GPIOWrite(HUMIDIFIER, HIGH);
