@@ -210,10 +210,12 @@ bool checkFan() {
     updateData();
   }
   ledcWrite(HEATER_PWM_CHANNEL, HEATER_HALF_PWR * ongoingCriticalAlarm());
+  Serial.println("point 1");
   testCurrent = measureMeanConsumption(MAIN_SHUNT, defaultTestingSamples);
-  Serial.println("FAN test: " + String(offsetCurrent - testCurrent));
   if (offsetCurrent - testCurrent < FAN_TEST_CURRENTDIF_MIN) {
     setAlarm(FAN_ISSUE_ALARM);
   }
+  Serial.println("point 2");
   ledcWrite(HEATER_PWM_CHANNEL, false);
+  Serial.println("point 3");
 }

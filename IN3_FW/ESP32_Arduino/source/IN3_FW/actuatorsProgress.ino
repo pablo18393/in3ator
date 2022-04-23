@@ -133,14 +133,13 @@ void actuatorsProgress() {
     else {
       temperatureAtStart = temperature[skinSensor];
     }
-    if (!checkFan()) {
-      exitActuation = true;
-    }
+    checkFan();
   }
   if (controlHumidity) {
     printLoadingHumidityBar();
   }
   humidityAtStart = humidity;
+  turnFans(ON);
   while (!exitActuation) {
     updateData();
     if (controlTemperature) {
