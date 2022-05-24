@@ -1,21 +1,3 @@
-
-void encSwitchHandler() {
-  if (!digitalRead(ENC_SWITCH)) {
-    if (millis() - lastEncPulse > encPulseDebounce) {
-      //statusEncSwitch = !statusEncSwitch;
-      //if (statusEncSwitch) {
-      encPulseDetected = true;
-      buzzerTone(buzzerStandbyToneTimes, buzzerSwitchDuration, buzzerRotaryEncoderTone);
-      lastbacklightHandler = millis();
-      if (ongoingAlarms()) {
-        disableAllAlarms();
-      }
-    }
-    //}
-    lastEncPulse = millis();
-  }
-}
-
 void encoderISR() {
   int newPos;
   encoder.tick(); // just call tick() to check the state.
@@ -32,11 +14,18 @@ void encoderISR() {
   }
 }
 
-void powerAlertISR() {
-  /*
-    if (millis() - lastPowerAlertNotification > powerAlertNotificationPeriod) {
-    lastPowerAlertNotification = millis();
-    powerAlert = true;
+void encSwitchHandler() {
+  if (!digitalRead(ENC_SWITCH)) {
+    if (millis() - lastEncPulse > encPulseDebounce) {
+      //statusEncSwitch = !statusEncSwitch;
+      //if (statusEncSwitch) {
+      encPulseDetected = true;
+      buzzerTone(buzzerStandbyToneTimes, buzzerSwitchDuration, buzzerRotaryEncoderTone);
+      lastbacklightHandler = millis();
+      if (ongoingAlarms()) {
+        disableAllAlarms();
+      }
     }
-  */
+    lastEncPulse = millis();
+  }
 }

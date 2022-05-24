@@ -5,7 +5,7 @@ void actuatorsProgress() {
     GPRSSetPostVariables(NULL, "ALARM");
   }
   else {
-    GPRSSetPostVariables(actuatorsModeON, "ON:" + String (desiredControlTemp, 1) + "," + String (desiredRoomHum));
+    GPRSSetPostVariables(actuatorsModeON, "ON:" + String (desiredControlTemperature, 1) + "," + String (desiredControlHumidity));
   }
   byte  numWords = false;
   temperaturePercentage = false;
@@ -176,7 +176,7 @@ void basictemperatureControl() {
   else {
     temperatureToControl = temperature[skinSensor];
   }
-  if (temperatureToControl < desiredControlTemp) {
+  if (temperatureToControl < desiredControlTemperature) {
     heatUp();
   }
   else {
@@ -185,7 +185,7 @@ void basictemperatureControl() {
 }
 
 void basicHumidityControl() {
-  if (humidity < desiredRoomHum) {
+  if (humidity < desiredControlHumidity) {
     if (!humidifierState || humidifierStateChange) {
       if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
         ledcWrite(HUMIDIFIER_PWM_CHANNEL, HUMIDIFIER_DUTY_CYCLE * ongoingCriticalAlarm());

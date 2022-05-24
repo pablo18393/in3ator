@@ -58,7 +58,7 @@ long lastTFTCheck;
 
 void initDebug() {
   Serial.begin(115200);
-  delay(100);
+  vTaskDelay(100);
   logln("in3ator debug uart, version " + String (FWversion) + ", SN: " + String (serialNumber));
 }
 
@@ -240,16 +240,6 @@ bool GPIORead(uint8_t GPIO) {
   return (digitalRead(GPIO));
 }
 
-void initGPRS()
-{
-  Serial2.begin(115200);
-  GPRS.enable = true;
-  GPRS.powerUp = true;
-  GPRSSetPostVariables(defaultPost, "First post, FW version: " + String (FWversion));
-  setGPRSPostPeriod(standByGPRSPostPeriod);
-  GPIOWrite(GPRS_PWRKEY, HIGH);
-}
-
 void initSenseCircuit() {
   standByCurrentTest();
   measureOffsetConsumption();
@@ -387,12 +377,7 @@ void TFTRestore() {
 }
 
 void initActuators() {
-  initHeater();
   actuatorsTest();
-}
-
-void initHeater() {
-
 }
 
 void initBuzzer() {
@@ -415,31 +400,6 @@ void initBuzzer() {
     logln("[HW] -> Fail -> test current is " + String (testCurrent) + " Amps");
   }
   GPRSSetPostVariables(NULL, ",Buz:" + String (testCurrent));
-}
-
-void buzzerHandler() {
-  if (millis() - buzzerTime > buzzerToneTime && buzzerBeeps) {
-    buzzerBeeps -= buzzerBuzzing;
-    buzzerBuzzing = !buzzerBuzzing;
-    ledcWrite(BUZZER_PWM_CHANNEL, BUZZER_MAX_PWM / 2 * buzzerBuzzing);
-    buzzerTime = millis();
-  }
-}
-
-void buzzerConstantTone (int freq) {
-  logln("[BUZZER] -> BUZZER activated in constant Mode");
-  ledcWrite(BUZZER_PWM_CHANNEL, BUZZER_MAX_PWM / 2);
-}
-
-void shutBuzzer () {
-  logln("[BUZZER] -> BUZZER was shutted");
-  ledcWrite(BUZZER_PWM_CHANNEL, false);
-}
-
-void buzzerTone (int beepTimes, int timeDelay, int freq) {
-  logln("[BUZZER] -> BUZZER beep mode activated  " + String(beepTimes) + " times");
-  buzzerBeeps += beepTimes;
-  buzzerToneTime = timeDelay;
 }
 
 void actuatorsTest() {

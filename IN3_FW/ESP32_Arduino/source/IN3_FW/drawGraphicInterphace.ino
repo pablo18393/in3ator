@@ -469,7 +469,7 @@ void drawActuatorsSeparators() {
 
 void printLoadingTemperatureBar() {
   barThickness = 3;
-  drawFloat(desiredControlTemp, 1, tft.width() - 5 * letter_width, temperatureY, textFontSize);
+  drawFloat(desiredControlTemperature, 1, tft.width() - 5 * letter_width, temperatureY, textFontSize);
   for (int i = true; i <= barThickness; i++) {
     tft.drawRect(tempBarPosX - barWidth / 2 - i, tempBarPosY - barHeight / 2 - i, barWidth + i * 2, barHeight + i * 2, COLOR_FRAME_BAR);
   }
@@ -477,7 +477,7 @@ void printLoadingTemperatureBar() {
 
 void printLoadingHumidityBar() {
   barThickness = 3;
-  drawFloat(desiredRoomHum, 1, humBarPosX + barWidth / 2 + 10, humidityY, textFontSize);
+  drawFloat(desiredControlHumidity, 1, humBarPosX + barWidth / 2 + 10, humidityY, textFontSize);
   for (int i = true; i <= barThickness; i++) {
     tft.drawRect(humBarPosX - barWidth / 2 - i, humBarPosY - barHeight / 2 - i, barWidth + i * 2, barHeight + i * 2, COLOR_FRAME_BAR);
   }

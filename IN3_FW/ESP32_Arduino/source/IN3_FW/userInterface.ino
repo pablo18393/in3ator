@@ -50,7 +50,7 @@ bool userInterfaceHandler() {
         }
       }
     }
-    delay(debounceTime);
+    vTaskDelay(debounceTime);
     switch (page) {
       case mainMenuPage:
         switch (bar_pos - graphicTextOffset ) {
@@ -65,12 +65,12 @@ bool userInterfaceHandler() {
               updateData();
               if (EncMove) {
                 if (EncMove > 0) {
-                  if (desiredControlTemp > minDesiredTemp[controlMode]) {
+                  if (desiredControlTemperature > minDesiredTemp[controlMode]) {
                     updateUIData = true;
                   }
                 }
                 else {
-                  if (desiredControlTemp < maxDesiredTemp[controlMode]) {
+                  if (desiredControlTemperature < maxDesiredTemp[controlMode]) {
                     updateUIData = true;
                   }
                 }
@@ -80,17 +80,17 @@ bool userInterfaceHandler() {
                     controlTemperature = true;
                     drawRightString(initialSensorsValue, initialSensorPosition, temperatureY, textFontSize);
                   }
-                  drawFloat(desiredControlTemp, 1, temperatureX - 65, temperatureY, textFontSize);
-                  desiredControlTemp -= float(EncMove) * stepTemperatureIncrement;
+                  drawFloat(desiredControlTemperature, 1, temperatureX - 65, temperatureY, textFontSize);
+                  desiredControlTemperature -= float(EncMove) * stepTemperatureIncrement;
                   setTextColor(COLOR_MENU_TEXT);
-                  drawFloat(desiredControlTemp, 1, temperatureX - 65, temperatureY, textFontSize);
+                  drawFloat(desiredControlTemperature, 1, temperatureX - 65, temperatureY, textFontSize);
                   enableSet = true;
                 }
                 EncMove = false;
                 updateUIData = false;
               }
             }
-            EEPROM.write(EEPROM_desiredControlMode, desiredControlTemp);
+            EEPROM.write(EEPROM_desiredControlMode, desiredControlTemperature);
             EEPROM.commit();
             drawStartMessage();
             break;
@@ -99,12 +99,12 @@ bool userInterfaceHandler() {
               updateData();
               if (EncMove ) {
                 if (EncMove > 0) {
-                  if (desiredRoomHum > minHum) {
+                  if (desiredControlHumidity > minHum) {
                     updateUIData = true;
                   }
                 }
                 else {
-                  if (desiredRoomHum < maxHum) {
+                  if (desiredControlHumidity < maxHum) {
                     updateUIData = true;
                   }
                 }
@@ -114,16 +114,18 @@ bool userInterfaceHandler() {
                     controlHumidity = true;
                     drawRightString(initialSensorsValue, initialSensorPosition, humidityY, textFontSize);
                   }
-                  drawCentreNumber(desiredRoomHum, humidityX - 65, humidityY);
-                  desiredRoomHum -= (EncMove) * stepHumidityIncrement;
+                  drawCentreNumber(desiredControlHumidity, humidityX - 65, humidityY);
+                  desiredControlHumidity -= (EncMove) * stepHumidityIncrement;
                   setTextColor(COLOR_MENU_TEXT);
-                  drawCentreNumber(desiredRoomHum, humidityX - 65, humidityY);
+                  drawCentreNumber(desiredControlHumidity, humidityX - 65, humidityY);
                   enableSet = true;
                 }
               }
               EncMove = false;
               updateUIData = false;
             }
+            EEPROM.write(EEPROM_desiredControlHumidity, desiredControlHumidity);
+            EEPROM.commit();
             drawStartMessage();
             break;
           case LEDGraphicPosition:
@@ -442,7 +444,7 @@ bool userInterfaceHandler() {
         back_mode();
       }
     }
-    delay(debounceTime);
+    vTaskDelay(debounceTime);
   }
 }
 
@@ -505,7 +507,7 @@ void checkSetMessage() {
 }
 
 bool back_mode() {
-  delay(debounceTime);
+  vTaskDelay(debounceTime);
   last_encPulsed = millis();
   byte back_bar = false;
   while (!GPIORead(ENC_SWITCH)) {
@@ -518,11 +520,11 @@ bool back_mode() {
       mainMenu();
       return true;
     }
-    delay((time_back_draw + time_back_wait) / width_back);
+    vTaskDelay((time_back_draw + time_back_wait) / width_back);
   }
   if (millis() - last_encPulsed > time_back_wait) {
     drawBack();
   }
-  delay(10);
+  vTaskDelay(10);
   return (false);
 }

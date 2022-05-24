@@ -68,12 +68,11 @@ void mainMenu() {
   bar_pos = true;
   selected = false;
   ypos = graphicHeight(bar_pos - 1);
-  desiredRoomHum = presetHumidity;
-  if (desiredControlTemp < minDesiredTemp[controlMode] || desiredControlTemp > maxDesiredTemp[controlMode]) {
-    desiredControlTemp = presetTemp[controlMode];
+  if (desiredControlTemperature < minDesiredTemp[controlMode] || desiredControlTemperature > maxDesiredTemp[controlMode]) {
+    desiredControlTemperature = presetTemp[controlMode];
   }
   while (!GPIORead(ENC_SWITCH)) {
     updateData();
   }
-  delay(debounceTime);
+  vTaskDelay(debounceTime);
 }

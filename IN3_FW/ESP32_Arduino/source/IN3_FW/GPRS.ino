@@ -104,6 +104,16 @@ int GPRSsequence = false;
 
 struct GPRSstruct GPRS;
 
+void initGPRS()
+{
+  Serial2.begin(115200);
+  GPRS.enable = true;
+  GPRS.powerUp = true;
+  GPRSSetPostVariables(defaultPost, "First post, FW version: " + String (FWversion));
+  setGPRSPostPeriod(standByGPRSPostPeriod);
+  GPIOWrite(GPRS_PWRKEY, HIGH);
+}
+
 void GPRS_Handler() {
   if (GPRS.enable) {
     if (GPRS.powerUp) {
@@ -152,7 +162,7 @@ void GPRSStatusHandler() {
     if (!GPRS.connectionStatus) {
       GPRS.powerUp = true;
     }
-    if (millis() - GPRS.lastSent > GPRS.sendPeriod * 1000) {
+    if (millis() - GPRS.lastSent > millisToSecs(GPRS.sendPeriod)) {
       logln("[GPRS] -> Posting GPRS data...");
       GPRS.post = true;
     }

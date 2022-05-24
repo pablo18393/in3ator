@@ -56,5 +56,5 @@ void settings() {
   while (!GPIORead(ENC_SWITCH)) {
     updateData();
   }
-  delay(debounceTime);
+  vTaskDelay(debounceTime);
 }

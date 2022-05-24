@@ -35,7 +35,7 @@ void firstPointCalibration() {
   while (!GPIORead(ENC_SWITCH)) {
     updateData();
   }
-  delay(debounceTime);
+  vTaskDelay(debounceTime);
 }
 
 void secondPointCalibration() {
@@ -74,7 +74,7 @@ void secondPointCalibration() {
   while (!GPIORead(ENC_SWITCH)) {
     updateData();
   }
-  delay(debounceTime);
+  vTaskDelay(debounceTime);
 }
 
 void autoCalibration() {
@@ -119,7 +119,7 @@ void autoCalibration() {
   while (!GPIORead(ENC_SWITCH)) {
     updateData();
   }
-  delay(debounceTime);
+  vTaskDelay(debounceTime);
   autoCalibrationProcess = setupAutoCalibrationPoint;
   while (!exitCalibrationMenu) {
     updateData();
@@ -134,13 +134,13 @@ void autoCalibration() {
         if (!GPIORead(ENC_SWITCH) || checkStableTemperatures(referenceSensorHistory, sensorToCalibrateHistory, historyLength, stabilityError)) {
           provisionalReferenceTemperatureLow = temperature[airSensor];
           provisionalRawTemperatureLow[skinSensor] = temperature[skinSensor];
-          delay(debounceTime);
+          vTaskDelay(debounceTime);
           while (!GPIORead(ENC_SWITCH)) {
             updateData();
             exitCalibrationMenu = back_mode();
           }
-          delay(debounceTime);
-          desiredControlTemp = 36;
+          vTaskDelay(debounceTime);
+          desiredControlTemperature = 36;
           startPID(airPID);
           //ledcWrite(HEATER_PWM_CHANNEL, HEATER_HALF_PWR * ongoingCriticalAlarm());
           autoCalibrationProcess = secondAutoCalibrationPoint;
@@ -166,7 +166,7 @@ void autoCalibration() {
         }
         break;
     }
-    if (millis() - lastTemperatureMeasurement > timeBetweenMeasurements * 60 * 1000) {
+    if (millis() - lastTemperatureMeasurement > millisToMin(timeBetweenMeasurements)) {
       lastTemperatureMeasurement = millis();
       if (historyLengthPosition == historyLength) {
         historyLengthPosition = false;

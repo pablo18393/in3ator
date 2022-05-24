@@ -3,7 +3,7 @@
 */
 
 //Firmware version and head title of UI screen
-#define FWversion "v9.2/8.B"
+#define FWversion "v9.3/8.B"
 #define headingTitle "in3ator"
 
 #include <esp_task_wdt.h>
@@ -65,7 +65,7 @@ bool buzzerBuzzing;
 
 //configuration variables
 #define debounceTime 10         //encoder debouncing time
-#define mosfet_switch_time 100   //delay to wait for mosfet to switch (in millis), oversized
+#define mosfet_switch_time 100   //vTaskDelay to wait for mosfet to switch (in millis), oversized
 #define timePressToSettings 5000 //in millis, time to press to go to settings window in UI
 #define debugUpdatePeriod 1000 //in millis, 
 bool WIFI_EN = true;
@@ -178,8 +178,8 @@ bool controlMode;
 bool defaultcontrolMode = SKIN_CONTROL;
 bool controlAlgorithm;
 bool defaultcontrolAlgorithm = PID_CONTROL;
-double desiredControlTemp; //preset baby skin temperature
-double desiredRoomHum; //preset enviromental humidity
+double desiredControlTemperature; //preset baby skin temperature
+double desiredControlHumidity; //preset enviromental humidity
 bool jaundiceEnable; //PWM that controls jaundice LED intensity
 double desiredHeaterTemp; //desired temperature in heater
 
@@ -191,7 +191,7 @@ const float maxDesiredTemp[2] = {37.5, 37}; //maximum allowed temperature to be 
 const float stepTemperatureIncrement = 0.1; //maximum allowed temperature to be set
 const float stepHumidityIncrement = 5; //maximum allowed temperature to be set
 const int presetTemp[2] = {36, 32}; //preset baby skin temperature
-const int presetHumidity = 70; //preset humidity
+const int presetHumidity = 60; //preset humidity
 const byte maxHum = 90; //maximum allowed humidity to be set
 const byte minHum = 20; //minimum allowed humidity to be set
 const byte LEDMaxIntensity = 100; //max LED intensity to be set
@@ -360,9 +360,6 @@ void setup() {
   initHardware(false);
   mainMenu();
 }
-
-bool wroteHeater[5];
-
 
 void loop() {
   userInterfaceHandler();

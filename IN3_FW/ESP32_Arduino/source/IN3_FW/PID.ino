@@ -11,9 +11,9 @@ double airControlPIDInput;
 double humidityControlPIDOutput;
 int humidifierTimeCycle = 5000;
 unsigned long windowStartTime;
-PID airControlPID(&airControlPIDInput, &HeaterPIDOutput, &desiredControlTemp, Kp[airPID], Ki[airPID], Kd[airPID], P_ON_E, DIRECT);
-PID skinControlPID(&skinControlPIDInput, &HeaterPIDOutput, &desiredControlTemp, Kp[skinPID], Ki[skinPID], Kd[skinPID], P_ON_E, DIRECT);
-PID humidityControlPID(&humidity, &humidityControlPIDOutput, &desiredRoomHum, Kp[humidityPID], Ki[humidityPID], Kd[humidityPID], P_ON_E, DIRECT);
+PID airControlPID(&airControlPIDInput, &HeaterPIDOutput, &desiredControlTemperature, Kp[airPID], Ki[airPID], Kd[airPID], P_ON_E, DIRECT);
+PID skinControlPID(&skinControlPIDInput, &HeaterPIDOutput, &desiredControlTemperature, Kp[skinPID], Ki[skinPID], Kd[skinPID], P_ON_E, DIRECT);
+PID humidityControlPID(&humidity, &humidityControlPIDOutput, &desiredControlHumidity, Kp[humidityPID], Ki[humidityPID], Kd[humidityPID], P_ON_E, DIRECT);
 
 void PIDHandler() {
   if (airControlPID.GetMode() == AUTOMATIC) {

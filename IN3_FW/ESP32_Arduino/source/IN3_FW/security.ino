@@ -38,6 +38,10 @@ bool alarmOnGoing[NUM_ALARMS];
 long lastAlarmTrigger[NUM_ALARMS];
 float alarmSensedValue;
 
+void initAlarms() {
+  lastAlarmTrigger[AIR_THERMAL_CUTOUT_ALARM] =
+}
+
 void securityCheck() {
   checkThermalCutOuts();
   checkAlarms();
@@ -58,10 +62,10 @@ void checkAlarms() {
       else {
         alarmSensedValue = temperature[skinSensor];
       }
-      evaluateAlarm(TEMPERATURE_ALARM, desiredControlTemp, alarmSensedValue, TEMPERATURE_ERROR, TEMPERATURE_ERROR_HYSTERESIS , lastAlarmTrigger[TEMPERATURE_ALARM]);
+      evaluateAlarm(TEMPERATURE_ALARM, desiredControlTemperature, alarmSensedValue, TEMPERATURE_ERROR, TEMPERATURE_ERROR_HYSTERESIS , lastAlarmTrigger[TEMPERATURE_ALARM]);
     }
     if (controlHumidity) {
-      evaluateAlarm(HUMIDITY_ALARM, humidity, desiredRoomHum, HUMIDITY_ERROR, HUMIDITY_ERROR_HYSTERESIS, lastAlarmTrigger[HUMIDITY_ALARM]);
+      evaluateAlarm(HUMIDITY_ALARM, humidity, desiredControlHumidity, HUMIDITY_ERROR, HUMIDITY_ERROR_HYSTERESIS, lastAlarmTrigger[HUMIDITY_ALARM]);
     }
   }
 }
@@ -94,9 +98,9 @@ void checkStatusOfSensor(byte sensor) {
 }
 
 bool evaluateAlarm(byte alarmID, float setPoint, float measuredValue, float errorMargin, float hysteresisValue, long alarmTime) {
-  if (millis() - alarmTime > ALARM_TIME_DELAY * 60 * 1000) { // min to millis
+  if (millis() - alarmTime > millisToMin(ALARM_TIME_DELAY)) { // min to millis
     if (errorMargin) {
-      if ((abs(setPoint - measuredValue) + hysteresisValue * alarmOnGoing[alarmID]) > errorMargin) {
+      if ((abs(setPoint - measuredValue) + hysteresisValue) > errorMargin) {
         if (!alarmOnGoing[alarmID]) {
           setAlarm(alarmID);
           return true;
@@ -109,7 +113,7 @@ bool evaluateAlarm(byte alarmID, float setPoint, float measuredValue, float erro
       }
     }
     else {
-      if ((measuredValue + hysteresisValue * alarmOnGoing[alarmID]) > setPoint) {
+      if ((measuredValue + hysteresisValue) > setPoint) {
         if (!alarmOnGoing[alarmID]) {
           setAlarm(alarmID);
           return true;
@@ -131,6 +135,15 @@ void alarmTimerStart() {
   }
 }
 
+byte activeAlarm() {
+  for (int i = 0; i < NUM_ALARMS; i++) {
+    if (alarmOnGoing[i]) {
+      return (i);
+    }
+  }
+  return false;
+}
+
 bool ongoingAlarms() {
   return (alarmOnGoing[TEMPERATURE_ALARM] || alarmOnGoing[HUMIDITY_ALARM] || alarmOnGoing[AIR_THERMAL_CUTOUT_ALARM] || alarmOnGoing[SKIN_THERMAL_CUTOUT_ALARM] || alarmOnGoing[AIR_SENSOR_ISSUE_ALARM] || alarmOnGoing[SKIN_SENSOR_ISSUE_ALARM]);
 }
@@ -149,17 +162,26 @@ void setAlarm (byte alarmID) {
 void resetAlarm (byte alarmID) {
   logln("[ALARM] ->" + String (alarmIDtoString(alarmID)) + " has been disable");
   alarmOnGoing[alarmID] = false;
+  drawHeading();
   if (!ongoingAlarms()) {
     shutBuzzer();
-    drawAlarmMessage(ERASE, alarmIDtoString(alarmID));
+  }
+  else {
+    drawAlarmMessage(DRAW, alarmIDtoString(activeAlarm()));
   }
 }
 
 void disableAllAlarms() {
+  bool shutDownBuzzer = false;
   for (int i = 0; i < NUM_ALARMS; i++) {
+    if (millis() - lastAlarmTrigger[i] > millisToMin(ALARM_TIME_DELAY)) {
+      shutDownBuzzer = true;
+    }
     lastAlarmTrigger[i] = millis();
   }
-  shutBuzzer();
+  if (shutDownBuzzer) {
+    //shutBuzzer();
+  }
 }
 
 char* alarmIDtoString (byte alarmID) {

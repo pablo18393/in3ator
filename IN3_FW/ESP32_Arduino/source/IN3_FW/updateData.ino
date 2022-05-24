@@ -29,7 +29,7 @@ int updateData() {
       logln("[PID] -> Humidifier output is: " + String (100 * humidityControlPIDOutput / humidifierTimeCycle) + "%");
     }
 
-      logln("[PID] -> Desired temp is: " + String (desiredControlTemp) + "ºC");
+      logln("[PID] -> Desired temp is: " + String (desiredControlTemperature) + "ºC");
 
     //logln("[SENSORS] -> Current consumption is: " + String (analogRead(SYSTEM_SHUNT)) + "," + String (currentConsumption) + " Amps");
     logln("[SENSORS] -> System current consumption is: " + String (currentConsumption[MAIN_SHUNT], 1) + " Amps");
@@ -73,7 +73,7 @@ void updateDisplaySensors() {
       else {
         temperatureToUpdate = temperature[skinSensor];
       }
-      temperaturePercentage = 100 - ((desiredControlTemp - temperatureToUpdate) * 100 / (desiredControlTemp - temperatureAtStart));
+      temperaturePercentage = 100 - ((desiredControlTemperature - temperatureToUpdate) * 100 / (desiredControlTemperature - temperatureAtStart));
       if (temperaturePercentage > 99) {
         temperaturePercentage = 100;
       }
@@ -87,7 +87,7 @@ void updateDisplaySensors() {
       if (displayProcessPercentage) {
         drawRightNumber(humidityPercentage, tft.width() / 2, humidityY);
       }
-      humidityPercentage = 100 - ((desiredRoomHum - humidity) * 100 / (desiredRoomHum - humidityAtStart));
+      humidityPercentage = 100 - ((desiredControlHumidity - humidity) * 100 / (desiredControlHumidity - humidityAtStart));
       if (humidityPercentage > 99) {
         humidityPercentage = 100;
       }

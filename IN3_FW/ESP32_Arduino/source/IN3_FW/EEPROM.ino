@@ -10,7 +10,7 @@
 #define EEPROM_usedGenericMosfet 60
 #define EEPROM_controlMode 70
 #define EEPROM_desiredControlMode 80
-#define EEPROM_diffHumidity 90
+#define EEPROM_desiredControlHumidity 90
 #define EEPROM_RawSkinTemperatureLowCorrection 100
 #define EEPROM_RawSkinTemperatureRangeCorrection 110
 #define EEPROM_RawAirTemperatureLowCorrection 120
@@ -33,14 +33,14 @@ void initEEPROM() {
   if (EEPROM.read(EEPROM_checkStatus)) {
     EEPROM.write(EEPROM_checkStatus, 0);
     EEPROM.commit();
-    delay(30);
+    vTaskDelay(30);
     if (EEPROM.read(EEPROM_checkStatus) != 0) {
     }
   }
   else {
     EEPROM.write(EEPROM_checkStatus, 1);
     EEPROM.commit();
-    delay(30);
+    vTaskDelay(30);
     if (EEPROM.read(EEPROM_checkStatus) != 1) {
     }
   }
@@ -65,13 +65,14 @@ void loaddefaultValues() {
   language = defaultLanguage;
   controlAlgorithm = defaultcontrolAlgorithm;
   controlMode = defaultcontrolMode;
-  desiredControlTemp = presetTemp[controlMode];
+  desiredControlTemperature = presetTemp[controlMode];
+  desiredControlHumidity = presetHumidity;
   EEPROM.write(EEPROM_autoLock, autoLock);
   EEPROM.write(EEPROM_WIFI_EN, WIFI_EN);
   EEPROM.write(EEPROM_language, language);
   EEPROM.write(EEPROM_controlAlgorithm, controlAlgorithm);
   EEPROM.write(EEPROM_controlMode, controlMode);
-  EEPROM.write(EEPROM_desiredControlMode, desiredControlTemp);
+  EEPROM.write(EEPROM_desiredControlMode, desiredControlTemperature);
   EEPROM.commit();
 }
 
@@ -106,15 +107,12 @@ void recapVariables() {
       //critical error
     }
   }
-  diffHumidity = EEPROM.read(EEPROM_diffHumidity);
-  if (diffHumidity > 100) {
-    diffHumidity = false;
-  }
   serialNumber = EEPROM.read(EEPROM_SerialNumber);
   WIFI_EN = EEPROM.read(EEPROM_WIFI_EN);
   controlAlgorithm = EEPROM.read(EEPROM_controlAlgorithm);
   controlMode = EEPROM.read(EEPROM_controlMode);
-  desiredControlTemp = EEPROM.read(EEPROM_desiredControlMode);
+  desiredControlTemperature = EEPROM.read(EEPROM_desiredControlMode);
+  desiredControlHumidity = EEPROM.read(EEPROM_desiredControlHumidity);
 }
 
 
