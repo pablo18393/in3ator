@@ -308,11 +308,11 @@ bool userInterfaceHandler() {
               updateData();
               if (EncMove) {
                 setTextColor(COLOR_MENU);
-                drawRightNumber(serialNumber, 280, ypos);
+                drawRightNumber(serialNumber, unitPosition, ypos);
                 serialNumber -= EncMove;
                 EEPROM.write(EEPROM_SerialNumber, serialNumber);
                 setTextColor(COLOR_MENU_TEXT);
-                drawRightNumber(serialNumber, 280, ypos);
+                drawRightNumber(serialNumber, unitPosition, ypos);
               }
               EncMove = false;
             }

@@ -146,7 +146,7 @@ void graphics() {
               drawRightString(textToWrite, unitPosition, ypos, textFontSize);
               break;
             case serialNumberGraphicPosition:
-              drawRightNumber(serialNumber, 280, ypos);
+              drawRightNumber(serialNumber, unitPosition, ypos);
               break;
             case WifiENGraphicPosition:
               if (WIFI_EN) {
