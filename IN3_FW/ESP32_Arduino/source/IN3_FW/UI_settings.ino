@@ -1,4 +1,4 @@
-void settings() {
+void UI_settings() {
   byte numWords = 7;
   page = settingsPage;
   print_text = true;

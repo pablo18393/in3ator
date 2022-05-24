@@ -3,7 +3,7 @@
 */
 
 //Firmware version and head title of UI screen
-#define FWversion "v9.3/8.B"
+#define FWversion "v9.4/8.B"
 #define headingTitle "in3ator"
 
 #include <esp_task_wdt.h>
@@ -358,7 +358,7 @@ int hardwareComponents;
 
 void setup() {
   initHardware(false);
-  mainMenu();
+  UI_mainMenu();
 }
 
 void loop() {

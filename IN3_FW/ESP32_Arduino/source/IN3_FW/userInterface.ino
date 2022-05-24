@@ -58,7 +58,7 @@ bool userInterfaceHandler() {
             controlMode = !controlMode;
             EEPROM.write(EEPROM_controlMode, controlMode);
             EEPROM.commit();
-            mainMenu();
+            UI_mainMenu();
             break;
           case temperatureGraphicPosition:
             while (GPIORead(ENC_SWITCH)) {
@@ -152,10 +152,10 @@ bool userInterfaceHandler() {
             GPIOWrite(PHOTOTHERAPY, jaundiceEnable);
             break;
           case settingsGraphicPosition:
-            settings();
+            UI_settings();
             break;
           case startGraphicPosition:
-            actuatorsProgress();
+            UI_actuatorsProgress();
             break;
         }
         break;
@@ -282,7 +282,7 @@ bool userInterfaceHandler() {
             }
             EEPROM.write(EEPROM_language, language);
             EEPROM.commit();
-            settings();
+            UI_settings();
             break;
           case controlAlgorithmGraphicPosition:
             controlAlgorithm = !controlAlgorithm;
@@ -351,10 +351,10 @@ bool userInterfaceHandler() {
             else {
               wifiDisable();
             }
-            settings();
+            UI_settings();
             break;
           case calibrateGraphicPosition:
-            calibrateSensors();
+            UI_calibration();
             break;
         }
         break;
@@ -369,7 +369,7 @@ bool userInterfaceHandler() {
           case restartCalibrationGraphicPosition:
             loadDefaultCalibration();
             recapVariables();
-            calibrateSensors();
+            UI_calibration();
             break;
         }
         break;
@@ -428,7 +428,7 @@ bool userInterfaceHandler() {
             else {
               logln("[CALIBRATION] -> ERROR -> DIVIDE BY ZERO");
             }
-            settings();
+            UI_settings();
             break;
         }
         break;
@@ -455,7 +455,7 @@ bool checkEncoderPress() {
     while (!GPIORead(ENC_SWITCH)) {
       updateData();
       if (millis() - timePressed > timePressToSettings) {
-        settings();
+        UI_settings();
         return (true);
       }
     }
@@ -517,7 +517,7 @@ bool back_mode() {
       tft.drawLine(width_back - back_bar, 0, width_back - back_bar, height_heading, COLOR_MENU);
     }
     if (back_bar == width_back) {
-      mainMenu();
+      UI_mainMenu();
       return true;
     }
     vTaskDelay((time_back_draw + time_back_wait) / width_back);

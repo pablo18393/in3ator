@@ -368,11 +368,11 @@ void TFTRestore() {
   initializeTFT();
   switch (page) {
     case actuatorsProgressPage:
-      actuatorsProgress();
+      UI_actuatorsProgress();
       break;
     case mainMenuPage:
     default:
-      mainMenu();
+      UI_mainMenu();
       break;
   }
 }

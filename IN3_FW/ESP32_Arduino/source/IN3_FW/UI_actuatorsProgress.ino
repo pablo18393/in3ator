@@ -1,4 +1,4 @@
-void actuatorsProgress() {
+void UI_actuatorsProgress() {
   bool exitActuation = false;
   alarmTimerStart();
   if (page == errorPage) {

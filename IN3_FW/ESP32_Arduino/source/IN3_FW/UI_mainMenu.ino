@@ -1,5 +1,5 @@
 
-void mainMenu() {
+void UI_mainMenu() {
   page = mainMenuPage;
   byte numWords = 5;
   print_text = true;
