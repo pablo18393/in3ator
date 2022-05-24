@@ -1,4 +1,4 @@
-long millisToMins(long timeInMillis) {
+long minsToMillis(long timeInMillis) {
   return (timeInMillis * 60 * 1000);
 }
 

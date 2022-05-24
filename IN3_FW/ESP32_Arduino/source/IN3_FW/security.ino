@@ -39,7 +39,8 @@ long lastAlarmTrigger[NUM_ALARMS];
 float alarmSensedValue;
 
 void initAlarms() {
-  lastAlarmTrigger[AIR_THERMAL_CUTOUT_ALARM] =
+  lastAlarmTrigger[AIR_THERMAL_CUTOUT_ALARM] = -1 * minsToMillis(ALARM_TIME_DELAY);
+  lastAlarmTrigger[SKIN_THERMAL_CUTOUT_ALARM] = -1 * minsToMillis(ALARM_TIME_DELAY);
 }
 
 void securityCheck() {
@@ -98,7 +99,7 @@ void checkStatusOfSensor(byte sensor) {
 }
 
 bool evaluateAlarm(byte alarmID, float setPoint, float measuredValue, float errorMargin, float hysteresisValue, long alarmTime) {
-  if (millis() - alarmTime > millisToMin(ALARM_TIME_DELAY)) { // min to millis
+  if (millis() - alarmTime > minsToMillis(ALARM_TIME_DELAY)) { // min to millis
     if (errorMargin) {
       if ((abs(setPoint - measuredValue) + hysteresisValue) > errorMargin) {
         if (!alarmOnGoing[alarmID]) {
@@ -133,6 +134,8 @@ void alarmTimerStart() {
   for (int  i = 0; i < NUM_ALARMS; i++) {
     lastAlarmTrigger [i] = millis();
   }
+  lastAlarmTrigger[AIR_THERMAL_CUTOUT_ALARM] = -1 * minsToMillis(ALARM_TIME_DELAY);
+  lastAlarmTrigger[SKIN_THERMAL_CUTOUT_ALARM] = -1 * minsToMillis(ALARM_TIME_DELAY);
 }
 
 byte activeAlarm() {
@@ -174,7 +177,7 @@ void resetAlarm (byte alarmID) {
 void disableAllAlarms() {
   bool shutDownBuzzer = false;
   for (int i = 0; i < NUM_ALARMS; i++) {
-    if (millis() - lastAlarmTrigger[i] > millisToMin(ALARM_TIME_DELAY)) {
+    if (millis() - lastAlarmTrigger[i] > minsToMillis(ALARM_TIME_DELAY)) {
       shutDownBuzzer = true;
     }
     lastAlarmTrigger[i] = millis();

@@ -166,7 +166,7 @@ void autoCalibration() {
         }
         break;
     }
-    if (millis() - lastTemperatureMeasurement > millisToMin(timeBetweenMeasurements)) {
+    if (millis() - lastTemperatureMeasurement > minsToMillis(timeBetweenMeasurements)) {
       lastTemperatureMeasurement = millis();
       if (historyLengthPosition == historyLength) {
         historyLengthPosition = false;

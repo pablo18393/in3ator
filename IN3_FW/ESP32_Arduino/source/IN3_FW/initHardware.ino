@@ -98,6 +98,7 @@ void initHardware (bool printOutputTest) {
   }
   buzzerTone(2, buzzerStandbyToneDuration, buzzerStandbyTone);
   watchdogInit();
+  initAlarms();
 }
 
 void initGPIO() {
