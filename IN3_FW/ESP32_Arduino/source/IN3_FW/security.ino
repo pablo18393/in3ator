@@ -99,7 +99,7 @@ void checkStatusOfSensor(byte sensor) {
 }
 
 bool evaluateAlarm(byte alarmID, float setPoint, float measuredValue, float errorMargin, float hysteresisValue, long alarmTime) {
-  if (millis() - alarmTime > minsToMillis(ALARM_TIME_DELAY)) { // min to millis
+  if (millis() - alarmTime > minsToMillis(ALARM_TIME_DELAY) || alarmOnGoing[alarmID]) { // min to millis
     if (errorMargin) {
       if ((abs(setPoint - measuredValue) + hysteresisValue) > errorMargin) {
         if (!alarmOnGoing[alarmID]) {
@@ -175,15 +175,13 @@ void resetAlarm (byte alarmID) {
 }
 
 void disableAllAlarms() {
-  bool shutDownBuzzer = false;
   for (int i = 0; i < NUM_ALARMS; i++) {
-    if (millis() - lastAlarmTrigger[i] > minsToMillis(ALARM_TIME_DELAY)) {
-      shutDownBuzzer = true;
+    if (alarmOnGoing[i]) {
+      if (millis() - lastAlarmTrigger[i] > minsToMillis(ALARM_TIME_DELAY)) {
+        shutBuzzer();
+      }
+      lastAlarmTrigger[i] = millis();
     }
-    lastAlarmTrigger[i] = millis();
-  }
-  if (shutDownBuzzer) {
-    shutBuzzer();
   }
 }
 
