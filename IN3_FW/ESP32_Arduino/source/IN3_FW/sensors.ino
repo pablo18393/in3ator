@@ -143,13 +143,19 @@ float adcToCelsius(float adcReading, int maxAdcReading) {
   //Variables used in calculus
   float vm = 0.0;
   float rntc = 0.0;
-  vm = (vcc) * ( adcReading / maxAdcReading);          //Calcular tensión en la entrada
-  rntc = rAux / ((vcc / vm) - 1);                   //Calcular la resistencia de la NTC
+  if (maxAdcReading && adcReading && (adcReading != maxAdcReading)) {
+    vm = (vcc) * ( adcReading / maxAdcReading);          //Calcular tensión en la entrada
+    rntc = rAux / ((vcc / vm) - 1);                   //Calcular la resistencia de la NTC
+  }
+  else {
+    return false;
+  }
   return (beta / (log(rntc / r0) + (beta / temp0)) - 273); //Calcular la temperatura en Celsius
 }
 
 bool updateRoomSensor() {
   if (roomSensorPresent) {
+    noInterrupts();
     bool sensorState = mySHTC3.update();
     float sensedTemperature;
     logln("[SENSORS] -> Updating room humidity: state is " + String(sensorState));
@@ -171,6 +177,7 @@ bool updateRoomSensor() {
     else {
       initRoomSensor();
     }
+    interrupts();
   }
   else {
     initRoomSensor();

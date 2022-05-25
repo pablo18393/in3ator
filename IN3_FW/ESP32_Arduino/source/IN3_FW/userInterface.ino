@@ -30,14 +30,16 @@ bool userInterfaceHandler() {
   }
   if (!GPIORead(ENC_SWITCH)) {
     selected = ! selected;
-    if (selected) {
-      tft.fillRect(0, (tft.height() - height_heading) * (bar_pos - 1) / rectangles + height_heading, width_select, (tft.height() - height_heading) / rectangles, COLOR_CHOSEN);
-    }
-    else {
-      tft.fillRect(0, (tft.height() - height_heading) * (bar_pos - 1) / rectangles + height_heading, width_select, (tft.height() - height_heading) / rectangles, WHITE);
-    }
-    for (int i = 2; i <= rectangles; i++) {
-      tft.fillRect(0, (tft.height() - height_heading) * (i - 1) / rectangles + height_heading - 1, tft.height(), width_indentation, WHITE); //mejorable
+    if (rectangles) {
+      if (selected) {
+        tft.fillRect(0, (tft.height() - height_heading) * (bar_pos - 1) / rectangles + height_heading, width_select, (tft.height() - height_heading) / rectangles, COLOR_CHOSEN);
+      }
+      else {
+        tft.fillRect(0, (tft.height() - height_heading) * (bar_pos - 1) / rectangles + height_heading, width_select, (tft.height() - height_heading) / rectangles, WHITE);
+      }
+      for (int i = 2; i <= rectangles; i++) {
+        tft.fillRect(0, (tft.height() - height_heading) * (i - 1) / rectangles + height_heading - 1, tft.height(), width_indentation, WHITE); //mejorable
+      }
     }
     while (!GPIORead(ENC_SWITCH)) {
       updateData();
@@ -465,7 +467,9 @@ bool userInterfaceHandler() {
         break;
     }
     selected = false;
-    tft.fillRect(0, (tft.height() - height_heading) * (bar_pos - 1) / rectangles + height_heading, width_select, (tft.height() - height_heading) / rectangles, WHITE);
+    if (rectangles) {
+      tft.fillRect(0, (tft.height() - height_heading) * (bar_pos - 1) / rectangles + height_heading, width_select, (tft.height() - height_heading) / rectangles, WHITE);
+    }
     while (!GPIORead(ENC_SWITCH)) {
       updateData();
       checkEncoderPress();
@@ -493,7 +497,10 @@ bool checkEncoderPress() {
 }
 
 int getYpos(byte row) {
+  if(rectangles){
   return ((tft.height() - height_heading) / (2 * rectangles) + (row - 1) * (tft.height() - height_heading) / (rectangles) + letter_height);
+  }
+  return false;
 }
 
 void checkSetMessage() {

@@ -29,6 +29,7 @@
 #include <SparkFun_ADS122C04_ADC_Arduino_Library.h> // Click here to get the library: http://librarymanager/All#SparkFun_ADS122C0
 
 
+TwoWire *wire;
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 SHTC3 mySHTC3;              // Declare an instance of the SHTC3 class
 RotaryEncoder encoder(ENC_A, ENC_B, RotaryEncoder::LatchMode::TWO03);
@@ -59,9 +60,7 @@ int serialNumber = 45;
 #define buzzerStandbyToneDuration 50 //in micros, tone freq
 #define buzzerSwitchDuration 10 //in micros, tone freq
 #define buzzerStandbyToneTimes 1 //in micros, tone freq
-int buzzerBeeps, buzzerToneTime;
-long buzzerTime;
-bool buzzerBuzzing;
+
 
 //configuration variables
 #define debounceTime 10         //encoder debouncing time

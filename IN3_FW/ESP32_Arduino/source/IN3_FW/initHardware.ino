@@ -52,6 +52,8 @@
 #define DEFECTIVE_BUZZER 1<<18
 #define DEFECTIVE_CURRENT_SENSOR 1<<19
 
+#define I2C_CLK_SPEED 50 //50k
+
 #define TFTCheckPeriod 10000
 long HW_error = false;
 long lastTFTCheck;
@@ -154,11 +156,13 @@ bool ADCConversionReady () {
 
 void initI2CBus() {
   Wire.begin();
+  wire = &Wire;
+  wire->setClock(I2C_CLK_SPEED * 1000UL);
 }
 
 void initCurrentSensor() {
-  Wire.beginTransmission(digitalCurrentSensor_i2c_address);
-  digitalCurrentSensorPresent = !(Wire.endTransmission());
+  wire->beginTransmission(digitalCurrentSensor_i2c_address);
+  digitalCurrentSensorPresent = !(wire->endTransmission());
   if (digitalCurrentSensorPresent) {
     PAC.begin();
     PAC.setSampleRate(1024);
@@ -169,8 +173,8 @@ void initCurrentSensor() {
 
 void initExternalADC() {
   long conversionTime;
-  Wire.beginTransmission(digitalCurrentSensor_i2c_address);
-  externalADCpresent = !(Wire.endTransmission());
+  wire->beginTransmission(digitalCurrentSensor_i2c_address);
+  externalADCpresent = !(wire->endTransmission());
   if (externalADCpresent) {
     logln("[HW] -> external ADC detected");
     mySensor.begin(externalADC_i2c_address);
@@ -289,8 +293,8 @@ void initSensors() {
 
 void initRoomSensor() {
   logln("[HW] -> Detecting room sensor...");
-  Wire.beginTransmission(roomSensorAddress);
-  roomSensorPresent = !(Wire.endTransmission());
+  wire->beginTransmission(roomSensorAddress);
+  roomSensorPresent = !(wire->endTransmission());
   if (roomSensorPresent == true) {
     logln("[HW] -> Room sensor succesfully found, initializing...");
     mySHTC3.begin(Wire);
@@ -330,7 +334,9 @@ void initTFT() {
   float testCurrent, offsetCurrent;
   int  timeOut = 4000;
   long processTime;
-  backlightPower = PWM_MAX_VALUE / screenBrightnessFactor;
+  if (screenBrightnessFactor) {
+    backlightPower = PWM_MAX_VALUE / screenBrightnessFactor;
+  }
   backlightPowerSafe = PWM_MAX_VALUE * backlightPowerSafePercentage;
   offsetCurrent = measureMeanConsumption(MAIN_SHUNT, defaultTestingSamples);
   GPIOWrite(TFT_CS, LOW);
@@ -339,8 +345,10 @@ void initTFT() {
   processTime = millis();
   for (int i = PWM_MAX_VALUE; i >= backlightPower; i--) {
     ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, i);
-    while (millis() - processTime < i / brightenRate) {
-      sensorsHandler();
+    if (brightenRate) {
+      while (millis() - processTime < i / brightenRate) {
+        sensorsHandler();
+      }
     }
     processTime = millis();
   }

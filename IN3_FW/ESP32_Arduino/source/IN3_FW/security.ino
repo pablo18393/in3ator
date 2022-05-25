@@ -183,7 +183,7 @@ void disableAllAlarms() {
     lastAlarmTrigger[i] = millis();
   }
   if (shutDownBuzzer) {
-    //shutBuzzer();
+    shutBuzzer();
   }
 }
 

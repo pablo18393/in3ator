@@ -7,11 +7,6 @@ void encoderISR() {
     EncMove = EncMoveOrientation * int(encoder.getDirection());
     lastEncMove = newPos;
   }
-  if (EncMove) {
-    if (ongoingAlarms()) {
-      disableAllAlarms();
-    }
-  }
 }
 
 void encSwitchHandler() {

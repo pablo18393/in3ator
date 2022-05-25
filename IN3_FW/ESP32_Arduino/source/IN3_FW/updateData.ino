@@ -9,7 +9,7 @@ int updateData() {
   sensorsHandler();
   GPRS_Handler();
   encSwitchHandler();
-  if (!autoCalibrationPage) {
+  if (page != autoCalibrationPage) {
     securityCheck();
   }
   if (powerAlert) {
@@ -39,7 +39,9 @@ int updateData() {
     logln("[SENSORS] -> Baby temperature: " + String(temperature[skinSensor]) + "ºC, correction error is " + String(errorTemperature[skinSensor]));
     logln("[SENSORS] -> Air temperature: " + String(temperature[airSensor]) + "ºC, correction error is " + String(errorTemperature[airSensor]));
     logln("[SENSORS] -> Humidity: " + String(humidity) + "%");
-    logln("[LATENCY] -> Looped " + String(loopCounts * 1000 / (millis() - lastDebugUpdate)) + " Times per second");
+    if (millis() - lastDebugUpdate) {
+      logln("[LATENCY] -> Looped " + String(loopCounts * 1000 / (millis() - lastDebugUpdate)) + " Times per second");
+    }
     loopCounts = 0;
     lastDebugUpdate = millis();
   }
@@ -75,7 +77,9 @@ void updateDisplaySensors() {
       else {
         temperatureToUpdate = temperature[skinSensor];
       }
-      temperaturePercentage = 100 - ((desiredControlTemperature - temperatureToUpdate) * 100 / (desiredControlTemperature - temperatureAtStart));
+      if ((desiredControlTemperature - temperatureAtStart)) {
+        temperaturePercentage = 100 - ((desiredControlTemperature - temperatureToUpdate) * 100 / (desiredControlTemperature - temperatureAtStart));
+      }
       if (temperaturePercentage > 99) {
         temperaturePercentage = 100;
       }
@@ -89,7 +93,9 @@ void updateDisplaySensors() {
       if (displayProcessPercentage) {
         drawRightNumber(humidityPercentage, tft.width() / 2, humidityY);
       }
-      humidityPercentage = 100 - ((desiredControlHumidity - humidity) * 100 / (desiredControlHumidity - humidityAtStart));
+      if ((desiredControlHumidity - humidityAtStart)) {
+        humidityPercentage = 100 - ((desiredControlHumidity - humidity) * 100 / (desiredControlHumidity - humidityAtStart));
+      }
       if (humidityPercentage > 99) {
         humidityPercentage = 100;
       }

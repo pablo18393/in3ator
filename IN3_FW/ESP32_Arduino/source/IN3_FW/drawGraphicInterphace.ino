@@ -7,11 +7,15 @@ void graphics() {
     tft.fillRect(0, height_heading, tft.width(), tft.height() - height_heading, COLOR_MENU);
   }
   if (print_text) {
-    tft.fillRect(0, height_heading, width_select, (tft.height() - height_heading) / rectangles, COLOR_SELECTED);
+    if (rectangles) {
+      tft.fillRect(0, height_heading, width_select, (tft.height() - height_heading) / rectangles, COLOR_SELECTED);
+    }
   }
   for (int i = 2; i <= rectangles; i++) {
-    tft.fillRect(0, (tft.height() - height_heading) * (i - 1) / rectangles + height_heading, width_select, (tft.height() - height_heading) / rectangles, COLOR_BAR);
-    tft.fillRect(0, (tft.height() - height_heading) * (i - 1) / rectangles + height_heading - 1, tft.width(), width_indentation, WHITE);
+    if (rectangles) {
+      tft.fillRect(0, (tft.height() - height_heading) * (i - 1) / rectangles + height_heading, width_select, (tft.height() - height_heading) / rectangles, COLOR_BAR);
+      tft.fillRect(0, (tft.height() - height_heading) * (i - 1) / rectangles + height_heading - 1, tft.width(), width_indentation, WHITE);
+    }
   }
   tft.drawRect(0, tft.height() - 1, width_select, tft.height() - 1, COLOR_MENU);
   if (print_text) {
@@ -200,13 +204,17 @@ void drawHeading() {
 }
 
 void eraseBar() {
-  tft.fillRect(0, (tft.height() - height_heading) * (bar_pos - 1) / rectangles + height_heading, width_select, (tft.height() - height_heading) / rectangles, COLOR_BAR);
+  if (rectangles) {
+    tft.fillRect(0, (tft.height() - height_heading) * (bar_pos - 1) / rectangles + height_heading, width_select, (tft.height() - height_heading) / rectangles, COLOR_BAR);
+  }
 }
 
 void updateBar() {
-  tft.fillRect(0, (tft.height() - height_heading) * (bar_pos - 1) / rectangles + height_heading, width_select, (tft.height() - height_heading) / rectangles, COLOR_SELECTED);
-  for (int i = 2; i <= rectangles; i++) {
-    tft.fillRect(0, (tft.height() - height_heading) * (i - 1) / rectangles + height_heading - 1, tft.height(), width_indentation, WHITE); //mejorable
+  if (rectangles) {
+    tft.fillRect(0, (tft.height() - height_heading) * (bar_pos - 1) / rectangles + height_heading, width_select, (tft.height() - height_heading) / rectangles, COLOR_SELECTED);
+    for (int i = 2; i <= rectangles; i++) {
+      tft.fillRect(0, (tft.height() - height_heading) * (i - 1) / rectangles + height_heading - 1, tft.height(), width_indentation, WHITE); //mejorable
+    }
   }
 }
 
@@ -383,7 +391,9 @@ void drawStop() {
 }
 
 int graphicHeight(int position) {
+  if(rectangles){
   return ((tft.height() - height_heading) / (2 * rectangles) + position * (tft.height() - height_heading) / (rectangles) + letter_height);
+  }
 }
 
 void drawSelectedTemperature() {
