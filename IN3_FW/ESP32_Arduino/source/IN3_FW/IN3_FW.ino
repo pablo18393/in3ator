@@ -3,7 +3,7 @@
 */
 
 //Firmware version and head title of UI screen
-#define FWversion "v9.4/8.B"
+#define FWversion "v9.5/8.B"
 #define headingTitle "in3ator"
 
 #include <esp_task_wdt.h>
@@ -82,7 +82,7 @@ int page;
 #define firstPointCalibrationPage 6
 #define secondPointCalibrationPage 7
 #define autoCalibrationPage 8
-
+#define fineTuneCalibrationPage 9
 //languages numbers that will be called in language variable
 byte language;
 #define spanish 0
@@ -113,6 +113,7 @@ double temperature[numSensors];
 double errorTemperature[numSensors], temperatureCalibrationPoint;
 double ReferenceTemperatureRange, ReferenceTemperatureLow;
 double provisionalReferenceTemperatureLow;
+double fineTuneSkinTemperature;
 double RawTemperatureLow[numSensors], RawTemperatureRange[numSensors];
 double provisionalRawTemperatureLow[numSensors];
 double temperatureMaxReset = -1000;
@@ -314,9 +315,10 @@ byte goToProcessRow;
 #define calibrateGraphicPosition 5
 #define setdefaultValuesGraphicPosition 6
 //calibration menu
-#define twoPointCalibrationGraphicPosition 0
-#define autoCalibrationGraphicPosition 1
-#define restartCalibrationGraphicPosition 2
+#define autoCalibrationGraphicPosition 0
+#define fineTuneCalibrationGraphicPosition 1
+#define twoPointCalibrationGraphicPosition 2
+#define restartCalibrationGraphicPosition 3
 
 //2p calibration
 #define temperatureCalibrationGraphicPosition 0

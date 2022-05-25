@@ -20,6 +20,7 @@
 #define EEPROM_controlAlgorithm 160
 #define EEPROM_ReferenceTemperatureRange 170
 #define EEPROM_ReferenceTemperatureLow 180
+#define EEPROM_FineTuneSkinTemperature 190
 
 
 
@@ -77,14 +78,15 @@ void loaddefaultValues() {
 }
 
 void loadDefaultCalibration() {
-  EEPROM.writeFloat(EEPROM_RawSkinTemperatureLowCorrection, 22.52);
-  EEPROM.writeFloat(EEPROM_RawSkinTemperatureRangeCorrection, 11.70);
+  EEPROM.writeFloat(EEPROM_RawSkinTemperatureLowCorrection, 25.54);
+  EEPROM.writeFloat(EEPROM_RawSkinTemperatureRangeCorrection, 14.28);
   EEPROM.writeFloat(EEPROM_RawAirTemperatureLowCorrection, 0);
   EEPROM.writeFloat(EEPROM_RawAirTemperatureRangeCorrection, 0);
   EEPROM.writeFloat(EEPROM_RawDigitalTemperatureLowCorrection, 0);
   EEPROM.writeFloat(EEPROM_RawDigitalTemperatureRangeCorrection, 0);
-  EEPROM.writeFloat(EEPROM_ReferenceTemperatureRange, 10.57);
-  EEPROM.writeFloat(EEPROM_ReferenceTemperatureLow, 21.29);
+  EEPROM.writeFloat(EEPROM_ReferenceTemperatureRange, 14.03);
+  EEPROM.writeFloat(EEPROM_ReferenceTemperatureLow, 21.15);
+  EEPROM.writeFloat(EEPROM_FineTuneSkinTemperature, 0);
   EEPROM.commit();
 }
 
@@ -97,6 +99,7 @@ void recapVariables() {
   RawTemperatureRange[airSensor] = EEPROM.readFloat(EEPROM_RawDigitalTemperatureRangeCorrection);
   ReferenceTemperatureRange = EEPROM.readFloat(EEPROM_ReferenceTemperatureRange);
   ReferenceTemperatureLow = EEPROM.readFloat(EEPROM_ReferenceTemperatureLow);
+  fineTuneSkinTemperature = EEPROM.readFloat(EEPROM_FineTuneSkinTemperature);
 
   for (int i = 0; i < numSensors; i++) {
     logln("calibration factors: " + String(RawTemperatureLow [i]) + "," + String (RawTemperatureRange [i]) + "," + String (ReferenceTemperatureRange) + "," + String (ReferenceTemperatureLow));
@@ -123,6 +126,7 @@ void saveCalibrationToEEPROM() {
   EEPROM.writeFloat(EEPROM_RawDigitalTemperatureRangeCorrection, RawTemperatureRange[airSensor]);
   EEPROM.writeFloat(EEPROM_ReferenceTemperatureRange, ReferenceTemperatureRange);
   EEPROM.writeFloat(EEPROM_ReferenceTemperatureLow, ReferenceTemperatureLow);
+  EEPROM.writeFloat(EEPROM_FineTuneSkinTemperature, fineTuneSkinTemperature);
   EEPROM.commit();
 }
 

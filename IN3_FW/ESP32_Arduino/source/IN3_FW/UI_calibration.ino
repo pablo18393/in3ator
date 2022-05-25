@@ -1,6 +1,6 @@
 
 void UI_calibration() {
-  byte numWords = 3;
+  byte numWords = 4;
   page = calibrateSensorsPage;
   print_text = true;
   tft.setTextSize(1);
@@ -11,21 +11,25 @@ void UI_calibration() {
   switch (language) {
     case english:
       words[twoPointCalibrationGraphicPosition]  = "2-p calibration";
+      words[fineTuneCalibrationGraphicPosition]  = "fine tune";
       words[autoCalibrationGraphicPosition]  = "auto calibration";
       words[restartCalibrationGraphicPosition] = "Reset values";
       break;
     case spanish:
       words[twoPointCalibrationGraphicPosition]  = "2-p calibracion";
+      words[fineTuneCalibrationGraphicPosition]  = "ajuste fino";
       words[autoCalibrationGraphicPosition]  = "auto calibracion";
       words[restartCalibrationGraphicPosition] = "Reiniciar valores";
       break;
     case french:
       words[twoPointCalibrationGraphicPosition]  = "2-p calibrage";
+      words[fineTuneCalibrationGraphicPosition]  = "affiner";
       words[autoCalibrationGraphicPosition]  = "calibrage auto";
       words[restartCalibrationGraphicPosition] = "Reinitialiser valeurs";
       break;
     case portuguese:
       words[twoPointCalibrationGraphicPosition]  = "2-p calibracao";
+      words[fineTuneCalibrationGraphicPosition]  = "sintonia fina";
       words[autoCalibrationGraphicPosition]  = "calibracao auto";
       words[restartCalibrationGraphicPosition] = "Redefinir valores";
       break;

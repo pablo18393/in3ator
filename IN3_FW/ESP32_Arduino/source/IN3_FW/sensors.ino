@@ -112,6 +112,7 @@ bool measureNTCTemperature() {
         errorTemperature[skinSensor] = temperature[skinSensor];
         if (RawTemperatureRange[skinSensor]) {
           temperature[skinSensor] = (((temperature[skinSensor] - RawTemperatureLow[skinSensor]) * ReferenceTemperatureRange) / RawTemperatureRange[skinSensor]) + ReferenceTemperatureLow;
+          temperature[skinSensor] += fineTuneSkinTemperature;
         }
         errorTemperature[skinSensor] -= temperature[skinSensor];
         if (temperature[skinSensor] < 0) {

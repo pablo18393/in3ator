@@ -1,82 +1,4 @@
 
-void firstPointCalibration() {
-  byte numWords = 2;
-  page = firstPointCalibrationPage;
-  print_text = true;
-  tft.setTextSize(1);
-  setTextColor(COLOR_MENU_TEXT);
-  for (int i = false; i < numWords; i++) {
-    pos_text[i] = LEFT_MARGIN;
-  }
-  pos_text[setCalibrationGraphicPosition] = CENTER;
-  switch (language) {
-    case english:
-      words[temperatureCalibrationGraphicPosition]  = "First point";
-      words[setCalibrationGraphicPosition]  = "SET";
-      break;
-    case spanish:
-      words[temperatureCalibrationGraphicPosition]  = "First point";
-      words[setCalibrationGraphicPosition]  = "SET";
-      break;
-    case french:
-      words[temperatureCalibrationGraphicPosition]  = "First point";
-      words[setCalibrationGraphicPosition]  = "SET";
-      break;
-    case portuguese:
-      words[temperatureCalibrationGraphicPosition]  = "First point";
-      words[setCalibrationGraphicPosition]  = "SET";
-      break;
-  }
-  rectangles = numWords;
-  graphics();
-  drawHeading();
-  bar_pos = true;
-  ypos = graphicHeight(bar_pos - 1);
-  while (!GPIORead(ENC_SWITCH)) {
-    updateData();
-  }
-  vTaskDelay(debounceTime);
-}
-
-void secondPointCalibration() {
-  byte numWords = 2;
-  page = secondPointCalibrationPage;
-  print_text = true;
-  tft.setTextSize(1);
-  setTextColor(COLOR_MENU_TEXT);
-  for (int i = false; i < numWords; i++) {
-    pos_text[i] = LEFT_MARGIN;
-  }
-  pos_text[setCalibrationGraphicPosition] = CENTER;
-  switch (language) {
-    case english:
-      words[temperatureCalibrationGraphicPosition]  = "Second point";
-      words[setCalibrationGraphicPosition]  = "SET";
-      break;
-    case spanish:
-      words[temperatureCalibrationGraphicPosition]  = "Second point";
-      words[setCalibrationGraphicPosition]  = "SET";
-      break;
-    case french:
-      words[temperatureCalibrationGraphicPosition]  = "Second point";
-      words[setCalibrationGraphicPosition]  = "SET";
-      break;
-    case portuguese:
-      words[temperatureCalibrationGraphicPosition]  = "Second point";
-      words[setCalibrationGraphicPosition]  = "SET";
-      break;
-  }
-  rectangles = numWords;
-  graphics();
-  drawHeading();
-  bar_pos = true;
-  ypos = graphicHeight(bar_pos - 1);
-  while (!GPIORead(ENC_SWITCH)) {
-    updateData();
-  }
-  vTaskDelay(debounceTime);
-}
-
 void autoCalibration() {
   bool exitCalibrationMenu = false;
   byte numWords = 1;
@@ -182,6 +104,110 @@ void autoCalibration() {
     }
   }
   UI_mainMenu();
+}
+
+void fineTuneCalibration() {
+  byte numWords = 2;
+  fineTuneSkinTemperature= false;
+  page = fineTuneCalibrationPage;
+  print_text = true;
+  tft.setTextSize(1);
+  setTextColor(COLOR_MENU_TEXT);
+  for (int i = false; i < numWords; i++) {
+    pos_text[i] = LEFT_MARGIN;
+  }
+  pos_text[setCalibrationGraphicPosition] = CENTER;
+  words[temperatureCalibrationGraphicPosition]  = "Temperature adjust";
+  words[setCalibrationGraphicPosition]  = "SET";
+  rectangles = numWords;
+  graphics();
+  drawHeading();
+  bar_pos = true;
+  ypos = graphicHeight(bar_pos - 1);
+  setTextColor(COLOR_MENU);
+  drawFloat(temperature[skinSensor], 1, valuePosition, ypos, textFontSize);
+  while (!GPIORead(ENC_SWITCH)) {
+    updateData();
+  }
+  vTaskDelay(debounceTime);
+}
+
+void firstPointCalibration() {
+  byte numWords = 2;
+  page = firstPointCalibrationPage;
+  print_text = true;
+  tft.setTextSize(1);
+  setTextColor(COLOR_MENU_TEXT);
+  for (int i = false; i < numWords; i++) {
+    pos_text[i] = LEFT_MARGIN;
+  }
+  pos_text[setCalibrationGraphicPosition] = CENTER;
+  switch (language) {
+    case english:
+      words[temperatureCalibrationGraphicPosition]  = "First point";
+      words[setCalibrationGraphicPosition]  = "SET";
+      break;
+    case spanish:
+      words[temperatureCalibrationGraphicPosition]  = "First point";
+      words[setCalibrationGraphicPosition]  = "SET";
+      break;
+    case french:
+      words[temperatureCalibrationGraphicPosition]  = "First point";
+      words[setCalibrationGraphicPosition]  = "SET";
+      break;
+    case portuguese:
+      words[temperatureCalibrationGraphicPosition]  = "First point";
+      words[setCalibrationGraphicPosition]  = "SET";
+      break;
+  }
+  rectangles = numWords;
+  graphics();
+  drawHeading();
+  bar_pos = true;
+  ypos = graphicHeight(bar_pos - 1);
+  while (!GPIORead(ENC_SWITCH)) {
+    updateData();
+  }
+  vTaskDelay(debounceTime);
+}
+
+void secondPointCalibration() {
+  byte numWords = 2;
+  page = secondPointCalibrationPage;
+  print_text = true;
+  tft.setTextSize(1);
+  setTextColor(COLOR_MENU_TEXT);
+  for (int i = false; i < numWords; i++) {
+    pos_text[i] = LEFT_MARGIN;
+  }
+  pos_text[setCalibrationGraphicPosition] = CENTER;
+  switch (language) {
+    case english:
+      words[temperatureCalibrationGraphicPosition]  = "Second point";
+      words[setCalibrationGraphicPosition]  = "SET";
+      break;
+    case spanish:
+      words[temperatureCalibrationGraphicPosition]  = "Second point";
+      words[setCalibrationGraphicPosition]  = "SET";
+      break;
+    case french:
+      words[temperatureCalibrationGraphicPosition]  = "Second point";
+      words[setCalibrationGraphicPosition]  = "SET";
+      break;
+    case portuguese:
+      words[temperatureCalibrationGraphicPosition]  = "Second point";
+      words[setCalibrationGraphicPosition]  = "SET";
+      break;
+  }
+  rectangles = numWords;
+  graphics();
+  drawHeading();
+  bar_pos = true;
+  ypos = graphicHeight(bar_pos - 1);
+  while (!GPIORead(ENC_SWITCH)) {
+    updateData();
+  }
+  vTaskDelay(debounceTime);
 }
 
 bool checkStableTemperatures(double *referenceSensorHistory, double *sensorToCalibrateHistory, int historyLength, double stabilityError) {

@@ -363,6 +363,9 @@ bool userInterfaceHandler() {
           case twoPointCalibrationGraphicPosition:
             firstPointCalibration();
             break;
+          case fineTuneCalibrationGraphicPosition:
+            fineTuneCalibration();
+            break;
           case autoCalibrationGraphicPosition:
             autoCalibration();
             break;
@@ -370,6 +373,32 @@ bool userInterfaceHandler() {
             loadDefaultCalibration();
             recapVariables();
             UI_calibration();
+            break;
+        }
+        break;
+      case fineTuneCalibrationPage:
+        switch (bar_pos - graphicTextOffset ) {
+          case temperatureCalibrationGraphicPosition:
+            errorTemperature[skinSensor] = false;
+            diffTemperature = temperature[skinSensor];
+            while (GPIORead(ENC_SWITCH)) {
+              updateData();
+              if (EncMove) {
+                setTextColor(COLOR_MENU);
+                drawFloat(diffTemperature, 1, valuePosition, ypos, textFontSize);
+                setTextColor(COLOR_MENU_TEXT);
+                diffTemperature += EncMove * (0.1);
+                drawFloat(diffTemperature, 1, valuePosition, ypos, textFontSize);
+                EncMove = false;
+              }
+            }
+            break;
+          case setCalibrationGraphicPosition:
+            fineTuneSkinTemperature = diffTemperature - temperature[skinSensor];
+            logln("[CALIBRATION] -> Fine tune value is " + String(fineTuneSkinTemperature));
+            EEPROM.writeFloat(EEPROM_FineTuneSkinTemperature, fineTuneSkinTemperature);
+            EEPROM.commit();
+            UI_mainMenu();
             break;
         }
         break;
