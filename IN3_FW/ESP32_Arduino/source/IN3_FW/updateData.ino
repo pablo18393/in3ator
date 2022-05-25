@@ -9,7 +9,9 @@ int updateData() {
   sensorsHandler();
   GPRS_Handler();
   encSwitchHandler();
-  securityCheck();
+  if (!autoCalibrationPage) {
+    securityCheck();
+  }
   if (powerAlert) {
     logln("[ALARM] -> maximum power exceeded");
     powerAlert = false;
@@ -29,7 +31,7 @@ int updateData() {
       logln("[PID] -> Humidifier output is: " + String (100 * humidityControlPIDOutput / humidifierTimeCycle) + "%");
     }
 
-      logln("[PID] -> Desired temp is: " + String (desiredControlTemperature) + "ºC");
+    logln("[PID] -> Desired temp is: " + String (desiredControlTemperature) + "ºC");
 
     //logln("[SENSORS] -> Current consumption is: " + String (analogRead(SYSTEM_SHUNT)) + "," + String (currentConsumption) + " Amps");
     logln("[SENSORS] -> System current consumption is: " + String (currentConsumption[MAIN_SHUNT], 1) + " Amps");
