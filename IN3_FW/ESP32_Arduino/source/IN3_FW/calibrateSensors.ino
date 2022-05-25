@@ -108,7 +108,7 @@ void autoCalibration() {
 
 void fineTuneCalibration() {
   byte numWords = 2;
-  fineTuneSkinTemperature= false;
+  fineTuneSkinTemperature = false;
   page = fineTuneCalibrationPage;
   print_text = true;
   tft.setTextSize(1);
@@ -124,7 +124,7 @@ void fineTuneCalibration() {
   drawHeading();
   bar_pos = true;
   ypos = graphicHeight(bar_pos - 1);
-  setTextColor(COLOR_MENU);
+  setTextColor(COLOR_MENU_TEXT);
   drawFloat(temperature[skinSensor], 1, valuePosition, ypos, textFontSize);
   while (!GPIORead(ENC_SWITCH)) {
     updateData();
@@ -165,6 +165,8 @@ void firstPointCalibration() {
   drawHeading();
   bar_pos = true;
   ypos = graphicHeight(bar_pos - 1);
+  setTextColor(COLOR_MENU_TEXT);
+  drawFloat(temperature[skinSensor], 1, valuePosition, ypos, textFontSize);
   while (!GPIORead(ENC_SWITCH)) {
     updateData();
   }
@@ -204,6 +206,8 @@ void secondPointCalibration() {
   drawHeading();
   bar_pos = true;
   ypos = graphicHeight(bar_pos - 1);
+  setTextColor(COLOR_MENU_TEXT);
+  drawFloat(temperature[skinSensor], 1, valuePosition, ypos, textFontSize);
   while (!GPIORead(ENC_SWITCH)) {
     updateData();
   }
