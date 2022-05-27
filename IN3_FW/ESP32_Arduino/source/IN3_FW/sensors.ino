@@ -156,10 +156,10 @@ float adcToCelsius(float adcReading, int maxAdcReading) {
 bool updateRoomSensor() {
   if (roomSensorPresent) {
     noInterrupts();
-    bool sensorState = mySHTC3.update();
+    SHTC3_Status_TypeDef result = mySHTC3.update();
     float sensedTemperature;
-    logln("[SENSORS] -> Updating room humidity: state is " + String(sensorState));
-    if (!sensorState) {
+    logln("[SENSORS] -> Updating room humidity: state is " + String(result));
+    if (mySHTC3.lastStatus == SHTC3_Status_Nominal) {
       sensedTemperature = mySHTC3.toDegC();
       if (sensedTemperature > minTempToDiscard && sensedTemperature < maxTempToDiscard) {
         lastSuccesfullSensorUpdate[airSensor] = millis();

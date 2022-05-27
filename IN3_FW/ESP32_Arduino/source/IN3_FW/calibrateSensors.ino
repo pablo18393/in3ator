@@ -1,3 +1,4 @@
+#define AUTO_CALIBRATION_RELATIVE_TEMP 10 //calibrating to instant temperature plus 10 degrees, to avoid overheat
 
 void autoCalibration() {
   bool exitCalibrationMenu = false;
@@ -62,7 +63,7 @@ void autoCalibration() {
             exitCalibrationMenu = back_mode();
           }
           vTaskDelay(debounceTime);
-          desiredControlTemperature = 36;
+          desiredControlTemperature = temperature[airSensor] + AUTO_CALIBRATION_RELATIVE_TEMP;
           startPID(airPID);
           //ledcWrite(HEATER_PWM_CHANNEL, HEATER_HALF_PWR * ongoingCriticalAlarm());
           autoCalibrationProcess = secondAutoCalibrationPoint;
