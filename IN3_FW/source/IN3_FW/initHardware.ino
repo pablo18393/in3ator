@@ -79,6 +79,7 @@ void initHardware (bool printOutputTest) {
   initBuzzer();
   initInterrupts();
   initActuators();
+  PINInit();
   initGPRS();
   if (WIFI_EN) {
     wifiInit();

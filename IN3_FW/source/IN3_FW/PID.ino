@@ -15,6 +15,12 @@ PID airControlPID(&airControlPIDInput, &HeaterPIDOutput, &desiredControlTemperat
 PID skinControlPID(&skinControlPIDInput, &HeaterPIDOutput, &desiredControlTemperature, Kp[skinPID], Ki[skinPID], Kd[skinPID], P_ON_E, DIRECT);
 PID humidityControlPID(&humidity, &humidityControlPIDOutput, &desiredControlHumidity, Kp[humidityPID], Ki[humidityPID], Kd[humidityPID], P_ON_E, DIRECT);
 
+void PINInit() {
+  airControlPID.SetMode(MANUAL);
+  skinControlPID.SetMode(MANUAL);
+  humidityControlPID.SetMode(MANUAL);
+}
+
 void PIDHandler() {
   if (airControlPID.GetMode() == AUTOMATIC) {
     airControlPIDInput = temperature[airSensor];

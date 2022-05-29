@@ -12,15 +12,16 @@ void encoderISR() {
 void encSwitchHandler() {
   if (!digitalRead(ENC_SWITCH)) {
     if (millis() - lastEncPulse > encPulseDebounce) {
-      //statusEncSwitch = !statusEncSwitch;
-      //if (statusEncSwitch) {
-      encPulseDetected = true;
-      buzzerTone(buzzerStandbyToneTimes, buzzerSwitchDuration, buzzerRotaryEncoderTone);
-      lastbacklightHandler = millis();
+      if (!encPulseDetected) {
+        buzzerTone(buzzerStandbyToneTimes, buzzerSwitchDuration, buzzerRotaryEncoderTone);
+      }
       if (ongoingAlarms()) {
         disableAllAlarms();
       }
+      encPulseDetected = true;
+      logln("[ENCODER] -> Pushed");
     }
     lastEncPulse = millis();
+    lastbacklightHandler = millis();
   }
 }

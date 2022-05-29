@@ -16,8 +16,7 @@ void updateData() {
     logln("[ALARM] -> maximum power exceeded");
     powerAlert = false;
   }
-  if (encPulseDetected) {
-    logln("[ENCODER] -> Pushed");
+  if (encPulseDetected && GPIORead(ENC_SWITCH)) {
     encPulseDetected = false;
   }
   if (millis() - lastDebugUpdate > debugUpdatePeriod) {
@@ -30,8 +29,9 @@ void updateData() {
     if (humidityControlPID.GetMode() == AUTOMATIC) {
       logln("[PID] -> Humidifier output is: " + String (100 * humidityControlPIDOutput / humidifierTimeCycle) + "%");
     }
-
+    if (airControlPID.GetMode() == AUTOMATIC || skinControlPID.GetMode() == AUTOMATIC || humidityControlPID.GetMode() == AUTOMATIC) {
     logln("[PID] -> Desired temp is: " + String (desiredControlTemperature) + "ºC");
+    }
 
     //logln("[SENSORS] -> Current consumption is: " + String (analogRead(SYSTEM_SHUNT)) + "," + String (currentConsumption) + " Amps");
     logln("[SENSORS] -> System current consumption is: " + String (currentConsumption[MAIN_SHUNT], 1) + " Amps");

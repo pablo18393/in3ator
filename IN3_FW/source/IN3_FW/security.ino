@@ -219,9 +219,7 @@ bool checkFan() {
   bool exitTest;
   ledcWrite(HEATER_PWM_CHANNEL, HEATER_HALF_PWR * ongoingCriticalAlarm());
   while (millis() - ongoingTest < FAN_TEST_PREHEAT_TIME) {
-    if (back_mode()) {
-      return false;
-    }
+    encoderContinuousPress();
     updateData();
   }
   offsetCurrent = measureMeanConsumption(MAIN_SHUNT, defaultTestingSamples);
@@ -229,9 +227,7 @@ bool checkFan() {
   turnFans(ON);
   ongoingTest = millis();
   while (millis() - ongoingTest < FAN_TEST_PREHEAT_TIME) {
-    if (back_mode()) {
-      return false;
-    }
+    encoderContinuousPress();
     updateData();
   }
   ledcWrite(HEATER_PWM_CHANNEL, HEATER_HALF_PWR * ongoingCriticalAlarm());

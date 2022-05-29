@@ -63,9 +63,8 @@ int serialNumber = 45;
 
 
 //configuration variables
-#define debounceTime 10         //encoder debouncing time
-#define mosfet_switch_time 100   //vTaskDelay to wait for mosfet to switch (in millis), oversized
-#define timePressToSettings 5000 //in millis, time to press to go to settings window in UI
+#define debounceTime 30         //encoder debouncing time
+#define timePressToSettings 3000 //in millis, time to press to go to settings window in UI
 #define debugUpdatePeriod 1000 //in millis, 
 bool WIFI_EN = true;
 bool defaultWIFI_EN = ON;

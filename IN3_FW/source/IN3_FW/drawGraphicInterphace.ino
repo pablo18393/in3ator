@@ -305,13 +305,13 @@ void drawHardwareErrorMessage(long error) {
     tft.println(textToWrite);
     tft.setTextSize(2);
     tft.println("  medicalopenworld.org");
-    tft.setTextSize(2);
   }
   else {
     tft.print("SUCCESS :)");
   }
   tft.println();
   tft.println();
+  tft.setTextSize(2);
   tft.print(" ");
   switch (language) {
     case spanish:
