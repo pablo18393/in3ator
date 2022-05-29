@@ -357,6 +357,7 @@ void userInterfaceHandler() {
             break;
           case HWTestGraphicPosition:
             initHardware(true);
+            UI_settings();
             break;
           case calibrateGraphicPosition:
             UI_calibration();

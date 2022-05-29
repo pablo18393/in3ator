@@ -274,7 +274,7 @@ int blinkTimeON = 1000; //displayed text ON time
 int blinkTimeOFF = 100; //displayed text OFF time
 bool selected;
 char* textToWrite;
-char* words[8];
+char* words[12];
 char* helpMessage;
 byte bar_pos = true;
 byte rectangles;
@@ -310,8 +310,8 @@ byte goToProcessRow;
 #define setdefaultValuesGraphicPosition 4
 #define HWTestGraphicPosition 5
 //old settings
-#define autoLockGraphicPosition 10
-#define controlAlgorithmGraphicPosition 12
+#define autoLockGraphicPosition 6
+#define controlAlgorithmGraphicPosition 7
 
 //calibration menu
 #define autoCalibrationGraphicPosition 0

@@ -283,28 +283,33 @@ void drawHardwareErrorMessage(long error) {
   tft.setTextColor(introTextColor); //use tft. because tft.print is configured by it
   tft.setCursor(tft.width() / 4 - hexDigits(error) * 16, tft.height() / 5);
   tft.setTextSize(3);
-  tft.print("HW error:");
-  tft.println(error, HEX);
-  tft.println();
-  tft.print(" ");
-  switch (language) {
-    case spanish:
-      textToWrite = convertStringToChar("Por favor contacta");
-      break;
-    case portuguese:
-      textToWrite = convertStringToChar("Por favor entre em contato");
-      break;
-    case english:
-      textToWrite = convertStringToChar("Please contact");
-      break;
-    case french:
-      textToWrite = convertStringToChar("S'il vous plait contactez");
-      break;
+  if (error) {
+    tft.print("HW error:");
+    tft.println(error, HEX);
+    tft.println();
+    tft.print(" ");
+    switch (language) {
+      case spanish:
+        textToWrite = convertStringToChar("Por favor contacta");
+        break;
+      case portuguese:
+        textToWrite = convertStringToChar("Por favor entre em contato");
+        break;
+      case english:
+        textToWrite = convertStringToChar("Please contact");
+        break;
+      case french:
+        textToWrite = convertStringToChar("S'il vous plait contactez");
+        break;
+    }
+    tft.println(textToWrite);
+    tft.setTextSize(2);
+    tft.println("  medicalopenworld.org");
+    tft.setTextSize(2);
   }
-  tft.println(textToWrite);
-  tft.setTextSize(2);
-  tft.println("  medicalopenworld.org");
-  tft.setTextSize(2);
+  else {
+    tft.print("SUCCESS :)");
+  }
   tft.println();
   tft.println();
   tft.print(" ");

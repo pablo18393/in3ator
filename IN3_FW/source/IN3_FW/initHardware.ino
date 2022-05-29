@@ -91,11 +91,11 @@ void initHardware (bool printOutputTest) {
     logln("[HW] -> HARDWARE TEST FAIL");
     logln("[HW] -> HARDWARE ERROR CODE:" + String(HW_error, HEX));
     GPRSSetPostVariables(NO_COMMENT, "HW FAIL" + String(HW_error, HEX));
-    if (printOutputTest) {
-      drawHardwareErrorMessage(HW_error);
-      while (GPIORead(ENC_SWITCH)) {
-        updateData();
-      }
+  }
+  if (printOutputTest) {
+    drawHardwareErrorMessage(HW_error);
+    while (GPIORead(ENC_SWITCH)) {
+      updateData();
     }
   }
   buzzerTone(2, buzzerStandbyToneDuration, buzzerStandbyTone);
