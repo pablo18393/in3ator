@@ -302,13 +302,17 @@ byte goToProcessRow;
 #define settingsGraphicPosition 5
 #define startGraphicPosition 4
 //settings
-#define autoLockGraphicPosition 0
+
+#define serialNumberGraphicPosition 0
 #define languageGraphicPosition 1
-#define controlAlgorithmGraphicPosition 2
-#define serialNumberGraphicPosition 3
-#define WifiENGraphicPosition 4
-#define calibrateGraphicPosition 5
-#define setdefaultValuesGraphicPosition 6
+#define WifiENGraphicPosition 2
+#define calibrateGraphicPosition 3
+#define setdefaultValuesGraphicPosition 4
+#define HWTestGraphicPosition 5
+//old settings
+#define autoLockGraphicPosition 10
+#define controlAlgorithmGraphicPosition 12
+
 //calibration menu
 #define autoCalibrationGraphicPosition 0
 #define fineTuneCalibrationGraphicPosition 1

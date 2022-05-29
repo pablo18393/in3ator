@@ -6,8 +6,9 @@ void UI_settings() {
   setTextColor(COLOR_MENU_TEXT);
   for (int i = false; i < numWords; i++) {
     pos_text[i] = LEFT_MARGIN;
-  }
+  } 
   pos_text[setdefaultValuesGraphicPosition] = CENTER;
+  pos_text[HWTestGraphicPosition] = CENTER;
   pos_text[calibrateGraphicPosition] = CENTER;
   switch (language) {
     case english:
@@ -44,6 +45,7 @@ void UI_settings() {
       break;
   }
   words[WifiENGraphicPosition] = convertStringToChar("WIFI");
+  words[HWTestGraphicPosition] = convertStringToChar("HW Test");
   if (WiFi.status() == WL_CONNECTED ) {
     words[WifiENGraphicPosition] = convertStringToChar("WIFI IP->");
   }

@@ -353,7 +353,9 @@ void userInterfaceHandler() {
             else {
               wifiDisable();
             }
-            UI_settings();
+            break;
+          case HWTestGraphicPosition:
+            initHardware(true);
             break;
           case calibrateGraphicPosition:
             UI_calibration();
