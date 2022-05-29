@@ -1,5 +1,5 @@
 void UI_settings() {
-  byte numWords = 7;
+  byte numWords = 6;
   page = settingsPage;
   print_text = true;
   tft.setTextSize(1);
