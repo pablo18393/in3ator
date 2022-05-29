@@ -156,7 +156,7 @@ void graphics() {
               if (WIFI_EN) {
                 drawRightString(convertStringToChar("ON"), unitPosition, ypos, textFontSize);
                 if (WiFi.status() == WL_CONNECTED ) {
-
+                  drawCentreString(convertStringToChar(String(WiFi.localIP()[0]) + "." + String(WiFi.localIP()[1]) + "." + String(WiFi.localIP()[2]) + "." + String(WiFi.localIP()[3])), tft.width() / 2, ypos, textFontSize);
                 }
               }
               else {

@@ -15,7 +15,6 @@ void UI_settings() {
       words[languageGraphicPosition] = convertStringToChar("Language");
       words[controlAlgorithmGraphicPosition] = convertStringToChar("Control algorithm");
       words[serialNumberGraphicPosition] = convertStringToChar("Serial number");
-      words[WifiENGraphicPosition] = convertStringToChar("WIFI");
       words[setdefaultValuesGraphicPosition] = convertStringToChar("Set default values");
       words[calibrateGraphicPosition] = convertStringToChar("Calibration");
       break;
@@ -24,7 +23,6 @@ void UI_settings() {
       words[languageGraphicPosition] = convertStringToChar("Idioma");
       words[controlAlgorithmGraphicPosition] = convertStringToChar("Algoritmo control");
       words[serialNumberGraphicPosition] = convertStringToChar("Serial number");
-      words[WifiENGraphicPosition] = convertStringToChar("WIFI");
       words[setdefaultValuesGraphicPosition] = convertStringToChar("Fijar valores estandar");
       words[calibrateGraphicPosition] = convertStringToChar("Calibracion");
       break;
@@ -33,7 +31,6 @@ void UI_settings() {
       words[languageGraphicPosition] = convertStringToChar("Langue");
       words[controlAlgorithmGraphicPosition] = convertStringToChar("Controle algorithme");
       words[serialNumberGraphicPosition] = convertStringToChar("Serial number");
-      words[WifiENGraphicPosition] = convertStringToChar("WIFI");
       words[setdefaultValuesGraphicPosition] = convertStringToChar("Definir valeurs default");
       words[calibrateGraphicPosition] = convertStringToChar("Etalonner");
       break;
@@ -42,10 +39,13 @@ void UI_settings() {
       words[languageGraphicPosition] = convertStringToChar("Idioma");
       words[controlAlgorithmGraphicPosition] = convertStringToChar("Algoritmo controle");
       words[serialNumberGraphicPosition] = convertStringToChar("Serial number");
-      words[WifiENGraphicPosition] = convertStringToChar("WIFI");
       words[setdefaultValuesGraphicPosition] = convertStringToChar("Definir valores de fabrica");
       words[calibrateGraphicPosition] = convertStringToChar("Calibrar");
       break;
+  }
+  words[WifiENGraphicPosition] = convertStringToChar("WIFI");
+  if (WiFi.status() == WL_CONNECTED ) {
+    words[WifiENGraphicPosition] = convertStringToChar("WIFI IP->");
   }
   rectangles = numWords;
   graphics();
