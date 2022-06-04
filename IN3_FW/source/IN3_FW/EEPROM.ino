@@ -21,7 +21,7 @@
 #define EEPROM_ReferenceTemperatureRange 170
 #define EEPROM_ReferenceTemperatureLow 180
 #define EEPROM_FineTuneSkinTemperature 190
-
+#define EEPROM_HWAlternativePinout 200
 
 
 bool firstTurnOn;
@@ -100,7 +100,8 @@ void recapVariables() {
   ReferenceTemperatureRange = EEPROM.readFloat(EEPROM_ReferenceTemperatureRange);
   ReferenceTemperatureLow = EEPROM.readFloat(EEPROM_ReferenceTemperatureLow);
   fineTuneSkinTemperature = EEPROM.readFloat(EEPROM_FineTuneSkinTemperature);
-
+  HWAlternativePinout = EEPROM.read(EEPROM_HWAlternativePinout);
+  Serial.println("HW ALTERNATIVE IS" + String(HWAlternativePinout));
   for (int i = 0; i < numSensors; i++) {
     logln("calibration factors: " + String(RawTemperatureLow [i]) + "," + String (RawTemperatureRange [i]) + "," + String (ReferenceTemperatureRange) + "," + String (ReferenceTemperatureLow));
   }

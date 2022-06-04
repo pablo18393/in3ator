@@ -3,7 +3,7 @@
 */
 
 //Firmware version and head title of UI screen
-#define FWversion "v9.6/8.B"
+#define FWversion "v9.8/8.B"
 #define headingTitle "in3ator"
 
 #include <esp_task_wdt.h>
@@ -44,6 +44,7 @@ SFE_ADS122C04 mySensor;
 int serialNumber = 45;
 #define WDT_TIMEOUT 15
 
+byte HWAlternativePinout;
 
 #define ON true
 #define OFF false

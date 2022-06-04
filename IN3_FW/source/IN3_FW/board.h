@@ -18,7 +18,7 @@
 #define BUZZER 5
 #define FAN 12
 #define PHOTOTHERAPY 13
-#define HUMIDIFIER 14
+int HUMIDIFIER; //It may be changed.
 #define TFT_CS 15
 #define ENC_A 25
 #define GPRS_PWRKEY 26
@@ -29,6 +29,14 @@
 #define USB_SHUNT 35
 #define SYS_SHUNT 36
 #define BABY_NTC_PIN 39
+
+int I2C_SDA;
+int I2C_SCL;
+#define I2C_SDA_DEFAULT 21
+#define I2C_SCL_DEFAULT 22
+#define I2C_SCL_ALTERNATIVE 14
+#define HUMIDIFIER_DEFAULT 14
+#define HUMIDIFIER_ALTERNATIVE 22
 
 #define SCREENBACKLIGHT_PWM_CHANNEL 0
 #define HEATER_PWM_CHANNEL 1
