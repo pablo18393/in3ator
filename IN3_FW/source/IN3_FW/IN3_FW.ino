@@ -3,7 +3,7 @@
 */
 
 //Firmware version and head title of UI screen
-#define FWversion "v9.8/8.B"
+#define FWversion "v9.10/8.B"
 #define headingTitle "in3ator"
 
 #include <esp_task_wdt.h>

@@ -101,7 +101,10 @@ void recapVariables() {
   ReferenceTemperatureLow = EEPROM.readFloat(EEPROM_ReferenceTemperatureLow);
   fineTuneSkinTemperature = EEPROM.readFloat(EEPROM_FineTuneSkinTemperature);
   HWAlternativePinout = EEPROM.read(EEPROM_HWAlternativePinout);
-  Serial.println("HW ALTERNATIVE IS" + String(HWAlternativePinout));
+  if (HWAlternativePinout > 255) {
+    Serial.println("HW ALTERNATIVE OVERFLOW");
+    HWAlternativePinout = false;
+  }
   for (int i = 0; i < numSensors; i++) {
     logln("calibration factors: " + String(RawTemperatureLow [i]) + "," + String (RawTemperatureRange [i]) + "," + String (ReferenceTemperatureRange) + "," + String (ReferenceTemperatureLow));
   }

@@ -70,6 +70,7 @@ void initHardware (bool printOutputTest) {
   initGPIO();
   logln("[HW] -> Initialiting hardware");
   initSensors();
+  initPWMGPIO();
   initSenseCircuit();
   initTFT();
   initPowerAlarm();
@@ -102,7 +103,7 @@ void initHardware (bool printOutputTest) {
 }
 
 void initGPIO() {
-  checkHWAlternativePins(HWAlternativePinout);
+  //checkHWAlternativePins(HWAlternativePinout);
   initPin(PHOTOTHERAPY, OUTPUT);
   initPin(GPRS_PWRKEY, OUTPUT);
   initPin(SYS_SHUNT, INPUT);
@@ -116,7 +117,8 @@ void initGPIO() {
   initPin(HEATER, OUTPUT);
   initPin(BUZZER, OUTPUT);
   initPin(SCREENBACKLIGHT, OUTPUT);
-  initPWMGPIO();
+  //initPin(HUMIDIFIER_DEFAULT, OUTPUT);
+  //initPin(HUMIDIFIER_ALTERNATIVE, OUTPUT);
 }
 
 void initPWMGPIO() {
@@ -164,9 +166,11 @@ void checkHWAlternativePins(int mode) {
       break;
   }
   I2C_SDA = I2C_SDA_DEFAULT;
+  logln("[HW] -> I2C Pins are " + String (I2C_SDA) + "," + String(I2C_SCL));
 }
 
 void alternateHWPins() {
+  initPin(HUMIDIFIER, INPUT);
   if (HUMIDIFIER == HUMIDIFIER_ALTERNATIVE) {
     HUMIDIFIER = HUMIDIFIER_DEFAULT;
     I2C_SCL = I2C_SCL_DEFAULT;
@@ -177,7 +181,6 @@ void alternateHWPins() {
   }
   initPin(HUMIDIFIER, OUTPUT);
   GPIOWrite(HUMIDIFIER, LOW);
-  initPWMGPIO();
   EEPROM.write(EEPROM_HWAlternativePinout, HUMIDIFIER);
   EEPROM.commit();
 }
@@ -187,14 +190,18 @@ void initI2CBus() {
 }
 
 void initI2CBus(int I2C_SDA, int I2C_SCL) {
-  Wire.end();
+  //deninitI2CBus();
   Wire.begin(I2C_SDA, I2C_SCL);
   wire = &Wire;
 }
 
+void deninitI2CBus() {
+  Wire.end();
+}
+
 void initRoomSensor() {
   roomSensorPresent = false;
-  initI2CBus(I2C_SDA, I2C_SCL);
+  initI2CBus(I2C_SDA_DEFAULT, I2C_SCL_ALTERNATIVE);
   logln("[HW] -> Detecting room sensor in DEFAULT pinout...");
   wire->beginTransmission(roomSensorAddress);
   roomSensorPresent = !(wire->endTransmission());
@@ -202,7 +209,9 @@ void initRoomSensor() {
     logln("[HW] -> Room sensor succesfully found, initializing...");
     mySHTC3.begin(Wire);
   }
+  /*
   else {
+    deninitI2CBus();
     alternateHWPins();
     initI2CBus(I2C_SDA, I2C_SCL);
     logln("[HW] -> Detecting room sensor in ALTERNATIVE pinout...");
@@ -212,7 +221,13 @@ void initRoomSensor() {
       logln("[HW] -> Room sensor succesfully found, initializing...");
       mySHTC3.begin(Wire);
     }
+    else {
+      logln("[HW] -> FAIL -> NO ROOM SENSOR FOUND");
+      deninitI2CBus();
+      alternateHWPins();
+    }
   }
+  */
 }
 
 void initCurrentSensor() {

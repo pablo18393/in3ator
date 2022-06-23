@@ -12,13 +12,19 @@
 #define HUMIDIFIER_SHUNT 1
 #define currentSensingNum 2
 
+#define I2C_SDA_DEFAULT 21
+#define I2C_SCL_DEFAULT 22
+#define I2C_SCL_ALTERNATIVE 14
+#define HUMIDIFIER_DEFAULT 14
+#define HUMIDIFIER_ALTERNATIVE 22
+
 #define TFT_DC 0
 #define ADC_READY 2
 #define ENC_SWITCH 4
 #define BUZZER 5
 #define FAN 12
 #define PHOTOTHERAPY 13
-int HUMIDIFIER; //It may be changed.
+int HUMIDIFIER = HUMIDIFIER_DEFAULT; //It may be changed.
 #define TFT_CS 15
 #define ENC_A 25
 #define GPRS_PWRKEY 26
@@ -32,11 +38,7 @@ int HUMIDIFIER; //It may be changed.
 
 int I2C_SDA;
 int I2C_SCL;
-#define I2C_SDA_DEFAULT 21
-#define I2C_SCL_DEFAULT 22
-#define I2C_SCL_ALTERNATIVE 14
-#define HUMIDIFIER_DEFAULT 14
-#define HUMIDIFIER_ALTERNATIVE 22
+
 
 #define SCREENBACKLIGHT_PWM_CHANNEL 0
 #define HEATER_PWM_CHANNEL 1
