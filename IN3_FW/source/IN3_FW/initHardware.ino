@@ -190,7 +190,7 @@ void initI2CBus() {
 }
 
 void initI2CBus(int I2C_SDA, int I2C_SCL) {
-  //deninitI2CBus();
+  deninitI2CBus();
   Wire.begin(I2C_SDA, I2C_SCL);
   wire = &Wire;
 }
@@ -201,7 +201,7 @@ void deninitI2CBus() {
 
 void initRoomSensor() {
   roomSensorPresent = false;
-  initI2CBus(I2C_SDA_DEFAULT, I2C_SCL_ALTERNATIVE);
+  initI2CBus(I2C_SDA_DEFAULT, I2C_SCL_DEFAULT);
   logln("[HW] -> Detecting room sensor in DEFAULT pinout...");
   wire->beginTransmission(roomSensorAddress);
   roomSensorPresent = !(wire->endTransmission());

@@ -3,7 +3,7 @@
 */
 
 //Firmware version and head title of UI screen
-#define FWversion "v9.10/8.B"
+#define FWversion "v9.11/8.B"
 #define headingTitle "in3ator"
 
 #include <esp_task_wdt.h>
@@ -269,10 +269,11 @@ int time_lock = 16000; //time to lock screen if no user actions
 const byte time_back_draw = 255;
 const byte time_back_wait = 255;
 long lastbacklightHandler; //last time there was a encoder movement or pulse
-long sensorsUpdatePeriod = 4000;
+long sensorsUpdatePeriod = 1000;
 int blinkTimeON = 1000; //displayed text ON time
 int blinkTimeOFF = 100; //displayed text OFF time
 bool selected;
+char cstring[100];
 char* textToWrite;
 char* words[12];
 char* helpMessage;

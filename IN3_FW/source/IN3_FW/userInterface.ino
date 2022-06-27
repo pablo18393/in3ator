@@ -123,19 +123,19 @@ void userInterfaceHandler() {
               jaundiceEnable = !jaundiceEnable;
               setTextColor(COLOR_MENU);
               if (jaundiceEnable) {
-                drawRightString(convertStringToChar("OFF"), unitPosition, ypos, textFontSize);
+                drawRightString(convertStringToChar(cstring,"OFF"), unitPosition, ypos, textFontSize);
               }
               else {
-                drawRightString(convertStringToChar("ON"), unitPosition, ypos, textFontSize);
+                drawRightString(convertStringToChar(cstring,"ON"), unitPosition, ypos, textFontSize);
               }
               setTextColor(COLOR_MENU_TEXT);
               if (jaundiceEnable) {
-                drawRightString(convertStringToChar("ON"), unitPosition, ypos, textFontSize);
+                drawRightString(convertStringToChar(cstring,"ON"), unitPosition, ypos, textFontSize);
                 GPRSSetPostVariables(jaundiceLEDON, "");
                 setGPRSPostPeriod(jaundiceGPRSPostPeriod);
               }
               else {
-                drawRightString(convertStringToChar("OFF"), unitPosition, ypos, textFontSize);
+                drawRightString(convertStringToChar(cstring,"OFF"), unitPosition, ypos, textFontSize);
                 GPRSSetPostVariables(jaundiceLEDOFF, "");
                 GPRSSetPostVariables(jaundiceLEDOFF, "");
                 setGPRSPostPeriod(standByGPRSPostPeriod);
@@ -157,32 +157,32 @@ void userInterfaceHandler() {
               if (autoLock) {
                 switch (language) {
                   case spanish:
-                    textToWrite = convertStringToChar("SI");
+                    textToWrite = convertStringToChar(cstring,"SI");
                     break;
                   case english:
-                    textToWrite = convertStringToChar("YES");
+                    textToWrite = convertStringToChar(cstring,"YES");
                     break;
                   case french:
-                    textToWrite = convertStringToChar("OUI");
+                    textToWrite = convertStringToChar(cstring,"OUI");
                     break;
                   case portuguese:
-                    textToWrite = convertStringToChar("SIM");
+                    textToWrite = convertStringToChar(cstring,"SIM");
                     break;
                 }
                 drawRightString(textToWrite, unitPosition, ypos, textFontSize);
                 setTextColor(COLOR_MENU_TEXT);
                 switch (language) {
                   case spanish:
-                    textToWrite = convertStringToChar("NO");
+                    textToWrite = convertStringToChar(cstring,"NO");
                     break;
                   case english:
-                    textToWrite = convertStringToChar("NO");
+                    textToWrite = convertStringToChar(cstring,"NO");
                     break;
                   case french:
-                    textToWrite = convertStringToChar("PAS");
+                    textToWrite = convertStringToChar(cstring,"PAS");
                     break;
                   case portuguese:
-                    textToWrite = convertStringToChar("NAO");
+                    textToWrite = convertStringToChar(cstring,"NAO");
                     break;
                 }
                 drawRightString(textToWrite, unitPosition, ypos, textFontSize);
@@ -191,32 +191,32 @@ void userInterfaceHandler() {
                 setTextColor(COLOR_MENU);
                 switch (language) {
                   case spanish:
-                    textToWrite = convertStringToChar("NO");
+                    textToWrite = convertStringToChar(cstring,"NO");
                     break;
                   case english:
-                    textToWrite = convertStringToChar("NO");
+                    textToWrite = convertStringToChar(cstring,"NO");
                     break;
                   case french:
-                    textToWrite = convertStringToChar("PAS");
+                    textToWrite = convertStringToChar(cstring,"PAS");
                     break;
                   case portuguese:
-                    textToWrite = convertStringToChar("NAO");
+                    textToWrite = convertStringToChar(cstring,"NAO");
                     break;
                 }
                 drawRightString(textToWrite, unitPosition, ypos, textFontSize);
                 setTextColor(COLOR_MENU_TEXT);
                 switch (language) {
                   case spanish:
-                    textToWrite = convertStringToChar("SI");
+                    textToWrite = convertStringToChar(cstring,"SI");
                     break;
                   case english:
-                    textToWrite = convertStringToChar("YES");
+                    textToWrite = convertStringToChar(cstring,"YES");
                     break;
                   case french:
-                    textToWrite = convertStringToChar("OUI");
+                    textToWrite = convertStringToChar(cstring,"OUI");
                     break;
                   case portuguese:
-                    textToWrite = convertStringToChar("SIM");
+                    textToWrite = convertStringToChar(cstring,"SIM");
                     break;
                 }
                 drawRightString(textToWrite, unitPosition, ypos, textFontSize);
@@ -232,16 +232,16 @@ void userInterfaceHandler() {
                   setTextColor(COLOR_MENU);
                   switch (language) {
                     case spanish:
-                      textToWrite = convertStringToChar("SPA");
+                      textToWrite = convertStringToChar(cstring,"SPA");
                       break;
                     case english:
-                      textToWrite = convertStringToChar("ENG");
+                      textToWrite = convertStringToChar(cstring,"ENG");
                       break;
                     case french:
-                      textToWrite = convertStringToChar("FRA");
+                      textToWrite = convertStringToChar(cstring,"FRA");
                       break;
                     case portuguese:
-                      textToWrite = convertStringToChar("POR");
+                      textToWrite = convertStringToChar(cstring,"POR");
                       break;
                   }
                   drawRightString(textToWrite, unitPosition, ypos, textFontSize);
@@ -255,16 +255,16 @@ void userInterfaceHandler() {
                   setTextColor(COLOR_MENU_TEXT);
                   switch (language) {
                     case spanish:
-                      textToWrite = convertStringToChar("SPA");
+                      textToWrite = convertStringToChar(cstring,"SPA");
                       break;
                     case english:
-                      textToWrite = convertStringToChar("ENG");
+                      textToWrite = convertStringToChar(cstring,"ENG");
                       break;
                     case french:
-                      textToWrite = convertStringToChar("FRA");
+                      textToWrite = convertStringToChar(cstring,"FRA");
                       break;
                     case portuguese:
-                      textToWrite = convertStringToChar("POR");
+                      textToWrite = convertStringToChar(cstring,"POR");
                       break;
                   }
                   drawRightString(textToWrite, unitPosition, ypos, textFontSize);
@@ -281,17 +281,17 @@ void userInterfaceHandler() {
               EEPROM.commit();
               setTextColor(COLOR_MENU);
               if (controlAlgorithm) {
-                drawRightString(convertStringToChar("BASIC"), unitPosition, ypos, textFontSize);
+                drawRightString(convertStringToChar(cstring,"BASIC"), unitPosition, ypos, textFontSize);
               }
               else {
-                drawRightString(convertStringToChar("PID"), unitPosition, ypos, textFontSize);
+                drawRightString(convertStringToChar(cstring,"PID"), unitPosition, ypos, textFontSize);
               }
               setTextColor(COLOR_MENU_TEXT);
               if ((controlAlgorithm)) {
-                drawRightString(convertStringToChar("PID"), unitPosition, ypos, textFontSize);
+                drawRightString(convertStringToChar(cstring,"PID"), unitPosition, ypos, textFontSize);
               }
               else {
-                drawRightString(convertStringToChar("BASIC"), unitPosition, ypos, textFontSize);
+                drawRightString(convertStringToChar(cstring,"BASIC"), unitPosition, ypos, textFontSize);
               }
               break;
             case serialNumberGraphicPosition:
@@ -321,17 +321,17 @@ void userInterfaceHandler() {
               EEPROM.commit();
               setTextColor(COLOR_MENU);
               if (WIFI_EN) {
-                drawRightString(convertStringToChar("OFF"), unitPosition, ypos, textFontSize);
+                drawRightString(convertStringToChar(cstring,"OFF"), unitPosition, ypos, textFontSize);
               }
               else {
-                drawRightString(convertStringToChar("ON"), unitPosition, ypos, textFontSize);
+                drawRightString(convertStringToChar(cstring,"ON"), unitPosition, ypos, textFontSize);
               }
               setTextColor(COLOR_MENU_TEXT);
               if (WIFI_EN) {
-                drawRightString(convertStringToChar("ON"), unitPosition, ypos, textFontSize);
+                drawRightString(convertStringToChar(cstring,"ON"), unitPosition, ypos, textFontSize);
               }
               else {
-                drawRightString(convertStringToChar("OFF"), unitPosition, ypos, textFontSize);
+                drawRightString(convertStringToChar(cstring,"OFF"), unitPosition, ypos, textFontSize);
               }
               break;
             case setdefaultValuesGraphicPosition:
@@ -515,16 +515,16 @@ void checkSetMessage() {
     if (page == mainMenuPage) {
       switch (language) {
         case english:
-          helpMessage = convertStringToChar("Set desired parameters");
+          helpMessage = convertStringToChar(cstring,"Set desired parameters");
           break;
         case spanish:
-          helpMessage = convertStringToChar("Introduce parametros");
+          helpMessage = convertStringToChar(cstring,"Introduce parametros");
           break;
         case french:
-          helpMessage = convertStringToChar("Entrer parametres");
+          helpMessage = convertStringToChar(cstring,"Entrer parametres");
           break;
         case portuguese:
-          helpMessage = convertStringToChar("Insira os parametros");
+          helpMessage = convertStringToChar(cstring,"Insira os parametros");
           break;
       }
     }
