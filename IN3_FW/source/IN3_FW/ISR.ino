@@ -1,4 +1,4 @@
-void encoderISR() {
+void IRAM_ATTR encoderISR() {
   int newPos;
   encoder.tick(); // just call tick() to check the state.
   newPos = encoder.getPosition();
@@ -9,7 +9,7 @@ void encoderISR() {
   }
 }
 
-void encSwitchHandler() {
+void IRAM_ATTR encSwitchHandler() {
   if (!digitalRead(ENC_SWITCH)) {
     if (millis() - lastEncPulse > encPulseDebounce) {
       if (!encPulseDetected) {
@@ -19,7 +19,7 @@ void encSwitchHandler() {
         disableAllAlarms();
       }
       encPulseDetected = true;
-      logln("[ENCODER] -> Pushed");
+      //logln("[ENCODER] -> Pushed");
     }
     lastEncPulse = millis();
     lastbacklightHandler = millis();

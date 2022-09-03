@@ -29,10 +29,10 @@ void updateData() {
       logln("[PID] -> Humidifier output is: " + String (100 * humidityControlPIDOutput / humidifierTimeCycle) + "%");
     }
     if (airControlPID.GetMode() == AUTOMATIC || skinControlPID.GetMode() == AUTOMATIC || humidityControlPID.GetMode() == AUTOMATIC) {
-    logln("[PID] -> Desired temp is: " + String (desiredControlTemperature) + "ºC");
+      logln("[PID] -> Desired temp is: " + String (desiredControlTemperature) + "ºC");
     }
 
-    logln("[SENSORS] -> System current consumption is: " + String (digitalCurrentSensor.getCurrent(INA3221_CH1),2) + " Amps");
+    logln("[SENSORS] -> System current consumption is: " + String (digitalCurrentSensor.getCurrent(INA3221_CH1), 2) + " Amps");
     logln("[SENSORS] -> Baby temperature: " + String(temperature[skinSensor]) + "ºC, correction error is " + String(errorTemperature[skinSensor]));
     logln("[SENSORS] -> Air temperature: " + String(temperature[airSensor]) + "ºC, correction error is " + String(errorTemperature[airSensor]));
     logln("[SENSORS] -> Humidity: " + String(humidity) + "%");
