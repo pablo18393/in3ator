@@ -222,7 +222,7 @@ bool checkFan() {
     encoderContinuousPress();
     updateData();
   }
-  offsetCurrent = measureMeanConsumption(MAIN_SHUNT, defaultTestingSamples);
+  offsetCurrent = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL);
   ledcWrite(HEATER_PWM_CHANNEL, false);
   turnFans(ON);
   ongoingTest = millis();
@@ -231,7 +231,7 @@ bool checkFan() {
     updateData();
   }
   ledcWrite(HEATER_PWM_CHANNEL, HEATER_HALF_PWR * ongoingCriticalAlarm());
-  testCurrent = measureMeanConsumption(MAIN_SHUNT, defaultTestingSamples);
+  testCurrent = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL);
   ledcWrite(HEATER_PWM_CHANNEL, false);
   if (offsetCurrent - testCurrent < FAN_TEST_CURRENTDIF_MIN) {
     setAlarm(FAN_ISSUE_ALARM);

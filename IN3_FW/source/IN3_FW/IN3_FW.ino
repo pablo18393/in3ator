@@ -3,7 +3,7 @@
 */
 
 //Firmware version and head title of UI screen
-#define FWversion "v9.11/8.B"
+#define FWversion "v10.1/9.B"
 #define headingTitle "in3ator"
 
 #include <esp_task_wdt.h>
@@ -22,22 +22,17 @@
 #include "board.h"
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
-//#include <SD.h>
 #include "SparkFun_SHTC3.h" // Click here to get the library: http://librarymanager/All#SparkFun_SHTC3
 #include <RotaryEncoder.h>
-#include <Microchip_PAC193x.h>
-#include <SparkFun_ADS122C04_ADC_Arduino_Library.h> // Click here to get the library: http://librarymanager/All#SparkFun_ADS122C0
-
+#include <Beastdevices_INA3221.h>
 
 TwoWire *wire;
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 SHTC3 mySHTC3;              // Declare an instance of the SHTC3 class
 RotaryEncoder encoder(ENC_A, ENC_B, RotaryEncoder::LatchMode::TWO03);
 #define Rsense 3000 //3 microohm as shunt resistor
-Microchip_PAC193x PAC(Rsense);
-SFE_ADS122C04 mySensor;
-#define externalADC_i2c_address 64
-#define digitalCurrentSensor_i2c_address 57
+Beastdevices_INA3221 digitalCurrentSensor(INA3221_ADDR41_VCC);
+#define digitalCurrentSensor_i2c_address 65
 #define roomSensorAddress 112
 
 
@@ -158,20 +153,10 @@ bool WIFI_connection_status = false;
 #define defaultTestingSamples 8000
 
 bool roomSensorPresent = false;
-bool externalADCpresent = false;
 bool digitalCurrentSensorPresent = false;
-long lastDigitalCurrentSensorRead;
-long lastexternalADCRead;
-float instantCurrent[currentSensingNum][secondOrder_filter];
-float previousCurrent[currentSensingNum][secondOrder_filter];
 
 float instantTemperature[secondOrder_filter];
 float previousTemperature[secondOrder_filter];
-
-int instantCurrent_array_pos = false;
-float currentConsumption[currentSensingNum];
-float currentToAmpFactor_MAIN = 0.003;
-float currentToAmpFactor_HUMIDIFIER = 0.00013;
 
 //room variables
 bool controlMode;

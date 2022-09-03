@@ -196,7 +196,7 @@ void getLocation() {
       checkSerial("OK", "ERROR");
       break;
     case 4:
-      Serial2.print("AT+SAPBR=3,1,\"APN\",\"TM\"\n");
+      Serial2.print("AT+SAPBR=3,1,\"APN\",\"iot.truphone.com\"\n");
       GPRS.process++;
       break;
     case 5:
@@ -310,7 +310,7 @@ void GPRSStablishConnection() {
       break;
     case 4:
       if (millis() - GPRS.packetSentenceTime > 4000) {
-        Serial2.write("AT+CSTT=\"TM\",\"\",\"\"\n\n");
+        Serial2.write("AT+CSTT=\"iot.truphone.com\",\"\",\"\"\n\n");
         GPRS.process++;
       }
       break;
@@ -714,8 +714,8 @@ bool GPRSLoadVariables() {
     databasePost[7] += ",\"jaundice_power\":\"" + String(jaundiceEnable) + "\"";
   }
   if (GPRS.postCurrentConsumption) {
-    databasePost[7] += ",\"power\":\"" + String(currentConsumption[MAIN_SHUNT], 1) + "\"";
-    databasePost[7] += ",\"power_usb\":\"" + String(currentConsumption[HUMIDIFIER_SHUNT], 2) + "\"";
+    databasePost[7] += ",\"power\":\"" + String(measureMeanConsumption(SYSTEM_SHUNT_CHANNEL), 1) + "\"";
+    //databasePost[7] += ",\"power_usb\":\"" + String(currentConsumption[HUMIDIFIER_SHUNT], 2) + "\"";
   }
   if (GPRS.postComment) {
     if (GPRS.comment.length() < 20) {

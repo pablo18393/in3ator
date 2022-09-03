@@ -24,32 +24,32 @@ void UI_actuatorsProgress() {
   if (controlMode) {
     switch (language) {
       case spanish:
-        textToWrite = convertStringToChar(cstring,"Temperatura aire");
+        textToWrite = convertStringToChar(cstring, "Temperatura aire");
         break;
       case portuguese:
-        textToWrite = convertStringToChar(cstring,"Temperatura do ar");
+        textToWrite = convertStringToChar(cstring, "Temperatura do ar");
         break;
       case english:
-        textToWrite = convertStringToChar(cstring,"Air temperature");
+        textToWrite = convertStringToChar(cstring, "Air temperature");
         break;
       case french:
-        textToWrite = convertStringToChar(cstring,"Temperature de l'air");
+        textToWrite = convertStringToChar(cstring, "Temperature de l'air");
         break;
     }
   }
   else {
     switch (language) {
       case spanish:
-        textToWrite = convertStringToChar(cstring,"Temperatura piel");
+        textToWrite = convertStringToChar(cstring, "Temperatura piel");
         break;
       case portuguese:
-        textToWrite = convertStringToChar(cstring,"temperatura da pele");
+        textToWrite = convertStringToChar(cstring, "temperatura da pele");
         break;
       case english:
-        textToWrite = convertStringToChar(cstring,"Skin temperature");
+        textToWrite = convertStringToChar(cstring, "Skin temperature");
         break;
       case french:
-        textToWrite = convertStringToChar(cstring,"Temperature de la peau");
+        textToWrite = convertStringToChar(cstring, "Temperature de la peau");
         break;
     }
   }
@@ -57,32 +57,32 @@ void UI_actuatorsProgress() {
   if (!controlMode) {
     switch (language) {
       case spanish:
-        textToWrite = convertStringToChar(cstring,"Temperatura aire");
+        textToWrite = convertStringToChar(cstring, "Temperatura aire");
         break;
       case portuguese:
-        textToWrite = convertStringToChar(cstring,"Temperatura do ar");
+        textToWrite = convertStringToChar(cstring, "Temperatura do ar");
         break;
       case english:
-        textToWrite = convertStringToChar(cstring,"Air temperature");
+        textToWrite = convertStringToChar(cstring, "Air temperature");
         break;
       case french:
-        textToWrite = convertStringToChar(cstring,"Temperature de l'air");
+        textToWrite = convertStringToChar(cstring, "Temperature de l'air");
         break;
     }
   }
   else {
     switch (language) {
       case spanish:
-        textToWrite = convertStringToChar(cstring,"Temperatura piel");
+        textToWrite = convertStringToChar(cstring, "Temperatura piel");
         break;
       case portuguese:
-        textToWrite = convertStringToChar(cstring,"temperatura da pele");
+        textToWrite = convertStringToChar(cstring, "temperatura da pele");
         break;
       case english:
-        textToWrite = convertStringToChar(cstring,"Skin temperature");
+        textToWrite = convertStringToChar(cstring, "Skin temperature");
         break;
       case french:
-        textToWrite = convertStringToChar(cstring,"Temperature de la peau");
+        textToWrite = convertStringToChar(cstring, "Temperature de la peau");
         break;
     }
   }
@@ -90,16 +90,16 @@ void UI_actuatorsProgress() {
 
   switch (language) {
     case spanish:
-      textToWrite = convertStringToChar(cstring,"Humedad");
+      textToWrite = convertStringToChar(cstring, "Humedad");
       break;
     case english:
-      textToWrite = convertStringToChar(cstring,"Humidity");
+      textToWrite = convertStringToChar(cstring, "Humidity");
       break;
     case french:
-      textToWrite = convertStringToChar(cstring,"Humidite");
+      textToWrite = convertStringToChar(cstring, "Humidite");
       break;
     case portuguese:
-      textToWrite = convertStringToChar(cstring,"Umidade");
+      textToWrite = convertStringToChar(cstring, "Umidade");
       break;
   }
   drawCentreString(textToWrite, tft.width() / 2, humBarPosY - 4 * letter_height / 3, textFontSize);
@@ -188,9 +188,9 @@ void basicHumidityControl() {
   if (humidity < desiredControlHumidity) {
     if (!humidifierState || humidifierStateChange) {
       if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
-        ledcWrite(HUMIDIFIER_PWM_CHANNEL, HUMIDIFIER_DUTY_CYCLE * ongoingCriticalAlarm());
+        ledcWrite(HUMIDIFIER_PWM_CHANNEL, HUMIDIFIER_DUTY_CYCLE);
       }
-      else {
+      else if (HUMIDIFIER_MODE == HUMIDIFIER_BINARY) {
         GPIOWrite(HUMIDIFIER, HIGH);
       }
       humidifierStateChange = false;
@@ -202,7 +202,7 @@ void basicHumidityControl() {
       if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
         ledcWrite(HUMIDIFIER_PWM_CHANNEL, false);
       }
-      else {
+      else if (HUMIDIFIER_MODE == HUMIDIFIER_BINARY) {
         GPIOWrite(HUMIDIFIER, LOW);
       }
       humidifierStateChange = false;
@@ -228,7 +228,7 @@ void turnActuators(bool mode) {
   if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
     ledcWrite(HUMIDIFIER_PWM_CHANNEL, HUMIDIFIER_DUTY_CYCLE * mode * ongoingCriticalAlarm());
   }
-  else {
+  else if (HUMIDIFIER_MODE == HUMIDIFIER_BINARY) {
     GPIOWrite(HUMIDIFIER, mode);
   }
   turnFans(mode);

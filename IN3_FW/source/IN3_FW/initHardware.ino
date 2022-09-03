@@ -1,11 +1,11 @@
 #define testMode false
 #define operativeMode true
 
-#define testTime 50
+#define CURRENT_STABILIZE_TIME 500
 
-#define NTC_BABY_MIN 0
+#define NTC_BABY_MIN 1
 #define NTC_BABY_MAX 60
-#define DIG_TEMP_ROOM_MIN 0
+#define DIG_TEMP_ROOM_MIN 1
 #define DIG_TEMP_ROOM_MAX 60
 #define DIG_HUM_ROOM_MIN 1
 #define DIG_HUM_ROOM_MAX 100
@@ -60,7 +60,7 @@ long lastTFTCheck;
 
 void initDebug() {
   Serial.begin(115200);
-  vTaskDelay(100);
+  vTaskDelay(CURRENT_STABILIZE_TIME);
   logln("in3ator debug uart, version " + String (FWversion) + ", SN: " + String (serialNumber));
 }
 
@@ -106,52 +106,37 @@ void initGPIO() {
   //checkHWAlternativePins(HWAlternativePinout);
   initPin(PHOTOTHERAPY, OUTPUT);
   initPin(GPRS_PWRKEY, OUTPUT);
-  initPin(SYS_SHUNT, INPUT);
   initPin(encoderpinA, INPUT_PULLUP);
   initPin(encoderpinB, INPUT_PULLUP);
   initPin(ENC_SWITCH, INPUT_PULLUP);
   initPin(TFT_CS, OUTPUT);
   initPin(PHOTOTHERAPY, OUTPUT);
   initPin(FAN, OUTPUT);
-  initPin(ADC_READY, INPUT_PULLUP);
   initPin(HEATER, OUTPUT);
   initPin(BUZZER, OUTPUT);
   initPin(SCREENBACKLIGHT, OUTPUT);
-  //initPin(HUMIDIFIER_DEFAULT, OUTPUT);
-  //initPin(HUMIDIFIER_ALTERNATIVE, OUTPUT);
+  initPin(ACTUATORS_EN, INPUT_PULLUP);
 }
 
 void initPWMGPIO() {
   ledcSetup(SCREENBACKLIGHT_PWM_CHANNEL, DEFAULT_PWM_FREQUENCY, DEFAULT_PWM_RESOLUTION);
   ledcSetup(HEATER_PWM_CHANNEL, HEATER_PWM_FREQUENCY, DEFAULT_PWM_RESOLUTION);
   ledcSetup(BUZZER_PWM_CHANNEL, DEFAULT_PWM_FREQUENCY, DEFAULT_PWM_RESOLUTION);
-  if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
-    ledcSetup(HUMIDIFIER_PWM_CHANNEL, HUMIDIFIER_PWM_FREQUENCY, DEFAULT_PWM_RESOLUTION);
-  }
   ledcAttachPin(SCREENBACKLIGHT, SCREENBACKLIGHT_PWM_CHANNEL);
   ledcAttachPin(HEATER, HEATER_PWM_CHANNEL);
   ledcAttachPin(BUZZER, BUZZER_PWM_CHANNEL);
-  if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
-    ledcAttachPin(HUMIDIFIER, HUMIDIFIER_PWM_CHANNEL);
-    ledcWrite(HUMIDIFIER_PWM_CHANNEL, false);
-  }
   ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, PWM_MAX_VALUE);
   ledcWrite(HEATER_PWM_CHANNEL, false);
   ledcWrite(BUZZER_PWM_CHANNEL, false);
 }
 
 void initInterrupts() {
-  //attachInterrupt(ENC_SWITCH, encSwitchHandler, CHANGE);
+  attachInterrupt(ENC_SWITCH, encSwitchHandler, CHANGE);
   attachInterrupt(ENC_A, encoderISR, CHANGE);
   attachInterrupt(ENC_B, encoderISR, CHANGE);
 }
 
 float readExternalADC() {
-  return (mySensor.readADC());
-}
-
-bool ADCConversionReady () {
-  return (!digitalRead(ADC_READY));
 }
 
 void checkHWAlternativePins(int mode) {
@@ -201,86 +186,28 @@ void deninitI2CBus() {
 
 void initRoomSensor() {
   roomSensorPresent = false;
-  initI2CBus(I2C_SDA_DEFAULT, I2C_SCL_DEFAULT);
-  logln("[HW] -> Detecting room sensor in DEFAULT pinout...");
   wire->beginTransmission(roomSensorAddress);
   roomSensorPresent = !(wire->endTransmission());
   if (roomSensorPresent == true) {
     logln("[HW] -> Room sensor succesfully found, initializing...");
     mySHTC3.begin(Wire);
   }
-  /*
-  else {
-    deninitI2CBus();
-    alternateHWPins();
-    initI2CBus(I2C_SDA, I2C_SCL);
-    logln("[HW] -> Detecting room sensor in ALTERNATIVE pinout...");
-    wire->beginTransmission(roomSensorAddress);
-    roomSensorPresent = !(wire->endTransmission());
-    if (roomSensorPresent == true) {
-      logln("[HW] -> Room sensor succesfully found, initializing...");
-      mySHTC3.begin(Wire);
-    }
-    else {
-      logln("[HW] -> FAIL -> NO ROOM SENSOR FOUND");
-      deninitI2CBus();
-      alternateHWPins();
-    }
-  }
-  */
 }
 
 void initCurrentSensor() {
   wire->beginTransmission(digitalCurrentSensor_i2c_address);
   digitalCurrentSensorPresent = !(wire->endTransmission());
   if (digitalCurrentSensorPresent) {
-    PAC.begin();
-    PAC.setSampleRate(1024);
-    PAC.UpdateCurrent();
-    logln("[HW] -> digital sensor detected, current consumption is " + String(float(PAC.Current / 1000), 2) + " Amperes");
-  }
-}
+    digitalCurrentSensor.begin();
+    digitalCurrentSensor.reset();
 
-void initExternalADC() {
-  long conversionTime;
-  wire->beginTransmission(digitalCurrentSensor_i2c_address);
-  externalADCpresent = !(wire->endTransmission());
-  if (externalADCpresent) {
-    logln("[HW] -> external ADC detected");
-    mySensor.begin(externalADC_i2c_address);
-    mySensor.setInputMultiplexer(ADS122C04_MUX_AIN0_AVSS); // Route AIN1 and AIN0 to AINP and AINN
-    mySensor.setGain(ADS122C04_GAIN_1); // Set the gain to 1
-    mySensor.enablePGA(ADS122C04_PGA_DISABLED); // Disable the Programmable Gain Amplifier
-    mySensor.setDataRate(ADS122C04_DATA_RATE_1000SPS); // Set the data rate (samples per second) to 1000
-    mySensor.setOperatingMode(ADS122C04_OP_MODE_NORMAL); // Disable turbo mode
-    mySensor.setConversionMode(ADS122C04_CONVERSION_MODE_CONTINUOUS); // Use single shot mode
-    mySensor.setVoltageReference(ADS122C04_VREF_INTERNAL); // Use the internal 2.048V reference
-    mySensor.enableInternalTempSensor(ADS122C04_TEMP_SENSOR_OFF); // Disable the temperature sensor
-    mySensor.setDataCounter(ADS122C04_DCNT_DISABLE); // Disable the data counter (Note: the library does not currently support the data count)
-    mySensor.setDataIntegrityCheck(ADS122C04_CRC_DISABLED); // Disable CRC checking (Note: the library does not currently support data integrity checking)
-    mySensor.setBurnOutCurrent(ADS122C04_BURN_OUT_CURRENT_OFF); // Disable the burn-out current
-    mySensor.setIDACcurrent(ADS122C04_IDAC_CURRENT_OFF); // Disable the IDAC current
-    mySensor.setIDAC1mux(ADS122C04_IDAC1_DISABLED); // Disable IDAC1
-    mySensor.setIDAC2mux(ADS122C04_IDAC2_DISABLED); // Disable IDAC2
-    conversionTime = micros();
-    mySensor.start(); // Start the conversion
-    while (!ADCConversionReady());
-    logln("[HW] -> Baby NTC voltage is: " + String(float(readExternalADC()) / 4096000, 4) + ", conversion made in " + String(micros() - conversionTime) + " us");
-    conversionTime = micros();
-    mySensor.setInputMultiplexer(ADS122C04_MUX_AIN1_AVSS); // Route AIN1 and AIN0 to AINP and AINN
-    mySensor.start(); // Start the conversion
-    while (!ADCConversionReady());
-    logln("[HW] -> Air NTC voltage is: " + String(float(readExternalADC()) / 4096000, 4) + ", conversion made in " + String(micros() - conversionTime) + " us");
-    conversionTime = micros();
-    mySensor.setInputMultiplexer(ADS122C04_MUX_AIN2_AVSS); // Route AIN1 and AIN0 to AINP and AINN
-    mySensor.start(); // Start the conversion
-    while (!ADCConversionReady());
-    logln("[HW] -> Vin voltage is: " + String(float(readExternalADC()) / 4096000, 4) + ", conversion made in " + String(micros() - conversionTime) + " us");
-    conversionTime = micros();
-    mySensor.setInputMultiplexer(ADS122C04_MUX_AIN3_AVSS); // Route AIN1 and AIN0 to AINP and AINN
-    mySensor.start(); // Start the conversion
-    while (!ADCConversionReady());
-    logln("[HW] -> System current voltage is: " + String(float(readExternalADC()) / 4096000, 4) + ", conversion made in " + String(micros() - conversionTime) + " us");
+    // Set shunt resistors to 10 mOhm for all channels
+    digitalCurrentSensor.setShuntRes(SYSTEM_SHUNT, PHOTOTHERAPY_SHUNT, FAN_SHUNT);
+
+    logln("[HW] -> digital sensor detected, current consumption is " + String(digitalCurrentSensor.getCurrent(INA3221_CH1), 2) + " Amperes");
+  }
+  else {
+    logln("[HW] -> no digital sensor detected");
   }
 }
 
@@ -317,12 +244,13 @@ bool GPIORead(uint8_t GPIO) {
 
 void initSenseCircuit() {
   standByCurrentTest();
-  measureOffsetConsumption();
 }
 
 void initSensors() {
   long error = HW_error;
   logln("[HW] -> Initialiting sensors");
+  initI2CBus();
+  initCurrentSensor();
   initRoomSensor();
   //sensors verification
   while (!measureNTCTemperature());
@@ -366,7 +294,7 @@ void standByCurrentTest() {
   float testCurrent;
   logln("[HW] -> Measuring standby current...");
 
-  testCurrent = measureMeanConsumption(MAIN_SHUNT, defaultTestingSamples);
+  testCurrent = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL);
   if (testCurrent < STANDBY_CONSUMPTION_MIN) {
     HW_error += DEFECTIVE_CURRENT_SENSOR;
     logln("[HW] -> Fail -> Defective current sensor");
@@ -385,7 +313,7 @@ void standByCurrentTest() {
 }
 
 void initializeTFT() {
-  tft.begin(DISPLAY_CONTROLLER_IC);
+  tft.begin(SPI_CLOCK_DIV8);
   tft.setRotation(DISPLAY_DEFAULT_ROTATION);
 }
 
@@ -398,7 +326,7 @@ void initTFT() {
     backlightPower = PWM_MAX_VALUE / screenBrightnessFactor;
   }
   backlightPowerSafe = PWM_MAX_VALUE * backlightPowerSafePercentage;
-  offsetCurrent = measureMeanConsumption(MAIN_SHUNT, defaultTestingSamples);
+  offsetCurrent = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL);
   GPIOWrite(TFT_CS, LOW);
   initializeTFT();
   loadlogo();
@@ -412,7 +340,7 @@ void initTFT() {
     }
     processTime = millis();
   }
-  testCurrent = measureMeanConsumption(MAIN_SHUNT, defaultTestingSamples) - offsetCurrent;
+  testCurrent = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL) - offsetCurrent;
   if (testCurrent < SCREEN_CONSUMPTION_MIN) {
     //HW_error += DEFECTIVE_SCREEN;
     logln("[HW] -> WARNING -> Screen current is not high enough");
@@ -453,11 +381,12 @@ void initBuzzer() {
   long error = HW_error;
   float testCurrent, offsetCurrent;
 
-  offsetCurrent = measureMeanConsumption(MAIN_SHUNT, defaultTestingSamples);
+  offsetCurrent = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL);
   ledcWrite(BUZZER_PWM_CHANNEL, BUZZER_MAX_PWM / 2);
-
-  testCurrent = measureMeanConsumption(MAIN_SHUNT, defaultTestingSamples) - offsetCurrent;
+  vTaskDelay(CURRENT_STABILIZE_TIME);
+  testCurrent = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL) - offsetCurrent;
   ledcWrite(BUZZER_PWM_CHANNEL, false);
+  vTaskDelay(CURRENT_STABILIZE_TIME);
   if (testCurrent < BUZZER_CONSUMPTION_MIN) {
     HW_error += DEFECTIVE_BUZZER;
     logln("[HW] -> Fail -> Buzzer current is not high enough");
@@ -474,12 +403,12 @@ void initBuzzer() {
 void actuatorsTest() {
   long error = HW_error;
   float testCurrent, offsetCurrent;
-
-  offsetCurrent = measureMeanConsumption(MAIN_SHUNT, defaultTestingSamples);
+  offsetCurrent = measureMeanConsumption(PHOTOTHERAPY_SHUNT_CHANNEL);
   logln("[HW] -> Checking actuators...");
-
   GPIOWrite(PHOTOTHERAPY, HIGH);
-  testCurrent = measureMeanConsumption(MAIN_SHUNT, defaultTestingSamples) - offsetCurrent;
+  vTaskDelay(CURRENT_STABILIZE_TIME);
+  testCurrent = measureMeanConsumption(PHOTOTHERAPY_SHUNT_CHANNEL) - offsetCurrent;
+  GPIOWrite(PHOTOTHERAPY, LOW);
   logln("[HW] -> Phototherapy current consumption: " + String (testCurrent) + " Amps");
   GPRSSetPostVariables(NO_COMMENT, ",Pho:" + String (testCurrent));
   if (testCurrent < PHOTOTHERAPY_CONSUMPTION_MIN) {
@@ -490,14 +419,15 @@ void actuatorsTest() {
     HW_error += PHOTOTHERAPY_CONSUMPTION_MAX_ERROR;
     logln("[HW] -> Fail -> PHOTOTHERAPY current consumption is too high");
   }
-  GPIOWrite(PHOTOTHERAPY, LOW);
+  vTaskDelay(CURRENT_STABILIZE_TIME);
   if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
     ledcWrite(HUMIDIFIER_PWM_CHANNEL, HUMIDIFIER_DUTY_CYCLE);
   }
-  else {
+  else if (HUMIDIFIER_MODE == HUMIDIFIER_BINARY) {
     GPIOWrite(HUMIDIFIER, HIGH);
   }
-  testCurrent = measureMeanConsumption(HUMIDIFIER_SHUNT, defaultTestingSamples);
+  vTaskDelay(CURRENT_STABILIZE_TIME);
+  testCurrent = measureMeanConsumption(HUMIDIFIER_SHUNT); // <- UPDATE THIS CODE
   logln("[HW] -> Humidifier current consumption: " + String (testCurrent) + " Amps");
   GPRSSetPostVariables(NO_COMMENT, ",Hum:" + String (testCurrent));
   if (testCurrent < HUMIDIFIER_CONSUMPTION_MIN) {
@@ -511,11 +441,14 @@ void actuatorsTest() {
   if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
     ledcWrite(HUMIDIFIER_PWM_CHANNEL, false);
   }
-  else {
+  else if (HUMIDIFIER_MODE == HUMIDIFIER_BINARY) {
     GPIOWrite(HUMIDIFIER, LOW);
   }
+  vTaskDelay(CURRENT_STABILIZE_TIME);
+  offsetCurrent = measureMeanConsumption(FAN_SHUNT_CHANNEL);
   GPIOWrite(FAN, HIGH);
-  testCurrent = measureMeanConsumption(MAIN_SHUNT, defaultTestingSamples) - offsetCurrent;
+  vTaskDelay(CURRENT_STABILIZE_TIME);
+  testCurrent = measureMeanConsumption(FAN_SHUNT_CHANNEL) - offsetCurrent;
   logln("[HW] -> FAN consumption: " + String (testCurrent) + " Amps");
   GPRSSetPostVariables(NO_COMMENT, ",Fan:" + String (testCurrent));
   if (testCurrent < FAN_CONSUMPTION_MIN) {
@@ -527,9 +460,11 @@ void actuatorsTest() {
     logln("[HW] -> Fail -> Fan current consumption is too high");
   }
   GPIOWrite(FAN, LOW);
-
+  vTaskDelay(CURRENT_STABILIZE_TIME);
+  offsetCurrent = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL);
   ledcWrite(HEATER_PWM_CHANNEL, PWM_MAX_VALUE);
-  testCurrent = measureMeanConsumption(MAIN_SHUNT, defaultTestingSamples) - offsetCurrent;
+  vTaskDelay(CURRENT_STABILIZE_TIME);
+  testCurrent = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL) - offsetCurrent;
   logln("[HW] -> Heater current consumption: " + String (testCurrent) + " Amps");
   GPRSSetPostVariables(NO_COMMENT, ",Hea:" + String (testCurrent));
   if (testCurrent < HEATER_CONSUMPTION_MIN) {
@@ -541,7 +476,7 @@ void actuatorsTest() {
     logln("[HW] -> Fail -> Heater current consumption is too high");
   }
   ledcWrite(HEATER_PWM_CHANNEL, 0);
-
+  vTaskDelay(CURRENT_STABILIZE_TIME);
   if (error == HW_error) {
     logln("[HW] -> OK -> Actuators are working as expected");
   }
