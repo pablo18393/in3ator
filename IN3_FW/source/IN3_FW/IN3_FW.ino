@@ -25,8 +25,10 @@
 #include "SparkFun_SHTC3.h" // Click here to get the library: http://librarymanager/All#SparkFun_SHTC3
 #include <RotaryEncoder.h>
 #include <Beastdevices_INA3221.h>
+#include "in3ator_humidifier.h"
 
 TwoWire *wire;
+MAM_in3ator_Humidifier in3_hum(DEFAULT_ADDRESS);
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 SHTC3 mySHTC3;              // Declare an instance of the SHTC3 class
 RotaryEncoder encoder(ENC_A, ENC_B, RotaryEncoder::LatchMode::TWO03);

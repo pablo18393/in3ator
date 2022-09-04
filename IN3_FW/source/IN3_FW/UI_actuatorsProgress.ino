@@ -187,24 +187,14 @@ void basictemperatureControl() {
 void basicHumidityControl() {
   if (humidity < desiredControlHumidity) {
     if (!humidifierState || humidifierStateChange) {
-      if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
-        ledcWrite(HUMIDIFIER_PWM_CHANNEL, HUMIDIFIER_DUTY_CYCLE);
-      }
-      else if (HUMIDIFIER_MODE == HUMIDIFIER_BINARY) {
-        GPIOWrite(HUMIDIFIER, HIGH);
-      }
+in3_hum.turn(ON);
       humidifierStateChange = false;
     }
     humidifierState = true;
   }
   else {
     if (humidifierState || humidifierStateChange) {
-      if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
-        ledcWrite(HUMIDIFIER_PWM_CHANNEL, false);
-      }
-      else if (HUMIDIFIER_MODE == HUMIDIFIER_BINARY) {
-        GPIOWrite(HUMIDIFIER, LOW);
-      }
+in3_hum.turn(OFF);
       humidifierStateChange = false;
     }
     humidifierState = false;
@@ -225,11 +215,11 @@ void stopActuation() {
 
 void turnActuators(bool mode) {
   ledcWrite(HEATER_PWM_CHANNEL, mode * BUZZER_MAX_PWR * ongoingCriticalAlarm());
-  if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
-    ledcWrite(HUMIDIFIER_PWM_CHANNEL, HUMIDIFIER_DUTY_CYCLE * mode * ongoingCriticalAlarm());
+  if(mode * ongoingCriticalAlarm()){
+    in3_hum.turn(ON);
   }
-  else if (HUMIDIFIER_MODE == HUMIDIFIER_BINARY) {
-    GPIOWrite(HUMIDIFIER, mode);
+  else{
+    in3_hum.turn(OFF);
   }
   turnFans(mode);
 }

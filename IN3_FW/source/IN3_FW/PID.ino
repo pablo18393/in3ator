@@ -40,24 +40,14 @@ void PIDHandler() {
     }
     if (humidityControlPIDOutput < millis() - windowStartTime) {
       if (humidifierState || humidifierStateChange) {
-        if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
-          ledcWrite(HUMIDIFIER_PWM_CHANNEL, false);
-        }
-        else if (HUMIDIFIER_MODE == HUMIDIFIER_BINARY) {
-          GPIOWrite(HUMIDIFIER, LOW);
-        }
+        in3_hum.turn(OFF);
         humidifierStateChange = false;
       }
       humidifierState = false;
     }
     else {
       if (!humidifierState || humidifierStateChange) {
-        if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
-          ledcWrite(HUMIDIFIER_PWM_CHANNEL, HUMIDIFIER_DUTY_CYCLE);
-        }
-        else if (HUMIDIFIER_MODE == HUMIDIFIER_BINARY) {
-          GPIOWrite(HUMIDIFIER, HIGH);
-        }
+        in3_hum.turn(ON);
         humidifierStateChange = false;
       }
       humidifierState = true;

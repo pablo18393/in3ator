@@ -373,10 +373,6 @@ void TFTRestore() {
   }
 }
 
-void initActuators() {
-  actuatorsTest();
-}
-
 void initBuzzer() {
   long error = HW_error;
   float testCurrent, offsetCurrent;
@@ -400,6 +396,11 @@ void initBuzzer() {
   GPRSSetPostVariables(NO_COMMENT, ",Buz:" + String (testCurrent));
 }
 
+void initActuators() {
+  in3_hum.begin();
+  actuatorsTest();
+}
+
 void actuatorsTest() {
   long error = HW_error;
   float testCurrent, offsetCurrent;
@@ -420,12 +421,7 @@ void actuatorsTest() {
     logln("[HW] -> Fail -> PHOTOTHERAPY current consumption is too high");
   }
   vTaskDelay(CURRENT_STABILIZE_TIME);
-  if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
-    ledcWrite(HUMIDIFIER_PWM_CHANNEL, HUMIDIFIER_DUTY_CYCLE);
-  }
-  else if (HUMIDIFIER_MODE == HUMIDIFIER_BINARY) {
-    GPIOWrite(HUMIDIFIER, HIGH);
-  }
+  in3_hum.turn(ON);
   vTaskDelay(CURRENT_STABILIZE_TIME);
   testCurrent = measureMeanConsumption(HUMIDIFIER_SHUNT); // <- UPDATE THIS CODE
   logln("[HW] -> Humidifier current consumption: " + String (testCurrent) + " Amps");
@@ -438,12 +434,7 @@ void actuatorsTest() {
     HW_error += HUMIDIFIER_CONSUMPTION_MAX_ERROR;
     logln("[HW] -> Fail -> HUMIDIFIER current consumption is too high");
   }
-  if (HUMIDIFIER_MODE == HUMIDIFIER_PWM) {
-    ledcWrite(HUMIDIFIER_PWM_CHANNEL, false);
-  }
-  else if (HUMIDIFIER_MODE == HUMIDIFIER_BINARY) {
-    GPIOWrite(HUMIDIFIER, LOW);
-  }
+  in3_hum.turn(OFF);
   vTaskDelay(CURRENT_STABILIZE_TIME);
   offsetCurrent = measureMeanConsumption(FAN_SHUNT_CHANNEL);
   GPIOWrite(FAN, HIGH);
