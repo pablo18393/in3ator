@@ -183,7 +183,6 @@ const byte maxHum = 90; //maximum allowed humidity to be set
 const byte minHum = 20; //minimum allowed humidity to be set
 const byte LEDMaxIntensity = 100; //max LED intensity to be set
 const byte fanMaxSpeed = 100; //max fan speed (percentage) to be set
-const float screenBrightnessFactor = 2.5; //Max brightness will be divided by this constant
 
 //Encoder variables
 #define NUMENCODERS 1 //number of encoders in circuit

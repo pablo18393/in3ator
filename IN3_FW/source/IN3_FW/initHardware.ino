@@ -125,7 +125,7 @@ void initPWMGPIO() {
   ledcAttachPin(SCREENBACKLIGHT, SCREENBACKLIGHT_PWM_CHANNEL);
   ledcAttachPin(HEATER, HEATER_PWM_CHANNEL);
   ledcAttachPin(BUZZER, BUZZER_PWM_CHANNEL);
-  ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, PWM_MAX_VALUE);
+  ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, false);
   ledcWrite(HEATER_PWM_CHANNEL, false);
   ledcWrite(BUZZER_PWM_CHANNEL, false);
 }
@@ -137,51 +137,6 @@ void initInterrupts() {
 }
 
 float readExternalADC() {
-}
-
-void checkHWAlternativePins(int mode) {
-  switch (mode) {
-    case HUMIDIFIER_ALTERNATIVE:
-      HUMIDIFIER = HUMIDIFIER_ALTERNATIVE;
-      I2C_SCL = I2C_SCL_ALTERNATIVE;
-      break;
-    default:
-      HUMIDIFIER = HUMIDIFIER_DEFAULT;
-      I2C_SCL = I2C_SCL_DEFAULT;
-      break;
-  }
-  I2C_SDA = I2C_SDA_DEFAULT;
-  logln("[HW] -> I2C Pins are " + String (I2C_SDA) + "," + String(I2C_SCL));
-}
-
-void alternateHWPins() {
-  initPin(HUMIDIFIER, INPUT);
-  if (HUMIDIFIER == HUMIDIFIER_ALTERNATIVE) {
-    HUMIDIFIER = HUMIDIFIER_DEFAULT;
-    I2C_SCL = I2C_SCL_DEFAULT;
-  }
-  else {
-    HUMIDIFIER = HUMIDIFIER_ALTERNATIVE;
-    I2C_SCL = I2C_SCL_ALTERNATIVE;
-  }
-  initPin(HUMIDIFIER, OUTPUT);
-  GPIOWrite(HUMIDIFIER, LOW);
-  EEPROM.write(EEPROM_HWAlternativePinout, HUMIDIFIER);
-  EEPROM.commit();
-}
-
-void initI2CBus() {
-  initI2CBus(I2C_SDA_DEFAULT, I2C_SCL_DEFAULT);
-}
-
-void initI2CBus(int I2C_SDA, int I2C_SCL) {
-  deninitI2CBus();
-  Wire.begin(I2C_SDA, I2C_SCL);
-  wire = &Wire;
-}
-
-void deninitI2CBus() {
-  Wire.end();
 }
 
 void initRoomSensor() {
@@ -203,7 +158,6 @@ void initCurrentSensor() {
 
     // Set shunt resistors to 10 mOhm for all channels
     digitalCurrentSensor.setShuntRes(SYSTEM_SHUNT, PHOTOTHERAPY_SHUNT, FAN_SHUNT);
-
     logln("[HW] -> digital sensor detected, current consumption is " + String(digitalCurrentSensor.getCurrent(INA3221_CH1), 2) + " Amperes");
   }
   else {
@@ -249,7 +203,8 @@ void initSenseCircuit() {
 void initSensors() {
   long error = HW_error;
   logln("[HW] -> Initialiting sensors");
-  initI2CBus();
+  Wire.begin(I2C_SDA, I2C_SCL);
+  wire = &Wire;
   initCurrentSensor();
   initRoomSensor();
   //sensors verification
@@ -323,7 +278,7 @@ void initTFT() {
   int  timeOut = 4000;
   long processTime;
   if (screenBrightnessFactor) {
-    backlightPower = PWM_MAX_VALUE / screenBrightnessFactor;
+    backlightPower = PWM_MAX_VALUE * screenBrightnessFactor;
   }
   backlightPowerSafe = PWM_MAX_VALUE * backlightPowerSafePercentage;
   offsetCurrent = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL);
@@ -331,7 +286,7 @@ void initTFT() {
   initializeTFT();
   loadlogo();
   processTime = millis();
-  for (int i = PWM_MAX_VALUE; i >= backlightPower; i--) {
+  for (int i = 0; i < backlightPower; i++) {
     ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, i);
     if (brightenRate) {
       while (millis() - processTime < i / brightenRate) {
