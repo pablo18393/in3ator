@@ -3,7 +3,7 @@
 */
 
 //Firmware version and head title of UI screen
-#define FWversion "v10.1/9.B"
+#define FWversion "v10.2/9.B"
 #define headingTitle "in3ator"
 
 #include <esp_task_wdt.h>
@@ -38,8 +38,8 @@ Beastdevices_INA3221 digitalCurrentSensor(INA3221_ADDR41_VCC);
 #define roomSensorAddress 112
 
 
-int serialNumber = 45;
-#define WDT_TIMEOUT 15
+int serialNumber = 80;
+#define WDT_TIMEOUT 25
 
 byte HWAlternativePinout;
 

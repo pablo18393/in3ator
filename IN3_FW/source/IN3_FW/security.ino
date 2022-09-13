@@ -4,7 +4,7 @@
 #define TEMPERATURE_ERROR_HYSTERESIS  0.05 // 0.05 degrees difference to disable alarm
 #define HUMIDITY_ERROR_HYSTERESIS  5 //5 %RH to disable alarm
 
-#define FAN_TEST_CURRENTDIF_MIN 0.4 //when the fan is spinning, heater cools down and consume less current
+#define FAN_TEST_CURRENTDIF_MIN 0.2 //when the fan is spinning, heater cools down and consume less current
 #define FAN_TEST_PREHEAT_TIME 30000 //when the fan is spinning, heater cools down and consume less current
 
 
@@ -189,45 +189,49 @@ char* alarmIDtoString (byte alarmID) {
   switch (alarmID) {
     case AIR_THERMAL_CUTOUT_ALARM:
     case SKIN_THERMAL_CUTOUT_ALARM:
-      return convertStringToChar(cstring,"THERMAL CUTOUT ALARM");
+      return convertStringToChar(cstring, "THERMAL CUTOUT ALARM");
       break;
     case TEMPERATURE_ALARM:
-      return convertStringToChar(cstring,"TEMPERATURE ALARM");
+      return convertStringToChar(cstring, "TEMPERATURE ALARM");
       break;
     case HUMIDITY_ALARM:
-      return convertStringToChar(cstring,"HUMIDITY ALARM");
+      return convertStringToChar(cstring, "HUMIDITY ALARM");
       break;
     case AIR_SENSOR_ISSUE_ALARM:
-      return convertStringToChar(cstring,"AIR SENSOR ALARM");
+      return convertStringToChar(cstring, "AIR SENSOR ALARM");
       break;
     case SKIN_SENSOR_ISSUE_ALARM:
-      return convertStringToChar(cstring,"SKIN SENSOR ALARM");
+      return convertStringToChar(cstring, "SKIN SENSOR ALARM");
       break;
     case FAN_ISSUE_ALARM:
-      return convertStringToChar(cstring,"FAN ALARM");
+      return convertStringToChar(cstring, "FAN ALARM");
       break;
     default:
-      return convertStringToChar(cstring,"ALARM");
+      return convertStringToChar(cstring, "ALARM");
       break;
   }
 }
 
 bool checkFan() {
+
   float offsetCurrent;
   float testCurrent;
   long ongoingTest = millis();
   bool exitTest;
   ledcWrite(HEATER_PWM_CHANNEL, HEATER_HALF_PWR * ongoingCriticalAlarm());
   while (millis() - ongoingTest < FAN_TEST_PREHEAT_TIME) {
-    encoderContinuousPress();
+    if (encoderContinuousPress()) {
+      return false;
+    }
     updateData();
   }
   offsetCurrent = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL);
-  ledcWrite(HEATER_PWM_CHANNEL, false);
   turnFans(ON);
   ongoingTest = millis();
   while (millis() - ongoingTest < FAN_TEST_PREHEAT_TIME) {
-    encoderContinuousPress();
+    if (encoderContinuousPress()) {
+      return false;
+    }
     updateData();
   }
   ledcWrite(HEATER_PWM_CHANNEL, HEATER_HALF_PWR * ongoingCriticalAlarm());

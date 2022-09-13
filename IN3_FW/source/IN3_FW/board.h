@@ -28,7 +28,7 @@
 #define HUMIDIFIER_SHUNT 1
 
 #define SDCard false
-#define SYSTEM_SHUNT 3 //miliohms
+#define SYSTEM_SHUNT 2 //miliohms
 #define PHOTOTHERAPY_SHUNT 20 //miliohms
 #define FAN_SHUNT 100 //miliohms
 
@@ -44,7 +44,7 @@
 #define HUMIDIFIER_PWM_CHANNEL 7
 #define DEFAULT_PWM_RESOLUTION 8
 #define DEFAULT_PWM_FREQUENCY 2000
-#define HEATER_PWM_FREQUENCY 100
+#define HEATER_PWM_FREQUENCY 2000
 #define HUMIDIFIER_PWM_FREQUENCY 110000
 
 #define maxADCvalue 4095

@@ -155,9 +155,10 @@ void initCurrentSensor() {
   if (digitalCurrentSensorPresent) {
     digitalCurrentSensor.begin();
     digitalCurrentSensor.reset();
-
     // Set shunt resistors to 10 mOhm for all channels
     digitalCurrentSensor.setShuntRes(SYSTEM_SHUNT, PHOTOTHERAPY_SHUNT, FAN_SHUNT);
+    digitalCurrentSensor.setShuntConversionTime(INA3221_REG_CONF_CT_140US);
+    digitalCurrentSensor.setAveragingMode(INA3221_REG_CONF_AVG_512);
     logln("[HW] -> digital sensor detected, current consumption is " + String(digitalCurrentSensor.getCurrent(INA3221_CH1), 2) + " Amperes");
   }
   else {

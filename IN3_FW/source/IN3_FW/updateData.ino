@@ -32,11 +32,12 @@ void updateData() {
       logln("[PID] -> Desired temp is: " + String (desiredControlTemperature) + "ºC");
     }
 
-    logln("[SENSORS] -> System current consumption is: " + String (digitalCurrentSensor.getCurrent(INA3221_CH1), 2) + " Amps");
+    logln("[SENSORS] -> System current consumption is: " + String (digitalCurrentSensor.getCurrent(INA3221_CH1), 4) + " Amps");
+    logln("[SENSORS] -> Phototherapy current consumption is: " + String (digitalCurrentSensor.getCurrent(INA3221_CH2), 4) + " Amps");
+    logln("[SENSORS] -> Fan current consumption is: " + String (digitalCurrentSensor.getCurrent(INA3221_CH3), 4) + " Amps");
     logln("[SENSORS] -> Baby temperature: " + String(temperature[skinSensor]) + "ºC, correction error is " + String(errorTemperature[skinSensor]));
     logln("[SENSORS] -> Air temperature: " + String(temperature[airSensor]) + "ºC, correction error is " + String(errorTemperature[airSensor]));
     logln("[SENSORS] -> Humidity: " + String(humidity) + "%");
-    logln("[ACTUATORS_EN] -> " + String(analogRead(ACTUATORS_EN)));
     if (millis() - lastDebugUpdate) {
       logln("[LATENCY] -> Looped " + String(loopCounts * 1000 / (millis() - lastDebugUpdate)) + " Times per second");
     }
@@ -111,68 +112,12 @@ void logln(String dataString) {
 
 void log(String dataString) {
   if (SDCard) {
-    /*
-      GPIOWrite(SD_CS, LOW);
-      GPIOWrite(TFT_CS, HIGH);
-      // if the file is available, write to it:
-      File dataFile = SD.open(logFile, FILE_WRITE);
-      if (dataFile) {
-      dataFile.print(day());
-      dataFile.print("/");
-      dataFile.print(month());
-      dataFile.print("/");
-      dataFile.print(year());
-      dataFile.print("-");
-      dataFile.print(hour());
-      dataFile.print(":");
-      dataFile.print(minute());
-      dataFile.print(":");
-      dataFile.print(second());
-      dataFile.print(";");
-      dataFile.print(dataString);
-      dataFile.close();
-      // print to the serial port too:
-      }
-      GPIOWrite(SD_CS, HIGH);
-      GPIOWrite(TFT_CS, LOW);
-    */
   }
   Serial.print(dataString);
 }
 
 void GPRSLocalLog() {
   if (SDCard) {
-    /*
-      GPIOWrite(SD_CS, LOW);
-      GPIOWrite(TFT_CS, HIGH);
-      String dataString;
-      dataString += temperature[skinSensor];
-      dataString += ";";
-      dataString += humidity;
-      dataString += ";";
-      // if the file is available, write to it:
-      File dataFile = SD.open(GPRSFile, FILE_WRITE);
-      if (dataFile) {
-      dataFile.print(day());
-      dataFile.print("/");
-      dataFile.print(month());
-      dataFile.print("/");
-      dataFile.print(year());
-      dataFile.print("-");
-      dataFile.print(hour());
-      dataFile.print(":");
-      dataFile.print(minute());
-      dataFile.print(":");
-      dataFile.print(second());
-      dataFile.print(";");
-      dataFile.println(dataString);
-      dataFile.close();
-      // print to the serial port too:
-      //logln(dataString);
-      }
-      GPIOWrite(SD_CS, HIGH);
-      GPIOWrite(TFT_CS, LOW);
-    */
   }
 }
 
