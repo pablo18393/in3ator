@@ -24,8 +24,8 @@
 */
 
 //PID VARIABLES
-#define airPID 0
-#define skinPID 1
+#define skinPID 0
+#define airPID 1
 #define humidityPID 2
 #define numPID 3
 

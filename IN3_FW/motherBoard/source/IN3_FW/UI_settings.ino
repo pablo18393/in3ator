@@ -67,12 +67,12 @@ void UI_settings() {
     words[WifiENGraphicPosition] = convertStringToChar("WIFI IP->");
   }
   menu_rows = numWords;
-  graphics();
-  drawHeading();
+  graphics(page, language, print_text, menu_rows, serialNumber, WIFI_EN);
+  drawHeading(page, serialNumber, FWversion);
   bar_pos = true;
   selected = false;
   ypos = graphicHeight(bar_pos - 1);
-  while (!GPIORead(ENC_SWITCH)) {
+  while (!digitalRead(ENC_SWITCH)) {
     updateData();
   }
   vTaskDelay(debounceTime);

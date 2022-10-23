@@ -58,11 +58,11 @@ void autoCalibration() {
       break;
   }
   menu_rows = numWords;
-  graphics();
-  drawHeading();
+  graphics(page, language, print_text, menu_rows, NULL, NULL);
+  drawHeading(page, serialNumber, FWversion);
   bar_pos = true;
   ypos = graphicHeight(bar_pos - 1);
-  while (!GPIORead(ENC_SWITCH)) {
+  while (!digitalRead(ENC_SWITCH)) {
     updateData();
   }
   vTaskDelay(debounceTime);
@@ -77,11 +77,11 @@ void autoCalibration() {
         turnFans(ON);
         break;
       case firstAutoCalibrationPoint:
-        if (!GPIORead(ENC_SWITCH) || checkStableTemperatures(referenceSensorHistory, sensorToCalibrateHistory, historyLength, stabilityError)) {
+        if (!digitalRead(ENC_SWITCH) || checkStableTemperatures(referenceSensorHistory, sensorToCalibrateHistory, historyLength, stabilityError)) {
           provisionalReferenceTemperatureLow = temperature[airSensor];
           provisionalRawTemperatureLow[skinSensor] = temperature[skinSensor];
           vTaskDelay(debounceTime);
-          while (!GPIORead(ENC_SWITCH)) {
+          while (!digitalRead(ENC_SWITCH)) {
             updateData();
             exitCalibrationMenu = back_mode();
           }
@@ -97,7 +97,7 @@ void autoCalibration() {
         break;
       case secondAutoCalibrationPoint:
         PIDHandler();
-        if (!GPIORead(ENC_SWITCH) || checkStableTemperatures(referenceSensorHistory, sensorToCalibrateHistory, historyLength, stabilityError)) {
+        if (!digitalRead(ENC_SWITCH) || checkStableTemperatures(referenceSensorHistory, sensorToCalibrateHistory, historyLength, stabilityError)) {
           Serial.println("=================================================point 2");
           ReferenceTemperatureLow = provisionalReferenceTemperatureLow;
           RawTemperatureLow[skinSensor] = provisionalRawTemperatureLow[skinSensor];
@@ -144,13 +144,13 @@ void fineTuneCalibration() {
   words[temperatureCalibrationGraphicPosition]  = convertStringToChar("Temperature adjust");
   words[setCalibrationGraphicPosition]  = convertStringToChar("SET");
   menu_rows = numWords;
-  graphics();
-  drawHeading();
+  graphics(page, language, print_text, menu_rows, NULL, NULL);
+  drawHeading(page, serialNumber, FWversion);
   bar_pos = true;
   ypos = graphicHeight(bar_pos - 1);
   setTextColor(COLOR_MENU_TEXT);
   drawFloat(temperature[skinSensor], 1, valuePosition, ypos, textFontSize);
-  while (!GPIORead(ENC_SWITCH)) {
+  while (!digitalRead(ENC_SWITCH)) {
     updateData();
   }
   vTaskDelay(debounceTime);
@@ -185,13 +185,13 @@ void firstPointCalibration() {
       break;
   }
   menu_rows = numWords;
-  graphics();
-  drawHeading();
+  graphics(page, language, print_text, menu_rows, NULL, NULL);
+  drawHeading(page, serialNumber, FWversion);
   bar_pos = true;
   ypos = graphicHeight(bar_pos - 1);
   setTextColor(COLOR_MENU_TEXT);
   drawFloat(temperature[skinSensor], 1, valuePosition, ypos, textFontSize);
-  while (!GPIORead(ENC_SWITCH)) {
+  while (!digitalRead(ENC_SWITCH)) {
     updateData();
   }
   vTaskDelay(debounceTime);
@@ -226,13 +226,13 @@ void secondPointCalibration() {
       break;
   }
   menu_rows = numWords;
-  graphics();
-  drawHeading();
+  graphics(page, language, print_text, menu_rows, NULL, NULL);
+  drawHeading(page, serialNumber, FWversion);
   bar_pos = true;
   ypos = graphicHeight(bar_pos - 1);
   setTextColor(COLOR_MENU_TEXT);
   drawFloat(temperature[skinSensor], 1, valuePosition, ypos, textFontSize);
-  while (!GPIORead(ENC_SWITCH)) {
+  while (!digitalRead(ENC_SWITCH)) {
     updateData();
   }
   vTaskDelay(debounceTime);

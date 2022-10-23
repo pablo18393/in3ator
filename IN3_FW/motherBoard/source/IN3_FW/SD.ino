@@ -43,8 +43,8 @@ void initSD() {
         logln(dataString);
       }
     }
-    GPIOWrite(SD_CS, HIGH);
-    GPIOWrite(TFT_CS, LOW);
+    digitalWrite(SD_CS, HIGH);
+    digitalWrite(TFT_CS, LOW);
   }
   */
 }

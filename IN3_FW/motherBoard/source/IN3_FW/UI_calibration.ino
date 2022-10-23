@@ -59,11 +59,11 @@ void UI_calibration() {
       break;
   }
   menu_rows = numWords;
-  graphics();
-  drawHeading();
+  graphics(page, language, print_text, menu_rows, NULL, NULL);
+  drawHeading(page, serialNumber, FWversion);
   bar_pos = true;
   ypos = graphicHeight(bar_pos - 1);
-  while (!GPIORead(ENC_SWITCH)) {
+  while (!digitalRead(ENC_SWITCH)) {
     updateData();
   }
   vTaskDelay(debounceTime);

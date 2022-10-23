@@ -137,7 +137,7 @@ void initGPRS()
   GPRS.powerUp = true;
   GPRSSetPostVariables(defaultPost, "First post, FW version: " + String (FWversion));
   setGPRSPostPeriod(standByGPRSPostPeriod);
-  GPIOWrite(GPRS_PWRKEY, HIGH);
+  digitalWrite(GPRS_PWRKEY, HIGH);
 }
 
 void GPRS_Handler() {
@@ -275,7 +275,7 @@ void GPRSPowerUp() {
     case 0:
       if (millis() - GPRS.packetSentenceTime > 2000) {
         GPRS.processTime = millis();
-        GPIOWrite(GPRS_PWRKEY, LOW);
+        digitalWrite(GPRS_PWRKEY, LOW);
         GPRS.processSuccess = true;
         GPRS.process++;
         GPRS.packetSentenceTime = millis();
@@ -284,7 +284,7 @@ void GPRSPowerUp() {
       break;
     case 1:
       if (millis() - GPRS.packetSentenceTime > 2000) {
-        GPIOWrite(GPRS_PWRKEY, HIGH);
+        digitalWrite(GPRS_PWRKEY, HIGH);
         GPRS.packetSentenceTime = millis();
         GPRS.process++;
         logln("[GPRS] -> GPRS powered");

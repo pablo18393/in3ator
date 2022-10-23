@@ -33,6 +33,7 @@ void updateData() {
   OTAHandler();
   sensorsHandler();
   GPRS_Handler();
+  backlightHandler();
   if (page != autoCalibrationPage) {
     securityCheck();
   }
@@ -40,7 +41,7 @@ void updateData() {
     logln("[ALARM] -> maximum power exceeded");
     powerAlert = false;
   }
-  if (encPulseDetected && GPIORead(ENC_SWITCH)) {
+  if (encPulseDetected && digitalRead(ENC_SWITCH)) {
     encPulseDetected = false;
   }
   if (millis() - lastDebugUpdate > debugUpdatePeriod) {
@@ -77,24 +78,24 @@ void updateData() {
     lastGraphicSensorsUpdate = millis();
   }
   if ((page == mainMenuPage) && !enableSet) {
-    checkSetMessage();
+    checkSetMessage(page);
   }
 }
 
 void updateDisplaySensors() {
   float temperatureToUpdate;
   if (page == mainMenuPage || (page == actuatorsProgressPage)) {
-    drawSelectedTemperature();
-    drawHumidity();
+    drawSelectedTemperature(temperature[controlMode], previousTemperature[controlMode]);
+    previousTemperature[controlMode] = temperature[controlMode];
+    drawHumidity(humidity, previousHumidity);
+    previousHumidity = humidity;
   }
   if (page == actuatorsProgressPage) {
-    drawUnselectedTemperature();
+    drawUnselectedTemperature(temperature[!controlMode], previousTemperature[!controlMode]);
+    previousTemperature[!controlMode] = temperature[!controlMode];
     setTextColor(COLOR_MENU_TEXT);
     if (controlTemperature) {
       float previousTemperaturePercentage = temperaturePercentage;
-      if (displayProcessPercentage) {
-        drawRightNumber(temperaturePercentage, tft.width() / 2, temperatureY);
-      }
       if (controlMode) {
         temperatureToUpdate = temperature[airSensor];
       }
@@ -114,9 +115,6 @@ void updateDisplaySensors() {
     }
     if (controlHumidity) {
       float previousHumidityPercentage = humidityPercentage;
-      if (displayProcessPercentage) {
-        drawRightNumber(humidityPercentage, tft.width() / 2, humidityY);
-      }
       if ((desiredControlHumidity - humidityAtStart)) {
         humidityPercentage = 100 - ((desiredControlHumidity - humidity) * 100 / (desiredControlHumidity - humidityAtStart));
       }

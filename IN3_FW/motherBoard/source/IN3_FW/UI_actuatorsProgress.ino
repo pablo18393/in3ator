@@ -26,20 +26,15 @@
 void UI_actuatorsProgress() {
   bool exitActuation = false;
   alarmTimerStart();
-  if (page == errorPage) {
-    GPRSSetPostVariables(NO_COMMENT, "ALARM");
-  }
-  else {
-    GPRSSetPostVariables(actuatorsModeON, "ON:" + String (desiredControlTemperature, 1) + "," + String (desiredControlHumidity));
-  }
+  GPRSSetPostVariables(actuatorsModeON, "ON:" + String (desiredControlTemperature, 1) + "," + String (desiredControlHumidity));
   byte  numWords = false;
   temperaturePercentage = false;
   page = actuatorsProgressPage;
   tft.setTextSize(1);
   print_text = false;
   menu_rows = numWords;
-  graphics();
-  drawHeading();
+  graphics(page, language, print_text, menu_rows, NULL, NULL);
+  drawHeading(page, serialNumber, FWversion);
   setTextColor(COLOR_MENU_TEXT);
   setSensorsGraphicPosition(page);
   drawActuatorsSeparators();
@@ -131,19 +126,12 @@ void UI_actuatorsProgress() {
   setTextColor(COLOR_WARNING_TEXT);
   drawStop();
   state_blink = true;
-  while (!GPIORead(ENC_SWITCH)) {
+  while (!digitalRead(ENC_SWITCH)) {
     updateData();
   }
   if (controlAlgorithm == PID_CONTROL) {
     if (controlTemperature) {
-      switch (controlMode) {
-        case SKIN_CONTROL:
-          startPID(skinPID);
-          break;
-        case AIR_CONTROL:
-          startPID(airPID);
-          break;
-      }
+      startPID(controlMode);
     }
     if (controlHumidity) {
       startPID(humidityPID);
@@ -151,17 +139,12 @@ void UI_actuatorsProgress() {
   }
   updateDisplaySensors();
   if (controlTemperature) {
-    printLoadingTemperatureBar();
-    if (controlMode) {
-      temperatureAtStart = temperature[airSensor];
-    }
-    else {
-      temperatureAtStart = temperature[skinSensor];
-    }
+    printLoadingTemperatureBar(desiredControlTemperature);
+    temperatureAtStart = temperature[controlMode];
     exitActuation = !checkFan();
   }
   if (controlHumidity) {
-    printLoadingHumidityBar();
+    printLoadingHumidityBar(desiredControlHumidity);
   }
   humidityAtStart = humidity;
   turnFans(ON);
@@ -183,7 +166,7 @@ void UI_actuatorsProgress() {
         PIDHandler();
       }
     }
-    while (!GPIORead(ENC_SWITCH)) {
+    while (!digitalRead(ENC_SWITCH)) {
       updateData();
       exitActuation = back_mode();
     }
@@ -195,12 +178,7 @@ void UI_actuatorsProgress() {
 
 void basictemperatureControl() {
   float temperatureToControl;
-  if (controlMode) {
-    temperatureToControl = temperature[airSensor];
-  }
-  else {
-    temperatureToControl = temperature[skinSensor];
-  }
+  temperatureToControl = temperature[controlMode];
   if (temperatureToControl < desiredControlTemperature) {
     heatUp();
   }
@@ -212,14 +190,14 @@ void basictemperatureControl() {
 void basicHumidityControl() {
   if (humidity < desiredControlHumidity) {
     if (!humidifierState || humidifierStateChange) {
-in3_hum.turn(ON);
+      in3_hum.turn(ON);
       humidifierStateChange = false;
     }
     humidifierState = true;
   }
   else {
     if (humidifierState || humidifierStateChange) {
-in3_hum.turn(OFF);
+      in3_hum.turn(OFF);
       humidifierStateChange = false;
     }
     humidifierState = false;
@@ -240,15 +218,15 @@ void stopActuation() {
 
 void turnActuators(bool mode) {
   ledcWrite(HEATER_PWM_CHANNEL, mode * BUZZER_MAX_PWR * ongoingCriticalAlarm());
-  if(mode * ongoingCriticalAlarm()){
+  if (mode * ongoingCriticalAlarm()) {
     in3_hum.turn(ON);
   }
-  else{
+  else {
     in3_hum.turn(OFF);
   }
   turnFans(mode);
 }
 
 void turnFans(bool mode) {
-  GPIOWrite(FAN, mode);
+  digitalWrite(FAN, mode);
 }

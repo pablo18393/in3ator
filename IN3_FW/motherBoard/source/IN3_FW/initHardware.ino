@@ -120,7 +120,7 @@ void initHardware (bool printOutputTest) {
   }
   if (printOutputTest || criticalError) {
     drawHardwareErrorMessage(HW_error, criticalError);
-    while (GPIORead(ENC_SWITCH)) {
+    while (digitalRead(ENC_SWITCH)) {
       updateData();
     }
   }
@@ -215,14 +215,6 @@ void checkTFTHealth() {
   }
 }
 
-void GPIOWrite(uint8_t GPIO, uint8_t Mode) {
-  digitalWrite(GPIO, Mode);
-}
-
-bool GPIORead(uint8_t GPIO) {
-  return (digitalRead(GPIO));
-}
-
 void initSenseCircuit() {
   standByCurrentTest();
 }
@@ -309,7 +301,7 @@ void initTFT() {
   }
   backlightPowerSafe = PWM_MAX_VALUE * backlightPowerSafePercentage;
   offsetCurrent = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL);
-  GPIOWrite(TFT_CS, LOW);
+  digitalWrite(TFT_CS, LOW);
   initializeTFT();
   loadlogo();
   processTime = millis();
@@ -342,7 +334,7 @@ void initTFT() {
 
 void TFTRestore() {
   logln("[HW] -> restoring TFT previous status");
-  GPIOWrite(TFT_CS, LOW);
+  digitalWrite(TFT_CS, LOW);
   initializeTFT();
   switch (page) {
     case actuatorsProgressPage:
@@ -408,10 +400,10 @@ bool actuatorsTest() {
   }
   vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT);
   offsetCurrent = measureMeanConsumption(PHOTOTHERAPY_SHUNT_CHANNEL);
-  GPIOWrite(PHOTOTHERAPY, HIGH);
+  digitalWrite(PHOTOTHERAPY, HIGH);
   vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT);
   testCurrent = measureMeanConsumption(PHOTOTHERAPY_SHUNT_CHANNEL) - offsetCurrent;
-  GPIOWrite(PHOTOTHERAPY, LOW);
+  digitalWrite(PHOTOTHERAPY, LOW);
   logln("[HW] -> Phototherapy current consumption: " + String (testCurrent) + " Amps");
   GPRSSetPostVariables(NO_COMMENT, ",Pho:" + String (testCurrent));
   if (testCurrent < PHOTOTHERAPY_CONSUMPTION_MIN) {
@@ -441,12 +433,12 @@ bool actuatorsTest() {
   }
   vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT);
   offsetCurrent = measureMeanConsumption(FAN_SHUNT_CHANNEL);
-  GPIOWrite(FAN, HIGH);
+  digitalWrite(FAN, HIGH);
   vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT);
   testCurrent = measureMeanConsumption(FAN_SHUNT_CHANNEL) - offsetCurrent;
   logln("[HW] -> FAN consumption: " + String (testCurrent) + " Amps");
   GPRSSetPostVariables(NO_COMMENT, ",Fan:" + String (testCurrent));
-  GPIOWrite(FAN, LOW);
+  digitalWrite(FAN, LOW);
   if (testCurrent < FAN_CONSUMPTION_MIN) {
     HW_error += FAN_CONSUMPTION_MIN_ERROR;
     logln("[HW] -> Fail -> Fan current consumption is too low");

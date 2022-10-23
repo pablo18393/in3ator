@@ -23,36 +23,35 @@
 
 */
 
-void userInterfaceHandler() {
-  backlightHandler();
-  if (EncMove) {
+void userInterfaceHandler(int UI_page, int UI_EncMove) {
+  if (UI_EncMove) {
     if (!selected) {
-      if (EncMove < 0) {
-        EncMove++;
-        if (page == mainMenuPage) {
+      if (UI_EncMove < 0) {
+        UI_EncMove++;
+        if (UI_page == mainMenuPage) {
           enableSetProcess = enableSet;
         }
         else {
           enableSetProcess = true;
         }
         if (bar_pos < menu_rows - !enableSetProcess) {
-          eraseBar();
+          eraseBar(menu_rows, bar_pos);
           bar_pos++;
-          updateBar();
+          updateBar(menu_rows, bar_pos);
         }
       }
       else {
-        EncMove --;
+        UI_EncMove --;
         if (bar_pos > 1) {
-          eraseBar();
+          eraseBar(menu_rows, bar_pos);
           bar_pos--;
-          updateBar();
+          updateBar(menu_rows, bar_pos);
         }
       }
       ypos = graphicHeight(bar_pos - 1);
     }
   }
-  if (!GPIORead(ENC_SWITCH)) {
+  if (!digitalRead(ENC_SWITCH)) {
     selected = ! selected;
     if (menu_rows) {
       if (selected) {
@@ -65,8 +64,8 @@ void userInterfaceHandler() {
         tft.fillRect(0, (tft.height() - height_heading) * (i - 1) / menu_rows + height_heading - 1, tft.height(), width_indentation, WHITE); //mejorable
       }
     }
-    if (!encoderContinuousPress()) {
-      switch (page) {
+    if (!encoderContinuousPress(UI_page)) {
+      switch (UI_page) {
         case mainMenuPage:
           switch (bar_pos - graphicTextOffset ) {
             case controlModeGraphicPosition:
@@ -76,10 +75,10 @@ void userInterfaceHandler() {
               UI_mainMenu();
               break;
             case temperatureGraphicPosition:
-              while (GPIORead(ENC_SWITCH)) {
+              while (digitalRead(ENC_SWITCH)) {
                 updateData();
-                if (EncMove) {
-                  if (EncMove > 0) {
+                if (UI_EncMove) {
+                  if (UI_EncMove > 0) {
                     if (desiredControlTemperature > minDesiredTemp[controlMode]) {
                       updateUIData = true;
                     }
@@ -96,24 +95,24 @@ void userInterfaceHandler() {
                       drawRightString(initialSensorsValue, initialSensorPosition, temperatureY, textFontSize);
                     }
                     drawFloat(desiredControlTemperature, 1, temperatureX - 65, temperatureY, textFontSize);
-                    desiredControlTemperature -= float(EncMove) * stepTemperatureIncrement;
+                    desiredControlTemperature -= float(UI_EncMove) * stepTemperatureIncrement;
                     setTextColor(COLOR_MENU_TEXT);
                     drawFloat(desiredControlTemperature, 1, temperatureX - 65, temperatureY, textFontSize);
                     enableSet = true;
                   }
-                  EncMove = false;
+                  UI_EncMove = false;
                   updateUIData = false;
                 }
               }
               EEPROM.write(EEPROM_desiredControlMode, desiredControlTemperature);
               EEPROM.commit();
-              drawStartMessage();
+              drawStartMessage(enableSet, menu_rows, helpMessage);
               break;
             case humidityGraphicPosition:
-              while (GPIORead(ENC_SWITCH)) {
+              while (digitalRead(ENC_SWITCH)) {
                 updateData();
-                if (EncMove ) {
-                  if (EncMove > 0) {
+                if (UI_EncMove ) {
+                  if (UI_EncMove > 0) {
                     if (desiredControlHumidity > minHum) {
                       updateUIData = true;
                     }
@@ -130,18 +129,18 @@ void userInterfaceHandler() {
                       drawRightString(initialSensorsValue, initialSensorPosition, humidityY, textFontSize);
                     }
                     drawCentreNumber(desiredControlHumidity, humidityX - 65, humidityY);
-                    desiredControlHumidity -= (EncMove) * stepHumidityIncrement;
+                    desiredControlHumidity -= (UI_EncMove) * stepHumidityIncrement;
                     setTextColor(COLOR_MENU_TEXT);
                     drawCentreNumber(desiredControlHumidity, humidityX - 65, humidityY);
                     enableSet = true;
                   }
                 }
-                EncMove = false;
+                UI_EncMove = false;
                 updateUIData = false;
               }
               EEPROM.write(EEPROM_desiredControlHumidity, desiredControlHumidity);
               EEPROM.commit();
-              drawStartMessage();
+              drawStartMessage(enableSet, menu_rows, helpMessage);
               break;
             case LEDGraphicPosition:
               jaundiceEnable = !jaundiceEnable;
@@ -164,7 +163,7 @@ void userInterfaceHandler() {
                 GPRSSetPostVariables(jaundiceLEDOFF, "");
                 setGPRSPostPeriod(standByGPRSPostPeriod);
               }
-              GPIOWrite(PHOTOTHERAPY, jaundiceEnable);
+              digitalWrite(PHOTOTHERAPY, jaundiceEnable);
               break;
             case settingsGraphicPosition:
               UI_settings();
@@ -177,9 +176,9 @@ void userInterfaceHandler() {
         case settingsPage:
           switch (bar_pos - graphicTextOffset ) {
             case languageGraphicPosition:
-              while (GPIORead(ENC_SWITCH)) {
+              while (digitalRead(ENC_SWITCH)) {
                 updateData();
-                if (EncMove) {
+                if (UI_EncMove) {
                   setTextColor(COLOR_MENU);
                   switch (language) {
                     case spanish:
@@ -196,7 +195,7 @@ void userInterfaceHandler() {
                       break;
                   }
                   drawRightString(textToWrite, unitPosition, ypos, textFontSize);
-                  language -= EncMove;
+                  language -= UI_EncMove;
                   if (language < 0) {
                     language = numLanguages - 1;
                   }
@@ -219,7 +218,7 @@ void userInterfaceHandler() {
                       break;
                   }
                   drawRightString(textToWrite, unitPosition, ypos, textFontSize);
-                  EncMove = false;
+                  UI_EncMove = false;
                 }
               }
               EEPROM.write(EEPROM_language, language);
@@ -227,17 +226,17 @@ void userInterfaceHandler() {
               UI_settings();
               break;
             case serialNumberGraphicPosition:
-              while (GPIORead(ENC_SWITCH) ) {
+              while (digitalRead(ENC_SWITCH) ) {
                 updateData();
-                if (EncMove) {
+                if (UI_EncMove) {
                   setTextColor(COLOR_MENU);
                   drawRightNumber(serialNumber, unitPosition, ypos);
-                  serialNumber -= EncMove;
+                  serialNumber -= UI_EncMove;
                   EEPROM.write(EEPROM_SerialNumber, serialNumber);
                   setTextColor(COLOR_MENU_TEXT);
                   drawRightNumber(serialNumber, unitPosition, ypos);
                 }
-                EncMove = false;
+                UI_EncMove = false;
               }
               EEPROM.commit();
               break;
@@ -308,15 +307,15 @@ void userInterfaceHandler() {
             case temperatureCalibrationGraphicPosition:
               errorTemperature[skinSensor] = false;
               diffTemperature = temperature[skinSensor];
-              while (GPIORead(ENC_SWITCH)) {
+              while (digitalRead(ENC_SWITCH)) {
                 updateData();
-                if (EncMove) {
+                if (UI_EncMove) {
                   setTextColor(COLOR_MENU);
                   drawFloat(diffTemperature, 1, valuePosition, ypos, textFontSize);
                   setTextColor(COLOR_MENU_TEXT);
-                  diffTemperature += EncMove * (0.1);
+                  diffTemperature += UI_EncMove * (0.1);
                   drawFloat(diffTemperature, 1, valuePosition, ypos, textFontSize);
-                  EncMove = false;
+                  UI_EncMove = false;
                 }
               }
               break;
@@ -335,15 +334,15 @@ void userInterfaceHandler() {
             case temperatureCalibrationGraphicPosition:
               errorTemperature[skinSensor] = false;
               diffTemperature = temperature[skinSensor];
-              while (GPIORead(ENC_SWITCH)) {
+              while (digitalRead(ENC_SWITCH)) {
                 updateData();
-                if (EncMove) {
+                if (UI_EncMove) {
                   setTextColor(COLOR_MENU);
                   drawFloat(diffTemperature, 1, valuePosition, ypos, textFontSize);
                   setTextColor(COLOR_MENU_TEXT);
-                  diffTemperature += EncMove * (0.1);
+                  diffTemperature += UI_EncMove * (0.1);
                   drawFloat(diffTemperature, 1, valuePosition, ypos, textFontSize);
-                  EncMove = false;
+                  UI_EncMove = false;
                 }
               }
               break;
@@ -359,15 +358,15 @@ void userInterfaceHandler() {
           switch (bar_pos - graphicTextOffset ) {
             case temperatureCalibrationGraphicPosition:
               diffTemperature = temperature[skinSensor];
-              while (GPIORead(ENC_SWITCH)) {
+              while (digitalRead(ENC_SWITCH)) {
                 updateData();
-                if (EncMove) {
+                if (UI_EncMove) {
                   setTextColor(COLOR_MENU);
                   drawFloat(diffTemperature, 1, valuePosition, ypos, textFontSize);
                   setTextColor(COLOR_MENU_TEXT);
-                  diffTemperature += EncMove * (0.1);
+                  diffTemperature += UI_EncMove * (0.1);
                   drawFloat(diffTemperature, 1, valuePosition, ypos, textFontSize);
-                  EncMove = false;
+                  UI_EncMove = false;
                   logln("difTemp: " + String(diffTemperature));
                 }
               }
@@ -395,17 +394,17 @@ void userInterfaceHandler() {
       if (menu_rows) {
         tft.fillRect(0, (tft.height() - height_heading) * (bar_pos - 1) / menu_rows + height_heading, width_select, (tft.height() - height_heading) / menu_rows, WHITE);
       }
-      encoderContinuousPress();
+      encoderContinuousPress(UI_page);
       vTaskDelay(debounceTime);
     }
   }
 }
 
-bool encoderContinuousPress() {
+bool encoderContinuousPress(int UI_page) {
   updateData();
-  if (page == mainMenuPage) {
+  if (UI_page == mainMenuPage) {
     long timePressed = millis();
-    while (!GPIORead(ENC_SWITCH)) {
+    while (!digitalRead(ENC_SWITCH)) {
       updateData();
       if (millis() - timePressed > timePressToSettings) {
         UI_settings();
@@ -419,49 +418,57 @@ bool encoderContinuousPress() {
   return false;
 }
 
-int getYpos(byte row) {
-  if (menu_rows) {
-    return ((tft.height() - height_heading) / (2 * menu_rows) + (row - 1) * (tft.height() - height_heading) / (menu_rows) + letter_height);
+int getYpos(int UI_menu_rows, byte row) {
+  row++; //because it starts at zero
+  if (UI_menu_rows) {
+    return ((tft.height() - height_heading) / (2 * UI_menu_rows) + (row - 1) * (tft.height() - height_heading) / (menu_rows) + letter_height);
   }
   return false;
 }
 
-void checkSetMessage() {
+void checkSetMessage(int UI_page)
+{
+  char *UI_helpMessage;
   int compareTime;
-  if (blinkSetMessageState) {
+  if (blinkSetMessageState)
+  {
     compareTime = blinkTimeON;
   }
-  else {
+  else
+  {
     compareTime = blinkTimeOFF;
   }
-  if (millis() - lastBlinkSetMessage > compareTime) {
+  if (millis() - lastBlinkSetMessage > compareTime)
+  {
     lastBlinkSetMessage = millis();
     blinkSetMessageState = !blinkSetMessageState;
-    if (blinkSetMessageState) {
+    if (blinkSetMessageState)
+    {
       setTextColor(COLOR_WARNING_TEXT);
-
     }
-    else {
+    else
+    {
       setTextColor(COLOR_MENU);
     }
-    if (page == mainMenuPage) {
-      switch (language) {
+    if (UI_page == mainMenuPage)
+    {
+      switch (language)
+      {
         case english:
-          helpMessage = convertStringToChar(cstring, "Set desired parameters");
+          UI_helpMessage = convertStringToChar(cstring, "Set desired parameters");
           break;
         case spanish:
-          helpMessage = convertStringToChar(cstring, "Introduce parametros");
+          UI_helpMessage = convertStringToChar(cstring, "Introduce parametros");
           break;
         case french:
-          helpMessage = convertStringToChar(cstring, "Entrer parametres");
+          UI_helpMessage = convertStringToChar(cstring, "Entrer parametres");
           break;
         case portuguese:
-          helpMessage = convertStringToChar(cstring, "Insira os parametros");
+          UI_helpMessage = convertStringToChar(cstring, "Insira os parametros");
           break;
       }
     }
-    drawCentreString(helpMessage, width_select + (tft.width() - width_select) / 2, getYpos(goToProcessRow), textFontSize);
-
+    drawCentreString(UI_helpMessage, width_select + (tft.width() - width_select) / 2, getYpos(menu_rows, startGraphicPosition), textFontSize);
   }
 }
 
@@ -470,7 +477,7 @@ bool back_mode() {
   vTaskDelay(debounceTime);
   last_encPulsed = millis();
   byte back_bar = false;
-  while (!GPIORead(ENC_SWITCH)) {
+  while (!digitalRead(ENC_SWITCH)) {
     updateData();
     if (millis() - last_encPulsed > time_back_wait) {
       back_bar++;

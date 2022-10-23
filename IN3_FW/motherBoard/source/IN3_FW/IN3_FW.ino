@@ -92,11 +92,10 @@ int page;
 #define actuatorsProgressPage 2
 #define settingsPage 3
 #define calibrateSensorsPage 4
-#define errorPage 5
-#define firstPointCalibrationPage 6
-#define secondPointCalibrationPage 7
-#define autoCalibrationPage 8
-#define fineTuneCalibrationPage 9
+#define firstPointCalibrationPage 5
+#define secondPointCalibrationPage 6
+#define autoCalibrationPage 7
+#define fineTuneCalibrationPage 8
 //languages numbers that will be called in language variable
 byte language;
 #define spanish 0
@@ -187,19 +186,19 @@ double desiredControlHumidity; //preset enviromental humidity
 bool jaundiceEnable; //PWM that controls jaundice LED intensity
 double desiredHeaterTemp; //desired temperature in heater
 
-//constants
-const byte humidifierDutyCycleMax = 100; //maximum humidity cycle in heater to be set
-const byte humidifierDutyCycleMin = 0; //minimum humidity cycle in heater to be set
+//#define system constants
+#define humidifierDutyCycleMax  100 //maximum humidity cycle in heater to be set
+#define humidifierDutyCycleMin 0 //minimum humidity cycle in heater to be set
 const float minDesiredTemp[2] = {35, 30}; //minimum allowed temperature to be set
 const float maxDesiredTemp[2] = {37.5, 37}; //maximum allowed temperature to be set
-const float stepTemperatureIncrement = 0.1; //maximum allowed temperature to be set
-const float stepHumidityIncrement = 5; //maximum allowed temperature to be set
+#define  stepTemperatureIncrement 0.1 //maximum allowed temperature to be set
+#define  stepHumidityIncrement 5 //maximum allowed temperature to be set
 const int presetTemp[2] = {36, 32}; //preset baby skin temperature
-const int presetHumidity = 60; //preset humidity
-const byte maxHum = 90; //maximum allowed humidity to be set
-const byte minHum = 20; //minimum allowed humidity to be set
-const byte LEDMaxIntensity = 100; //max LED intensity to be set
-const byte fanMaxSpeed = 100; //max fan speed (percentage) to be set
+#define  presetHumidity 60 //preset humidity
+#define  maxHum 90 //maximum allowed humidity to be set
+#define  minHum 20 //minimum allowed humidity to be set
+#define  LEDMaxIntensity 100 //max LED intensity to be set
+#define  fanMaxSpeed 100 //max fan speed (percentage) to be set
 
 //Encoder variables
 #define NUMENCODERS 1 //number of encoders in circuit
@@ -234,6 +233,10 @@ long last_encPulsed; //last time encoder was pulsed
 #define arrow_height  6
 #define arrow_tail  5
 #define headint_text_height height_heading / 5
+#define initialSensorsValue "XX"
+#define barThickness 3
+#define blinkTimeON 1000 //displayed text ON time
+#define blinkTimeOFF 100 //displayed text OFF time
 
 //Text Graphic position variables
 int humidityX;
@@ -245,10 +248,7 @@ int separatorBotYPos;
 bool controlTemperature;
 bool controlHumidity;
 int ypos;
-bool displayProcessPercentage = false;
 bool print_text;
-bool display_drawStop = false;
-char initialSensorsValue[] = "XX";
 int initialSensorPosition = separatorPosition - letter_width;
 bool pos_text[8];
 
@@ -270,7 +270,6 @@ bool enableSet;
 float temperaturePercentage, temperatureAtStart;
 float humidityPercentage, humidityAtStart;
 int barWidth, barHeight, tempBarPosX, tempBarPosY, humBarPosX, humBarPosY;
-byte barThickness;
 int screenTextColor, screenTextBackgroundColor;
 
 //User Interface display variables
@@ -281,8 +280,7 @@ const byte time_back_draw = 255;
 const byte time_back_wait = 255;
 long lastbacklightHandler; //last time there was a encoder movement or pulse
 long sensorsUpdatePeriod = 1000;
-int blinkTimeON = 1000; //displayed text ON time
-int blinkTimeOFF = 100; //displayed text OFF time
+
 bool selected;
 char cstring[128];
 char* textToWrite;
@@ -298,7 +296,6 @@ long blinking;
 bool state_blink;
 bool blinkSetMessageState;
 long lastBlinkSetMessage;
-byte goToProcessRow;
 
 //graphic text configurations
 #define graphicTextOffset  1                //bar pos is counted from 1, but text from 0
@@ -364,14 +361,12 @@ byte goToProcessRow;
 #define PIDISRPeriod 1000    // in msecs
 #define peripheralsISRPeriod 100000    // in milliseconds
 
-int hardwareComponents;
-
 void setup() {
   initHardware(false);
   UI_mainMenu();
 }
 
 void loop() {
-  userInterfaceHandler();
+  userInterfaceHandler(page, EncMove);
   updateData();
 }

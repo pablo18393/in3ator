@@ -82,9 +82,8 @@ void UI_mainMenu() {
   words[startGraphicPosition] = convertStringToChar("");
   menu_rows = numWords;
   setSensorsGraphicPosition(page);
-  goToProcessRow = numWords;
-  graphics();
-  drawHeading();
+  graphics(page, language, print_text, menu_rows, controlMode, jaundiceEnable);
+  drawHeading(page, serialNumber, FWversion);
   updateDisplaySensors();
   controlTemperature = false;
   controlHumidity = false;
@@ -95,7 +94,7 @@ void UI_mainMenu() {
   if (desiredControlTemperature < minDesiredTemp[controlMode] || desiredControlTemperature > maxDesiredTemp[controlMode]) {
     desiredControlTemperature = presetTemp[controlMode];
   }
-  while (!GPIORead(ENC_SWITCH)) {
+  while (!digitalRead(ENC_SWITCH)) {
     updateData();
   }
   vTaskDelay(debounceTime);

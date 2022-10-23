@@ -177,18 +177,18 @@ void setAlarm (byte alarmID) {
   logln("[ALARM] ->" + String (alarmIDtoString(alarmID)) + " has been triggered");
   alarmOnGoing[alarmID] = true;
   buzzerConstantTone(buzzerAlarmTone);
-  drawAlarmMessage(DRAW, alarmIDtoString(alarmID));
+  drawAlarmMessage(alarmIDtoString(alarmID));
 }
 
 void resetAlarm (byte alarmID) {
   logln("[ALARM] ->" + String (alarmIDtoString(alarmID)) + " has been disable");
   alarmOnGoing[alarmID] = false;
-  drawHeading();
+  drawHeading(page, serialNumber, FWversion);
   if (!ongoingAlarms()) {
     shutBuzzer();
   }
   else {
-    drawAlarmMessage(DRAW, alarmIDtoString(activeAlarm()));
+    drawAlarmMessage(alarmIDtoString(activeAlarm()));
   }
 }
 
@@ -241,7 +241,7 @@ bool checkFan() {
   bool exitTest;
   ledcWrite(HEATER_PWM_CHANNEL, HEATER_HALF_PWR * ongoingCriticalAlarm());
   while (millis() - ongoingTest < FAN_TEST_PREHEAT_TIME) {
-    if (encoderContinuousPress()) {
+    if (encoderContinuousPress(page)) {
       return false;
     }
     updateData();
@@ -250,7 +250,7 @@ bool checkFan() {
   turnFans(ON);
   ongoingTest = millis();
   while (millis() - ongoingTest < FAN_TEST_PREHEAT_TIME) {
-    if (encoderContinuousPress()) {
+    if (encoderContinuousPress(page)) {
       return false;
     }
     updateData();
