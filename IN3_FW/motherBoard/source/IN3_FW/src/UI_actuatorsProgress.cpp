@@ -1,0 +1,409 @@
+/*
+  MIT License
+
+  Copyright (c) 2022 Medical Open World, Pablo Sánchez Bergasa
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+*/
+#include <Arduino.h>
+#include "main.h"
+
+extern TwoWire *wire;
+extern MAM_in3ator_Humidifier in3_hum;
+extern Adafruit_ILI9341 tft;
+extern SHTC3 mySHTC3;              // Declare an instance of the SHTC3 class
+extern RotaryEncoder encoder;
+extern Beastdevices_INA3221 digitalCurrentSensor;
+
+extern int serialNumber;
+
+extern bool WIFI_EN;
+extern bool defaultWIFI_EN;
+extern long lastDebugUpdate;
+extern long loopCounts;
+extern int page;
+extern byte language;
+extern int temperature_filter; //amount of temperature samples to filter
+extern long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
+
+extern int NTC_PIN[numNTC];
+extern double temperature[numSensors];
+extern double errorTemperature[numSensors], temperatureCalibrationPoint;
+extern double ReferenceTemperatureRange, ReferenceTemperatureLow;
+extern double provisionalReferenceTemperatureLow;
+extern double fineTuneSkinTemperature;
+extern double RawTemperatureLow[numSensors], RawTemperatureRange[numSensors];
+extern double provisionalRawTemperatureLow[numSensors];
+extern double temperatureMaxReset;
+extern double temperatureMinReset;
+extern double temperatureMax[numSensors], temperatureMin[numSensors];
+extern int temperatureArray [numNTC][analog_temperature_filter]; //variable to handle each NTC with the array of last samples (only for NTC)
+extern int temperature_array_pos; //temperature sensor number turn to measure
+extern float diffTemperature; //difference between measured temperature and user input real temperature
+extern bool faultNTC[numNTC]; //variable to control a failure in NTC
+extern double humidity; // room humidity variable
+extern bool humidifierState, humidifierStateChange;
+extern int previousHumidity; //previous sampled humidity
+extern float diffHumidity; //difference between measured humidity and user input real humidity
+
+
+extern byte autoCalibrationProcess;
+
+//Sensor check rate (in ms). Both sensors are checked in same interrupt and they have different check rates
+extern byte encoderRate;
+extern byte encoderCount;
+extern bool encPulseDetected;
+extern volatile long lastEncPulse;
+extern volatile bool statusEncSwitch;
+
+//WIFI
+extern bool WIFI_connection_status;
+
+extern bool roomSensorPresent;
+extern bool digitalCurrentSensorPresent;
+
+extern float instantTemperature[secondOrder_filter];
+extern float previousTemperature[secondOrder_filter];
+
+//room variables
+extern bool controlMode;
+extern bool defaultcontrolMode;
+extern bool controlAlgorithm;
+extern bool defaultcontrolAlgorithm;
+extern double desiredControlTemperature; //preset baby skin temperature
+extern double desiredControlHumidity; //preset enviromental humidity
+extern bool jaundiceEnable; //PWM that controls jaundice LED intensity
+extern double desiredHeaterTemp; //desired temperature in heater
+
+extern boolean A_set;
+extern boolean B_set;
+extern int encoderpinA; // pin  encoder A
+extern int encoderpinB; // pin  encoder B
+extern bool encPulsed, encPulsedBefore; //encoder switch status
+extern bool updateUIData;
+extern volatile int EncMove; //moved encoder
+extern volatile int lastEncMove; //moved last encoder
+extern volatile int EncMoveOrientation; //set to -1 to increase values clockwise
+extern  int last_encoder_move; //moved encoder
+extern long encoder_debounce_time; //in milliseconds, debounce time in encoder to filter signal bounces
+extern long last_encPulsed; //last time encoder was pulsed
+
+//Text Graphic position variables
+extern int humidityX;
+extern int humidityY;
+extern int temperatureX;
+extern int temperatureY;
+extern int separatorTopYPos;
+extern int separatorBotYPos;
+extern bool controlTemperature;
+extern bool controlHumidity;
+extern int ypos;
+extern bool print_text;
+extern int initialSensorPosition;
+extern bool pos_text[8];
+
+extern bool enableSet;
+extern float temperaturePercentage, temperatureAtStart;
+extern float humidityPercentage, humidityAtStart;
+extern int barWidth, barHeight, tempBarPosX, tempBarPosY, humBarPosX, humBarPosY;
+extern int screenTextColor, screenTextBackgroundColor;
+
+//User Interface display variables
+extern bool autoLock; //setting that enables backlight switch OFF after a given time of no user actions
+extern bool defaultAutoLock; //setting that enables backlight switch OFF after a given time of no user actions
+extern int time_lock; //time to lock screen if no user actions
+extern long lastbacklightHandler; //last time there was a encoder movement or pulse
+extern long sensorsUpdatePeriod;
+
+extern bool selected;
+extern char cstring[128];
+extern char* textToWrite;
+extern char* words[12];
+extern char* helpMessage;
+extern byte bar_pos;
+extern byte menu_rows;
+extern byte length;
+extern long lastGraphicSensorsUpdate;
+extern long lastSensorsUpdate;
+extern bool enableSetProcess;
+extern long blinking;
+extern bool state_blink;
+extern bool blinkSetMessageState;
+extern long lastBlinkSetMessage;
+
+extern bool powerAlert;
+extern long lastSuccesfullSensorUpdate[numSensors];
+
+extern double HeaterPIDOutput;
+extern double skinControlPIDInput;
+extern double airControlPIDInput;
+extern double humidityControlPIDOutput;
+extern int humidifierTimeCycle;
+extern unsigned long windowStartTime;
+
+extern double Kp[numPID], Ki[numPID], Kd[numPID];
+extern PID airControlPID;
+extern PID skinControlPID;
+extern PID humidityControlPID;
+
+
+void heatUp()
+{
+  ledcWrite(HEATER_PWM_CHANNEL, BUZZER_MAX_PWR * ongoingCriticalAlarm());
+}
+
+void basictemperatureControl()
+{
+  float temperatureToControl;
+  temperatureToControl = temperature[controlMode];
+  if (temperatureToControl < desiredControlTemperature)
+  {
+    heatUp();
+  }
+  else
+  {
+    ledcWrite(HEATER_PWM_CHANNEL, LOW);
+  }
+}
+
+void basicHumidityControl()
+{
+  if (humidity < desiredControlHumidity)
+  {
+    if (!humidifierState || humidifierStateChange)
+    {
+      in3_hum.turn(ON);
+      humidifierStateChange = false;
+    }
+    humidifierState = true;
+  }
+  else
+  {
+    if (humidifierState || humidifierStateChange)
+    {
+      in3_hum.turn(OFF);
+      humidifierStateChange = false;
+    }
+    humidifierState = false;
+  }
+}
+
+void turnActuators(bool mode)
+{
+  ledcWrite(HEATER_PWM_CHANNEL, mode * BUZZER_MAX_PWR * ongoingCriticalAlarm());
+  if (mode * ongoingCriticalAlarm())
+  {
+    in3_hum.turn(ON);
+  }
+  else
+  {
+    in3_hum.turn(OFF);
+  }
+  turnFans(mode);
+}
+
+void stopActuation()
+{
+  stopPID(airPID);
+  stopPID(skinPID);
+  stopPID(humidityPID);
+  turnActuators(OFF);
+}
+
+void turnFans(bool mode)
+{
+  digitalWrite(FAN, mode);
+}
+
+void UI_actuatorsProgress()
+{
+  bool exitActuation = false;
+  alarmTimerStart();
+  GPRSSetPostVariables(actuatorsModeON, "ON:" + String(desiredControlTemperature, 1) + "," + String(desiredControlHumidity));
+  byte numWords = false;
+  temperaturePercentage = false;
+  page = actuatorsProgressPage;
+  tft.setTextSize(1);
+  print_text = false;
+  menu_rows = numWords;
+  graphics(page, language, print_text, menu_rows, NULL, NULL);
+  drawHeading(page, serialNumber, FWversion);
+  setTextColor(COLOR_MENU_TEXT);
+  setSensorsGraphicPosition(page);
+  drawActuatorsSeparators();
+
+  setGPRSPostPeriod(actuatingGPRSPostPeriod);
+
+  if (controlMode)
+  {
+    switch (language)
+    {
+    case spanish:
+      textToWrite = convertStringToChar(cstring, "Temperatura aire");
+      break;
+    case portuguese:
+      textToWrite = convertStringToChar(cstring, "Temperatura do ar");
+      break;
+    case english:
+      textToWrite = convertStringToChar(cstring, "Air temperature");
+      break;
+    case french:
+      textToWrite = convertStringToChar(cstring, "Temperature de l'air");
+      break;
+    }
+  }
+  else
+  {
+    switch (language)
+    {
+    case spanish:
+      textToWrite = convertStringToChar(cstring, "Temperatura piel");
+      break;
+    case portuguese:
+      textToWrite = convertStringToChar(cstring, "temperatura da pele");
+      break;
+    case english:
+      textToWrite = convertStringToChar(cstring, "Skin temperature");
+      break;
+    case french:
+      textToWrite = convertStringToChar(cstring, "Temperature de la peau");
+      break;
+    }
+  }
+  drawCentreString(textToWrite, tft.width() / 2, tempBarPosY - 4 * letter_height / 3, textFontSize);
+  if (!controlMode)
+  {
+    switch (language)
+    {
+    case spanish:
+      textToWrite = convertStringToChar(cstring, "Temperatura aire");
+      break;
+    case portuguese:
+      textToWrite = convertStringToChar(cstring, "Temperatura do ar");
+      break;
+    case english:
+      textToWrite = convertStringToChar(cstring, "Air temperature");
+      break;
+    case french:
+      textToWrite = convertStringToChar(cstring, "Temperature de l'air");
+      break;
+    }
+  }
+  else
+  {
+    switch (language)
+    {
+    case spanish:
+      textToWrite = convertStringToChar(cstring, "Temperatura piel");
+      break;
+    case portuguese:
+      textToWrite = convertStringToChar(cstring, "temperatura da pele");
+      break;
+    case english:
+      textToWrite = convertStringToChar(cstring, "Skin temperature");
+      break;
+    case french:
+      textToWrite = convertStringToChar(cstring, "Temperature de la peau");
+      break;
+    }
+  }
+  drawCentreString(textToWrite, tft.width() / 2, tft.height() / 2 - letter_height, textFontSize);
+
+  switch (language)
+  {
+  case spanish:
+    textToWrite = convertStringToChar(cstring, "Humedad");
+    break;
+  case english:
+    textToWrite = convertStringToChar(cstring, "Humidity");
+    break;
+  case french:
+    textToWrite = convertStringToChar(cstring, "Humidite");
+    break;
+  case portuguese:
+    textToWrite = convertStringToChar(cstring, "Umidade");
+    break;
+  }
+  drawCentreString(textToWrite, tft.width() / 2, humBarPosY - 4 * letter_height / 3, textFontSize);
+  setTextColor(COLOR_WARNING_TEXT);
+  drawStop();
+  state_blink = true;
+  while (!digitalRead(ENC_SWITCH))
+  {
+    updateData();
+  }
+  if (controlAlgorithm == PID_CONTROL)
+  {
+    if (controlTemperature)
+    {
+      startPID(controlMode);
+    }
+    if (controlHumidity)
+    {
+      startPID(humidityPID);
+    }
+  }
+  updateDisplaySensors();
+  if (controlTemperature)
+  {
+    printLoadingTemperatureBar(desiredControlTemperature);
+    temperatureAtStart = temperature[controlMode];
+    exitActuation = !checkFan();
+  }
+  if (controlHumidity)
+  {
+    printLoadingHumidityBar(desiredControlHumidity);
+  }
+  humidityAtStart = humidity;
+  turnFans(ON);
+  while (!exitActuation)
+  {
+    updateData();
+    if (controlTemperature)
+    {
+      if (controlAlgorithm == BASIC_CONTROL)
+      {
+        basictemperatureControl();
+      }
+      else
+      {
+        PIDHandler();
+      }
+    }
+    if (controlHumidity)
+    {
+      if (controlAlgorithm == BASIC_CONTROL)
+      {
+        basicHumidityControl();
+      }
+      else
+      {
+        PIDHandler();
+      }
+    }
+    while (!digitalRead(ENC_SWITCH))
+    {
+      updateData();
+      exitActuation = back_mode();
+    }
+    blinkGoBackMessage();
+  }
+  stopActuation();
+}

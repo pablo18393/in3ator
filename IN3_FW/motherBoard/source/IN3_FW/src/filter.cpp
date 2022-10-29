@@ -23,28 +23,16 @@
 
 */
 
-String logFile = "datalog.txt";
-String GPRSFile = "GPRS.txt";
+//butterworth2 0.8hz cutoff frequency, 1khz sampling, 2nd order, low pass
+//site: https://www.meme.net.au/butterworth.html
 
-void initSD() {
-  /*
-  if (SDCard) {
-    SD.begin(SD_CS);
-    if (!SD.exists(GPRSFile)) {
-      logln("Creating log file");
-      File dataFile = SD.open(GPRSFile, FILE_WRITE);
-      //String dataString = "SN, babyTemp,Humidity, HeaterTemp, BoardTemp1, BoardTemp2, BoardTemp3, Longitud, Latitud, JaudicePower, BPM, IBI, RPS, HeaterPower";
-      String dataString = "babyTemp,Humidity";
-      // if the file is available, write to it:
-      if (dataFile) {
-        dataFile.println(dataString);
-        dataFile.close();
-        // print to the serial port too:
-        logln(dataString);
-      }
-    }
-    digitalWrite(SD_CS, HIGH);
-    digitalWrite(TFT_CS, LOW);
-  }
-  */
+#include <Arduino.h>
+#include "main.h"
+
+const double b[] = {0.000006294162241, 0.00001258832448, 0.000006294162241};
+const double a[] = {1.9928914235, -0.9929165938};
+
+double butterworth2(double y1, double y2, double x0, double x1, double x2) {
+  return (a[0] * y1 + a[1] * y2 +
+          b[0] * x0 + b[1] * x1 + b[2] * x2);
 }

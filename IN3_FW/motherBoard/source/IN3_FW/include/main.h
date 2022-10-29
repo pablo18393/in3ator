@@ -1,31 +1,5 @@
-/*
-  MIT License
-
-  Copyright (c) 2022 Medical Open World, Pablo Sánchez Bergasa
-
-  Permission is hereby granted, free of charge, to any person obtaining a copy
-  of this software and associated documentation files (the "Software"), to deal
-  in the Software without restriction, including without limitation the rights
-  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-  copies of the Software, and to permit persons to whom the Software is
-  furnished to do so, subject to the following conditions:
-
-  The above copyright notice and this permission notice shall be included in all
-  copies or substantial portions of the Software.
-
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-  SOFTWARE.
-
-*/
-
-//Firmware version and head title of UI screen
-#define FWversion "v10.3/9.C"
-#define headingTitle "in3ator"
+#ifndef _MAIN_H
+#define _MAIN_H
 
 #include <esp_task_wdt.h>
 #include <WiFi.h>
@@ -47,18 +21,9 @@
 #include <Beastdevices_INA3221.h> //
 #include "in3ator_humidifier.h"
 
-TwoWire *wire;
-MAM_in3ator_Humidifier in3_hum(DEFAULT_ADDRESS);
-Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
-SHTC3 mySHTC3;              // Declare an instance of the SHTC3 class
-RotaryEncoder encoder(ENC_A, ENC_B, RotaryEncoder::LatchMode::TWO03);
-#define Rsense 3000 //3 microohm as shunt resistor
-Beastdevices_INA3221 digitalCurrentSensor(INA3221_ADDR41_VCC);
-#define digitalCurrentSensor_i2c_address 65
-#define roomSensorAddress 112
+#define FWversion "v10.3/9.C"
+#define headingTitle "in3ator"
 
-
-int serialNumber = 80;
 #define WDT_TIMEOUT 25
 
 #define ON true
@@ -77,17 +42,35 @@ int serialNumber = 80;
 #define buzzerSwitchDuration 10 //in micros, tone freq
 #define buzzerStandbyToneTimes 1 //in micros, tone freq
 
+//EEPROM variables
+#define EEPROM_checkStatus 0
+#define EEPROM_firstTurnOn 10
+#define EEPROM_autoLock 20
+#define EEPROM_language 30
+#define EEPROM_SerialNumber 40
+#define EEPROM_WIFI_EN 50
+#define EEPROM_usedGenericMosfet 60
+#define EEPROM_controlMode 70
+#define EEPROM_desiredControlMode 80
+#define EEPROM_desiredControlHumidity 90
+#define EEPROM_RawSkinTemperatureLowCorrection 100
+#define EEPROM_RawSkinTemperatureRangeCorrection 110
+#define EEPROM_RawAirTemperatureLowCorrection 120
+#define EEPROM_RawAirTemperatureRangeCorrection 130
+#define EEPROM_RawDigitalTemperatureLowCorrection 140
+#define EEPROM_RawDigitalTemperatureRangeCorrection 150
+#define EEPROM_controlAlgorithm 160
+#define EEPROM_ReferenceTemperatureRange 170
+#define EEPROM_ReferenceTemperatureLow 180
+#define EEPROM_FineTuneSkinTemperature 190
 
 //configuration variables
 #define debounceTime 30         //encoder debouncing time
 #define timePressToSettings 3000 //in millis, time to press to go to settings window in UI
 #define debugUpdatePeriod 1000 //in millis, 
-bool WIFI_EN = true;
-bool defaultWIFI_EN = ON;
-long lastDebugUpdate;
-long loopCounts;
+
 //pages number in UI. Configuration and information will be displayed depending on the page number
-int page;
+
 #define mainMenuPage 1
 #define actuatorsProgressPage 2
 #define settingsPage 3
@@ -97,7 +80,6 @@ int page;
 #define autoCalibrationPage 7
 #define fineTuneCalibrationPage 8
 //languages numbers that will be called in language variable
-byte language;
 #define spanish 0
 #define english 1
 #define french 2
@@ -114,49 +96,14 @@ byte language;
 #define secondOrder_filter 3 //amount of temperature samples to filter
 #define analog_temperature_filter 500 //amount of temperature samples to filter
 #define digital_temperature_filter 10 //amount of temperature samples to filter
-int temperature_filter = analog_temperature_filter; //amount of temperature samples to filter
 
 #define NTCMeasurementPeriod 1000 //in millis
 #define CurrentMeasurementPeriod 500 //in micros
 #define CurrentUpdatePeriod 1000 //in millis
-long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
 
-int NTC_PIN[numNTC] = {BABY_NTC_PIN};
-double temperature[numSensors];
-double errorTemperature[numSensors], temperatureCalibrationPoint;
-double ReferenceTemperatureRange, ReferenceTemperatureLow;
-double provisionalReferenceTemperatureLow;
-double fineTuneSkinTemperature;
-double RawTemperatureLow[numSensors], RawTemperatureRange[numSensors];
-double provisionalRawTemperatureLow[numSensors];
-double temperatureMaxReset = -1000;
-double temperatureMinReset = 1000;
-double temperatureMax[numSensors], temperatureMin[numSensors];
-int temperatureArray [numNTC][analog_temperature_filter]; //variable to handle each NTC with the array of last samples (only for NTC)
-int temperature_array_pos; //temperature sensor number turn to measure
-float diffTemperature; //difference between measured temperature and user input real temperature
-bool faultNTC[numNTC]; //variable to control a failure in NTC
-double humidity; // room humidity variable
-bool humidifierState, humidifierStateChange;
-int previousHumidity; //previous sampled humidity
-float diffHumidity; //difference between measured humidity and user input real humidity
-
-
-byte autoCalibrationProcess;
 #define setupAutoCalibrationPoint 0
 #define firstAutoCalibrationPoint 1
 #define secondAutoCalibrationPoint 2
-
-//Sensor check rate (in ms). Both sensors are checked in same interrupt and they have different check rates
-byte encoderRate = true;
-byte encoderCount = false;
-bool encPulseDetected;
-volatile long lastEncPulse;
-#define encPulseDebounce 50
-volatile bool statusEncSwitch;
-
-//WIFI
-bool WIFI_connection_status = false;
 
 //GPRS variables to transmit
 #define turnedOn 0 //transmit first turned ON with hardware verification
@@ -169,31 +116,17 @@ bool WIFI_connection_status = false;
 //sensor variables
 #define defaultCurrentSamples 30
 #define defaultTestingSamples 8000
+#define Rsense 3000 //3 microohm as shunt resistor
+#define digitalCurrentSensor_i2c_address 65
+#define roomSensorAddress 112
 
-bool roomSensorPresent = false;
-bool digitalCurrentSensorPresent = false;
-
-float instantTemperature[secondOrder_filter];
-float previousTemperature[secondOrder_filter];
-
-//room variables
-bool controlMode;
-bool defaultcontrolMode = SKIN_CONTROL;
-bool controlAlgorithm;
-bool defaultcontrolAlgorithm = PID_CONTROL;
-double desiredControlTemperature; //preset baby skin temperature
-double desiredControlHumidity; //preset enviromental humidity
-bool jaundiceEnable; //PWM that controls jaundice LED intensity
-double desiredHeaterTemp; //desired temperature in heater
 
 //#define system constants
 #define humidifierDutyCycleMax  100 //maximum humidity cycle in heater to be set
 #define humidifierDutyCycleMin 0 //minimum humidity cycle in heater to be set
-const float minDesiredTemp[2] = {35, 30}; //minimum allowed temperature to be set
-const float maxDesiredTemp[2] = {37.5, 37}; //maximum allowed temperature to be set
+
 #define  stepTemperatureIncrement 0.1 //maximum allowed temperature to be set
 #define  stepHumidityIncrement 5 //maximum allowed temperature to be set
-const int presetTemp[2] = {36, 32}; //preset baby skin temperature
 #define  presetHumidity 60 //preset humidity
 #define  maxHum 90 //maximum allowed humidity to be set
 #define  minHum 20 //minimum allowed humidity to be set
@@ -203,18 +136,7 @@ const int presetTemp[2] = {36, 32}; //preset baby skin temperature
 //Encoder variables
 #define NUMENCODERS 1 //number of encoders in circuit
 #define ENCODER_TICKS_DIV 0
-boolean A_set;
-boolean B_set;
-int encoderpinA = ENC_A; // pin  encoder A
-int encoderpinB = ENC_B; // pin  encoder B
-bool encPulsed, encPulsedBefore; //encoder switch status
-bool updateUIData;
-volatile int EncMove; //moved encoder
-volatile int lastEncMove; //moved last encoder
-volatile int EncMoveOrientation = -1; //set to -1 to increase values clockwise
-volatile int last_encoder_move; //moved encoder
-long encoder_debounce_time = true; //in milliseconds, debounce time in encoder to filter signal bounces
-long last_encPulsed; //last time encoder was pulsed
+#define encPulseDebounce 50
 
 //User Interface display constants
 #define brightenRate  10        //intro brighten speed (Higher value, faster)
@@ -237,21 +159,8 @@ long last_encPulsed; //last time encoder was pulsed
 #define barThickness 3
 #define blinkTimeON 1000 //displayed text ON time
 #define blinkTimeOFF 100 //displayed text OFF time
-
-//Text Graphic position variables
-int humidityX;
-int humidityY;
-int temperatureX;
-int temperatureY;
-int separatorTopYPos;
-int separatorBotYPos;
-bool controlTemperature;
-bool controlHumidity;
-int ypos;
-bool print_text;
-int initialSensorPosition = separatorPosition - letter_width;
-bool pos_text[8];
-
+#define time_back_draw 255
+#define time_back_wait 255
 //security defs
 #define HUMIDITY_ALARM 0
 #define TEMPERATURE_ALARM 1
@@ -266,36 +175,6 @@ bool pos_text[8];
 //Graphic variables
 #define ERASE false
 #define DRAW  true
-bool enableSet;
-float temperaturePercentage, temperatureAtStart;
-float humidityPercentage, humidityAtStart;
-int barWidth, barHeight, tempBarPosX, tempBarPosY, humBarPosX, humBarPosY;
-int screenTextColor, screenTextBackgroundColor;
-
-//User Interface display variables
-bool autoLock; //setting that enables backlight switch OFF after a given time of no user actions
-bool defaultAutoLock = ON; //setting that enables backlight switch OFF after a given time of no user actions
-int time_lock = 16000; //time to lock screen if no user actions
-const byte time_back_draw = 255;
-const byte time_back_wait = 255;
-long lastbacklightHandler; //last time there was a encoder movement or pulse
-long sensorsUpdatePeriod = 1000;
-
-bool selected;
-char cstring[128];
-char* textToWrite;
-char* words[12];
-char* helpMessage;
-byte bar_pos = true;
-byte menu_rows;
-byte length;
-long lastGraphicSensorsUpdate;
-long lastSensorsUpdate;
-bool enableSetProcess;
-long blinking;
-bool state_blink;
-bool blinkSetMessageState;
-long lastBlinkSetMessage;
 
 //graphic text configurations
 #define graphicTextOffset  1                //bar pos is counted from 1, but text from 0
@@ -361,12 +240,140 @@ long lastBlinkSetMessage;
 #define PIDISRPeriod 1000    // in msecs
 #define peripheralsISRPeriod 100000    // in milliseconds
 
-void setup() {
-  initHardware(false);
-  UI_mainMenu();
-}
+// post content variables
+#define defaultPost 0
+#define jaundiceLEDON 1
+#define jaundiceLEDOFF 2
+#define actuatorsModeON 3
+#define actuatorsModeOFF 4
+#define pulseFound 5
+#define pulseLost 6
+#define standByMode 7
+#define addLocation 8
+#define removeLocation 9
 
-void loop() {
-  userInterfaceHandler(page, EncMove);
-  updateData();
-}
+#define standByGPRSPostPeriod 800
+#define actuatingGPRSPostPeriod 120
+#define jaundiceGPRSPostPeriod 600
+#define GPRSRoutinePeriod 1 // in millis
+#define GPRS_SHUT OFF
+#define NO_COMMENT false
+
+
+// PID VARIABLES
+#define skinPID 0
+#define airPID 1
+#define humidityPID 2
+#define numPID 3
+
+void logln(String dataString);
+long millisToSecs(long timeInMillis);
+long minsToMillis(long timeInMillis);
+void initHardware (bool printOutputTest);
+void UI_mainMenu();
+void userInterfaceHandler(int UI_page);
+void updateData();
+void buzzerHandler();
+void buzzerTone (int beepTimes, int timevTaskDelay, int freq);
+
+void shutBuzzer ();
+float measureMeanConsumption(int shunt);
+void watchdogReload();
+void OTAHandler(void);
+void sensorsHandler();
+void GPRS_Handler();
+void securityCheck();
+void buzzerConstantTone (int freq);
+void drawAlarmMessage(char *alertMessage);
+void drawHeading(int UI_page, int UI_serialNumber, String UI_text);
+char *convertStringToChar(String input);
+char *convertStringToChar(char *arrayInput, String input);
+int16_t drawCentreString(char *string, int16_t dX, int16_t poY, int16_t size);
+void eraseBar(int UI_menu_rows, int bar_pos);
+void updateBar(int UI_menu_rows, int bar_pos);
+void graphics(uint8_t UI_page, uint8_t UI_language, uint8_t UI_print_text, uint8_t UI_menu_rows, uint8_t UI_var_0, uint8_t UI_var_1);
+int graphicHeight(int position);
+int16_t drawFloat(float floatNumber, int16_t decimal, int16_t poX, int16_t poY, int16_t size);
+void setTextColor(int16_t color);
+
+void turnFans(bool mode);
+void alarmTimerStart();
+void GPRSSetPostVariables(byte postContent, String postComment);
+void setGPRSPostPeriod(long seconds);
+
+bool ongoingCriticalAlarm();
+void setAlarm(byte alarmID);
+void resetAlarm(byte alarmID);
+
+void PIDInit();
+void PIDHandler();
+void startPID(byte var);
+void stopPID(byte var);
+
+bool encoderContinuousPress(int UI_page);
+
+void updateLoadingTemperatureBar(float prev, float actual);
+void updateLoadingHumidityBar(float prev, float actual);
+void drawSelectedTemperature(float temperatureToDraw, float previousTemperatureDrawn);
+void drawUnselectedTemperature(float temperatureToDraw, float previousTemperatureDrawn);
+void drawHumidity(int UI_humidity, int UI_previousHumdity);
+int16_t drawRightString(char *string, int16_t dX, int16_t poY, int16_t size);
+void drawStartMessage(bool UI_enableSet, int UI_menu_rows, char *UI_helpMessage);
+void drawCentreNumber(int n, int x, int i);
+void drawRightNumber(int n, int x, int i);
+void drawBack();
+void drawActuatorsSeparators();
+void drawStop();
+void printLoadingTemperatureBar(int UI_desiredControlTemperature);
+void printLoadingHumidityBar(int UI_desiredControlHumidity);
+void blinkGoBackMessage();
+bool ongoingAlarms();
+void disableAllAlarms();
+
+void checkSetMessage(int UI_page);
+bool checkFan();
+
+bool updateRoomSensor();
+void updateDisplaySensors();
+
+void UI_settings();
+void UI_actuatorsProgress();
+
+void wifiInit(void);
+void wifiDisable();
+
+void loaddefaultValues();
+void UI_calibration();
+void firstPointCalibration();
+void fineTuneCalibration();
+void autoCalibration();
+void loadDefaultCalibration();
+void recapVariables();
+void clearCalibrationValues();
+void secondPointCalibration();
+void saveCalibrationToEEPROM();
+int getYpos(int UI_menu_rows, byte row);
+bool back_mode();
+void setSensorsGraphicPosition(int UI_page);
+
+void basicHumidityControl();
+bool checkStableTemperatures(double *referenceSensorHistory, double *sensorToCalibrateHistory, int historyLength, double stabilityError);
+void clearGPRSBuffer();
+void initRoomSensor();
+
+double butterworth2(double y1, double y2, double x0, double x1, double x2);
+
+void initEEPROM();
+void initGPRS();
+void drawHardwareErrorMessage(long error, bool criticalError);
+void watchdogInit();
+void initAlarms();
+void IRAM_ATTR encSwitchHandler();
+void IRAM_ATTR encoderISR();
+
+bool measureNTCTemperature();
+void loadlogo();
+
+void initPin(uint8_t GPIO, uint8_t Mode);
+
+#endif

@@ -22,6 +22,8 @@
   SOFTWARE.
 
 */
+#include <Arduino.h>
+#include "main.h"
 
 #define BUZZER_DISABLED false
 #define BUZZER_ENABLED true

@@ -22,31 +22,31 @@
   SOFTWARE.
 
 */
+#include <Arduino.h>
+#include "main.h"
 
-void IRAM_ATTR encoderISR() {
-  int newPos;
-  encoder.tick(); // just call tick() to check the state.
-  newPos = encoder.getPosition();
-  lastbacklightHandler = millis();
-  if (abs(lastEncMove - newPos) > ENCODER_TICKS_DIV) {
-    EncMove = EncMoveOrientation * int(encoder.getDirection());
-    lastEncMove = newPos;
-  }
-}
+String logFile = "datalog.txt";
+String GPRSFile = "GPRS.txt";
 
-void IRAM_ATTR encSwitchHandler() {
-  if (!digitalRead(ENC_SWITCH)) {
-    if (millis() - lastEncPulse > encPulseDebounce) {
-      if (!encPulseDetected) {
-        buzzerTone(buzzerStandbyToneTimes, buzzerSwitchDuration, buzzerRotaryEncoderTone);
+void initSD() {
+  /*
+  if (SDCard) {
+    SD.begin(SD_CS);
+    if (!SD.exists(GPRSFile)) {
+      logln("Creating log file");
+      File dataFile = SD.open(GPRSFile, FILE_WRITE);
+      //String dataString = "SN, babyTemp,Humidity, HeaterTemp, BoardTemp1, BoardTemp2, BoardTemp3, Longitud, Latitud, JaudicePower, BPM, IBI, RPS, HeaterPower";
+      String dataString = "babyTemp,Humidity";
+      // if the file is available, write to it:
+      if (dataFile) {
+        dataFile.println(dataString);
+        dataFile.close();
+        // print to the serial port too:
+        logln(dataString);
       }
-      if (ongoingAlarms()) {
-        disableAllAlarms();
-      }
-      encPulseDetected = true;
-      //logln("[ENCODER] -> Pushed");
     }
-    lastEncPulse = millis();
-    lastbacklightHandler = millis();
+    digitalWrite(SD_CS, HIGH);
+    digitalWrite(TFT_CS, LOW);
   }
+  */
 }

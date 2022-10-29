@@ -79,21 +79,15 @@
 #define minimumAllowedNTCMeasurement maxADCvalue/5
 #define maximumAllowedNTCMeasurement maxADCvalue*4/5
 
-int HUMIDIFIER_DUTY_CYCLE = 0.40 * PWM_MAX_VALUE;
-
 #define BL_NORMAL 0
 #define BL_POWERSAVE 1
 
 #define maxTempToDiscard 60
 #define minTempToDiscard 5
 
-int ScreenBacklightMode;
-float backlightPower;
-float backlightPowerSafe;
-float backlightPowerSafePercentage = 0.1; //10% screen bright
-const float screenBrightnessFactor = 0.6; //Max brightness will be multiplied by this constant
-
 #define BUZZER_MAX_PWR PWM_MAX_VALUE
 #define HEATER_HALF_PWR PWM_MAX_VALUE/2
 
 #define BUZZER_MAX_PWM PWM_MAX_VALUE
+
+#define screenBrightnessFactor 0.6 //Max brightness will be multiplied by this constant
