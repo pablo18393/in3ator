@@ -127,7 +127,6 @@ extern int screenTextColor, screenTextBackgroundColor;
 // User Interface display variables
 extern bool autoLock;             // setting that enables backlight switch OFF after a given time of no user actions
 extern bool defaultAutoLock;      // setting that enables backlight switch OFF after a given time of no user actions
-extern int time_lock;             // time to lock screen if no user actions
 extern long lastbacklightHandler; // last time there was a encoder movement or pulse
 extern long sensorsUpdatePeriod;
 
@@ -164,8 +163,6 @@ extern PID humidityControlPID;
 
 extern int ScreenBacklightMode;
 extern float backlightPower;
-extern float backlightPowerSafe;
-extern float backlightPowerSafePercentage; // 10% screen bright
 
 #define testMode false
 #define operativeMode true
@@ -413,7 +410,6 @@ void initTFT()
   {
     backlightPower = PWM_MAX_VALUE * screenBrightnessFactor;
   }
-  backlightPowerSafe = PWM_MAX_VALUE * backlightPowerSafePercentage;
   offsetCurrent = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL);
   digitalWrite(TFT_CS, LOW);
   initializeTFT();

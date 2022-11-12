@@ -132,7 +132,6 @@ extern int screenTextColor, screenTextBackgroundColor;
 //User Interface display variables
 extern bool autoLock; //setting that enables backlight switch OFF after a given time of no user actions
 extern bool defaultAutoLock; //setting that enables backlight switch OFF after a given time of no user actions
-extern int time_lock; //time to lock screen if no user actions
 extern long lastbacklightHandler; //last time there was a encoder movement or pulse
 extern long sensorsUpdatePeriod;
 

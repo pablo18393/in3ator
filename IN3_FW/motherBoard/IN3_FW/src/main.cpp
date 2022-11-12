@@ -131,7 +131,6 @@ int screenTextColor, screenTextBackgroundColor;
 // User Interface display variables
 bool autoLock;             // setting that enables backlight switch OFF after a given time of no user actions
 bool defaultAutoLock = ON; // setting that enables backlight switch OFF after a given time of no user actions
-int time_lock = 16000;     // time to lock screen if no user actions
 long lastbacklightHandler; // last time there was a encoder movement or pulse
 long sensorsUpdatePeriod = 1000;
 
@@ -167,8 +166,6 @@ PID humidityControlPID(&humidity, &humidityControlPIDOutput, &desiredControlHumi
 
 int ScreenBacklightMode;
 float backlightPower;
-float backlightPowerSafe;
-float backlightPowerSafePercentage = 0.1; // 10% screen bright
 
 void GPRS_Task(void *pvParameters)
 {

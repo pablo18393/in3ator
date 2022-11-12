@@ -7,7 +7,7 @@
 #include <WebServer.h>
 #include <ESPmDNS.h>
 #include <Update.h>
-//include libraries
+// include libraries
 #include "SPI.h"
 #include "Adafruit_GFX.h"
 #include "Adafruit_ILI9341.h"
@@ -16,11 +16,10 @@
 #include <PID_v1.h> //
 #include "board.h"
 #include <Wire.h>
-#include "SparkFun_SHTC3.h" // Click here to get the library: http://librarymanager/All#SparkFun_SHTC3
-#include <RotaryEncoder.h> //
+#include "SparkFun_SHTC3.h"       // Click here to get the library: http://librarymanager/All#SparkFun_SHTC3
+#include <RotaryEncoder.h>        //
 #include <Beastdevices_INA3221.h> //
 #include "in3ator_humidifier.h"
-
 
 #define FWversion "v10.3/9.C"
 #define headingTitle "in3ator"
@@ -34,16 +33,16 @@
 #define SKIN_CONTROL false
 #define AIR_CONTROL true
 
-//buzzer variables
-#define buzzerStandbyPeriod 10000 //in millis, there will be a periodic tone when regulating baby's constants
-#define buzzerStandbyTone 500 //in micros, tone freq
-#define buzzerAlarmTone 500 //in micros, tone freq
-#define buzzerRotaryEncoderTone 2200 //in micros, tone freq
-#define buzzerStandbyToneDuration 50 //in micros, tone freq
-#define buzzerSwitchDuration 10 //in micros, tone freq
-#define buzzerStandbyToneTimes 1 //in micros, tone freq
+// buzzer variables
+#define buzzerStandbyPeriod 10000    // in millis, there will be a periodic tone when regulating baby's constants
+#define buzzerStandbyTone 500        // in micros, tone freq
+#define buzzerAlarmTone 500          // in micros, tone freq
+#define buzzerRotaryEncoderTone 2200 // in micros, tone freq
+#define buzzerStandbyToneDuration 50 // in micros, tone freq
+#define buzzerSwitchDuration 10      // in micros, tone freq
+#define buzzerStandbyToneTimes 1     // in micros, tone freq
 
-//EEPROM variables
+// EEPROM variables
 #define EEPROM_checkStatus 0
 #define EEPROM_firstTurnOn 10
 #define EEPROM_autoLock 20
@@ -66,12 +65,12 @@
 #define EEPROM_FineTuneSkinTemperature 190
 #define EEPROM_TM_REGISTERED 200
 
-//configuration variables
-#define debounceTime 30         //encoder debouncing time
-#define timePressToSettings 3000 //in millis, time to press to go to settings window in UI
-#define debugUpdatePeriod 1000 //in millis, 
+// configuration variables
+#define debounceTime 30          // encoder debouncing time
+#define timePressToSettings 3000 // in millis, time to press to go to settings window in UI
+#define debugUpdatePeriod 1000   // in millis,
 
-//pages number in UI. Configuration and information will be displayed depending on the page number
+// pages number in UI. Configuration and information will be displayed depending on the page number
 
 #define mainMenuPage 1
 #define actuatorsProgressPage 2
@@ -81,89 +80,88 @@
 #define secondPointCalibrationPage 6
 #define autoCalibrationPage 7
 #define fineTuneCalibrationPage 8
-//languages numbers that will be called in language variable
+// languages numbers that will be called in language variable
 #define spanish 0
 #define english 1
 #define french 2
 #define portuguese 3
 #define numLanguages 4
-#define defaultLanguage english //Preset number configuration when booting for first time
+#define defaultLanguage english // Preset number configuration when booting for first time
 
-//number assignment of each enviromental sensor for later call in variable
+// number assignment of each enviromental sensor for later call in variable
 #define skinSensor 0
 #define airSensor 1
-#define numNTC 1 //number of NTC
-#define numSensors 2 //number of total temperature sensors in system
+#define numNTC 1     // number of NTC
+#define numSensors 2 // number of total temperature sensors in system
 
-#define secondOrder_filter 3 //amount of temperature samples to filter
-#define analog_temperature_filter 500 //amount of temperature samples to filter
-#define digital_temperature_filter 10 //amount of temperature samples to filter
+#define secondOrder_filter 3          // amount of temperature samples to filter
+#define analog_temperature_filter 500 // amount of temperature samples to filter
+#define digital_temperature_filter 10 // amount of temperature samples to filter
 
-#define NTCMeasurementPeriod 1000 //in millis
-#define CurrentMeasurementPeriod 500 //in micros
-#define CurrentUpdatePeriod 1000 //in millis
+#define NTCMeasurementPeriod 1000    // in millis
+#define CurrentMeasurementPeriod 500 // in micros
+#define CurrentUpdatePeriod 1000     // in millis
 
 #define setupAutoCalibrationPoint 0
 #define firstAutoCalibrationPoint 1
 #define secondAutoCalibrationPoint 2
 
-//GPRS variables to transmit
-#define turnedOn 0 //transmit first turned ON with hardware verification
-#define room 1 //transmit room variables
-#define aliveRefresh 2 //message to let know that incubator is still ON
+// GPRS variables to transmit
+#define turnedOn 0     // transmit first turned ON with hardware verification
+#define room 1         // transmit room variables
+#define aliveRefresh 2 // message to let know that incubator is still ON
 
 #define digitalCurrentSensorReadPeriod 500
 #define externalADCReadPeriod 30
 
-//sensor variables
+// sensor variables
 #define defaultCurrentSamples 30
 #define defaultTestingSamples 8000
-#define Rsense 3000 //3 microohm as shunt resistor
+#define Rsense 3000 // 3 microohm as shunt resistor
 #define digitalCurrentSensor_i2c_address 65
 #define roomSensorAddress 112
 
+// #define system constants
+#define humidifierDutyCycleMax 100 // maximum humidity cycle in heater to be set
+#define humidifierDutyCycleMin 0   // minimum humidity cycle in heater to be set
 
-//#define system constants
-#define humidifierDutyCycleMax  100 //maximum humidity cycle in heater to be set
-#define humidifierDutyCycleMin 0 //minimum humidity cycle in heater to be set
+#define stepTemperatureIncrement 0.1 // maximum allowed temperature to be set
+#define stepHumidityIncrement 5      // maximum allowed temperature to be set
+#define presetHumidity 60            // preset humidity
+#define maxHum 90                    // maximum allowed humidity to be set
+#define minHum 20                    // minimum allowed humidity to be set
+#define LEDMaxIntensity 100          // max LED intensity to be set
+#define fanMaxSpeed 100              // max fan speed (percentage) to be set
 
-#define  stepTemperatureIncrement 0.1 //maximum allowed temperature to be set
-#define  stepHumidityIncrement 5 //maximum allowed temperature to be set
-#define  presetHumidity 60 //preset humidity
-#define  maxHum 90 //maximum allowed humidity to be set
-#define  minHum 20 //minimum allowed humidity to be set
-#define  LEDMaxIntensity 100 //max LED intensity to be set
-#define  fanMaxSpeed 100 //max fan speed (percentage) to be set
-
-//Encoder variables
-#define NUMENCODERS 1 //number of encoders in circuit
+// Encoder variables
+#define NUMENCODERS 1 // number of encoders in circuit
 #define ENCODER_TICKS_DIV 0
 #define encPulseDebounce 50
 
-//User Interface display constants
-#define brightenRate  10        //intro brighten speed (Higher value, faster)
+// User Interface display constants
+#define brightenRate 10 // intro brighten speed (Higher value, faster)
 #define valuePosition 245
 #define separatorPosition 240
 #define unitPosition 315
-#define textFontSize 2          //text default size
-#define width_select  7
-#define height_heading  34
-#define width_indentation  4
-#define width_back  50
-#define side_gap  4
-#define letter_height  26
-#define letter_width  14
-#define logo  40
-#define arrow_height  6
-#define arrow_tail  5
+#define textFontSize 2 // text default size
+#define width_select 7
+#define height_heading 34
+#define width_indentation 4
+#define width_back 50
+#define side_gap 4
+#define letter_height 26
+#define letter_width 14
+#define logo 40
+#define arrow_height 6
+#define arrow_tail 5
 #define headint_text_height height_heading / 5
 #define initialSensorsValue "XX"
 #define barThickness 3
-#define blinkTimeON 1000 //displayed text ON time
-#define blinkTimeOFF 100 //displayed text OFF time
+#define blinkTimeON 1000 // displayed text ON time
+#define blinkTimeOFF 100 // displayed text OFF time
 #define time_back_draw 255
 #define time_back_wait 255
-//security defs
+// security defs
 #define HUMIDITY_ALARM 0
 #define TEMPERATURE_ALARM 1
 #define AIR_THERMAL_CUTOUT_ALARM 2
@@ -174,24 +172,24 @@
 #define HEATER_ISSUE_ALARM 7
 #define NUM_ALARMS 8
 
-//Graphic variables
+// Graphic variables
 #define ERASE false
-#define DRAW  true
+#define DRAW true
 
-//graphic text configurations
-#define graphicTextOffset  1                //bar pos is counted from 1, but text from 0
+// graphic text configurations
+#define graphicTextOffset 1 // bar pos is counted from 1, but text from 0
 #define CENTER true
 #define LEFT_MARGIN false
 
-//below are all the different variables positions that will be displayed in user interface
-//mainMenu
+// below are all the different variables positions that will be displayed in user interface
+// mainMenu
 #define controlModeGraphicPosition 0
 #define temperatureGraphicPosition 1
 #define humidityGraphicPosition 2
 #define LEDGraphicPosition 3
 #define settingsGraphicPosition 5
 #define startGraphicPosition 4
-//settings
+// settings
 
 #define serialNumberGraphicPosition 0
 #define languageGraphicPosition 1
@@ -200,20 +198,20 @@
 #define setdefaultValuesGraphicPosition 4
 #define HWTestGraphicPosition 5
 
-//calibration menu
+// calibration menu
 #define autoCalibrationGraphicPosition 0
 #define fineTuneCalibrationGraphicPosition 1
 #define twoPointCalibrationGraphicPosition 2
 #define restartCalibrationGraphicPosition 3
 
-//2p calibration
+// 2p calibration
 #define temperatureCalibrationGraphicPosition 0
 #define setCalibrationGraphicPosition 1
 
-//auto calibration
+// auto calibration
 #define autoCalibrationMessageGraphicPosition 0
 
-//color options
+// color options
 #define BLACK 0x0000
 #define BLUE 0x001F
 #define RED 0xF800
@@ -224,7 +222,7 @@
 #define WHITE 0xFFFF
 #define COLOR_WARNING_TEXT ILI9341_ORANGE
 #define COLOR_MENU BLACK
-#define COLOR_BAR  BLACK
+#define COLOR_BAR BLACK
 #define COLOR_MENU_TEXT WHITE
 #define COLOR_SELECTED WHITE
 #define COLOR_CHOSEN BLUE
@@ -239,8 +237,8 @@
 #define introTextColor BLACK
 #define transitionEffect BLACK
 
-#define PIDISRPeriod 1000    // in msecs
-#define peripheralsISRPeriod 100000    // in milliseconds
+#define PIDISRPeriod 1000           // in msecs
+#define peripheralsISRPeriod 100000 // in milliseconds
 
 // PID VARIABLES
 #define skinPID 0
@@ -251,25 +249,28 @@
 void GPRSSetPostVariables(byte postContent, String postComment);
 #define NO_COMMENT 0
 
+#define BACKLIGHT_NO_INTERACTION_TIME 30000 // time to decrease backlight display if no user actions
+#define BACKLIGHT_POWER_SAFE_PERCENTAGE 0.1
+#define BACKLIGHT_POWER_SAFE PWM_MAX_VALUE *BACKLIGHT_POWER_SAFE_PERCENTAGE
 
 void logln(String dataString);
 long millisToSecs(long timeInMillis);
 long minsToMillis(long timeInMillis);
-void initHardware (bool printOutputTest);
+void initHardware(bool printOutputTest);
 void UI_mainMenu();
 void userInterfaceHandler(int UI_page);
 void updateData();
 void buzzerHandler();
-void buzzerTone (int beepTimes, int timevTaskDelay, int freq);
+void buzzerTone(int beepTimes, int timevTaskDelay, int freq);
 
-void shutBuzzer ();
+void shutBuzzer();
 float measureMeanConsumption(int shunt);
 void watchdogReload();
 void OTAHandler(void);
 void sensorsHandler();
 void GPRS_Handler();
 void securityCheck();
-void buzzerConstantTone (int freq);
+void buzzerConstantTone(int freq);
 void drawAlarmMessage(char *alertMessage);
 void drawHeading(int UI_page, int UI_serialNumber, String UI_text);
 char *convertStringToChar(String input);
