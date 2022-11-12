@@ -227,7 +227,7 @@ void UI_mainMenu() {
   menu_rows = numWords;
   setSensorsGraphicPosition(page);
   graphics(page, language, print_text, menu_rows, controlMode, jaundiceEnable);
-  drawHeading(page, serialNumber, FWversion);
+  drawHeading(page, serialNumber);
   updateDisplaySensors();
   controlTemperature = false;
   controlHumidity = false;

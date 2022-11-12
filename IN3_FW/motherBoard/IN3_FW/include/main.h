@@ -268,7 +268,7 @@ void GPRS_Handler();
 void securityCheck();
 void buzzerConstantTone(int freq);
 void drawAlarmMessage(char *alertMessage);
-void drawHeading(int UI_page, int UI_serialNumber, String UI_text);
+void drawHeading(int UI_page, int UI_serialNumber);
 char *convertStringToChar(String input);
 char *convertStringToChar(char *arrayInput, String input);
 int16_t drawCentreString(char *string, int16_t dX, int16_t poY, int16_t size);

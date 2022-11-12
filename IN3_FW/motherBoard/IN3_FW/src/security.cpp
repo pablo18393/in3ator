@@ -28,7 +28,7 @@
 extern TwoWire *wire;
 extern MAM_in3ator_Humidifier in3_hum;
 extern Adafruit_ILI9341 tft;
-extern SHTC3 mySHTC3;              // Declare an instance of the SHTC3 class
+extern SHTC3 mySHTC3; // Declare an instance of the SHTC3 class
 extern RotaryEncoder encoder;
 extern Beastdevices_INA3221 digitalCurrentSensor;
 
@@ -40,7 +40,7 @@ extern long lastDebugUpdate;
 extern long loopCounts;
 extern int page;
 extern byte language;
-extern int temperature_filter; //amount of temperature samples to filter
+extern int temperature_filter; // amount of temperature samples to filter
 extern long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
 
 extern int NTC_PIN[numNTC];
@@ -54,26 +54,25 @@ extern double provisionalRawTemperatureLow[numSensors];
 extern double temperatureMaxReset;
 extern double temperatureMinReset;
 extern double temperatureMax[numSensors], temperatureMin[numSensors];
-extern int temperatureArray [numNTC][analog_temperature_filter]; //variable to handle each NTC with the array of last samples (only for NTC)
-extern int temperature_array_pos; //temperature sensor number turn to measure
-extern float diffTemperature; //difference between measured temperature and user input real temperature
-extern bool faultNTC[numNTC]; //variable to control a failure in NTC
-extern double humidity; // room humidity variable
+extern int temperatureArray[numNTC][analog_temperature_filter]; // variable to handle each NTC with the array of last samples (only for NTC)
+extern int temperature_array_pos;                               // temperature sensor number turn to measure
+extern float diffTemperature;                                   // difference between measured temperature and user input real temperature
+extern bool faultNTC[numNTC];                                   // variable to control a failure in NTC
+extern double humidity;                                         // room humidity variable
 extern bool humidifierState, humidifierStateChange;
-extern int previousHumidity; //previous sampled humidity
-extern float diffHumidity; //difference between measured humidity and user input real humidity
-
+extern int previousHumidity; // previous sampled humidity
+extern float diffHumidity;   // difference between measured humidity and user input real humidity
 
 extern byte autoCalibrationProcess;
 
-//Sensor check rate (in ms). Both sensors are checked in same interrupt and they have different check rates
+// Sensor check rate (in ms). Both sensors are checked in same interrupt and they have different check rates
 extern byte encoderRate;
 extern byte encoderCount;
 extern bool encPulseDetected;
 extern volatile long lastEncPulse;
 extern volatile bool statusEncSwitch;
 
-//WIFI
+// WIFI
 extern bool WIFI_connection_status;
 
 extern bool roomSensorPresent;
@@ -82,34 +81,34 @@ extern bool digitalCurrentSensorPresent;
 extern float instantTemperature[secondOrder_filter];
 extern float previousTemperature[secondOrder_filter];
 
-//room variables
+// room variables
 extern bool controlMode;
 extern bool defaultcontrolMode;
 extern bool controlAlgorithm;
 extern bool defaultcontrolAlgorithm;
-extern double desiredControlTemperature; //preset baby skin temperature
-extern double desiredControlHumidity; //preset enviromental humidity
-extern bool jaundiceEnable; //PWM that controls jaundice LED intensity
-extern double desiredHeaterTemp; //desired temperature in heater
+extern double desiredControlTemperature; // preset baby skin temperature
+extern double desiredControlHumidity;    // preset enviromental humidity
+extern bool jaundiceEnable;              // PWM that controls jaundice LED intensity
+extern double desiredHeaterTemp;         // desired temperature in heater
 
-extern const float minDesiredTemp[2]; //minimum allowed temperature to be set
-extern const float maxDesiredTemp[2]; //maximum allowed temperature to be set
-extern const int presetTemp[2]; //preset baby skin temperature
+extern const float minDesiredTemp[2]; // minimum allowed temperature to be set
+extern const float maxDesiredTemp[2]; // maximum allowed temperature to be set
+extern const int presetTemp[2];       // preset baby skin temperature
 
 extern boolean A_set;
 extern boolean B_set;
-extern int encoderpinA; // pin  encoder A
-extern int encoderpinB; // pin  encoder B
-extern bool encPulsed, encPulsedBefore; //encoder switch status
+extern int encoderpinA;                 // pin  encoder A
+extern int encoderpinB;                 // pin  encoder B
+extern bool encPulsed, encPulsedBefore; // encoder switch status
 extern bool updateUIData;
-extern volatile int EncMove; //moved encoder
-extern volatile int lastEncMove; //moved last encoder
-extern volatile int EncMoveOrientation; //set to -1 to increase values clockwise
-extern  int last_encoder_move; //moved encoder
-extern long encoder_debounce_time; //in milliseconds, debounce time in encoder to filter signal bounces
-extern long last_encPulsed; //last time encoder was pulsed
+extern volatile int EncMove;            // moved encoder
+extern volatile int lastEncMove;        // moved last encoder
+extern volatile int EncMoveOrientation; // set to -1 to increase values clockwise
+extern int last_encoder_move;           // moved encoder
+extern long encoder_debounce_time;      // in milliseconds, debounce time in encoder to filter signal bounces
+extern long last_encPulsed;             // last time encoder was pulsed
 
-//Text Graphic position variables
+// Text Graphic position variables
 extern int humidityX;
 extern int humidityY;
 extern int temperatureX;
@@ -129,17 +128,17 @@ extern float humidityPercentage, humidityAtStart;
 extern int barWidth, barHeight, tempBarPosX, tempBarPosY, humBarPosX, humBarPosY;
 extern int screenTextColor, screenTextBackgroundColor;
 
-//User Interface display variables
-extern bool autoLock; //setting that enables backlight switch OFF after a given time of no user actions
-extern bool defaultAutoLock; //setting that enables backlight switch OFF after a given time of no user actions
-extern long lastbacklightHandler; //last time there was a encoder movement or pulse
+// User Interface display variables
+extern bool autoLock;             // setting that enables backlight switch OFF after a given time of no user actions
+extern bool defaultAutoLock;      // setting that enables backlight switch OFF after a given time of no user actions
+extern long lastbacklightHandler; // last time there was a encoder movement or pulse
 extern long sensorsUpdatePeriod;
 
 extern bool selected;
 extern char cstring[128];
-extern char* textToWrite;
-extern char* words[12];
-extern char* helpMessage;
+extern char *textToWrite;
+extern char *words[12];
+extern char *helpMessage;
 extern byte bar_pos;
 extern byte menu_rows;
 extern byte length;
@@ -165,8 +164,6 @@ extern double Kp[numPID], Ki[numPID], Kd[numPID];
 extern PID airControlPID;
 extern PID skinControlPID;
 extern PID humidityControlPID;
-
-
 
 #define TEMPERATURE_ERROR 1 // 1 degrees difference to trigger alarm
 #define HUMIDITY_ERROR 12   // 12 %RH to trigger alarm
@@ -254,7 +251,7 @@ void checkThermalCutOuts()
 
 void checkStatusOfSensor(byte sensor)
 {
-  byte alarmID;
+  byte alarmID = false;
   switch (sensor)
   {
   case airSensor:
@@ -264,18 +261,21 @@ void checkStatusOfSensor(byte sensor)
     alarmID = SKIN_SENSOR_ISSUE_ALARM;
     break;
   }
-  if (millis() - lastSuccesfullSensorUpdate[sensor] > MINIMUM_SUCCESSFULL_SENSOR_UPDATE)
+  if (alarmID)
   {
-    if (!alarmOnGoing[alarmID])
+    if (millis() - lastSuccesfullSensorUpdate[sensor] > MINIMUM_SUCCESSFULL_SENSOR_UPDATE)
     {
-      setAlarm(alarmID);
+      if (!alarmOnGoing[alarmID])
+      {
+        setAlarm(alarmID);
+      }
     }
-  }
-  else
-  {
-    if (alarmOnGoing[alarmID])
+    else
     {
-      resetAlarm(alarmID);
+      if (alarmOnGoing[alarmID])
+      {
+        resetAlarm(alarmID);
+      }
     }
   }
 }
@@ -308,12 +308,14 @@ byte activeAlarm()
   return false;
 }
 
-bool ongoingAlarms() {
+bool ongoingAlarms()
+{
   return (alarmOnGoing[TEMPERATURE_ALARM] || alarmOnGoing[HUMIDITY_ALARM] || alarmOnGoing[AIR_THERMAL_CUTOUT_ALARM] || alarmOnGoing[SKIN_THERMAL_CUTOUT_ALARM] || alarmOnGoing[AIR_SENSOR_ISSUE_ALARM] || alarmOnGoing[SKIN_SENSOR_ISSUE_ALARM] || alarmOnGoing[HEATER_ISSUE_ALARM] || alarmOnGoing[FAN_ISSUE_ALARM]);
 }
 
-bool ongoingCriticalAlarm() {
-  return (!(alarmOnGoing[AIR_THERMAL_CUTOUT_ALARM] || alarmOnGoing[SKIN_THERMAL_CUTOUT_ALARM] || alarmOnGoing[AIR_SENSOR_ISSUE_ALARM] || alarmOnGoing[SKIN_SENSOR_ISSUE_ALARM]|| alarmOnGoing[HEATER_ISSUE_ALARM]));
+bool ongoingCriticalAlarm()
+{
+  return (!(alarmOnGoing[AIR_THERMAL_CUTOUT_ALARM] || alarmOnGoing[SKIN_THERMAL_CUTOUT_ALARM] || alarmOnGoing[AIR_SENSOR_ISSUE_ALARM] || alarmOnGoing[SKIN_SENSOR_ISSUE_ALARM] || alarmOnGoing[HEATER_ISSUE_ALARM]));
 }
 
 char *alarmIDtoString(byte alarmID)
@@ -360,7 +362,7 @@ void resetAlarm(byte alarmID)
 {
   logln("[ALARM] ->" + String(alarmIDtoString(alarmID)) + " has been disable");
   alarmOnGoing[alarmID] = false;
-  drawHeading(page, serialNumber, FWversion);
+  drawHeading(page, serialNumber);
   if (!ongoingAlarms())
   {
     shutBuzzer();
@@ -392,7 +394,6 @@ bool checkFan()
   float offsetCurrent;
   float testCurrent;
   long ongoingTest = millis();
-  bool exitTest;
   ledcWrite(HEATER_PWM_CHANNEL, HEATER_HALF_PWR * ongoingCriticalAlarm());
   while (millis() - ongoingTest < FAN_TEST_PREHEAT_TIME)
   {

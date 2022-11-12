@@ -17,7 +17,6 @@
 #define actuatingGPRSPostPeriod 30
 #define jaundiceGPRSPostPeriod 30
 #define GPRS_SHUT OFF
-#define NO_COMMENT false
 
 #define APN "TM"
 #define APN_TM "\"TM\"""\n"

@@ -28,7 +28,7 @@
 extern TwoWire *wire;
 extern MAM_in3ator_Humidifier in3_hum;
 extern Adafruit_ILI9341 tft;
-extern SHTC3 mySHTC3;              // Declare an instance of the SHTC3 class
+extern SHTC3 mySHTC3; // Declare an instance of the SHTC3 class
 extern RotaryEncoder encoder;
 extern Beastdevices_INA3221 digitalCurrentSensor;
 
@@ -40,7 +40,7 @@ extern long lastDebugUpdate;
 extern long loopCounts;
 extern int page;
 extern byte language;
-extern int temperature_filter; //amount of temperature samples to filter
+extern int temperature_filter; // amount of temperature samples to filter
 extern long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
 
 extern int NTC_PIN[numNTC];
@@ -54,26 +54,25 @@ extern double provisionalRawTemperatureLow[numSensors];
 extern double temperatureMaxReset;
 extern double temperatureMinReset;
 extern double temperatureMax[numSensors], temperatureMin[numSensors];
-extern int temperatureArray [numNTC][analog_temperature_filter]; //variable to handle each NTC with the array of last samples (only for NTC)
-extern int temperature_array_pos; //temperature sensor number turn to measure
-extern float diffTemperature; //difference between measured temperature and user input real temperature
-extern bool faultNTC[numNTC]; //variable to control a failure in NTC
-extern double humidity; // room humidity variable
+extern int temperatureArray[numNTC][analog_temperature_filter]; // variable to handle each NTC with the array of last samples (only for NTC)
+extern int temperature_array_pos;                               // temperature sensor number turn to measure
+extern float diffTemperature;                                   // difference between measured temperature and user input real temperature
+extern bool faultNTC[numNTC];                                   // variable to control a failure in NTC
+extern double humidity;                                         // room humidity variable
 extern bool humidifierState, humidifierStateChange;
-extern int previousHumidity; //previous sampled humidity
-extern float diffHumidity; //difference between measured humidity and user input real humidity
-
+extern int previousHumidity; // previous sampled humidity
+extern float diffHumidity;   // difference between measured humidity and user input real humidity
 
 extern byte autoCalibrationProcess;
 
-//Sensor check rate (in ms). Both sensors are checked in same interrupt and they have different check rates
+// Sensor check rate (in ms). Both sensors are checked in same interrupt and they have different check rates
 extern byte encoderRate;
 extern byte encoderCount;
 extern bool encPulseDetected;
 extern volatile long lastEncPulse;
 extern volatile bool statusEncSwitch;
 
-//WIFI
+// WIFI
 extern bool WIFI_connection_status;
 
 extern bool roomSensorPresent;
@@ -82,30 +81,30 @@ extern bool digitalCurrentSensorPresent;
 extern float instantTemperature[secondOrder_filter];
 extern float previousTemperature[secondOrder_filter];
 
-//room variables
+// room variables
 extern bool controlMode;
 extern bool defaultcontrolMode;
 extern bool controlAlgorithm;
 extern bool defaultcontrolAlgorithm;
-extern double desiredControlTemperature; //preset baby skin temperature
-extern double desiredControlHumidity; //preset enviromental humidity
-extern bool jaundiceEnable; //PWM that controls jaundice LED intensity
-extern double desiredHeaterTemp; //desired temperature in heater
+extern double desiredControlTemperature; // preset baby skin temperature
+extern double desiredControlHumidity;    // preset enviromental humidity
+extern bool jaundiceEnable;              // PWM that controls jaundice LED intensity
+extern double desiredHeaterTemp;         // desired temperature in heater
 
 extern boolean A_set;
 extern boolean B_set;
-extern int encoderpinA; // pin  encoder A
-extern int encoderpinB; // pin  encoder B
-extern bool encPulsed, encPulsedBefore; //encoder switch status
+extern int encoderpinA;                 // pin  encoder A
+extern int encoderpinB;                 // pin  encoder B
+extern bool encPulsed, encPulsedBefore; // encoder switch status
 extern bool updateUIData;
-extern volatile int EncMove; //moved encoder
-extern volatile int lastEncMove; //moved last encoder
-extern volatile int EncMoveOrientation; //set to -1 to increase values clockwise
-extern  int last_encoder_move; //moved encoder
-extern long encoder_debounce_time; //in milliseconds, debounce time in encoder to filter signal bounces
-extern long last_encPulsed; //last time encoder was pulsed
+extern volatile int EncMove;            // moved encoder
+extern volatile int lastEncMove;        // moved last encoder
+extern volatile int EncMoveOrientation; // set to -1 to increase values clockwise
+extern int last_encoder_move;           // moved encoder
+extern long encoder_debounce_time;      // in milliseconds, debounce time in encoder to filter signal bounces
+extern long last_encPulsed;             // last time encoder was pulsed
 
-//Text Graphic position variables
+// Text Graphic position variables
 extern int humidityX;
 extern int humidityY;
 extern int temperatureX;
@@ -125,17 +124,17 @@ extern float humidityPercentage, humidityAtStart;
 extern int barWidth, barHeight, tempBarPosX, tempBarPosY, humBarPosX, humBarPosY;
 extern int screenTextColor, screenTextBackgroundColor;
 
-//User Interface display variables
-extern bool autoLock; //setting that enables backlight switch OFF after a given time of no user actions
-extern bool defaultAutoLock; //setting that enables backlight switch OFF after a given time of no user actions
-extern long lastbacklightHandler; //last time there was a encoder movement or pulse
+// User Interface display variables
+extern bool autoLock;             // setting that enables backlight switch OFF after a given time of no user actions
+extern bool defaultAutoLock;      // setting that enables backlight switch OFF after a given time of no user actions
+extern long lastbacklightHandler; // last time there was a encoder movement or pulse
 extern long sensorsUpdatePeriod;
 
 extern bool selected;
 extern char cstring[128];
-extern char* textToWrite;
-extern char* words[12];
-extern char* helpMessage;
+extern char *textToWrite;
+extern char *words[12];
+extern char *helpMessage;
 extern byte bar_pos;
 extern byte menu_rows;
 extern byte length;
@@ -161,7 +160,6 @@ extern double Kp[numPID], Ki[numPID], Kd[numPID];
 extern PID airControlPID;
 extern PID skinControlPID;
 extern PID humidityControlPID;
-
 
 void setSensorsGraphicPosition(int UI_page)
 {
@@ -192,7 +190,6 @@ void setSensorsGraphicPosition(int UI_page)
 int16_t drawString(char *string, int16_t poX, int16_t poY, int16_t size)
 {
   int16_t sumX = 0;
-  int16_t xPlus = 0;
   int16_t width = 8;
   int16_t gap = -2;
 
@@ -205,7 +202,7 @@ int16_t drawString(char *string, int16_t poX, int16_t poY, int16_t size)
   return sumX;
 }
 
-void drawHeading(int UI_page, int UI_serialNumber, String UI_text)
+void drawHeading(int UI_page, int UI_serialNumber)
 {
   tft.fillRect(0, 0, tft.width(), height_heading, COLOR_HEADING);
   if (UI_page != mainMenuPage)
@@ -215,7 +212,7 @@ void drawHeading(int UI_page, int UI_serialNumber, String UI_text)
   setTextColor(COLOR_MENU);
   drawCentreString(convertStringToChar(cstring, "in3_"), tft.width() / 2 - 2 * letter_width - 10, headint_text_height, textFontSize);
   drawCentreNumber(UI_serialNumber, tft.width() / 2, headint_text_height);
-  drawCentreString(convertStringToChar(cstring, UI_text), tft.width() - 4 * letter_width, headint_text_height, textFontSize);
+  drawCentreString(convertStringToChar(cstring, "v" FWversion "/" HWversion), tft.width() - 4 * letter_width, headint_text_height, textFontSize);
 }
 
 void eraseBar(int UI_menu_rows, int bar_pos)
@@ -511,13 +508,11 @@ int16_t drawCentreString(char *string, int16_t dX, int16_t poY, int16_t size)
   int16_t sumX = 0;
   int16_t len = 0;
   char *pointer = string;
-  char ascii;
   int16_t width = 8;
   int16_t gap = -2;
 
   while (*pointer)
   {
-    ascii = *pointer;
     len += (width + gap);
     *pointer++;
   }
@@ -540,13 +535,11 @@ int16_t drawRightString(char *string, int16_t dX, int16_t poY, int16_t size)
   int16_t sumX = 0;
   int16_t len = 0;
   char *pointer = string;
-  char ascii;
   int16_t width = 8;
   int16_t gap = -2;
 
   while (*pointer)
   {
-    ascii = *pointer;
     len += (width + gap);
     *pointer++;
   }
@@ -584,7 +577,6 @@ int16_t drawFloat(float floatNumber, int16_t decimal, int16_t poX, int16_t poY, 
   float rounding = 0.5;
   float eep = 0.000001;
   int16_t sumX = 0;
-  int16_t xPlus = 0;
   char negativeSymbol[] = "-";
   char decimalSymbol[] = ".";
   int16_t width = 8;
@@ -605,7 +597,7 @@ int16_t drawFloat(float floatNumber, int16_t decimal, int16_t poX, int16_t poY, 
   }
   floatNumber += rounding;
   temp = (long)floatNumber;
-  xPlus = drawNumber(temp, poX, poY, size);
+  drawNumber(temp, poX, poY, size);
   while (temp > 9)
   {
     temp /= 10;
@@ -672,7 +664,6 @@ void loadlogo()
 */
 void drawHardwareErrorMessage(long error, bool criticalError)
 {
-  char *messageToWrite[50];
   tft.fillScreen(introBackColor);
   tft.setTextColor(introTextColor); // use tft. because tft.print is configured by it
   tft.setCursor(tft.width() / 4 - hexDigits(error) * 16, tft.height() / 5);
@@ -822,7 +813,7 @@ void graphics(uint8_t UI_page, uint8_t UI_language, uint8_t UI_print_text, uint8
           break;
         case temperatureGraphicPosition:
           drawTemperatureUnits();
-          drawRightString(initialSensorsValue, initialSensorPosition, temperatureY, textFontSize);
+          drawRightString(convertStringToChar(cstring, initialSensorsValue), initialSensorPosition, temperatureY, textFontSize);
           break;
         case LEDGraphicPosition:
           if (UI_var_1)
@@ -836,7 +827,7 @@ void graphics(uint8_t UI_page, uint8_t UI_language, uint8_t UI_print_text, uint8
           break;
         case humidityGraphicPosition:
           drawHumidityUnits();
-          drawRightString(initialSensorsValue, initialSensorPosition, humidityY, textFontSize);
+          drawRightString(convertStringToChar(cstring, initialSensorsValue), initialSensorPosition, humidityY, textFontSize);
           break;
         }
         break;

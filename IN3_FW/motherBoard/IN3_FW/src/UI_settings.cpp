@@ -215,7 +215,7 @@ void UI_settings()
   }
   menu_rows = numWords;
   graphics(page, language, print_text, menu_rows, serialNumber, WIFI_EN);
-  drawHeading(page, serialNumber, FWversion);
+  drawHeading(page, serialNumber);
   bar_pos = true;
   selected = false;
   ypos = graphicHeight(bar_pos - 1);

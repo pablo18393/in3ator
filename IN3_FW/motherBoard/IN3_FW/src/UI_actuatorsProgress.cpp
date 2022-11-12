@@ -241,8 +241,8 @@ void UI_actuatorsProgress()
   tft.setTextSize(1);
   print_text = false;
   menu_rows = numWords;
-  graphics(page, language, print_text, menu_rows, NULL, NULL);
-  drawHeading(page, serialNumber, FWversion);
+  graphics(page, language, print_text, menu_rows, false, false);
+  drawHeading(page, serialNumber);
   setTextColor(COLOR_MENU_TEXT);
   setSensorsGraphicPosition(page);
   drawActuatorsSeparators();

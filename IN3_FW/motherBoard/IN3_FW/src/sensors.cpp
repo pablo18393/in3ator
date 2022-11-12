@@ -204,8 +204,6 @@ float adcToCelsius(float adcReading, int maxAdcReading)
 
 bool measureNTCTemperature()
 {
-  float analogMeasurement;
-  unsigned long start_time = millis(); // Record the start time so we can timeout
   int NTCmeasurement;
   if (micros() - lastNTCmeasurement > NTCMeasurementPeriod)
   {

@@ -202,8 +202,8 @@ void autoCalibration()
     break;
   }
   menu_rows = numWords;
-  graphics(page, language, print_text, menu_rows, NULL, NULL);
-  drawHeading(page, serialNumber, FWversion);
+  graphics(page, language, print_text, menu_rows, false, false);
+  drawHeading(page, serialNumber);
   bar_pos = true;
   ypos = graphicHeight(bar_pos - 1);
   while (!digitalRead(ENC_SWITCH))
@@ -299,8 +299,8 @@ void fineTuneCalibration()
   words[temperatureCalibrationGraphicPosition] = convertStringToChar("Temperature adjust");
   words[setCalibrationGraphicPosition] = convertStringToChar("SET");
   menu_rows = numWords;
-  graphics(page, language, print_text, menu_rows, NULL, NULL);
-  drawHeading(page, serialNumber, FWversion);
+  graphics(page, language, print_text, menu_rows, false, false);
+  drawHeading(page, serialNumber);
   bar_pos = true;
   ypos = graphicHeight(bar_pos - 1);
   setTextColor(COLOR_MENU_TEXT);
@@ -344,8 +344,8 @@ void firstPointCalibration()
     break;
   }
   menu_rows = numWords;
-  graphics(page, language, print_text, menu_rows, NULL, NULL);
-  drawHeading(page, serialNumber, FWversion);
+  graphics(page, language, print_text, menu_rows, false, false);
+  drawHeading(page, serialNumber);
   bar_pos = true;
   ypos = graphicHeight(bar_pos - 1);
   setTextColor(COLOR_MENU_TEXT);
@@ -389,8 +389,8 @@ void secondPointCalibration()
     break;
   }
   menu_rows = numWords;
-  graphics(page, language, print_text, menu_rows, NULL, NULL);
-  drawHeading(page, serialNumber, FWversion);
+  graphics(page, language, print_text, menu_rows, false, false);
+  drawHeading(page, serialNumber);
   bar_pos = true;
   ypos = graphicHeight(bar_pos - 1);
   setTextColor(COLOR_MENU_TEXT);

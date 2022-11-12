@@ -33,7 +33,7 @@ void MAM_in3ator_Humidifier::_read(in3atorHum_param_t param, uint16_t *val) {
     _i2c->write(param); // parameter
     _i2c->endTransmission();
 
-    _i2c->requestFrom(_i2c_addr, (uint8_t)2);
+    _i2c->requestFrom(_i2c_addr, 2);
 
     if (_i2c->available())
     {

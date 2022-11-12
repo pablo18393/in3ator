@@ -228,7 +228,7 @@ void initDebug()
 {
   Serial.begin(115200);
   vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT);
-  logln("in3ator debug uart, version " + String(FWversion) + ", SN: " + String(serialNumber));
+  logln("in3ator debug uart, version v" + String(FWversion)+ "/" + String(HWversion) + ", SN: " + String(serialNumber));
 }
 
 void initPWMGPIO()

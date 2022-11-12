@@ -24,7 +24,10 @@
 */
 
 
-#define FWversion "v10.3/9.C"
+#define HW_NUM "9"
+#define HW_REVISION "A"
+#define HWversion HW_NUM "." HW_REVISION
+#define FWversion "10.4"
 #define headingTitle "in3ator"
 
 //Hardware
@@ -95,7 +98,9 @@
 
 #define BUZZER_MAX_PWM PWM_MAX_VALUE
 
-#define SCREEN_BRIGHTNESS_FACTOR 0.6 //Max brightness will be multiplied by this constant
-#define BACKLIGHT_POWER_SAFE_PERCENTAGE 0.1
+
+#define SCREEN_BRIGHTNESS_FACTOR 0.1 //Max brightness will be multiplied by this constant
+#define BACKLIGHT_POWER_SAFE_PERCENTAGE 0.6
+
 #define BACKLIGHT_POWER_SAFE PWM_MAX_VALUE *BACKLIGHT_POWER_SAFE_PERCENTAGE
 #define BACKLIGHT_POWER_DEFAULT PWM_MAX_VALUE *SCREEN_BRIGHTNESS_FACTOR
