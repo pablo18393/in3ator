@@ -165,7 +165,6 @@ PID skinControlPID(&skinControlPIDInput, &HeaterPIDOutput, &desiredControlTemper
 PID humidityControlPID(&humidity, &humidityControlPIDOutput, &desiredControlHumidity, Kp[humidityPID], Ki[humidityPID], Kd[humidityPID], P_ON_E, DIRECT);
 
 int ScreenBacklightMode;
-float backlightPower;
 
 void GPRS_Task(void *pvParameters)
 {

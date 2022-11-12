@@ -21,9 +21,6 @@
 #include <Beastdevices_INA3221.h> //
 #include "in3ator_humidifier.h"
 
-#define FWversion "v10.3/9.C"
-#define headingTitle "in3ator"
-
 #define WDT_TIMEOUT 25
 
 #define ON true
@@ -246,12 +243,11 @@
 #define humidityPID 2
 #define numPID 3
 
+#define BACKLIGHT_NO_INTERACTION_TIME 12000 // time to decrease backlight display if no user actions
+
+
 void GPRSSetPostVariables(byte postContent, String postComment);
 #define NO_COMMENT 0
-
-#define BACKLIGHT_NO_INTERACTION_TIME 30000 // time to decrease backlight display if no user actions
-#define BACKLIGHT_POWER_SAFE_PERCENTAGE 0.1
-#define BACKLIGHT_POWER_SAFE PWM_MAX_VALUE *BACKLIGHT_POWER_SAFE_PERCENTAGE
 
 void logln(String dataString);
 long millisToSecs(long timeInMillis);

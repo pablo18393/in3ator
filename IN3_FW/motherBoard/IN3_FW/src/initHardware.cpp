@@ -162,7 +162,6 @@ extern PID skinControlPID;
 extern PID humidityControlPID;
 
 extern int ScreenBacklightMode;
-extern float backlightPower;
 
 #define testMode false
 #define operativeMode true
@@ -397,7 +396,7 @@ void initSenseCircuit()
 void initializeTFT()
 {
   tft.setController(ST7789V_CONTROLLER);
-  tft.begin(SPI_CLOCK_DIV16);
+  tft.begin(DISPLAY_SPI_CLK);
   tft.setRotation(DISPLAY_DEFAULT_ROTATION);
 }
 
@@ -406,16 +405,12 @@ void initTFT()
   long error = HW_error;
   float testCurrent, offsetCurrent;
   long processTime;
-  if (screenBrightnessFactor)
-  {
-    backlightPower = PWM_MAX_VALUE * screenBrightnessFactor;
-  }
   offsetCurrent = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL);
   digitalWrite(TFT_CS, LOW);
   initializeTFT();
   loadlogo();
   processTime = millis();
-  for (int i = 0; i < backlightPower; i++)
+  for (int i = 0; i < BACKLIGHT_POWER_DEFAULT; i++)
   {
     ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, i);
     if (brightenRate)

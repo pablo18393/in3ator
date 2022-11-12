@@ -165,7 +165,6 @@ extern PID skinControlPID;
 extern PID humidityControlPID;
 
 extern int ScreenBacklightMode;
-extern float backlightPower;
 
 long lastHumToggle;
 bool humToggle;
@@ -256,7 +255,7 @@ void backlightHandler()
     {
       if (ScreenBacklightMode != BL_NORMAL)
       {
-        ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, backlightPower);
+        ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, BACKLIGHT_POWER_DEFAULT);
         ScreenBacklightMode = BL_NORMAL;
       }
     }
@@ -265,7 +264,7 @@ void backlightHandler()
   {
     if (ScreenBacklightMode != BL_NORMAL)
     {
-      ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, backlightPower);
+      ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, BACKLIGHT_POWER_DEFAULT);
       ScreenBacklightMode = BL_NORMAL;
     }
   }
