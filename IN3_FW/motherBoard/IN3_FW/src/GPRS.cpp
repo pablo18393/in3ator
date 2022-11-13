@@ -284,8 +284,8 @@ void GPRSPost()
       GPRS.firstPost = true;
       GPRS_get_SIM_info();
       tb.sendAttributeInt("SN", in3.serialNumber);
-      tb.sendAttributeString("HW_num", HW_NUM);
-      tb.sendAttributeString("HW_revision", HW_REVISION);
+      tb.sendAttributeInt("HW_num", HW_NUM);
+      tb.sendAttributeString("HW_revision", (const char *) HW_REVISION);
       tb.sendAttributeString("FW_version", FWversion);
       tb.sendAttributeString("CCID", GPRS.CCID.c_str());
       tb.sendAttributeString("IMEI", GPRS.IMEI.c_str());

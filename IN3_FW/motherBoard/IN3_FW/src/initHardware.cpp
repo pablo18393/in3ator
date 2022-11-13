@@ -150,8 +150,8 @@ extern int ScreenBacklightMode;
 #define testMode false
 #define operativeMode true
 
-#define CURRENT_STABILIZE_TIME_DEFAULT 500
-#define CURRENT_STABILIZE_TIME_HEATER 4000
+#define CURRENT_STABILIZE_TIME_DEFAULT 100
+#define CURRENT_STABILIZE_TIME_HEATER 100
 
 #define NTC_BABY_MIN 1
 #define NTC_BABY_MAX 60
@@ -278,7 +278,7 @@ void initCurrentSensor()
     // Set shunt resistors to 10 mOhm for all channels
     digitalCurrentSensor.setShuntRes(SYSTEM_SHUNT, PHOTOTHERAPY_SHUNT, FAN_SHUNT);
     digitalCurrentSensor.setShuntConversionTime(INA3221_REG_CONF_CT_140US);
-    digitalCurrentSensor.setAveragingMode(INA3221_REG_CONF_AVG_512);
+    digitalCurrentSensor.setAveragingMode(INA3221_REG_CONF_AVG_128);
     logln("[HW] -> digital sensor detected, current consumption is " + String(digitalCurrentSensor.getCurrent(INA3221_CH1), 2) + " Amperes");
   }
   else

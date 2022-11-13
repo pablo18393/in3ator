@@ -23,20 +23,19 @@
 
 */
 
-
-#define HW_NUM "9"
-#define HW_REVISION "A"
-#define HWversion HW_NUM "." HW_REVISION
+#define HW_NUM 9
+#define HW_REVISION 'C'
+#define HWversion String(HW_NUM) + "." + String(HW_REVISION)
 #define FWversion "10.4"
 #define headingTitle "in3ator"
 
-//Hardware
+// Hardware
 #define DISPLAY_SPI_CLK SPI_CLOCK_DIV16
 
-//PINOUT
+// PINOUT
 #define TFT_DC 0
 #define ENC_SWITCH 4
-#define BUZZER 35
+#define BUZZER 5
 #define FAN 12
 #define PHOTOTHERAPY 13
 #define ACTUATORS_EN 14
@@ -61,9 +60,9 @@
 #define HUMIDIFIER_SHUNT 1
 
 #define SDCard false
-#define SYSTEM_SHUNT 2 //miliohms
-#define PHOTOTHERAPY_SHUNT 20 //miliohms
-#define FAN_SHUNT 100 //miliohms
+#define SYSTEM_SHUNT 2        // miliohms
+#define PHOTOTHERAPY_SHUNT 20 // miliohms
+#define FAN_SHUNT 100         // miliohms
 
 #define HUMIDIFIER_BINARY 0
 #define HUMIDIFIER_PWM 1
@@ -84,8 +83,8 @@
 #define maxDACvalue 4095
 #define PWM_MAX_VALUE (pow(2, DEFAULT_PWM_RESOLUTION) - 1)
 
-#define minimumAllowedNTCMeasurement maxADCvalue/5
-#define maximumAllowedNTCMeasurement maxADCvalue*4/5
+#define minimumAllowedNTCMeasurement maxADCvalue / 5
+#define maximumAllowedNTCMeasurement maxADCvalue * 4 / 5
 
 #define BL_NORMAL 0
 #define BL_POWERSAVE 1
@@ -94,13 +93,17 @@
 #define minTempToDiscard 5
 
 #define BUZZER_MAX_PWR PWM_MAX_VALUE
-#define HEATER_HALF_PWR PWM_MAX_VALUE/2
+#define HEATER_HALF_PWR PWM_MAX_VALUE / 2
 
 #define BUZZER_MAX_PWM PWM_MAX_VALUE
 
-
-#define SCREEN_BRIGHTNESS_FACTOR 0.1 //Max brightness will be multiplied by this constant
+#if (HW_NUM <= 8 || (HW_NUM==9 && HW_REVISION=='A') )
+#define SCREEN_BRIGHTNESS_FACTOR 0.1 // Max brightness will be multiplied by this constant
 #define BACKLIGHT_POWER_SAFE_PERCENTAGE 0.6
+#else
+#define SCREEN_BRIGHTNESS_FACTOR 0.6 // Max brightness will be multiplied by this constant
+#define BACKLIGHT_POWER_SAFE_PERCENTAGE 0.1
+#endif
 
 #define BACKLIGHT_POWER_SAFE PWM_MAX_VALUE *BACKLIGHT_POWER_SAFE_PERCENTAGE
 #define BACKLIGHT_POWER_DEFAULT PWM_MAX_VALUE *SCREEN_BRIGHTNESS_FACTOR

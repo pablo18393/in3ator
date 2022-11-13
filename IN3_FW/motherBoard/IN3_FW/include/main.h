@@ -292,6 +292,7 @@ void buzzerTone(int beepTimes, int timevTaskDelay, int freq);
 
 void shutBuzzer();
 float measureMeanConsumption(int shunt);
+float measureMeanVoltage(int shunt);
 void watchdogReload();
 void OTAHandler(void);
 void sensorsHandler();
