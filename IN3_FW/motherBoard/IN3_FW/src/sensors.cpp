@@ -32,7 +32,6 @@ extern SHTC3 mySHTC3;              // Declare an instance of the SHTC3 class
 extern RotaryEncoder encoder;
 extern Beastdevices_INA3221 digitalCurrentSensor;
 
-extern int serialNumber;
 
 extern bool WIFI_EN;
 extern bool defaultWIFI_EN;
@@ -44,7 +43,6 @@ extern int temperature_filter; //amount of temperature samples to filter
 extern long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
 
 extern int NTC_PIN[numNTC];
-extern double temperature[numSensors];
 extern double errorTemperature[numSensors], temperatureCalibrationPoint;
 extern double ReferenceTemperatureRange, ReferenceTemperatureLow;
 extern double provisionalReferenceTemperatureLow;
@@ -58,7 +56,6 @@ extern int temperatureArray [numNTC][analog_temperature_filter]; //variable to h
 extern int temperature_array_pos; //temperature sensor number turn to measure
 extern float diffTemperature; //difference between measured temperature and user input real temperature
 extern bool faultNTC[numNTC]; //variable to control a failure in NTC
-extern double humidity; // room humidity variable
 extern bool humidifierState, humidifierStateChange;
 extern int previousHumidity; //previous sampled humidity
 extern float diffHumidity; //difference between measured humidity and user input real humidity
@@ -162,6 +159,7 @@ extern PID airControlPID;
 extern PID skinControlPID;
 extern PID humidityControlPID;
 
+extern in3ator_parameters in3;
 
 void sensorsHandler()
 {
@@ -212,31 +210,31 @@ bool measureNTCTemperature()
     {
       lastSuccesfullSensorUpdate[skinSensor] = millis();
       previousTemperature[0] = adcToCelsius(NTCmeasurement, maxADCvalue);
-      temperature[skinSensor] = butterworth2(instantTemperature[1], instantTemperature[2], previousTemperature[0], previousTemperature[1], previousTemperature[2]);
-      instantTemperature[0] = temperature[skinSensor];
+      in3.temperature[skinSensor] = butterworth2(instantTemperature[1], instantTemperature[2], previousTemperature[0], previousTemperature[1], previousTemperature[2]);
+      instantTemperature[0] = in3.temperature[skinSensor];
       for (int i = 1; i >= 0; i--)
       {
         instantTemperature[i + 1] = instantTemperature[i];
         previousTemperature[i + 1] = previousTemperature[i];
       }
-      errorTemperature[skinSensor] = temperature[skinSensor];
+      errorTemperature[skinSensor] = in3.temperature[skinSensor];
       if (RawTemperatureRange[skinSensor])
       {
-        temperature[skinSensor] = (((temperature[skinSensor] - RawTemperatureLow[skinSensor]) * ReferenceTemperatureRange) / RawTemperatureRange[skinSensor]) + ReferenceTemperatureLow;
-        temperature[skinSensor] += fineTuneSkinTemperature;
+        in3.temperature[skinSensor] = (((in3.temperature[skinSensor] - RawTemperatureLow[skinSensor]) * ReferenceTemperatureRange) / RawTemperatureRange[skinSensor]) + ReferenceTemperatureLow;
+        in3.temperature[skinSensor] += fineTuneSkinTemperature;
       }
-      errorTemperature[skinSensor] -= temperature[skinSensor];
-      if (temperature[skinSensor] < 0)
+      errorTemperature[skinSensor] -= in3.temperature[skinSensor];
+      if (in3.temperature[skinSensor] < 0)
       {
-        temperature[skinSensor] = 0;
+        in3.temperature[skinSensor] = 0;
       }
-      if (temperature[skinSensor] > temperatureMax[skinSensor])
+      if (in3.temperature[skinSensor] > temperatureMax[skinSensor])
       {
-        temperatureMax[skinSensor] = temperature[skinSensor];
+        temperatureMax[skinSensor] = in3.temperature[skinSensor];
       }
-      if (temperature[skinSensor] < temperatureMin[skinSensor])
+      if (in3.temperature[skinSensor] < temperatureMin[skinSensor])
       {
-        temperatureMin[skinSensor] = temperature[skinSensor];
+        temperatureMin[skinSensor] = in3.temperature[skinSensor];
       }
       lastNTCmeasurement = micros();
     }
@@ -259,15 +257,15 @@ bool updateRoomSensor()
       if (sensedTemperature > minTempToDiscard && sensedTemperature < maxTempToDiscard)
       {
         lastSuccesfullSensorUpdate[airSensor] = millis();
-        temperature[airSensor] = sensedTemperature; // Add here measurement to temp array
-        humidity = mySHTC3.toPercent();
-        if (temperature[airSensor] > temperatureMax[airSensor])
+        in3.temperature[airSensor] = sensedTemperature; // Add here measurement to temp array
+        in3.humidity = mySHTC3.toPercent();
+        if (in3.temperature[airSensor] > temperatureMax[airSensor])
         {
-          temperatureMax[airSensor] = temperature[airSensor];
+          temperatureMax[airSensor] = in3.temperature[airSensor];
         }
-        if (temperature[airSensor] < temperatureMin[airSensor])
+        if (in3.temperature[airSensor] < temperatureMin[airSensor])
         {
-          temperatureMin[airSensor] = temperature[airSensor];
+          temperatureMin[airSensor] = in3.temperature[airSensor];
         }
         return true;
       }

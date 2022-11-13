@@ -32,7 +32,6 @@ extern SHTC3 mySHTC3;              // Declare an instance of the SHTC3 class
 extern RotaryEncoder encoder;
 extern Beastdevices_INA3221 digitalCurrentSensor;
 
-extern int serialNumber;
 
 extern bool WIFI_EN;
 extern bool defaultWIFI_EN;
@@ -44,7 +43,6 @@ extern int temperature_filter; //amount of temperature samples to filter
 extern long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
 
 extern int NTC_PIN[numNTC];
-extern double temperature[numSensors];
 extern double errorTemperature[numSensors], temperatureCalibrationPoint;
 extern double ReferenceTemperatureRange, ReferenceTemperatureLow;
 extern double provisionalReferenceTemperatureLow;
@@ -58,7 +56,6 @@ extern int temperatureArray [numNTC][analog_temperature_filter]; //variable to h
 extern int temperature_array_pos; //temperature sensor number turn to measure
 extern float diffTemperature; //difference between measured temperature and user input real temperature
 extern bool faultNTC[numNTC]; //variable to control a failure in NTC
-extern double humidity; // room humidity variable
 extern bool humidifierState, humidifierStateChange;
 extern int previousHumidity; //previous sampled humidity
 extern float diffHumidity; //difference between measured humidity and user input real humidity
@@ -166,6 +163,7 @@ extern PID airControlPID;
 extern PID skinControlPID;
 extern PID humidityControlPID;
 
+extern in3ator_parameters in3;
 
 void userInterfaceHandler(int UI_page)
 {
@@ -261,7 +259,7 @@ void userInterfaceHandler(int UI_page)
                 if (!controlTemperature)
                 {
                   controlTemperature = true;
-                  drawRightString(initialSensorsValue, initialSensorPosition, temperatureY, textFontSize);
+                  drawRightString(convertStringToChar(cstring, initialSensorsValue), initialSensorPosition, temperatureY, textFontSize);
                 }
                 drawFloat(desiredControlTemperature, 1, temperatureX - 65, temperatureY, textFontSize);
                 desiredControlTemperature -= float(EncMove) * stepTemperatureIncrement;
@@ -303,12 +301,12 @@ void userInterfaceHandler(int UI_page)
                 if (!controlHumidity)
                 {
                   controlHumidity = true;
-                  drawRightString(initialSensorsValue, initialSensorPosition, humidityY, textFontSize);
+                  drawRightString(convertStringToChar(cstring, initialSensorsValue), initialSensorPosition, humidityY, textFontSize);
                 }
                 drawCentreNumber(desiredControlHumidity, humidityX - 65, humidityY);
                 desiredControlHumidity -= (EncMove)*stepHumidityIncrement;
                 setTextColor(COLOR_MENU_TEXT);
-                drawCentreNumber(desiredControlHumidity, humidityX - 65, humidityY);
+                drawCentreNumber(desiredControlHumidity , humidityX - 65, humidityY);
                 enableSet = true;
               }
             }
@@ -415,11 +413,11 @@ void userInterfaceHandler(int UI_page)
             if (EncMove)
             {
               setTextColor(COLOR_MENU);
-              drawRightNumber(serialNumber, unitPosition, ypos);
-              serialNumber -= EncMove;
-              EEPROM.write(EEPROM_SerialNumber, serialNumber);
+              drawRightNumber(in3.serialNumber, unitPosition, ypos);
+              in3.serialNumber -= EncMove;
+              EEPROM.write(EEPROM_SerialNumber, in3.serialNumber);
               setTextColor(COLOR_MENU_TEXT);
-              drawRightNumber(serialNumber, unitPosition, ypos);
+              drawRightNumber(in3.serialNumber, unitPosition, ypos);
             }
             EncMove = false;
           }
@@ -501,7 +499,7 @@ void userInterfaceHandler(int UI_page)
         {
         case temperatureCalibrationGraphicPosition:
           errorTemperature[skinSensor] = false;
-          diffTemperature = temperature[skinSensor];
+          diffTemperature = in3.temperature[skinSensor];
           while (digitalRead(ENC_SWITCH))
           {
             updateData();
@@ -517,7 +515,7 @@ void userInterfaceHandler(int UI_page)
           }
           break;
         case setCalibrationGraphicPosition:
-          fineTuneSkinTemperature = diffTemperature - temperature[skinSensor];
+          fineTuneSkinTemperature = diffTemperature - in3.temperature[skinSensor];
           logln("[CALIBRATION] -> Fine tune value is " + String(fineTuneSkinTemperature));
           EEPROM.writeFloat(EEPROM_FineTuneSkinTemperature, fineTuneSkinTemperature);
           EEPROM.commit();
@@ -531,7 +529,7 @@ void userInterfaceHandler(int UI_page)
         {
         case temperatureCalibrationGraphicPosition:
           errorTemperature[skinSensor] = false;
-          diffTemperature = temperature[skinSensor];
+          diffTemperature = in3.temperature[skinSensor];
           while (digitalRead(ENC_SWITCH))
           {
             updateData();
@@ -548,7 +546,7 @@ void userInterfaceHandler(int UI_page)
           break;
         case setCalibrationGraphicPosition:
           provisionalReferenceTemperatureLow = diffTemperature;
-          provisionalRawTemperatureLow[skinSensor] = temperature[skinSensor];
+          provisionalRawTemperatureLow[skinSensor] = in3.temperature[skinSensor];
           logln("[CALIBRATION] -> Low reference point is " + String(provisionalReferenceTemperatureLow) + ", low raw skin point is " + String(provisionalRawTemperatureLow[skinSensor]));
           secondPointCalibration();
           break;
@@ -558,7 +556,7 @@ void userInterfaceHandler(int UI_page)
         switch (bar_pos - graphicTextOffset)
         {
         case temperatureCalibrationGraphicPosition:
-          diffTemperature = temperature[skinSensor];
+          diffTemperature = in3.temperature[skinSensor];
           while (digitalRead(ENC_SWITCH))
           {
             updateData();
@@ -580,7 +578,7 @@ void userInterfaceHandler(int UI_page)
           ReferenceTemperatureRange = diffTemperature - ReferenceTemperatureLow;
           if (RawTemperatureRange[skinSensor])
           {
-            RawTemperatureRange[skinSensor] = (temperature[skinSensor] - RawTemperatureLow[skinSensor]);
+            RawTemperatureRange[skinSensor] = (in3.temperature[skinSensor] - RawTemperatureLow[skinSensor]);
             logln("calibration factors: " + String(RawTemperatureLow[skinSensor]) + "," + String(RawTemperatureRange[skinSensor]) + "," + String(ReferenceTemperatureRange) + "," + String(ReferenceTemperatureLow));
             saveCalibrationToEEPROM();
           }

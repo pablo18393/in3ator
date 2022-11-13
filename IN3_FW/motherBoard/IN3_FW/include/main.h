@@ -21,7 +21,7 @@
 #include <Beastdevices_INA3221.h> //
 #include "in3ator_humidifier.h"
 
-#define WDT_TIMEOUT 25
+#define WDT_TIMEOUT 45
 
 #define ON true
 #define OFF false
@@ -244,10 +244,31 @@
 #define numPID 3
 
 #define BACKLIGHT_NO_INTERACTION_TIME 12000 // time to decrease backlight display if no user actions
-
+#define DEFAULT_SERIAL_NUMBER 0
 
 void GPRSSetPostVariables(byte postContent, String postComment);
 #define NO_COMMENT 0
+
+typedef struct
+{
+    double temperature[numSensors];
+    double humidity;
+
+    double system_current_standby_test;
+    double heater_current_test;
+    double fan_current_test;
+    double phototherapy_current_test;
+    double humidifier_current_test;
+    double display_current_test;
+    double buzzer_current_test;
+    double HW_test_error_code;
+
+    double system_current;
+    double fan_current;
+    double phototherapy_current;
+    int serialNumber = DEFAULT_SERIAL_NUMBER;
+
+} in3ator_parameters;
 
 void logln(String dataString);
 long millisToSecs(long timeInMillis);

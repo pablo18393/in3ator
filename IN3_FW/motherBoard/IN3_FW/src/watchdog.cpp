@@ -25,8 +25,6 @@
 #include <Arduino.h>
 #include "main.h"
 
-
-
 void watchdogInit()
 {
   esp_task_wdt_init(WDT_TIMEOUT, true); // enable panic so ESP32 restarts

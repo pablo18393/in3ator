@@ -32,7 +32,6 @@ extern SHTC3 mySHTC3; // Declare an instance of the SHTC3 class
 extern RotaryEncoder encoder;
 extern Beastdevices_INA3221 digitalCurrentSensor;
 
-extern int serialNumber;
 
 extern bool WIFI_EN;
 extern bool defaultWIFI_EN;
@@ -44,7 +43,6 @@ extern int temperature_filter; // amount of temperature samples to filter
 extern long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
 
 extern int NTC_PIN[numNTC];
-extern double temperature[numSensors];
 extern double errorTemperature[numSensors], temperatureCalibrationPoint;
 extern double ReferenceTemperatureRange, ReferenceTemperatureLow;
 extern double provisionalReferenceTemperatureLow;
@@ -58,7 +56,6 @@ extern int temperatureArray[numNTC][analog_temperature_filter]; // variable to h
 extern int temperature_array_pos;                               // temperature sensor number turn to measure
 extern float diffTemperature;                                   // difference between measured temperature and user input real temperature
 extern bool faultNTC[numNTC];                                   // variable to control a failure in NTC
-extern double humidity;                                         // room humidity variable
 extern bool humidifierState, humidifierStateChange;
 extern int previousHumidity; // previous sampled humidity
 extern float diffHumidity;   // difference between measured humidity and user input real humidity
@@ -193,6 +190,8 @@ bool alarmOnGoing[NUM_ALARMS];
 long lastAlarmTrigger[NUM_ALARMS];
 float alarmSensedValue;
 
+extern in3ator_parameters in3;
+
 void initAlarms()
 {
   lastAlarmTrigger[AIR_THERMAL_CUTOUT_ALARM] = -1 * minsToMillis(ALARM_TIME_DELAY);
@@ -245,8 +244,8 @@ bool evaluateAlarm(byte alarmID, float setPoint, float measuredValue, float erro
 
 void checkThermalCutOuts()
 {
-  evaluateAlarm(AIR_THERMAL_CUTOUT_ALARM, AIR_THERMAL_CUTOUT, temperature[airSensor], false, AIR_THERMAL_CUTOUT_HYSTERESIS, lastAlarmTrigger[AIR_THERMAL_CUTOUT_ALARM]);
-  evaluateAlarm(SKIN_THERMAL_CUTOUT_ALARM, SKIN_THERMAL_CUTOUT, temperature[skinSensor], false, SKIN_THERMAL_CUTOUT_HYSTERESIS, lastAlarmTrigger[SKIN_THERMAL_CUTOUT_ALARM]);
+  evaluateAlarm(AIR_THERMAL_CUTOUT_ALARM, AIR_THERMAL_CUTOUT, in3.temperature[airSensor], false, AIR_THERMAL_CUTOUT_HYSTERESIS, lastAlarmTrigger[AIR_THERMAL_CUTOUT_ALARM]);
+  evaluateAlarm(SKIN_THERMAL_CUTOUT_ALARM, SKIN_THERMAL_CUTOUT, in3.temperature[skinSensor], false, SKIN_THERMAL_CUTOUT_HYSTERESIS, lastAlarmTrigger[SKIN_THERMAL_CUTOUT_ALARM]);
 }
 
 void checkStatusOfSensor(byte sensor)
@@ -362,7 +361,7 @@ void resetAlarm(byte alarmID)
 {
   logln("[ALARM] ->" + String(alarmIDtoString(alarmID)) + " has been disable");
   alarmOnGoing[alarmID] = false;
-  drawHeading(page, serialNumber);
+  drawHeading(page, in3.serialNumber);
   if (!ongoingAlarms())
   {
     shutBuzzer();
@@ -433,17 +432,17 @@ void checkAlarms()
     {
       if (controlMode)
       {
-        alarmSensedValue = temperature[airSensor];
+        alarmSensedValue = in3.temperature[airSensor];
       }
       else
       {
-        alarmSensedValue = temperature[skinSensor];
+        alarmSensedValue = in3.temperature[skinSensor];
       }
       evaluateAlarm(TEMPERATURE_ALARM, desiredControlTemperature, alarmSensedValue, TEMPERATURE_ERROR, TEMPERATURE_ERROR_HYSTERESIS, lastAlarmTrigger[TEMPERATURE_ALARM]);
     }
     if (controlHumidity)
     {
-      evaluateAlarm(HUMIDITY_ALARM, humidity, desiredControlHumidity, HUMIDITY_ERROR, HUMIDITY_ERROR_HYSTERESIS, lastAlarmTrigger[HUMIDITY_ALARM]);
+      evaluateAlarm(HUMIDITY_ALARM, in3.humidity, desiredControlHumidity, HUMIDITY_ERROR, HUMIDITY_ERROR_HYSTERESIS, lastAlarmTrigger[HUMIDITY_ALARM]);
     }
   }
 }

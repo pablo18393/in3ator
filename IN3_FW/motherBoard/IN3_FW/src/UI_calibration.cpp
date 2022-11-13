@@ -32,7 +32,6 @@ extern SHTC3 mySHTC3;              // Declare an instance of the SHTC3 class
 extern RotaryEncoder encoder;
 extern Beastdevices_INA3221 digitalCurrentSensor;
 
-extern int serialNumber;
 
 extern bool WIFI_EN;
 extern bool defaultWIFI_EN;
@@ -44,7 +43,6 @@ extern int temperature_filter; //amount of temperature samples to filter
 extern long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
 
 extern int NTC_PIN[numNTC];
-extern double temperature[numSensors];
 extern double errorTemperature[numSensors], temperatureCalibrationPoint;
 extern double ReferenceTemperatureRange, ReferenceTemperatureLow;
 extern double provisionalReferenceTemperatureLow;
@@ -58,7 +56,6 @@ extern int temperatureArray [numNTC][analog_temperature_filter]; //variable to h
 extern int temperature_array_pos; //temperature sensor number turn to measure
 extern float diffTemperature; //difference between measured temperature and user input real temperature
 extern bool faultNTC[numNTC]; //variable to control a failure in NTC
-extern double humidity; // room humidity variable
 extern bool humidifierState, humidifierStateChange;
 extern int previousHumidity; //previous sampled humidity
 extern float diffHumidity; //difference between measured humidity and user input real humidity
@@ -162,6 +159,7 @@ extern PID airControlPID;
 extern PID skinControlPID;
 extern PID humidityControlPID;
 
+extern in3ator_parameters in3;
 
 void UI_calibration() {
   byte numWords = 4;
@@ -200,7 +198,7 @@ void UI_calibration() {
   }
   menu_rows = numWords;
   graphics(page, language, print_text, menu_rows, false, false);
-  drawHeading(page, serialNumber);
+  drawHeading(page, in3.serialNumber);
   bar_pos = true;
   ypos = graphicHeight(bar_pos - 1);
   while (!digitalRead(ENC_SWITCH)) {

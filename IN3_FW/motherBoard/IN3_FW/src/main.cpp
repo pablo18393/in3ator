@@ -34,7 +34,6 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 SHTC3 mySHTC3; // Declare an instance of the SHTC3 class
 RotaryEncoder encoder(ENC_A, ENC_B, RotaryEncoder::LatchMode::TWO03);
 Beastdevices_INA3221 digitalCurrentSensor(INA3221_ADDR41_VCC);
-int serialNumber = 80;
 
 bool WIFI_EN = true;
 bool defaultWIFI_EN = ON;
@@ -46,7 +45,6 @@ int temperature_filter = analog_temperature_filter; // amount of temperature sam
 long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
 
 int NTC_PIN[numNTC] = {BABY_NTC_PIN};
-double temperature[numSensors];
 double errorTemperature[numSensors], temperatureCalibrationPoint;
 double ReferenceTemperatureRange, ReferenceTemperatureLow;
 double provisionalReferenceTemperatureLow;
@@ -60,7 +58,6 @@ int temperatureArray[numNTC][analog_temperature_filter]; // variable to handle e
 int temperature_array_pos;                               // temperature sensor number turn to measure
 float diffTemperature;                                   // difference between measured temperature and user input real temperature
 bool faultNTC[numNTC];                                   // variable to control a failure in NTC
-double humidity;                                         // room humidity variable
 bool humidifierState, humidifierStateChange;
 int previousHumidity; // previous sampled humidity
 float diffHumidity;   // difference between measured humidity and user input real humidity
@@ -160,11 +157,14 @@ double airControlPIDInput;
 double humidityControlPIDOutput;
 int humidifierTimeCycle = 5000;
 unsigned long windowStartTime;
-PID airControlPID(&airControlPIDInput, &HeaterPIDOutput, &desiredControlTemperature, Kp[airPID], Ki[airPID], Kd[airPID], P_ON_E, DIRECT);
-PID skinControlPID(&skinControlPIDInput, &HeaterPIDOutput, &desiredControlTemperature, Kp[skinPID], Ki[skinPID], Kd[skinPID], P_ON_E, DIRECT);
-PID humidityControlPID(&humidity, &humidityControlPIDOutput, &desiredControlHumidity, Kp[humidityPID], Ki[humidityPID], Kd[humidityPID], P_ON_E, DIRECT);
 
 int ScreenBacklightMode;
+
+in3ator_parameters in3;
+
+PID airControlPID(&airControlPIDInput, &HeaterPIDOutput, &desiredControlTemperature, Kp[airPID], Ki[airPID], Kd[airPID], P_ON_E, DIRECT);
+PID skinControlPID(&skinControlPIDInput, &HeaterPIDOutput, &desiredControlTemperature, Kp[skinPID], Ki[skinPID], Kd[skinPID], P_ON_E, DIRECT);
+PID humidityControlPID(&in3.humidity, &humidityControlPIDOutput, &desiredControlHumidity, Kp[humidityPID], Ki[humidityPID], Kd[humidityPID], P_ON_E, DIRECT);
 
 void GPRS_Task(void *pvParameters)
 {

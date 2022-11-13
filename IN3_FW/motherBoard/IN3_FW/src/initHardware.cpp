@@ -32,8 +32,6 @@ extern SHTC3 mySHTC3; // Declare an instance of the SHTC3 class
 extern RotaryEncoder encoder;
 extern Beastdevices_INA3221 digitalCurrentSensor;
 
-extern int serialNumber;
-
 extern bool WIFI_EN;
 extern bool defaultWIFI_EN;
 extern long lastDebugUpdate;
@@ -44,7 +42,6 @@ extern int temperature_filter; // amount of temperature samples to filter
 extern long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
 
 extern int NTC_PIN[numNTC];
-extern double temperature[numSensors];
 extern double errorTemperature[numSensors], temperatureCalibrationPoint;
 extern double ReferenceTemperatureRange, ReferenceTemperatureLow;
 extern double provisionalReferenceTemperatureLow;
@@ -58,7 +55,6 @@ extern int temperatureArray[numNTC][analog_temperature_filter]; // variable to h
 extern int temperature_array_pos;                               // temperature sensor number turn to measure
 extern float diffTemperature;                                   // difference between measured temperature and user input real temperature
 extern bool faultNTC[numNTC];                                   // variable to control a failure in NTC
-extern double humidity;                                         // room humidity variable
 extern bool humidifierState, humidifierStateChange;
 extern int previousHumidity; // previous sampled humidity
 extern float diffHumidity;   // difference between measured humidity and user input real humidity
@@ -224,11 +220,13 @@ extern int ScreenBacklightMode;
 long HW_error = false;
 long lastTFTCheck;
 
+extern in3ator_parameters in3;
+
 void initDebug()
 {
   Serial.begin(115200);
   vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT);
-  logln("in3ator debug uart, version v" + String(FWversion)+ "/" + String(HWversion) + ", SN: " + String(serialNumber));
+  logln("in3ator debug uart, version v" + String(FWversion) + "/" + String(HWversion) + ", SN: " + String(in3.serialNumber));
 }
 
 void initPWMGPIO()
@@ -316,34 +314,34 @@ void initSensors()
   // sensors verification
   while (!measureNTCTemperature())
     ;
-  if (temperature[skinSensor] < NTC_BABY_MIN)
+  if (in3.temperature[skinSensor] < NTC_BABY_MIN)
   {
     logln("[HW] -> Fail -> NTC temperature is lower than expected");
     HW_error += NTC_BABY_MIN_ERROR;
   }
-  if (temperature[skinSensor] > NTC_BABY_MAX)
+  if (in3.temperature[skinSensor] > NTC_BABY_MAX)
   {
     logln("[HW] -> Fail -> NTC temperature is higher than expected");
     HW_error += NTC_BABY_MAX_ERROR;
   }
   if (updateRoomSensor())
   {
-    if (temperature[airSensor] < DIG_TEMP_ROOM_MIN)
+    if (in3.temperature[airSensor] < DIG_TEMP_ROOM_MIN)
     {
       logln("[HW] -> Fail -> Room temperature is lower than expected");
       HW_error += DIG_TEMP_ROOM_MIN_ERROR;
     }
-    if (temperature[airSensor] > DIG_TEMP_ROOM_MAX)
+    if (in3.temperature[airSensor] > DIG_TEMP_ROOM_MAX)
     {
       logln("[HW] -> Fail -> Room temperature is higher than expected");
       HW_error += DIG_TEMP_ROOM_MAX_ERROR;
     }
-    if (humidity < DIG_HUM_ROOM_MIN)
+    if (in3.humidity < DIG_HUM_ROOM_MIN)
     {
       logln("[HW] -> Fail -> Room humidity is lower than expected");
       HW_error += DIG_HUM_ROOM_MIN_ERROR;
     }
-    if (humidity > DIG_HUM_ROOM_MAX)
+    if (in3.humidity > DIG_HUM_ROOM_MAX)
     {
       logln("[HW] -> Fail -> Room humidity is higher than expected");
       HW_error += DIG_HUM_ROOM_MAX_ERROR;
@@ -385,7 +383,7 @@ void standByCurrentTest()
   {
     logln("[HW] -> Fail -> test current is " + String(testCurrent) + " Amps");
   }
-  GPRSSetPostVariables(NO_COMMENT, ",CT:" + String(testCurrent));
+  in3.system_current_standby_test = testCurrent;
 }
 
 void initSenseCircuit()
@@ -441,7 +439,7 @@ void initTFT()
   {
     logln("[HW] -> Fail -> test current is " + String(testCurrent) + " Amps");
   }
-  GPRSSetPostVariables(NO_COMMENT, ",TFT:" + String(testCurrent));
+  in3.display_current_test = testCurrent;
 }
 
 void TFTRestore()
@@ -485,7 +483,7 @@ void initBuzzer()
   {
     logln("[HW] -> Fail -> test current is " + String(testCurrent) + " Amps");
   }
-  GPRSSetPostVariables(NO_COMMENT, ",Buz:" + String(testCurrent));
+  in3.buzzer_current_test = testCurrent;
 }
 
 bool actuatorsTest()
@@ -498,7 +496,7 @@ bool actuatorsTest()
   vTaskDelay(CURRENT_STABILIZE_TIME_HEATER);
   testCurrent = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL) - offsetCurrent;
   logln("[HW] -> Heater current consumption: " + String(testCurrent) + " Amps");
-  GPRSSetPostVariables(NO_COMMENT, ",Hea:" + String(testCurrent));
+  in3.heater_current_test = testCurrent;
   ledcWrite(HEATER_PWM_CHANNEL, 0);
   if (testCurrent < HEATER_CONSUMPTION_MIN)
   {
@@ -521,7 +519,7 @@ bool actuatorsTest()
   testCurrent = measureMeanConsumption(PHOTOTHERAPY_SHUNT_CHANNEL) - offsetCurrent;
   digitalWrite(PHOTOTHERAPY, LOW);
   logln("[HW] -> Phototherapy current consumption: " + String(testCurrent) + " Amps");
-  GPRSSetPostVariables(NO_COMMENT, ",Pho:" + String(testCurrent));
+  in3.phototherapy_current_test = testCurrent;
   if (testCurrent < PHOTOTHERAPY_CONSUMPTION_MIN)
   {
     HW_error += PHOTOTHERAPY_CONSUMPTION_MIN_ERROR;
@@ -538,7 +536,7 @@ bool actuatorsTest()
   vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT);
   testCurrent = measureMeanConsumption(HUMIDIFIER_SHUNT); // <- UPDATE THIS CODE
   logln("[HW] -> Humidifier current consumption: " + String(testCurrent) + " Amps");
-  GPRSSetPostVariables(NO_COMMENT, ",Hum:" + String(testCurrent));
+  in3.humidifier_current_test = testCurrent;
   in3_hum.turn(OFF);
   if (testCurrent < HUMIDIFIER_CONSUMPTION_MIN)
   {
@@ -557,7 +555,7 @@ bool actuatorsTest()
   vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT);
   testCurrent = measureMeanConsumption(FAN_SHUNT_CHANNEL) - offsetCurrent;
   logln("[HW] -> FAN consumption: " + String(testCurrent) + " Amps");
-  GPRSSetPostVariables(NO_COMMENT, ",Fan:" + String(testCurrent));
+  in3.fan_current_test = testCurrent;
   digitalWrite(FAN, LOW);
   if (testCurrent < FAN_CONSUMPTION_MIN)
   {
@@ -630,14 +628,13 @@ void initHardware(bool printOutputTest)
   if (!HW_error)
   {
     logln("[HW] -> HARDWARE OK");
-    GPRSSetPostVariables(NO_COMMENT, "HW OK");
   }
   else
   {
     logln("[HW] -> HARDWARE TEST FAIL");
     logln("[HW] -> HARDWARE ERROR CODE:" + String(HW_error, HEX));
-    GPRSSetPostVariables(NO_COMMENT, "HW FAIL" + String(HW_error, HEX));
   }
+  in3.HW_test_error_code = HW_error;
   if (printOutputTest || criticalError)
   {
     drawHardwareErrorMessage(HW_error, criticalError);

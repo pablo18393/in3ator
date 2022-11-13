@@ -32,7 +32,6 @@ extern SHTC3 mySHTC3;              // Declare an instance of the SHTC3 class
 extern RotaryEncoder encoder;
 extern Beastdevices_INA3221 digitalCurrentSensor;
 
-extern int serialNumber;
 
 extern bool WIFI_EN;
 extern bool defaultWIFI_EN;
@@ -44,7 +43,6 @@ extern int temperature_filter; //amount of temperature samples to filter
 extern long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
 
 extern int NTC_PIN[numNTC];
-extern double temperature[numSensors];
 extern double errorTemperature[numSensors], temperatureCalibrationPoint;
 extern double ReferenceTemperatureRange, ReferenceTemperatureLow;
 extern double provisionalReferenceTemperatureLow;
@@ -58,7 +56,6 @@ extern int temperatureArray [numNTC][analog_temperature_filter]; //variable to h
 extern int temperature_array_pos; //temperature sensor number turn to measure
 extern float diffTemperature; //difference between measured temperature and user input real temperature
 extern bool faultNTC[numNTC]; //variable to control a failure in NTC
-extern double humidity; // room humidity variable
 extern bool humidifierState, humidifierStateChange;
 extern int previousHumidity; //previous sampled humidity
 extern float diffHumidity; //difference between measured humidity and user input real humidity
@@ -162,7 +159,7 @@ extern PID airControlPID;
 extern PID skinControlPID;
 extern PID humidityControlPID;
 
-
+extern in3ator_parameters in3;
 
 void autoCalibration()
 {
@@ -175,8 +172,8 @@ void autoCalibration()
   int historyLengthPosition = false;
   double referenceSensorHistory[historyLength];
   double sensorToCalibrateHistory[historyLength];
-  referenceSensorHistory[0] = temperature[airSensor];
-  sensorToCalibrateHistory[0] = temperature[skinSensor];
+  referenceSensorHistory[0] = in3.temperature[airSensor];
+  sensorToCalibrateHistory[0] = in3.temperature[skinSensor];
   page = autoCalibrationPage;
   print_text = true;
   tft.setTextSize(1);
@@ -203,7 +200,7 @@ void autoCalibration()
   }
   menu_rows = numWords;
   graphics(page, language, print_text, menu_rows, false, false);
-  drawHeading(page, serialNumber);
+  drawHeading(page, in3.serialNumber);
   bar_pos = true;
   ypos = graphicHeight(bar_pos - 1);
   while (!digitalRead(ENC_SWITCH))
@@ -226,8 +223,8 @@ void autoCalibration()
     case firstAutoCalibrationPoint:
       if (!digitalRead(ENC_SWITCH) || checkStableTemperatures(referenceSensorHistory, sensorToCalibrateHistory, historyLength, stabilityError))
       {
-        provisionalReferenceTemperatureLow = temperature[airSensor];
-        provisionalRawTemperatureLow[skinSensor] = temperature[skinSensor];
+        provisionalReferenceTemperatureLow = in3.temperature[airSensor];
+        provisionalRawTemperatureLow[skinSensor] = in3.temperature[skinSensor];
         vTaskDelay(debounceTime);
         while (!digitalRead(ENC_SWITCH))
         {
@@ -251,8 +248,8 @@ void autoCalibration()
         Serial.println("=================================================point 2");
         ReferenceTemperatureLow = provisionalReferenceTemperatureLow;
         RawTemperatureLow[skinSensor] = provisionalRawTemperatureLow[skinSensor];
-        ReferenceTemperatureRange = temperature[airSensor] - ReferenceTemperatureLow;
-        RawTemperatureRange[skinSensor] = (temperature[skinSensor] - RawTemperatureLow[skinSensor]);
+        ReferenceTemperatureRange = in3.temperature[airSensor] - ReferenceTemperatureLow;
+        RawTemperatureRange[skinSensor] = (in3.temperature[skinSensor] - RawTemperatureLow[skinSensor]);
         logln("calibration factors: " + String(RawTemperatureLow[skinSensor]) + "," + String(RawTemperatureRange[skinSensor]) + "," + String(ReferenceTemperatureRange) + "," + String(ReferenceTemperatureLow));
         saveCalibrationToEEPROM();
         ledcWrite(HEATER_PWM_CHANNEL, false);
@@ -269,8 +266,8 @@ void autoCalibration()
       {
         historyLengthPosition = false;
       }
-      referenceSensorHistory[historyLengthPosition] = temperature[airSensor];
-      sensorToCalibrateHistory[historyLengthPosition] = temperature[skinSensor];
+      referenceSensorHistory[historyLengthPosition] = in3.temperature[airSensor];
+      sensorToCalibrateHistory[historyLengthPosition] = in3.temperature[skinSensor];
       historyLengthPosition++;
 
       for (int i = 0; i < historyLength; i++)
@@ -300,11 +297,11 @@ void fineTuneCalibration()
   words[setCalibrationGraphicPosition] = convertStringToChar("SET");
   menu_rows = numWords;
   graphics(page, language, print_text, menu_rows, false, false);
-  drawHeading(page, serialNumber);
+  drawHeading(page, in3.serialNumber);
   bar_pos = true;
   ypos = graphicHeight(bar_pos - 1);
   setTextColor(COLOR_MENU_TEXT);
-  drawFloat(temperature[skinSensor], 1, valuePosition, ypos, textFontSize);
+  drawFloat(in3.temperature[skinSensor], 1, valuePosition, ypos, textFontSize);
   while (!digitalRead(ENC_SWITCH))
   {
     updateData();
@@ -345,11 +342,11 @@ void firstPointCalibration()
   }
   menu_rows = numWords;
   graphics(page, language, print_text, menu_rows, false, false);
-  drawHeading(page, serialNumber);
+  drawHeading(page, in3.serialNumber);
   bar_pos = true;
   ypos = graphicHeight(bar_pos - 1);
   setTextColor(COLOR_MENU_TEXT);
-  drawFloat(temperature[skinSensor], 1, valuePosition, ypos, textFontSize);
+  drawFloat(in3.temperature[skinSensor], 1, valuePosition, ypos, textFontSize);
   while (!digitalRead(ENC_SWITCH))
   {
     updateData();
@@ -390,11 +387,11 @@ void secondPointCalibration()
   }
   menu_rows = numWords;
   graphics(page, language, print_text, menu_rows, false, false);
-  drawHeading(page, serialNumber);
+  drawHeading(page, in3.serialNumber);
   bar_pos = true;
   ypos = graphicHeight(bar_pos - 1);
   setTextColor(COLOR_MENU_TEXT);
-  drawFloat(temperature[skinSensor], 1, valuePosition, ypos, textFontSize);
+  drawFloat(in3.temperature[skinSensor], 1, valuePosition, ypos, textFontSize);
   while (!digitalRead(ENC_SWITCH))
   {
     updateData();

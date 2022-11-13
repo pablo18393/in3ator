@@ -33,7 +33,6 @@ extern SHTC3 mySHTC3;              // Declare an instance of the SHTC3 class
 extern RotaryEncoder encoder;
 extern Beastdevices_INA3221 digitalCurrentSensor;
 
-extern int serialNumber;
 
 extern bool WIFI_EN;
 extern bool defaultWIFI_EN;
@@ -45,7 +44,6 @@ extern int temperature_filter; //amount of temperature samples to filter
 extern long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
 
 extern int NTC_PIN[numNTC];
-extern double temperature[numSensors];
 extern double errorTemperature[numSensors], temperatureCalibrationPoint;
 extern double ReferenceTemperatureRange, ReferenceTemperatureLow;
 extern double provisionalReferenceTemperatureLow;
@@ -59,7 +57,6 @@ extern int temperatureArray [numNTC][analog_temperature_filter]; //variable to h
 extern int temperature_array_pos; //temperature sensor number turn to measure
 extern float diffTemperature; //difference between measured temperature and user input real temperature
 extern bool faultNTC[numNTC]; //variable to control a failure in NTC
-extern double humidity; // room humidity variable
 extern bool humidifierState, humidifierStateChange;
 extern int previousHumidity; //previous sampled humidity
 extern float diffHumidity; //difference between measured humidity and user input real humidity

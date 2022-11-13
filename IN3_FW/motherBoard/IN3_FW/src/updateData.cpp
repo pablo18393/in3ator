@@ -31,7 +31,6 @@ extern SHTC3 mySHTC3; // Declare an instance of the SHTC3 class
 extern RotaryEncoder encoder;
 extern Beastdevices_INA3221 digitalCurrentSensor;
 
-extern int serialNumber;
 
 extern bool WIFI_EN;
 extern bool defaultWIFI_EN;
@@ -43,7 +42,6 @@ extern int temperature_filter; // amount of temperature samples to filter
 extern long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
 
 extern int NTC_PIN[numNTC];
-extern double temperature[numSensors];
 extern double errorTemperature[numSensors], temperatureCalibrationPoint;
 extern double ReferenceTemperatureRange, ReferenceTemperatureLow;
 extern double provisionalReferenceTemperatureLow;
@@ -57,7 +55,6 @@ extern int temperatureArray[numNTC][analog_temperature_filter]; // variable to h
 extern int temperature_array_pos;                               // temperature sensor number turn to measure
 extern float diffTemperature;                                   // difference between measured temperature and user input real temperature
 extern bool faultNTC[numNTC];                                   // variable to control a failure in NTC
-extern double humidity;                                         // room humidity variable
 extern bool humidifierState, humidifierStateChange;
 extern int previousHumidity; // previous sampled humidity
 extern float diffHumidity;   // difference between measured humidity and user input real humidity
@@ -169,31 +166,33 @@ extern int ScreenBacklightMode;
 long lastHumToggle;
 bool humToggle;
 
+extern in3ator_parameters in3;
+
 void updateDisplaySensors()
 {
   float temperatureToUpdate;
   if (page == mainMenuPage || (page == actuatorsProgressPage))
   {
-    drawSelectedTemperature(temperature[controlMode], previousTemperature[controlMode]);
-    previousTemperature[controlMode] = temperature[controlMode];
-    drawHumidity(humidity, previousHumidity);
-    previousHumidity = humidity;
+    drawSelectedTemperature(in3.temperature[controlMode], previousTemperature[controlMode]);
+    previousTemperature[controlMode] = in3.temperature[controlMode];
+    drawHumidity(in3.humidity, previousHumidity);
+    previousHumidity = in3.humidity;
   }
   if (page == actuatorsProgressPage)
   {
-    drawUnselectedTemperature(temperature[!controlMode], previousTemperature[!controlMode]);
-    previousTemperature[!controlMode] = temperature[!controlMode];
+    drawUnselectedTemperature(in3.temperature[!controlMode], previousTemperature[!controlMode]);
+    previousTemperature[!controlMode] = in3.temperature[!controlMode];
     setTextColor(COLOR_MENU_TEXT);
     if (controlTemperature)
     {
       float previousTemperaturePercentage = temperaturePercentage;
       if (controlMode)
       {
-        temperatureToUpdate = temperature[airSensor];
+        temperatureToUpdate = in3.temperature[airSensor];
       }
       else
       {
-        temperatureToUpdate = temperature[skinSensor];
+        temperatureToUpdate = in3.temperature[skinSensor];
       }
       if ((desiredControlTemperature - temperatureAtStart))
       {
@@ -214,7 +213,7 @@ void updateDisplaySensors()
       float previousHumidityPercentage = humidityPercentage;
       if ((desiredControlHumidity - humidityAtStart))
       {
-        humidityPercentage = 100 - ((desiredControlHumidity - humidity) * 100 / (desiredControlHumidity - humidityAtStart));
+        humidityPercentage = 100 - ((desiredControlHumidity - in3.humidity) * 100 / (desiredControlHumidity - humidityAtStart));
       }
       if (humidityPercentage > 99)
       {
@@ -313,14 +312,15 @@ void updateData()
     logln("[SENSORS] -> System current consumption is: " + String(digitalCurrentSensor.getCurrent(INA3221_CH1), 4) + " Amps");
     logln("[SENSORS] -> Phototherapy current consumption is: " + String(digitalCurrentSensor.getCurrent(INA3221_CH2), 4) + " Amps");
     logln("[SENSORS] -> Fan current consumption is: " + String(digitalCurrentSensor.getCurrent(INA3221_CH3), 4) + " Amps");
-    logln("[SENSORS] -> Baby temperature: " + String(temperature[skinSensor]) + "ºC, correction error is " + String(errorTemperature[skinSensor]));
-    logln("[SENSORS] -> Air temperature: " + String(temperature[airSensor]) + "ºC, correction error is " + String(errorTemperature[airSensor]));
-    logln("[SENSORS] -> Humidity: " + String(humidity) + "%");
+    logln("[SENSORS] -> Baby temperature: " + String(in3.temperature[skinSensor]) + "ºC, correction error is " + String(errorTemperature[skinSensor]));
+    logln("[SENSORS] -> Air temperature: " + String(in3.temperature[airSensor]) + "ºC, correction error is " + String(errorTemperature[airSensor]));
+    logln("[SENSORS] -> Humidity: " + String(in3.humidity) + "%");
     logln("[SENSORS] -> ON_OFF: " + String(digitalRead(ON_OFF_SWITCH)));
     if (millis() - lastDebugUpdate)
     {
       logln("[LATENCY] -> Looped " + String(loopCounts * 1000 / (millis() - lastDebugUpdate)) + " Times per second");
     }
+    
     loopCounts = 0;
     lastDebugUpdate = millis();
   }
