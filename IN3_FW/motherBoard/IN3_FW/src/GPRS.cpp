@@ -71,9 +71,7 @@ int checkSerial(const char *success, const char *error)
 void initGPRS()
 {
   Serial2.begin(115200);
-  GPRS.enable = true;
   GPRS.powerUp = true;
-  setGPRSPostPeriod(standByGPRSPostPeriod);
   digitalWrite(GPRS_PWRKEY, HIGH);
 }
 
@@ -93,7 +91,7 @@ void GPRS_get_SIM_info()
 {
   GPRS.CCID = modem.getSimCCID();
 
-  GPRS.CCID.remove(GPRS.CCID.length()-1);
+  GPRS.CCID.remove(GPRS.CCID.length() - 1);
 
   GPRS.IMEI = modem.getIMEI();
 
@@ -244,9 +242,20 @@ void readGPRSData()
   }
 }
 
-void setGPRSPostPeriod(long seconds)
+void GPRSSetPostPeriod()
 {
-  GPRS.sendPeriod = seconds;
+  if (in3.temperatureControl || in3.humidityControl)
+  {
+    GPRS.sendPeriod = actuatingGPRSPostPeriod;
+  }
+  else if (in3.phototherapy)
+  {
+    GPRS.sendPeriod = phototherapyGPRSPostPeriod;
+  }
+  else
+  {
+    GPRS.sendPeriod = standByGPRSPostPeriod;
+  }
 }
 
 void GPRSPost()
@@ -289,11 +298,52 @@ void GPRSPost()
       tb.sendTelemetryFloat("tri_longitud", GPRS.longitud);
       tb.sendTelemetryFloat("tri_latitud", GPRS.latitud);
       tb.sendTelemetryFloat("tri_accuracy", GPRS.accuracy);
+      tb.sendTelemetryInt("UI_language", in3.language);
     }
 
     tb.sendTelemetryFloat("Air_temp", in3.temperature[airSensor]);
     tb.sendTelemetryFloat("Skin_temp", in3.temperature[skinSensor]);
     tb.sendTelemetryInt("Humidity", in3.humidity);
+
+    if (in3.temperatureControl || in3.humidityControl)
+    {
+      if (!GPRS.firstConfigPost)
+      {
+        GPRS.firstConfigPost = true;
+        if (in3.temperatureControl)
+        {
+          if (in3.controlMode == AIR_CONTROL)
+          {
+            tb.sendTelemetryString("Control_mode", "AIR");
+          }
+          else
+          {
+            tb.sendTelemetryString("Control_mode", "SKIN");
+          }
+          tb.sendTelemetryFloat("Temp_desired", in3.desiredControlTemperature);
+        }
+        if (in3.humidityControl)
+        {
+          tb.sendTelemetryFloat("Hum_desired", in3.desiredControlHumidity);
+        }
+      }
+      tb.sendTelemetryFloat("SYS_current", in3.system_current);
+      tb.sendTelemetryFloat("Fan_current", in3.fan_current);
+    }
+    else
+    {
+      GPRS.firstConfigPost = false;
+    }
+    if (in3.humidityControl)
+    {
+      tb.sendTelemetryFloat("Humidifier_current", in3.humidifier_current);
+      tb.sendTelemetryFloat("Humidifier_voltage", in3.humidifier_voltage);
+    }
+    if (in3.phototherapy)
+    {
+      tb.sendTelemetryFloat("Phototherapy_current", in3.phototherapy_current);
+    }
+
     GPRS.process = false;
     GPRS.lastSent = millis();
     logln("[GPRS] -> GPRS POST SUCCESS");
@@ -302,20 +352,18 @@ void GPRSPost()
 
 void GPRS_Handler()
 {
-  if (GPRS.enable)
+  if (GPRS.powerUp)
   {
-    if (GPRS.powerUp)
-    {
-      GPRSPowerUp();
-    }
-    if (GPRS.connect)
-    {
-      GPRSStablishConnection();
-    }
-    if (GPRS.post)
-    {
-      GPRSPost();
-    }
-    readGPRSData();
+    GPRSPowerUp();
   }
+  if (GPRS.connect)
+  {
+    GPRSStablishConnection();
+  }
+  if (GPRS.post)
+  {
+    GPRSSetPostPeriod();
+    GPRSPost();
+  }
+  readGPRSData();
 }

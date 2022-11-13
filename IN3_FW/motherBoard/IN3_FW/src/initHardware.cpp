@@ -37,7 +37,6 @@ extern bool defaultWIFI_EN;
 extern long lastDebugUpdate;
 extern long loopCounts;
 extern int page;
-extern byte language;
 extern int temperature_filter; // amount of temperature samples to filter
 extern long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
 
@@ -48,13 +47,10 @@ extern double provisionalReferenceTemperatureLow;
 extern double fineTuneSkinTemperature;
 extern double RawTemperatureLow[numSensors], RawTemperatureRange[numSensors];
 extern double provisionalRawTemperatureLow[numSensors];
-extern double temperatureMaxReset;
-extern double temperatureMinReset;
 extern double temperatureMax[numSensors], temperatureMin[numSensors];
 extern int temperatureArray[numNTC][analog_temperature_filter]; // variable to handle each NTC with the array of last samples (only for NTC)
 extern int temperature_array_pos;                               // temperature sensor number turn to measure
 extern float diffTemperature;                                   // difference between measured temperature and user input real temperature
-extern bool faultNTC[numNTC];                                   // variable to control a failure in NTC
 extern bool humidifierState, humidifierStateChange;
 extern int previousHumidity; // previous sampled humidity
 extern float diffHumidity;   // difference between measured humidity and user input real humidity
@@ -78,14 +74,8 @@ extern float instantTemperature[secondOrder_filter];
 extern float previousTemperature[secondOrder_filter];
 
 // room variables
-extern bool controlMode;
-extern bool defaultcontrolMode;
 extern bool controlAlgorithm;
 extern bool defaultcontrolAlgorithm;
-extern double desiredControlTemperature; // preset baby skin temperature
-extern double desiredControlHumidity;    // preset enviromental humidity
-extern bool jaundiceEnable;              // PWM that controls jaundice LED intensity
-extern double desiredHeaterTemp;         // desired temperature in heater
 
 extern boolean A_set;
 extern boolean B_set;
@@ -107,8 +97,6 @@ extern int temperatureX;
 extern int temperatureY;
 extern int separatorTopYPos;
 extern int separatorBotYPos;
-extern bool controlTemperature;
-extern bool controlHumidity;
 extern int ypos;
 extern bool print_text;
 extern int initialSensorPosition;

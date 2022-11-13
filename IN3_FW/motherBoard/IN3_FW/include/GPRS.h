@@ -12,9 +12,9 @@
 #define modemSerial Serial2
 #define DEFAULT_POST_PERIOD 10
 
-#define standByGPRSPostPeriod 30
-#define actuatingGPRSPostPeriod 30
-#define jaundiceGPRSPostPeriod 30
+#define standByGPRSPostPeriod 3600
+#define actuatingGPRSPostPeriod 60
+#define phototherapyGPRSPostPeriod 180
 #define GPRS_SHUT OFF
 
 #define APN_TM "TM"
@@ -46,6 +46,7 @@ struct GPRSstruct
     long packetSentenceTime;
     bool post;
     bool firstPost;
+    bool firstConfigPost;
 
     String CCID;
     String IMEI;

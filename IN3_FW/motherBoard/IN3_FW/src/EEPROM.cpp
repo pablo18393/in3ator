@@ -28,18 +28,16 @@
 extern TwoWire *wire;
 extern MAM_in3ator_Humidifier in3_hum;
 extern Adafruit_ILI9341 tft;
-extern SHTC3 mySHTC3;              // Declare an instance of the SHTC3 class
+extern SHTC3 mySHTC3; // Declare an instance of the SHTC3 class
 extern RotaryEncoder encoder;
 extern Beastdevices_INA3221 digitalCurrentSensor;
-
 
 extern bool WIFI_EN;
 extern bool defaultWIFI_EN;
 extern long lastDebugUpdate;
 extern long loopCounts;
 extern int page;
-extern byte language;
-extern int temperature_filter; //amount of temperature samples to filter
+extern int temperature_filter; // amount of temperature samples to filter
 extern long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
 
 extern int NTC_PIN[numNTC];
@@ -49,28 +47,24 @@ extern double provisionalReferenceTemperatureLow;
 extern double fineTuneSkinTemperature;
 extern double RawTemperatureLow[numSensors], RawTemperatureRange[numSensors];
 extern double provisionalRawTemperatureLow[numSensors];
-extern double temperatureMaxReset;
-extern double temperatureMinReset;
 extern double temperatureMax[numSensors], temperatureMin[numSensors];
-extern int temperatureArray [numNTC][analog_temperature_filter]; //variable to handle each NTC with the array of last samples (only for NTC)
-extern int temperature_array_pos; //temperature sensor number turn to measure
-extern float diffTemperature; //difference between measured temperature and user input real temperature
-extern bool faultNTC[numNTC]; //variable to control a failure in NTC
+extern int temperatureArray[numNTC][analog_temperature_filter]; // variable to handle each NTC with the array of last samples (only for NTC)
+extern int temperature_array_pos;                               // temperature sensor number turn to measure
+extern float diffTemperature;                                   // difference between measured temperature and user input real temperature
 extern bool humidifierState, humidifierStateChange;
-extern int previousHumidity; //previous sampled humidity
-extern float diffHumidity; //difference between measured humidity and user input real humidity
-
+extern int previousHumidity; // previous sampled humidity
+extern float diffHumidity;   // difference between measured humidity and user input real humidity
 
 extern byte autoCalibrationProcess;
 
-//Sensor check rate (in ms). Both sensors are checked in same interrupt and they have different check rates
+// Sensor check rate (in ms). Both sensors are checked in same interrupt and they have different check rates
 extern byte encoderRate;
 extern byte encoderCount;
 extern bool encPulseDetected;
 extern volatile long lastEncPulse;
 extern volatile bool statusEncSwitch;
 
-//WIFI
+// WIFI
 extern bool WIFI_connection_status;
 
 extern bool roomSensorPresent;
@@ -79,42 +73,34 @@ extern bool digitalCurrentSensorPresent;
 extern float instantTemperature[secondOrder_filter];
 extern float previousTemperature[secondOrder_filter];
 
-//room variables
-extern bool controlMode;
-extern bool defaultcontrolMode;
+// room variables
 extern bool controlAlgorithm;
 extern bool defaultcontrolAlgorithm;
-extern double desiredControlTemperature; //preset baby skin temperature
-extern double desiredControlHumidity; //preset enviromental humidity
-extern bool jaundiceEnable; //PWM that controls jaundice LED intensity
-extern double desiredHeaterTemp; //desired temperature in heater
 
-extern float minDesiredTemp[2]; //minimum allowed temperature to be set
-extern float maxDesiredTemp[2]; //maximum allowed temperature to be set
-extern int presetTemp[2]; //preset baby skin temperature
+extern float minDesiredTemp[2]; // minimum allowed temperature to be set
+extern float maxDesiredTemp[2]; // maximum allowed temperature to be set
+extern int presetTemp[2];       // preset baby skin temperature
 
 extern boolean A_set;
 extern boolean B_set;
-extern int encoderpinA; // pin  encoder A
-extern int encoderpinB; // pin  encoder B
-extern bool encPulsed, encPulsedBefore; //encoder switch status
+extern int encoderpinA;                 // pin  encoder A
+extern int encoderpinB;                 // pin  encoder B
+extern bool encPulsed, encPulsedBefore; // encoder switch status
 extern bool updateUIData;
-extern volatile int EncMove; //moved encoder
-extern volatile int lastEncMove; //moved last encoder
-extern volatile int EncMoveOrientation; //set to -1 to increase values clockwise
-extern  int last_encoder_move; //moved encoder
-extern long encoder_debounce_time; //in milliseconds, debounce time in encoder to filter signal bounces
-extern long last_encPulsed; //last time encoder was pulsed
+extern volatile int EncMove;            // moved encoder
+extern volatile int lastEncMove;        // moved last encoder
+extern volatile int EncMoveOrientation; // set to -1 to increase values clockwise
+extern int last_encoder_move;           // moved encoder
+extern long encoder_debounce_time;      // in milliseconds, debounce time in encoder to filter signal bounces
+extern long last_encPulsed;             // last time encoder was pulsed
 
-//Text Graphic position variables
+// Text Graphic position variables
 extern int humidityX;
 extern int humidityY;
 extern int temperatureX;
 extern int temperatureY;
 extern int separatorTopYPos;
 extern int separatorBotYPos;
-extern bool controlTemperature;
-extern bool controlHumidity;
 extern int ypos;
 extern bool print_text;
 extern int initialSensorPosition;
@@ -126,17 +112,17 @@ extern float humidityPercentage, humidityAtStart;
 extern int barWidth, barHeight, tempBarPosX, tempBarPosY, humBarPosX, humBarPosY;
 extern int screenTextColor, screenTextBackgroundColor;
 
-//User Interface display variables
-extern bool autoLock; //setting that enables backlight switch OFF after a given time of no user actions
-extern bool defaultAutoLock; //setting that enables backlight switch OFF after a given time of no user actions
-extern long lastbacklightHandler; //last time there was a encoder movement or pulse
+// User Interface display variables
+extern bool autoLock;             // setting that enables backlight switch OFF after a given time of no user actions
+extern bool defaultAutoLock;      // setting that enables backlight switch OFF after a given time of no user actions
+extern long lastbacklightHandler; // last time there was a encoder movement or pulse
 extern long sensorsUpdatePeriod;
 
 extern bool selected;
 extern char cstring[128];
-extern char* textToWrite;
-extern char* words[12];
-extern char* helpMessage;
+extern char *textToWrite;
+extern char *words[12];
+extern char *helpMessage;
 extern byte bar_pos;
 extern byte menu_rows;
 extern byte length;
@@ -214,17 +200,17 @@ void loaddefaultValues()
 {
   autoLock = defaultAutoLock;
   WIFI_EN = defaultWIFI_EN;
-  language = defaultLanguage;
+  in3.language = defaultLanguage;
   controlAlgorithm = defaultcontrolAlgorithm;
-  controlMode = defaultcontrolMode;
-  desiredControlTemperature = presetTemp[controlMode];
-  desiredControlHumidity = presetHumidity;
+  in3.controlMode = AIR_CONTROL;
+  in3.desiredControlTemperature = presetTemp[in3.controlMode];
+  in3.desiredControlHumidity = presetHumidity;
   EEPROM.write(EEPROM_autoLock, autoLock);
   EEPROM.write(EEPROM_WIFI_EN, WIFI_EN);
-  EEPROM.write(EEPROM_language, language);
+  EEPROM.write(EEPROM_language, in3.language);
   EEPROM.write(EEPROM_controlAlgorithm, controlAlgorithm);
-  EEPROM.write(EEPROM_controlMode, controlMode);
-  EEPROM.write(EEPROM_desiredControlMode, desiredControlTemperature);
+  EEPROM.write(EEPROM_controlMode, in3.controlMode);
+  EEPROM.write(EEPROM_desiredControlMode, in3.desiredControlTemperature);
   EEPROM.commit();
 }
 
@@ -245,7 +231,7 @@ void loadDefaultCalibration()
 void recapVariables()
 {
   autoLock = EEPROM.read(EEPROM_autoLock);
-  language = EEPROM.read(EEPROM_language);
+  in3.language = EEPROM.read(EEPROM_language);
   RawTemperatureLow[skinSensor] = EEPROM.readFloat(EEPROM_RawSkinTemperatureLowCorrection);
   RawTemperatureRange[skinSensor] = EEPROM.readFloat(EEPROM_RawSkinTemperatureRangeCorrection);
   RawTemperatureLow[airSensor] = EEPROM.readFloat(EEPROM_RawDigitalTemperatureLowCorrection);
@@ -268,9 +254,9 @@ void recapVariables()
   in3.serialNumber = EEPROM.read(EEPROM_SerialNumber);
   WIFI_EN = EEPROM.read(EEPROM_WIFI_EN);
   controlAlgorithm = EEPROM.read(EEPROM_controlAlgorithm);
-  controlMode = EEPROM.read(EEPROM_controlMode);
-  desiredControlTemperature = EEPROM.read(EEPROM_desiredControlMode);
-  desiredControlHumidity = EEPROM.read(EEPROM_desiredControlHumidity);
+  in3.controlMode = EEPROM.read(EEPROM_controlMode);
+  in3.desiredControlTemperature = EEPROM.read(EEPROM_desiredControlMode);
+  in3.desiredControlHumidity = EEPROM.read(EEPROM_desiredControlHumidity);
 }
 
 void saveCalibrationToEEPROM()

@@ -40,7 +40,6 @@ bool defaultWIFI_EN = ON;
 long lastDebugUpdate;
 long loopCounts;
 int page;
-byte language;
 int temperature_filter = analog_temperature_filter; // amount of temperature samples to filter
 long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
 
@@ -51,13 +50,10 @@ double provisionalReferenceTemperatureLow;
 double fineTuneSkinTemperature;
 double RawTemperatureLow[numSensors], RawTemperatureRange[numSensors];
 double provisionalRawTemperatureLow[numSensors];
-double temperatureMaxReset = -1000;
-double temperatureMinReset = 1000;
 double temperatureMax[numSensors], temperatureMin[numSensors];
 int temperatureArray[numNTC][analog_temperature_filter]; // variable to handle each NTC with the array of last samples (only for NTC)
 int temperature_array_pos;                               // temperature sensor number turn to measure
 float diffTemperature;                                   // difference between measured temperature and user input real temperature
-bool faultNTC[numNTC];                                   // variable to control a failure in NTC
 bool humidifierState, humidifierStateChange;
 int previousHumidity; // previous sampled humidity
 float diffHumidity;   // difference between measured humidity and user input real humidity
@@ -69,7 +65,6 @@ byte encoderRate = true;
 byte encoderCount = false;
 bool encPulseDetected;
 volatile long lastEncPulse;
-#define encPulseDebounce 50
 volatile bool statusEncSwitch;
 
 bool roomSensorPresent = false;
@@ -79,15 +74,8 @@ float instantTemperature[secondOrder_filter];
 float previousTemperature[secondOrder_filter];
 
 // room variables
-bool controlMode;
-bool defaultcontrolMode = SKIN_CONTROL;
 bool controlAlgorithm;
 bool defaultcontrolAlgorithm = PID_CONTROL;
-double desiredControlTemperature; // preset baby skin temperature
-double desiredControlHumidity;    // preset enviromental humidity
-bool jaundiceEnable;              // PWM that controls jaundice LED intensity
-double desiredHeaterTemp;         // desired temperature in heater
-
 float minDesiredTemp[2] = {35, 30};   // minimum allowed temperature to be set
 float maxDesiredTemp[2] = {37.5, 37}; // maximum allowed temperature to be set
 int presetTemp[2] = {36, 32};         // preset baby skin temperature
@@ -112,8 +100,6 @@ int temperatureX;
 int temperatureY;
 int separatorTopYPos;
 int separatorBotYPos;
-bool controlTemperature;
-bool controlHumidity;
 int ypos;
 bool print_text;
 int initialSensorPosition = separatorPosition - letter_width;
@@ -162,16 +148,16 @@ int ScreenBacklightMode;
 
 in3ator_parameters in3;
 
-PID airControlPID(&airControlPIDInput, &HeaterPIDOutput, &desiredControlTemperature, Kp[airPID], Ki[airPID], Kd[airPID], P_ON_E, DIRECT);
-PID skinControlPID(&skinControlPIDInput, &HeaterPIDOutput, &desiredControlTemperature, Kp[skinPID], Ki[skinPID], Kd[skinPID], P_ON_E, DIRECT);
-PID humidityControlPID(&in3.humidity, &humidityControlPIDOutput, &desiredControlHumidity, Kp[humidityPID], Ki[humidityPID], Kd[humidityPID], P_ON_E, DIRECT);
+PID airControlPID(&airControlPIDInput, &HeaterPIDOutput, &in3.desiredControlTemperature, Kp[airPID], Ki[airPID], Kd[airPID], P_ON_E, DIRECT);
+PID skinControlPID(&skinControlPIDInput, &HeaterPIDOutput, &in3.desiredControlTemperature, Kp[skinPID], Ki[skinPID], Kd[skinPID], P_ON_E, DIRECT);
+PID humidityControlPID(&in3.humidity, &humidityControlPIDOutput, &in3.desiredControlHumidity, Kp[humidityPID], Ki[humidityPID], Kd[humidityPID], P_ON_E, DIRECT);
 
 void GPRS_Task(void *pvParameters)
 {
   for (;;)
   {
     GPRS_Handler();
-    vTaskDelay(50 / portTICK_PERIOD_MS);
+    vTaskDelay(GPRS_TASK_PERIOD / portTICK_PERIOD_MS);
   }
 }
 

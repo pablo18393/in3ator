@@ -31,13 +31,11 @@ extern SHTC3 mySHTC3; // Declare an instance of the SHTC3 class
 extern RotaryEncoder encoder;
 extern Beastdevices_INA3221 digitalCurrentSensor;
 
-
 extern bool WIFI_EN;
 extern bool defaultWIFI_EN;
 extern long lastDebugUpdate;
 extern long loopCounts;
 extern int page;
-extern byte language;
 extern int temperature_filter; // amount of temperature samples to filter
 extern long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
 
@@ -48,13 +46,10 @@ extern double provisionalReferenceTemperatureLow;
 extern double fineTuneSkinTemperature;
 extern double RawTemperatureLow[numSensors], RawTemperatureRange[numSensors];
 extern double provisionalRawTemperatureLow[numSensors];
-extern double temperatureMaxReset;
-extern double temperatureMinReset;
 extern double temperatureMax[numSensors], temperatureMin[numSensors];
 extern int temperatureArray[numNTC][analog_temperature_filter]; // variable to handle each NTC with the array of last samples (only for NTC)
 extern int temperature_array_pos;                               // temperature sensor number turn to measure
 extern float diffTemperature;                                   // difference between measured temperature and user input real temperature
-extern bool faultNTC[numNTC];                                   // variable to control a failure in NTC
 extern bool humidifierState, humidifierStateChange;
 extern int previousHumidity; // previous sampled humidity
 extern float diffHumidity;   // difference between measured humidity and user input real humidity
@@ -78,15 +73,8 @@ extern float instantTemperature[secondOrder_filter];
 extern float previousTemperature[secondOrder_filter];
 
 // room variables
-extern bool controlMode;
-extern bool defaultcontrolMode;
 extern bool controlAlgorithm;
 extern bool defaultcontrolAlgorithm;
-extern double desiredControlTemperature; // preset baby skin temperature
-extern double desiredControlHumidity;    // preset enviromental humidity
-extern bool jaundiceEnable;              // PWM that controls jaundice LED intensity
-extern double desiredHeaterTemp;         // desired temperature in heater
-
 extern const float minDesiredTemp[2]; // minimum allowed temperature to be set
 extern const float maxDesiredTemp[2]; // maximum allowed temperature to be set
 extern const int presetTemp[2];       // preset baby skin temperature
@@ -111,8 +99,6 @@ extern int temperatureX;
 extern int temperatureY;
 extern int separatorTopYPos;
 extern int separatorBotYPos;
-extern bool controlTemperature;
-extern bool controlHumidity;
 extern int ypos;
 extern bool print_text;
 extern int initialSensorPosition;
@@ -173,20 +159,20 @@ void updateDisplaySensors()
   float temperatureToUpdate;
   if (page == mainMenuPage || (page == actuatorsProgressPage))
   {
-    drawSelectedTemperature(in3.temperature[controlMode], previousTemperature[controlMode]);
-    previousTemperature[controlMode] = in3.temperature[controlMode];
+    drawSelectedTemperature(in3.temperature[in3.controlMode], previousTemperature[in3.controlMode]);
+    previousTemperature[in3.controlMode] = in3.temperature[in3.controlMode];
     drawHumidity(in3.humidity, previousHumidity);
     previousHumidity = in3.humidity;
   }
   if (page == actuatorsProgressPage)
   {
-    drawUnselectedTemperature(in3.temperature[!controlMode], previousTemperature[!controlMode]);
-    previousTemperature[!controlMode] = in3.temperature[!controlMode];
+    drawUnselectedTemperature(in3.temperature[!in3.controlMode], previousTemperature[!in3.controlMode]);
+    previousTemperature[!in3.controlMode] = in3.temperature[!in3.controlMode];
     setTextColor(COLOR_MENU_TEXT);
-    if (controlTemperature)
+    if (in3.temperatureControl)
     {
       float previousTemperaturePercentage = temperaturePercentage;
-      if (controlMode)
+      if (in3.controlMode)
       {
         temperatureToUpdate = in3.temperature[airSensor];
       }
@@ -194,9 +180,9 @@ void updateDisplaySensors()
       {
         temperatureToUpdate = in3.temperature[skinSensor];
       }
-      if ((desiredControlTemperature - temperatureAtStart))
+      if ((in3.desiredControlTemperature - temperatureAtStart))
       {
-        temperaturePercentage = 100 - ((desiredControlTemperature - temperatureToUpdate) * 100 / (desiredControlTemperature - temperatureAtStart));
+        temperaturePercentage = 100 - ((in3.desiredControlTemperature - temperatureToUpdate) * 100 / (in3.desiredControlTemperature - temperatureAtStart));
       }
       if (temperaturePercentage > 99)
       {
@@ -208,12 +194,12 @@ void updateDisplaySensors()
       }
       updateLoadingTemperatureBar(int(previousTemperaturePercentage), int(temperaturePercentage));
     }
-    if (controlHumidity)
+    if (in3.humidityControl)
     {
       float previousHumidityPercentage = humidityPercentage;
-      if ((desiredControlHumidity - humidityAtStart))
+      if ((in3.desiredControlHumidity - humidityAtStart))
       {
-        humidityPercentage = 100 - ((desiredControlHumidity - in3.humidity) * 100 / (desiredControlHumidity - humidityAtStart));
+        humidityPercentage = 100 - ((in3.desiredControlHumidity - in3.humidity) * 100 / (in3.desiredControlHumidity - humidityAtStart));
       }
       if (humidityPercentage > 99)
       {
@@ -306,7 +292,7 @@ void updateData()
     }
     if (airControlPID.GetMode() == AUTOMATIC || skinControlPID.GetMode() == AUTOMATIC || humidityControlPID.GetMode() == AUTOMATIC)
     {
-      logln("[PID] -> Desired temp is: " + String(desiredControlTemperature) + "ºC");
+      logln("[PID] -> Desired temp is: " + String(in3.desiredControlTemperature) + "ºC");
     }
 
     logln("[SENSORS] -> System current consumption is: " + String(digitalCurrentSensor.getCurrent(INA3221_CH1), 4) + " Amps");
@@ -320,7 +306,7 @@ void updateData()
     {
       logln("[LATENCY] -> Looped " + String(loopCounts * 1000 / (millis() - lastDebugUpdate)) + " Times per second");
     }
-    
+
     loopCounts = 0;
     lastDebugUpdate = millis();
   }

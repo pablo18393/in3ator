@@ -244,15 +244,15 @@
 #define numPID 3
 
 #define BACKLIGHT_NO_INTERACTION_TIME 12000 // time to decrease backlight display if no user actions
-#define DEFAULT_SERIAL_NUMBER 0
 
-void GPRSSetPostVariables(byte postContent, String postComment);
-#define NO_COMMENT 0
+#define GPRS_TASK_PERIOD 50
 
 typedef struct
 {
     double temperature[numSensors];
     double humidity;
+    double desiredControlTemperature; 
+    double desiredControlHumidity; 
 
     double system_current_standby_test;
     double heater_current_test;
@@ -265,8 +265,17 @@ typedef struct
 
     double system_current;
     double fan_current;
+    double humidifier_current;
+    double humidifier_voltage;
     double phototherapy_current;
-    int serialNumber = DEFAULT_SERIAL_NUMBER;
+    int serialNumber = false;
+
+    bool controlMode = AIR_CONTROL;
+    bool temperatureControl = false;
+    bool humidityControl = false;
+    bool phototherapy = false;
+
+    byte language;
 
 } in3ator_parameters;
 
