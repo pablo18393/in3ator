@@ -101,9 +101,12 @@ void GPRS_get_SIM_info()
 
   GPRS.IP = modem.localIP();
 
-  GPRS.CSQ = modem.getSignalQuality();
-
   GPRS_get_triangulation_location();
+}
+
+void GPRSUpdateCSQ()
+{
+  GPRS.CSQ = modem.getSignalQuality();
 }
 
 void GPRSStatusHandler()
@@ -195,7 +198,6 @@ void GPRSStablishConnection()
       GPRS.APN = APN_TM;
       if (modem.gprsConnect(GPRS.APN.c_str(), GPRS_USER, GPRS_PASS))
       {
-        GPRS_get_SIM_info();
         logln("[GPRS] -> Attached");
         GPRS.process++;
       }
@@ -205,7 +207,6 @@ void GPRSStablishConnection()
         GPRS.APN = APN_TRUPHONE;
         if (modem.gprsConnect(GPRS.APN.c_str(), GPRS_USER, GPRS_PASS))
         {
-          GPRS_get_SIM_info();
           logln("[GPRS] -> Attached");
           GPRS.process++;
         }
@@ -281,7 +282,16 @@ void GPRSPost()
     if (!GPRS.firstPost)
     {
       GPRS.firstPost = true;
-      tb.sendTelemetryInt("SN", in3.serialNumber);
+      GPRS_get_SIM_info();
+      tb.sendAttributeInt("SN", in3.serialNumber);
+      tb.sendAttributeString("HW_num", HW_NUM);
+      tb.sendAttributeString("HW_revision", HW_REVISION);
+      tb.sendAttributeString("FW_version", FWversion);
+      tb.sendAttributeString("CCID", GPRS.CCID.c_str());
+      tb.sendAttributeString("IMEI", GPRS.IMEI.c_str());
+      tb.sendAttributeString("APN", GPRS.APN.c_str());
+      tb.sendAttributeString("COP", GPRS.COP.c_str());
+
       tb.sendTelemetryFloat("SYS_current_stanby_test", in3.system_current_standby_test);
       tb.sendTelemetryFloat("Heater_current_test", in3.heater_current_test);
       tb.sendTelemetryFloat("Fan_current_test", in3.fan_current_test);
@@ -290,23 +300,23 @@ void GPRSPost()
       tb.sendTelemetryFloat("Display_current_test", in3.humidifier_current_test);
       tb.sendTelemetryFloat("Buzzer_current_test", in3.buzzer_current_test);
       tb.sendTelemetryInt("HW_Test", in3.HW_test_error_code);
-      tb.sendTelemetryInt("CSQ", GPRS.CSQ);
-      tb.sendTelemetryString("CCID", GPRS.CCID.c_str());
-      tb.sendTelemetryString("IMEI", GPRS.IMEI.c_str());
-      tb.sendTelemetryString("COP", GPRS.COP.c_str());
-      tb.sendTelemetryString("APN", GPRS.APN.c_str());
+
       tb.sendTelemetryFloat("tri_longitud", GPRS.longitud);
       tb.sendTelemetryFloat("tri_latitud", GPRS.latitud);
       tb.sendTelemetryFloat("tri_accuracy", GPRS.accuracy);
       tb.sendTelemetryInt("UI_language", in3.language);
     }
-
+    GPRSUpdateCSQ();
     tb.sendTelemetryFloat("Air_temp", in3.temperature[airSensor]);
     tb.sendTelemetryFloat("Skin_temp", in3.temperature[skinSensor]);
     tb.sendTelemetryInt("Humidity", in3.humidity);
+    tb.sendTelemetryFloat("SYS_current", in3.system_current);
+    tb.sendTelemetryFloat("SYS_voltage", in3.system_voltage);
+    tb.sendTelemetryInt("CSQ", GPRS.CSQ);
 
     if (in3.temperatureControl || in3.humidityControl)
     {
+      tb.sendTelemetryFloat("Fan_current", in3.fan_current);
       if (!GPRS.firstConfigPost)
       {
         GPRS.firstConfigPost = true;
@@ -327,8 +337,6 @@ void GPRSPost()
           tb.sendTelemetryFloat("Hum_desired", in3.desiredControlHumidity);
         }
       }
-      tb.sendTelemetryFloat("SYS_current", in3.system_current);
-      tb.sendTelemetryFloat("Fan_current", in3.fan_current);
     }
     else
     {

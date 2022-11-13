@@ -147,6 +147,7 @@ extern in3ator_parameters in3;
 void sensorsHandler()
 {
   measureNTCTemperature();
+  in3.system_voltage = measureMeanVoltage(SYSTEM_SHUNT_CHANNEL);
   // currentMonitor();
 }
 
@@ -155,6 +156,15 @@ float measureMeanConsumption(int shunt)
   if (digitalCurrentSensorPresent)
   {
     return (digitalCurrentSensor.getCurrent(ina3221_ch_t(shunt))); // Amperes
+  }
+  return (false);
+}
+
+float measureMeanVoltage(int shunt)
+{
+  if (digitalCurrentSensorPresent)
+  {
+    return (digitalCurrentSensor.getVoltage(ina3221_ch_t(shunt))); // Amperes
   }
   return (false);
 }

@@ -264,6 +264,7 @@ typedef struct
     double HW_test_error_code;
 
     double system_current;
+    double system_voltage;
     double fan_current;
     double humidifier_current;
     double humidifier_voltage;
