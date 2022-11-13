@@ -83,7 +83,7 @@ void GPRS_get_triangulation_location()
   int hour = 0;
   int min = 0;
   int sec = 0;
-  modem.getGsmLocation(&GPRS.latitud, &GPRS.longitud, &GPRS.accuracy, &year, &month, &day, &hour,
+  modem.getGsmLocation(&GPRS.longitud, &GPRS.latitud, &GPRS.accuracy, &year, &month, &day, &hour,
                        &min, &sec);
 }
 
