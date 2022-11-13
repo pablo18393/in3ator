@@ -520,9 +520,10 @@ bool actuatorsTest()
     return (true);
   }
   vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT);
+  offsetCurrent = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL); // <- UPDATE THIS CODE TO ASK I2C DATA
   in3_hum.turn(ON);
   vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT);
-  testCurrent = measureMeanConsumption(HUMIDIFIER_SHUNT); // <- UPDATE THIS CODE
+  testCurrent = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL) - offsetCurrent; // <- UPDATE THIS CODE TO ASK I2C DATA
   logln("[HW] -> Humidifier current consumption: " + String(testCurrent) + " Amps");
   in3.humidifier_current_test = testCurrent;
   in3_hum.turn(OFF);

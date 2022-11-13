@@ -147,6 +147,7 @@ extern in3ator_parameters in3;
 void sensorsHandler()
 {
   measureNTCTemperature();
+  in3.system_current = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL);
   in3.system_voltage = measureMeanVoltage(SYSTEM_SHUNT_CHANNEL);
   // currentMonitor();
 }

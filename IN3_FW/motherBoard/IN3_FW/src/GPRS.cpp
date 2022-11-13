@@ -245,23 +245,29 @@ void readGPRSData()
 
 void GPRSSetPostPeriod()
 {
-  if (in3.temperatureControl || in3.humidityControl)
+  if (GPRS.firstPost)
   {
-    GPRS.sendPeriod = actuatingGPRSPostPeriod;
-  }
-  else if (in3.phototherapy)
-  {
-    GPRS.sendPeriod = phototherapyGPRSPostPeriod;
+    if (in3.temperatureControl || in3.humidityControl)
+    {
+      GPRS.sendPeriod = actuatingGPRSPostPeriod;
+    }
+    else if (in3.phototherapy)
+    {
+      GPRS.sendPeriod = phototherapyGPRSPostPeriod;
+    }
+    else
+    {
+      GPRS.sendPeriod = standByGPRSPostPeriod;
+    }
   }
   else
   {
-    GPRS.sendPeriod = standByGPRSPostPeriod;
+    GPRS.sendPeriod = false;
   }
 }
 
 void GPRSPost()
 {
-
   if (!tb.connected())
   {
     // Connect to the ThingsBoard
@@ -274,7 +280,6 @@ void GPRSPost()
       Serial.println("Failed to connect");
       return;
     }
-    delay(1000);
   }
   if (tb.connected() && millis() - GPRS.lastSent > millisToSecs(GPRS.sendPeriod))
   {
@@ -285,7 +290,7 @@ void GPRSPost()
       GPRS_get_SIM_info();
       tb.sendAttributeInt("SN", in3.serialNumber);
       tb.sendAttributeInt("HW_num", HW_NUM);
-      tb.sendAttributeString("HW_revision", (const char *) HW_REVISION);
+      tb.sendAttributeString("HW_revision", String(HW_REVISION).c_str());
       tb.sendAttributeString("FW_version", FWversion);
       tb.sendAttributeString("CCID", GPRS.CCID.c_str());
       tb.sendAttributeString("IMEI", GPRS.IMEI.c_str());
@@ -297,7 +302,7 @@ void GPRSPost()
       tb.sendTelemetryFloat("Fan_current_test", in3.fan_current_test);
       tb.sendTelemetryFloat("Phototherapy_current_test", in3.phototherapy_current_test);
       tb.sendTelemetryFloat("Humidifier_current_test", in3.humidifier_current_test);
-      tb.sendTelemetryFloat("Display_current_test", in3.humidifier_current_test);
+      tb.sendTelemetryFloat("Display_current_test", in3.display_current_test);
       tb.sendTelemetryFloat("Buzzer_current_test", in3.buzzer_current_test);
       tb.sendTelemetryInt("HW_Test", in3.HW_test_error_code);
 
