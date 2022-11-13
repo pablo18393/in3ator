@@ -150,8 +150,8 @@ extern int ScreenBacklightMode;
 #define testMode false
 #define operativeMode true
 
-#define CURRENT_STABILIZE_TIME_DEFAULT 100
-#define CURRENT_STABILIZE_TIME_HEATER 100
+#define CURRENT_STABILIZE_TIME_DEFAULT 300
+#define CURRENT_STABILIZE_TIME_HEATER 800
 
 #define NTC_BABY_MIN 1
 #define NTC_BABY_MAX 60
