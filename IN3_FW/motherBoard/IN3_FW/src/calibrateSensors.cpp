@@ -145,17 +145,19 @@ extern PID humidityControlPID;
 
 extern in3ator_parameters in3;
 
+#define CALIBRATION_ERROR 0.05
+#define TIME_BETWEEN_SAMPLES 1 //minutes
+#define SAMPLES_WITHIN_ERROR 3
+#define DEFAULT_CALIBRATION_TEMPERATURE 36
+
 void autoCalibration()
 {
   bool exitCalibrationMenu = false;
   byte numWords = 1;
   long lastTemperatureMeasurement = millis();
-  float timeBetweenMeasurements = 4; // in minutes
-  double stabilityError = 0.1;       // ºC
-  int historyLength = 5;
   int historyLengthPosition = false;
-  double referenceSensorHistory[historyLength];
-  double sensorToCalibrateHistory[historyLength];
+  double referenceSensorHistory[SAMPLES_WITHIN_ERROR];
+  double sensorToCalibrateHistory[SAMPLES_WITHIN_ERROR];
   referenceSensorHistory[0] = in3.temperature[airSensor];
   sensorToCalibrateHistory[0] = in3.temperature[skinSensor];
   page = autoCalibrationPage;
@@ -205,7 +207,7 @@ void autoCalibration()
       turnFans(ON);
       break;
     case firstAutoCalibrationPoint:
-      if (!digitalRead(ENC_SWITCH) || checkStableTemperatures(referenceSensorHistory, sensorToCalibrateHistory, historyLength, stabilityError))
+      if (!digitalRead(ENC_SWITCH) || checkStableTemperatures(referenceSensorHistory, sensorToCalibrateHistory, SAMPLES_WITHIN_ERROR, CALIBRATION_ERROR))
       {
         provisionalReferenceTemperatureLow = in3.temperature[airSensor];
         provisionalRawTemperatureLow[skinSensor] = in3.temperature[skinSensor];
@@ -216,7 +218,7 @@ void autoCalibration()
           exitCalibrationMenu = back_mode();
         }
         vTaskDelay(debounceTime);
-        in3.desiredControlTemperature = 36;
+        in3.desiredControlTemperature = DEFAULT_CALIBRATION_TEMPERATURE;
         startPID(airPID);
         // ledcWrite(HEATER_PWM_CHANNEL, HEATER_HALF_PWR * ongoingCriticalAlarm());
         autoCalibrationProcess = secondAutoCalibrationPoint;
@@ -227,7 +229,7 @@ void autoCalibration()
       break;
     case secondAutoCalibrationPoint:
       PIDHandler();
-      if (!digitalRead(ENC_SWITCH) || checkStableTemperatures(referenceSensorHistory, sensorToCalibrateHistory, historyLength, stabilityError))
+      if (!digitalRead(ENC_SWITCH) || checkStableTemperatures(referenceSensorHistory, sensorToCalibrateHistory, SAMPLES_WITHIN_ERROR, CALIBRATION_ERROR))
       {
         Serial.println("=================================================point 2");
         ReferenceTemperatureLow = provisionalReferenceTemperatureLow;
@@ -243,10 +245,10 @@ void autoCalibration()
       }
       break;
     }
-    if (millis() - lastTemperatureMeasurement > minsToMillis(timeBetweenMeasurements))
+    if (millis() - lastTemperatureMeasurement > minsToMillis(TIME_BETWEEN_SAMPLES))
     {
       lastTemperatureMeasurement = millis();
-      if (historyLengthPosition == historyLength)
+      if (historyLengthPosition == SAMPLES_WITHIN_ERROR)
       {
         historyLengthPosition = false;
       }
@@ -254,7 +256,7 @@ void autoCalibration()
       sensorToCalibrateHistory[historyLengthPosition] = in3.temperature[skinSensor];
       historyLengthPosition++;
 
-      for (int i = 0; i < historyLength; i++)
+      for (int i = 0; i < SAMPLES_WITHIN_ERROR; i++)
       {
         Serial.println(abs(*referenceSensorHistory - *(referenceSensorHistory + i)));
         Serial.println(abs(*sensorToCalibrateHistory - *(sensorToCalibrateHistory + i)));

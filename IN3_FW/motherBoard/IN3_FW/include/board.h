@@ -27,6 +27,7 @@
 #define HW_REVISION 'C'
 #define HWversion String(HW_NUM) + "." + String(HW_REVISION)
 #define FWversion "10.4"
+#define WIFI_NAME "In3_v" + String(FWversion) + "/" + String(HWversion)
 #define headingTitle "in3ator"
 
 // Hardware

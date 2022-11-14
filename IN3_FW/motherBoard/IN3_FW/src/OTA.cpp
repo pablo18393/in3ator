@@ -31,8 +31,10 @@ const char *wifiPassword = "12345678";
 
 WebServer wifiServer(80);
 
-//WIFI
+// WIFI
 bool WIFI_connection_status = false;
+
+extern in3ator_parameters in3;
 
 /*
    Login page
@@ -127,6 +129,9 @@ const char *serverIndex =
 void wifiInit(void)
 {
   // Connect to WiFi network
+  WiFi.mode(WIFI_STA);
+  WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
+  WiFi.setHostname(String(String(WIFI_NAME) + "_" + String(in3.serialNumber)).c_str());
   WiFi.begin(ssid, wifiPassword);
 }
 
