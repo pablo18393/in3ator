@@ -207,7 +207,7 @@ void stopActuation()
 
 void turnFans(bool mode)
 {
-  digitalWrite(FAN, mode);
+  digitalWrite(FAN, mode * ongoingCriticalAlarm());
 }
 
 void UI_actuatorsProgress()
@@ -340,7 +340,7 @@ void UI_actuatorsProgress()
   {
     printLoadingTemperatureBar(in3.desiredControlTemperature);
     temperatureAtStart = in3.temperature[in3.controlMode];
-    //exitActuation = !checkFan();
+    // exitActuation = !checkFan();
   }
   if (in3.humidityControl)
   {
