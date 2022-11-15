@@ -10,7 +10,7 @@
 
 #define modemSerial Serial2
 
-#define standByGPRSPostPeriod 30
+#define standByGPRSPostPeriod 1800
 #define actuatingGPRSPostPeriod 60
 #define phototherapyGPRSPostPeriod 180
 #define GPRS_SHUT OFF

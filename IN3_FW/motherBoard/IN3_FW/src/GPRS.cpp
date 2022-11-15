@@ -369,7 +369,7 @@ void GPRSPost()
     }
     if (tb.connected() && millis() - GPRS.lastSent > secsToMillis(GPRS.sendPeriod))
     {
-      logln("[GPRS] -> sendPeriod is " + String(GPRS.sendPeriod) + "secs");
+      logln("[GPRS] -> sendPeriod is " + String(GPRS.sendPeriod) + " secs");
       logln("[GPRS] -> Posting GPRS data...");
       
       if (!GPRS.firstPost)
