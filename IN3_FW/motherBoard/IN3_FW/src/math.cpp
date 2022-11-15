@@ -27,6 +27,6 @@ long minsToMillis(long timeInMillis) {
   return (timeInMillis * 60 * 1000);
 }
 
-long millisToSecs(long timeInMillis) {
+long secsToMillis(long timeInMillis) {
   return (timeInMillis * 1000);
 }

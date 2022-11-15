@@ -23,10 +23,11 @@
 
 */
 
+#define TINY_GSM_MODEM_SIM800
+
 #include <Arduino.h>
 #include "GPRS.h"
 #include "main.h"
-#define TINY_GSM_MODEM_SIM800
 #include <TinyGsmClient.h>
 #include "ThingsBoard.h"
 #include <WiFi.h>
@@ -36,21 +37,25 @@ TinyGsm modem(modemSerial);
 
 // Initialize GSM client
 TinyGsmClient client(modem);
+WiFiClient espClient;
 
 // Initialize ThingsBoard instance
 ThingsBoard tb(client);
+// ThingsBoard tb(espClient);
 
 // Initialize ThingsBoard client provision instance
 ThingsBoard tb_provision(client);
+// ThingsBoard tb_provision(espClient);
 
 unsigned long previous_processing_time;
-
-// Statuses for provisioning
-volatile bool provisionResponseProcessed = false;
 
 extern in3ator_parameters in3;
 GPRSstruct GPRS;
 Credentials credentials;
+
+const char *provisionDeviceKey = "3ze2np7my4acf643r0jz";
+const char *provisionDeviceSecret = "nruedye0eiz1dkm8mo96";
+const char *deviceName = "test_autoprovisioning_11";
 
 void clearGPRSBuffer()
 {
@@ -226,7 +231,7 @@ void GPRSStablishConnection()
     }
     break;
   case 2:
-
+    GPRS_get_SIM_info();
     GPRS.connectionStatus = true;
     GPRS.connect = false;
     GPRS.process = false;
@@ -285,7 +290,7 @@ void GPRSProvisionResponse(Provision_Data &data)
   {
     Serial.print("Provision response contains the error: ");
     Serial.println(data["errorMsg"].as<String>());
-    provisionResponseProcessed = true;
+    GPRS.provision_request_processed = true;
     return;
   }
   if (strncmp(data["credentialsType"], "ACCESS_TOKEN", strlen("ACCESS_TOKEN")) == 0)
@@ -293,31 +298,27 @@ void GPRSProvisionResponse(Provision_Data &data)
     credentials.client_id = "";
     credentials.username = data["credentialsValue"].as<String>();
     credentials.password = "";
-  }
-  if (strncmp(data["credentialsType"], "MQTT_BASIC", strlen("MQTT_BASIC")) == 0)
-  {
-    /*
-    JsonObject credentials_value = data["credentialsValue"].as<JsonObject>(); //
-    credentials.client_id = credentials_value["clientId"].as<String>();
-    credentials.username = credentials_value["userName"].as<String>();
-    credentials.password = credentials_value["password"].as<String>();
-    */
+    GPRS.provisioned = true;
+    GPRS.device_token = credentials.username;
+    EEPROM.writeString(EEPROM_THINGSBOARD_TOKEN, GPRS.device_token);
+    EEPROM.write(EEPROM_THINGSBOARD_PROVISIONED, GPRS.provisioned);
+    EEPROM.commit();
+    Serial.println("Device provisioned successfully");
   }
   if (tb_provision.connected())
   {
     tb_provision.disconnect();
   }
-  provisionResponseProcessed = true;
+  GPRS.provision_request_processed = true;
 }
-
-Provision_Callback provisionCallback;
 
 void TBProvision()
 {
   if (!tb_provision.connected())
   {
+    const Provision_Callback provisionCallback = (Provision_Callback)GPRSProvisionResponse;
     // Connect to the ThingsBoard
-    Serial.print("Connecting to: ");
+    Serial.print("Sending provision request to: ");
     Serial.print(THINGSBOARD_SERVER);
     if (!tb_provision.connect(THINGSBOARD_SERVER, "provision", THINGSBOARD_PORT))
     {
@@ -326,13 +327,18 @@ void TBProvision()
     }
     if (tb_provision.Provision_Subscribe(provisionCallback))
     {
-      if (tb_provision.sendProvisionRequest(GPRS.CCID.c_str(), PROVISION_DEVICE_KEY, PROVISION_DEVICE_SECRET))
-      {
-        GPRS.provisioned = true;
-        EEPROM.write(EEPROM_THINGSBOARD_PROVISIONED, GPRS.provisioned);
-        EEPROM.commit();
-        Serial.println("Provision request was sent!");
-      }
+    }
+  }
+  else
+  {
+    if (tb_provision.sendProvisionRequest(GPRS.CCID.c_str(), PROVISION_DEVICE_KEY, PROVISION_DEVICE_SECRET))
+    {
+      GPRS.provision_request_sent = true;
+      Serial.println("Provision request was sent!");
+    }
+    else
+    {
+      Serial.println("Provision request FAILED!");
     }
   }
 }
@@ -341,8 +347,10 @@ void GPRSPost()
 {
   if (!GPRS.provisioned)
   {
-    TBProvision();
-    // GPRSProvisionResponse(provisionCallback);
+    if (!GPRS.provision_request_sent)
+    {
+      TBProvision();
+    }
   }
   else
   {
@@ -352,16 +360,18 @@ void GPRSPost()
       Serial.print("Connecting to: ");
       Serial.print(THINGSBOARD_SERVER);
       Serial.print(" with token ");
-      Serial.println(TOKEN);
-      if (!tb.connect(THINGSBOARD_SERVER, TOKEN))
+      Serial.println(GPRS.device_token);
+      if (!tb.connect(THINGSBOARD_SERVER, GPRS.device_token.c_str()))
       {
         Serial.println("Failed to connect");
         return;
       }
     }
-    if (tb.connected() && millis() - GPRS.lastSent > millisToSecs(GPRS.sendPeriod))
+    if (tb.connected() && millis() - GPRS.lastSent > secsToMillis(GPRS.sendPeriod))
     {
+      logln("[GPRS] -> sendPeriod is " + String(GPRS.sendPeriod) + "secs");
       logln("[GPRS] -> Posting GPRS data...");
+      
       if (!GPRS.firstPost)
       {
         GPRS.firstPost = true;
@@ -456,6 +466,14 @@ void GPRS_Handler()
   {
     GPRSSetPostPeriod();
     GPRSPost();
+    if (!GPRS.provision_request_processed)
+    {
+      tb_provision.loop();
+    }
+    else
+    {
+      tb.loop();
+    }
   }
   readGPRSData();
 }

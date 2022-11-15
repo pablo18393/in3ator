@@ -30,7 +30,7 @@ extern bool autoLock;
 extern bool WIFI_EN;
 bool firstTurnOn;
 extern bool controlAlgorithm;
-extern int presetTemp[2];         // preset baby skin temperature
+extern int presetTemp[2]; // preset baby skin temperature
 extern double RawTemperatureLow[numSensors], RawTemperatureRange[numSensors];
 extern double ReferenceTemperatureRange, ReferenceTemperatureLow;
 extern double fineTuneSkinTemperature;
@@ -142,6 +142,10 @@ void recapVariables()
   in3.desiredControlTemperature = EEPROM.read(EEPROM_desiredControlMode);
   in3.desiredControlHumidity = EEPROM.read(EEPROM_desiredControlHumidity);
   GPRS.provisioned = EEPROM.read(EEPROM_THINGSBOARD_PROVISIONED);
+  if (GPRS.provisioned)
+  {
+    GPRS.device_token = EEPROM.readString(EEPROM_THINGSBOARD_TOKEN);
+  }
 }
 
 void saveCalibrationToEEPROM()

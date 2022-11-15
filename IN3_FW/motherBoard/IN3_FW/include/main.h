@@ -62,6 +62,7 @@
 #define EEPROM_ReferenceTemperatureLow 180
 #define EEPROM_FineTuneSkinTemperature 190
 #define EEPROM_THINGSBOARD_PROVISIONED 200
+#define EEPROM_THINGSBOARD_TOKEN 205
 
 // configuration variables
 #define debounceTime 30          // encoder debouncing time
@@ -286,16 +287,8 @@ typedef struct
 
 } in3ator_parameters;
 
-// Struct for client connecting after provisioning
-struct Credentials {
-  String client_id;
-  String username;
-  String password;
-};
-
-
 void logln(String dataString);
-long millisToSecs(long timeInMillis);
+long secsToMillis(long timeInMillis);
 long minsToMillis(long timeInMillis);
 void initHardware(bool printOutputTest);
 void UI_mainMenu();

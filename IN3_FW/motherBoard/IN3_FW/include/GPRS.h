@@ -1,6 +1,6 @@
-#define TOKEN "tOUZTeBHHycW5BGntTuO"
+//#define TOKEN "tOUZTeBHHycW5BGntTuO"
 #define THINGSBOARD_SERVER "mon.medicalopenworld.org"
-#define THINGSBOARD_PORT  1883
+#define THINGSBOARD_PORT 1883
 
 // Baud rate for debug serial
 #define SERIAL_DEBUG_BAUD 115200
@@ -8,12 +8,9 @@
 #define RX_BUFFER_LENGTH 1024
 #define GPRS_TIMEOUT 60000 // in millisecs
 
-#define GPRS_CONNECTION_TIMEOUT 2000
-
 #define modemSerial Serial2
-#define DEFAULT_POST_PERIOD 10
 
-#define standByGPRSPostPeriod 3600
+#define standByGPRSPostPeriod 30
 #define actuatingGPRSPostPeriod 60
 #define phototherapyGPRSPostPeriod 180
 #define GPRS_SHUT OFF
@@ -35,7 +32,9 @@
 
 struct GPRSstruct
 {
-    int provisioned;
+    int provisioned = false;
+    bool provision_request_sent = false;
+    bool provision_request_processed = false;
 
     bool enable;
     long sendPeriod;
@@ -51,7 +50,7 @@ struct GPRSstruct
     long processTime;
     long packetSentenceTime;
     bool post;
-    bool firstPost;
+    bool firstPost = false;
     bool firstConfigPost;
 
     String CCID;
@@ -61,8 +60,16 @@ struct GPRSstruct
     int CSQ;
     String APN;
     IPAddress IP;
+    String device_token;
 
     float longitud;
     float latitud;
     float accuracy;
+};
+
+// Struct for client connecting after provisioning
+struct Credentials {
+  String client_id;
+  String username;
+  String password;
 };

@@ -303,7 +303,6 @@ void updateData()
     {
       logln("[LATENCY] -> Looped " + String(loopCounts * 1000 / (millis() - lastDebugUpdate)) + " Times per second");
     }
-
     loopCounts = 0;
     lastDebugUpdate = millis();
   }

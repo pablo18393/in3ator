@@ -26,8 +26,11 @@
 #include "main.h"
 
 const char *wifiHost = "in3ator";
-const char *ssid = "in3wifi";
-const char *wifiPassword = "12345678";
+
+//const char *ssid = "in3wifi";
+//const char *wifiPassword = "12345678";
+const char *ssid = "casapatas";
+const char *wifiPassword = "lawifidepatas";
 
 WebServer wifiServer(80);
 
