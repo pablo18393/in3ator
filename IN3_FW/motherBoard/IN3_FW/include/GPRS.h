@@ -1,5 +1,6 @@
 #define TOKEN "tOUZTeBHHycW5BGntTuO"
 #define THINGSBOARD_SERVER "mon.medicalopenworld.org"
+#define THINGSBOARD_PORT  1883
 
 // Baud rate for debug serial
 #define SERIAL_DEBUG_BAUD 115200
@@ -23,6 +24,9 @@
 #define GPRS_USER ""
 #define GPRS_PASS ""
 
+#define PROVISION_DEVICE_KEY "3ze2np7my4acf643r0jz"
+#define PROVISION_DEVICE_SECRET "nruedye0eiz1dkm8mo96"
+
 #define SIMCOM800_AT "AT\n"
 #define SIMCOM800_AT_CFUN "AT+CFUN=1\n"
 
@@ -31,6 +35,8 @@
 
 struct GPRSstruct
 {
+    int provisioned;
+
     bool enable;
     long sendPeriod;
     long lastSent;

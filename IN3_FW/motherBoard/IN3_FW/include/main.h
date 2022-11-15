@@ -40,6 +40,7 @@
 #define buzzerStandbyToneTimes 1     // in micros, tone freq
 
 // EEPROM variables
+#define EEPROM_SIZE 256
 #define EEPROM_checkStatus 0
 #define EEPROM_firstTurnOn 10
 #define EEPROM_autoLock 20
@@ -60,7 +61,7 @@
 #define EEPROM_ReferenceTemperatureRange 170
 #define EEPROM_ReferenceTemperatureLow 180
 #define EEPROM_FineTuneSkinTemperature 190
-#define EEPROM_TM_REGISTERED 200
+#define EEPROM_THINGSBOARD_PROVISIONED 200
 
 // configuration variables
 #define debounceTime 30          // encoder debouncing time
@@ -158,6 +159,11 @@
 #define blinkTimeOFF 100 // displayed text OFF time
 #define time_back_draw 255
 #define time_back_wait 255
+
+#define DEFAULT_AUTOLOCK ON
+#define DEFAULT_WIFI_EN ON
+#define DEFAULT_CONTROL_ALGORITHM PID_CONTROL
+
 // security defs
 #define HUMIDITY_ALARM 0
 #define TEMPERATURE_ALARM 1
@@ -251,8 +257,8 @@ typedef struct
 {
     double temperature[numSensors];
     double humidity;
-    double desiredControlTemperature; 
-    double desiredControlHumidity; 
+    double desiredControlTemperature;
+    double desiredControlHumidity;
 
     double system_current_standby_test;
     double heater_current_test;
@@ -279,6 +285,14 @@ typedef struct
     byte language;
 
 } in3ator_parameters;
+
+// Struct for client connecting after provisioning
+struct Credentials {
+  String client_id;
+  String username;
+  String password;
+};
+
 
 void logln(String dataString);
 long millisToSecs(long timeInMillis);

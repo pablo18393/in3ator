@@ -33,7 +33,6 @@ extern RotaryEncoder encoder;
 extern Beastdevices_INA3221 digitalCurrentSensor;
 
 extern bool WIFI_EN;
-extern bool defaultWIFI_EN;
 extern long lastDebugUpdate;
 extern long loopCounts;
 extern int page;
@@ -75,7 +74,6 @@ extern float previousTemperature[secondOrder_filter];
 
 // room variables
 extern bool controlAlgorithm;
-extern bool defaultcontrolAlgorithm;
 extern boolean A_set;
 extern boolean B_set;
 extern int encoderpinA;                 // pin  encoder A
@@ -109,7 +107,6 @@ extern int screenTextColor, screenTextBackgroundColor;
 
 // User Interface display variables
 extern bool autoLock;             // setting that enables backlight switch OFF after a given time of no user actions
-extern bool defaultAutoLock;      // setting that enables backlight switch OFF after a given time of no user actions
 extern long lastbacklightHandler; // last time there was a encoder movement or pulse
 extern long sensorsUpdatePeriod;
 

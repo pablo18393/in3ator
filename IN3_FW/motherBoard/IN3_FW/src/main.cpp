@@ -36,7 +36,6 @@ RotaryEncoder encoder(ENC_A, ENC_B, RotaryEncoder::LatchMode::TWO03);
 Beastdevices_INA3221 digitalCurrentSensor(INA3221_ADDR41_VCC);
 
 bool WIFI_EN = true;
-bool defaultWIFI_EN = ON;
 long lastDebugUpdate;
 long loopCounts;
 int page;
@@ -75,7 +74,6 @@ float previousTemperature[secondOrder_filter];
 
 // room variables
 bool controlAlgorithm;
-bool defaultcontrolAlgorithm = PID_CONTROL;
 float minDesiredTemp[2] = {35, 30};   // minimum allowed temperature to be set
 float maxDesiredTemp[2] = {37.5, 37}; // maximum allowed temperature to be set
 int presetTemp[2] = {36, 32};         // preset baby skin temperature
@@ -113,7 +111,6 @@ int screenTextColor, screenTextBackgroundColor;
 
 // User Interface display variables
 bool autoLock;             // setting that enables backlight switch OFF after a given time of no user actions
-bool defaultAutoLock = ON; // setting that enables backlight switch OFF after a given time of no user actions
 long lastbacklightHandler; // last time there was a encoder movement or pulse
 long sensorsUpdatePeriod = 1000;
 

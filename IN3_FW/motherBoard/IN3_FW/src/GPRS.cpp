@@ -29,6 +29,7 @@
 #define TINY_GSM_MODEM_SIM800
 #include <TinyGsmClient.h>
 #include "ThingsBoard.h"
+#include <WiFi.h>
 
 // Initialize GSM modem
 TinyGsm modem(modemSerial);
@@ -39,10 +40,17 @@ TinyGsmClient client(modem);
 // Initialize ThingsBoard instance
 ThingsBoard tb(client);
 
-int GPRSsequence = false;
+// Initialize ThingsBoard client provision instance
+ThingsBoard tb_provision(client);
 
-struct GPRSstruct GPRS;
+unsigned long previous_processing_time;
+
+// Statuses for provisioning
+volatile bool provisionResponseProcessed = false;
+
 extern in3ator_parameters in3;
+GPRSstruct GPRS;
+Credentials credentials;
 
 void clearGPRSBuffer()
 {
@@ -266,100 +274,171 @@ void GPRSSetPostPeriod()
   }
 }
 
-void GPRSPost()
+void GPRSProvisionResponse(Provision_Data &data)
 {
-  if (!tb.connected())
+  Serial.println("Received device provision response");
+  int jsonSize = measureJson(data) + 1;
+  char buffer[jsonSize];
+  serializeJson(data, buffer, jsonSize);
+  Serial.println(buffer);
+  if (strncmp(data["status"], "SUCCESS", strlen("SUCCESS")) != 0)
+  {
+    Serial.print("Provision response contains the error: ");
+    Serial.println(data["errorMsg"].as<String>());
+    provisionResponseProcessed = true;
+    return;
+  }
+  if (strncmp(data["credentialsType"], "ACCESS_TOKEN", strlen("ACCESS_TOKEN")) == 0)
+  {
+    credentials.client_id = "";
+    credentials.username = data["credentialsValue"].as<String>();
+    credentials.password = "";
+  }
+  if (strncmp(data["credentialsType"], "MQTT_BASIC", strlen("MQTT_BASIC")) == 0)
+  {
+    /*
+    JsonObject credentials_value = data["credentialsValue"].as<JsonObject>(); //
+    credentials.client_id = credentials_value["clientId"].as<String>();
+    credentials.username = credentials_value["userName"].as<String>();
+    credentials.password = credentials_value["password"].as<String>();
+    */
+  }
+  if (tb_provision.connected())
+  {
+    tb_provision.disconnect();
+  }
+  provisionResponseProcessed = true;
+}
+
+Provision_Callback provisionCallback;
+
+void TBProvision()
+{
+  if (!tb_provision.connected())
   {
     // Connect to the ThingsBoard
     Serial.print("Connecting to: ");
     Serial.print(THINGSBOARD_SERVER);
-    Serial.print(" with token ");
-    Serial.println(TOKEN);
-    if (!tb.connect(THINGSBOARD_SERVER, TOKEN))
+    if (!tb_provision.connect(THINGSBOARD_SERVER, "provision", THINGSBOARD_PORT))
     {
       Serial.println("Failed to connect");
       return;
     }
-  }
-  if (tb.connected() && millis() - GPRS.lastSent > millisToSecs(GPRS.sendPeriod))
-  {
-    logln("[GPRS] -> Posting GPRS data...");
-    if (!GPRS.firstPost)
+    if (tb_provision.Provision_Subscribe(provisionCallback))
     {
-      GPRS.firstPost = true;
-      GPRS_get_SIM_info();
-      tb.sendAttributeInt("SN", in3.serialNumber);
-      tb.sendAttributeInt("HW_num", HW_NUM);
-      tb.sendAttributeString("HW_revision", String(HW_REVISION).c_str());
-      tb.sendAttributeString("FW_version", FWversion);
-      tb.sendAttributeString("CCID", GPRS.CCID.c_str());
-      tb.sendAttributeString("IMEI", GPRS.IMEI.c_str());
-      tb.sendAttributeString("APN", GPRS.APN.c_str());
-      tb.sendAttributeString("COP", GPRS.COP.c_str());
-
-      tb.sendTelemetryFloat("SYS_current_stanby_test", in3.system_current_standby_test);
-      tb.sendTelemetryFloat("Heater_current_test", in3.heater_current_test);
-      tb.sendTelemetryFloat("Fan_current_test", in3.fan_current_test);
-      tb.sendTelemetryFloat("Phototherapy_current_test", in3.phototherapy_current_test);
-      tb.sendTelemetryFloat("Humidifier_current_test", in3.humidifier_current_test);
-      tb.sendTelemetryFloat("Display_current_test", in3.display_current_test);
-      tb.sendTelemetryFloat("Buzzer_current_test", in3.buzzer_current_test);
-      tb.sendTelemetryInt("HW_Test", in3.HW_test_error_code);
-
-      tb.sendTelemetryFloat("tri_longitud", GPRS.longitud);
-      tb.sendTelemetryFloat("tri_latitud", GPRS.latitud);
-      tb.sendTelemetryFloat("tri_accuracy", GPRS.accuracy);
-      tb.sendTelemetryInt("UI_language", in3.language);
-    }
-    GPRSUpdateCSQ();
-    tb.sendTelemetryFloat("Air_temp", in3.temperature[airSensor]);
-    tb.sendTelemetryFloat("Skin_temp", in3.temperature[skinSensor]);
-    tb.sendTelemetryInt("Humidity", in3.humidity);
-    tb.sendTelemetryFloat("SYS_current", in3.system_current);
-    tb.sendTelemetryFloat("SYS_voltage", in3.system_voltage);
-    tb.sendTelemetryInt("CSQ", GPRS.CSQ);
-
-    if (in3.temperatureControl || in3.humidityControl)
-    {
-      tb.sendTelemetryFloat("Fan_current", in3.fan_current);
-      if (!GPRS.firstConfigPost)
+      if (tb_provision.sendProvisionRequest(GPRS.CCID.c_str(), PROVISION_DEVICE_KEY, PROVISION_DEVICE_SECRET))
       {
-        GPRS.firstConfigPost = true;
-        if (in3.temperatureControl)
-        {
-          if (in3.controlMode == AIR_CONTROL)
-          {
-            tb.sendTelemetryString("Control_mode", "AIR");
-          }
-          else
-          {
-            tb.sendTelemetryString("Control_mode", "SKIN");
-          }
-          tb.sendTelemetryFloat("Temp_desired", in3.desiredControlTemperature);
-        }
-        if (in3.humidityControl)
-        {
-          tb.sendTelemetryFloat("Hum_desired", in3.desiredControlHumidity);
-        }
+        GPRS.provisioned = true;
+        EEPROM.write(EEPROM_THINGSBOARD_PROVISIONED, GPRS.provisioned);
+        EEPROM.commit();
+        Serial.println("Provision request was sent!");
       }
     }
-    else
-    {
-      GPRS.firstConfigPost = false;
-    }
-    if (in3.humidityControl)
-    {
-      tb.sendTelemetryFloat("Humidifier_current", in3.humidifier_current);
-      tb.sendTelemetryFloat("Humidifier_voltage", in3.humidifier_voltage);
-    }
-    if (in3.phototherapy)
-    {
-      tb.sendTelemetryFloat("Phototherapy_current", in3.phototherapy_current);
-    }
+  }
+}
 
-    GPRS.process = false;
-    GPRS.lastSent = millis();
-    logln("[GPRS] -> GPRS POST SUCCESS");
+void GPRSPost()
+{
+  if (!GPRS.provisioned)
+  {
+    TBProvision();
+    // GPRSProvisionResponse(provisionCallback);
+  }
+  else
+  {
+    if (!tb.connected())
+    {
+      // Connect to the ThingsBoard
+      Serial.print("Connecting to: ");
+      Serial.print(THINGSBOARD_SERVER);
+      Serial.print(" with token ");
+      Serial.println(TOKEN);
+      if (!tb.connect(THINGSBOARD_SERVER, TOKEN))
+      {
+        Serial.println("Failed to connect");
+        return;
+      }
+    }
+    if (tb.connected() && millis() - GPRS.lastSent > millisToSecs(GPRS.sendPeriod))
+    {
+      logln("[GPRS] -> Posting GPRS data...");
+      if (!GPRS.firstPost)
+      {
+        GPRS.firstPost = true;
+        GPRS_get_SIM_info();
+        tb.sendAttributeInt("SN", in3.serialNumber);
+        tb.sendAttributeInt("HW_num", HW_NUM);
+        tb.sendAttributeString("HW_revision", String(HW_REVISION).c_str());
+        tb.sendAttributeString("FW_version", FWversion);
+        tb.sendAttributeString("CCID", GPRS.CCID.c_str());
+        tb.sendAttributeString("IMEI", GPRS.IMEI.c_str());
+        tb.sendAttributeString("APN", GPRS.APN.c_str());
+        tb.sendAttributeString("COP", GPRS.COP.c_str());
+
+        tb.sendTelemetryFloat("SYS_current_stanby_test", in3.system_current_standby_test);
+        tb.sendTelemetryFloat("Heater_current_test", in3.heater_current_test);
+        tb.sendTelemetryFloat("Fan_current_test", in3.fan_current_test);
+        tb.sendTelemetryFloat("Phototherapy_current_test", in3.phototherapy_current_test);
+        tb.sendTelemetryFloat("Humidifier_current_test", in3.humidifier_current_test);
+        tb.sendTelemetryFloat("Display_current_test", in3.display_current_test);
+        tb.sendTelemetryFloat("Buzzer_current_test", in3.buzzer_current_test);
+        tb.sendTelemetryInt("HW_Test", in3.HW_test_error_code);
+
+        tb.sendTelemetryFloat("tri_longitud", GPRS.longitud);
+        tb.sendTelemetryFloat("tri_latitud", GPRS.latitud);
+        tb.sendTelemetryFloat("tri_accuracy", GPRS.accuracy);
+        tb.sendTelemetryInt("UI_language", in3.language);
+      }
+      GPRSUpdateCSQ();
+      tb.sendTelemetryFloat("Air_temp", in3.temperature[airSensor]);
+      tb.sendTelemetryFloat("Skin_temp", in3.temperature[skinSensor]);
+      tb.sendTelemetryInt("Humidity", in3.humidity);
+      tb.sendTelemetryFloat("SYS_current", in3.system_current);
+      tb.sendTelemetryFloat("SYS_voltage", in3.system_voltage);
+      tb.sendTelemetryInt("CSQ", GPRS.CSQ);
+
+      if (in3.temperatureControl || in3.humidityControl)
+      {
+        tb.sendTelemetryFloat("Fan_current", in3.fan_current);
+        if (!GPRS.firstConfigPost)
+        {
+          GPRS.firstConfigPost = true;
+          if (in3.temperatureControl)
+          {
+            if (in3.controlMode == AIR_CONTROL)
+            {
+              tb.sendTelemetryString("Control_mode", "AIR");
+            }
+            else
+            {
+              tb.sendTelemetryString("Control_mode", "SKIN");
+            }
+            tb.sendTelemetryFloat("Temp_desired", in3.desiredControlTemperature);
+          }
+          if (in3.humidityControl)
+          {
+            tb.sendTelemetryFloat("Hum_desired", in3.desiredControlHumidity);
+          }
+        }
+      }
+      else
+      {
+        GPRS.firstConfigPost = false;
+      }
+      if (in3.humidityControl)
+      {
+        tb.sendTelemetryFloat("Humidifier_current", in3.humidifier_current);
+        tb.sendTelemetryFloat("Humidifier_voltage", in3.humidifier_voltage);
+      }
+      if (in3.phototherapy)
+      {
+        tb.sendTelemetryFloat("Phototherapy_current", in3.phototherapy_current);
+      }
+
+      GPRS.process = false;
+      GPRS.lastSent = millis();
+      logln("[GPRS] -> GPRS POST SUCCESS");
+    }
   }
 }
 
