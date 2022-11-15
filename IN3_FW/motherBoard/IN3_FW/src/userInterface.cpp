@@ -644,21 +644,7 @@ void checkSetMessage(int UI_page)
     }
     if (page == mainMenuPage)
     {
-      switch (in3.language)
-      {
-      case english:
-        helpMessage = convertStringToChar(cstring, "Set desired parameters");
-        break;
-      case spanish:
-        helpMessage = convertStringToChar(cstring, "Introduce parametros");
-        break;
-      case french:
-        helpMessage = convertStringToChar(cstring, "Entrer parametres");
-        break;
-      case portuguese:
-        helpMessage = convertStringToChar(cstring, "Insira os parametros");
-        break;
-      }
+      drawHelpMessage(in3.language);
     }
     drawCentreString(helpMessage, width_select + (tft.width() - width_select) / 2, getYpos(menu_rows, startGraphicPosition), textFontSize);
   }

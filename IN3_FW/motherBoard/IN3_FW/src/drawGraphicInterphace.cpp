@@ -32,7 +32,6 @@ extern SHTC3 mySHTC3; // Declare an instance of the SHTC3 class
 extern RotaryEncoder encoder;
 extern Beastdevices_INA3221 digitalCurrentSensor;
 
-
 extern bool WIFI_EN;
 extern long lastDebugUpdate;
 extern long loopCounts;
@@ -370,11 +369,31 @@ void drawHumidity(int UI_humidity, int UI_previousHumdity)
   drawCentreNumber(UI_humidity, humidityX, humidityY);
 }
 
+void drawHelpMessage(byte UI_language)
+{
+  switch (UI_language)
+  {
+  case english:
+    helpMessage = convertStringToChar(cstring, "Set desired parameters");
+    break;
+  case spanish:
+    helpMessage = convertStringToChar(cstring, "Introduce parametros");
+    break;
+  case french:
+    helpMessage = convertStringToChar(cstring, "Entrer parametres");
+    break;
+  case portuguese:
+    helpMessage = convertStringToChar(cstring, "Insira os parametros");
+    break;
+  }
+}
+
 void drawStartMessage(bool UI_enableSet, int UI_menu_rows, char *UI_helpMessage)
 {
   if (UI_enableSet)
   {
     setTextColor(COLOR_MENU);
+    drawHelpMessage(in3.language);
     drawCentreString(helpMessage, width_select + (tft.width() - width_select) / 2, getYpos(UI_menu_rows, startGraphicPosition), textFontSize);
     setTextColor(COLOR_MENU_TEXT);
     switch (in3.language)
