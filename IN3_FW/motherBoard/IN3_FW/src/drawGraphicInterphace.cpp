@@ -195,7 +195,7 @@ void drawHeading(int UI_page, int UI_serialNumber)
   setTextColor(COLOR_MENU);
   drawCentreString(convertStringToChar(cstring, "in3_"), tft.width() / 2 - 2 * letter_width - 10, headint_text_height, textFontSize);
   drawCentreNumber(UI_serialNumber, tft.width() / 2, headint_text_height);
-  drawCentreString(convertStringToChar(cstring, HWversion), tft.width() - 4 * letter_width, headint_text_height, textFontSize);
+  drawCentreString(convertStringToChar(cstring, String(FWversion) + "/" + HWversion), tft.width() - 4 * letter_width, headint_text_height, textFontSize);
 }
 
 void eraseBar(int UI_menu_rows, int bar_pos)

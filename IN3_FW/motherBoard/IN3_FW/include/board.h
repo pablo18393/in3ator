@@ -26,7 +26,7 @@
 #define HW_NUM 9
 #define HW_REVISION 'C'
 #define HWversion String(HW_NUM) + "." + String(HW_REVISION)
-#define FWversion "10.4"
+#define FWversion "10.5"
 #define WIFI_NAME "In3_v" + String(FWversion) + "/" + String(HWversion)
 #define headingTitle "in3ator"
 
@@ -48,9 +48,6 @@
 #define HEATER 27
 #define ENC_B 32
 #define SCREENBACKLIGHT 33
-#define VOLTAGE_IN 35
-#define USB_SHUNT 35
-#define SYS_SHUNT 35
 #define BABY_NTC_PIN 39
 #define ON_OFF_SWITCH 34
 

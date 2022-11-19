@@ -252,7 +252,7 @@
 
 #define BACKLIGHT_NO_INTERACTION_TIME 12000 // time to decrease backlight display if no user actions
 
-#define GPRS_TASK_PERIOD 50
+#define GPRS_TASK_PERIOD 500
 
 typedef struct
 {

@@ -27,10 +27,8 @@
 
 const char *wifiHost = "in3ator";
 
-//const char *ssid = "in3wifi";
-//const char *wifiPassword = "12345678";
-const char *ssid = "casapatas";
-const char *wifiPassword = "lawifidepatas";
+const char *ssid = "in3wifi";
+const char *wifiPassword = "12345678";
 
 WebServer wifiServer(80);
 

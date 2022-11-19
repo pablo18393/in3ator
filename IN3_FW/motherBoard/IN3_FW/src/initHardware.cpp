@@ -147,8 +147,8 @@ extern int ScreenBacklightMode;
 #define testMode false
 #define operativeMode true
 
-#define CURRENT_STABILIZE_TIME_DEFAULT 300
-#define CURRENT_STABILIZE_TIME_HEATER 800
+#define CURRENT_STABILIZE_TIME_DEFAULT 700
+#define CURRENT_STABILIZE_TIME_HEATER 1000
 
 #define NTC_BABY_MIN 1
 #define NTC_BABY_MAX 60
@@ -157,12 +157,12 @@ extern int ScreenBacklightMode;
 #define DIG_HUM_ROOM_MIN 1
 #define DIG_HUM_ROOM_MAX 100
 
-#define HEATER_CONSUMPTION_MIN 2.5
+#define HEATER_CONSUMPTION_MIN 1.5
 #define FAN_CONSUMPTION_MIN 0.03
 #define PHOTOTHERAPY_CONSUMPTION_MIN 0.3
 #define HUMIDIFIER_CONSUMPTION_MIN 0.07
 
-#define HEATER_CONSUMPTION_MAX 8
+#define HEATER_CONSUMPTION_MAX 10
 #define FAN_CONSUMPTION_MAX 1
 #define PHOTOTHERAPY_CONSUMPTION_MAX 3
 #define HUMIDIFIER_CONSUMPTION_MAX 0.8
@@ -605,7 +605,6 @@ void initHardware(bool printOutputTest)
   initInterrupts();
   PIDInit();
   criticalError = initActuators();
-  criticalError = false;
   initGPRS();
   if (WIFI_EN)
   {

@@ -10,7 +10,7 @@
 
 #define modemSerial Serial2
 
-#define standByGPRSPostPeriod 1800
+#define standByGPRSPostPeriod 3600
 #define actuatingGPRSPostPeriod 60
 #define phototherapyGPRSPostPeriod 180
 #define GPRS_SHUT OFF
@@ -21,8 +21,8 @@
 #define GPRS_USER ""
 #define GPRS_PASS ""
 
-#define PROVISION_DEVICE_KEY "3ze2np7my4acf643r0jz"
-#define PROVISION_DEVICE_SECRET "nruedye0eiz1dkm8mo96"
+#define PROVISION_DEVICE_KEY "8f9yvlkqxirz2pq9n5co"
+#define PROVISION_DEVICE_SECRET "bz9fwzi8t3pnqxdlipqz"
 
 #define SIMCOM800_AT "AT\n"
 #define SIMCOM800_AT_CFUN "AT+CFUN=1\n"
