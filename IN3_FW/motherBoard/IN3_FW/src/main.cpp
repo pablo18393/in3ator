@@ -164,11 +164,7 @@ void setup()
   UI_mainMenu();
   // Task generation
   /* Task n#1 - GPRS Handler */
-  logln("Creating GPRS task ...\n");
-  while (xTaskCreatePinnedToCore(GPRS_Task, (const char *)"GPRS", 4096, NULL, 1, NULL, 1) != pdPASS)
-    ;
-  ;
-  logln("GPRS task successfully created!\n");
+  xTaskCreate(GPRS_Task, "GPRS task", 2000, NULL, 0, NULL);
 }
 
 void loop()
