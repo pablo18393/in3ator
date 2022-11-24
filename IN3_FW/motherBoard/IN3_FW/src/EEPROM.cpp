@@ -69,7 +69,6 @@ void initEEPROM()
     {
       EEPROM.write(i, 0);
     }
-    loadDefaultCalibration();
     loaddefaultValues();
     logln("[FLASH] -> First turn on, loading default values");
   }
@@ -100,6 +99,7 @@ void loaddefaultValues()
 
 void loadDefaultCalibration()
 {
+  /*
   EEPROM.writeFloat(EEPROM_RawSkinTemperatureLowCorrection, 25.54);
   EEPROM.writeFloat(EEPROM_RawSkinTemperatureRangeCorrection, 14.28);
   EEPROM.writeFloat(EEPROM_RawAirTemperatureLowCorrection, 0);
@@ -110,6 +110,7 @@ void loadDefaultCalibration()
   EEPROM.writeFloat(EEPROM_ReferenceTemperatureLow, 21.15);
   EEPROM.writeFloat(EEPROM_FineTuneSkinTemperature, 0);
   EEPROM.commit();
+  */
 }
 
 void recapVariables()

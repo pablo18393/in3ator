@@ -157,17 +157,14 @@ void GPRSPowerUp()
   switch (GPRS.process)
   {
   case 0:
-    if (millis() - GPRS.packetSentenceTime > 2000)
-    {
-      GPRS.processTime = millis();
-      digitalWrite(GPRS_PWRKEY, LOW);
-      GPRS.process++;
-      GPRS.packetSentenceTime = millis();
-      logln("[GPRS] -> powering up GPRS");
-    }
+    GPRS.processTime = millis();
+    digitalWrite(GPRS_PWRKEY, LOW);
+    GPRS.process++;
+    GPRS.packetSentenceTime = millis();
+    logln("[GPRS] -> powering up GPRS");
     break;
   case 1:
-    if (millis() - GPRS.packetSentenceTime > 2000)
+    if (millis() - GPRS.packetSentenceTime > 500)
     {
       digitalWrite(GPRS_PWRKEY, HIGH);
       GPRS.packetSentenceTime = millis();
@@ -176,7 +173,7 @@ void GPRSPowerUp()
     }
     break;
   case 2:
-    if (millis() - GPRS.packetSentenceTime > 7000)
+    if (millis() - GPRS.packetSentenceTime > 1000)
     {
       clearGPRSBuffer();
       logln("[GPRS] -> Sending AT command");
@@ -205,10 +202,17 @@ void GPRSStablishConnection()
     GPRS.process++;
     break;
   case 1:
-    if (millis() - GPRS.processTime > 5000)
+    logln("[GPRS] -> Connecting...");
+    GPRS.APN = APN_TM;
+    if (modem.gprsConnect(GPRS.APN.c_str(), GPRS_USER, GPRS_PASS))
     {
-      logln("[GPRS] -> Connecting...");
-      GPRS.APN = APN_TM;
+      logln("[GPRS] -> Attached");
+      GPRS.process++;
+    }
+    else
+    {
+      logln("[GPRS] -> Attach FAIL, retrying with different APN...");
+      GPRS.APN = APN_TRUPHONE;
       if (modem.gprsConnect(GPRS.APN.c_str(), GPRS_USER, GPRS_PASS))
       {
         logln("[GPRS] -> Attached");
@@ -216,17 +220,7 @@ void GPRSStablishConnection()
       }
       else
       {
-        logln("[GPRS] -> Attach FAIL, retrying with different APN...");
-        GPRS.APN = APN_TRUPHONE;
-        if (modem.gprsConnect(GPRS.APN.c_str(), GPRS_USER, GPRS_PASS))
-        {
-          logln("[GPRS] -> Attached");
-          GPRS.process++;
-        }
-        else
-        {
-          logln("[GPRS] -> Attach FAIL, retrying...");
-        }
+        logln("[GPRS] -> Attach FAIL, retrying...");
       }
     }
     break;
@@ -371,7 +365,7 @@ void GPRSPost()
     {
       logln("[GPRS] -> sendPeriod is " + String(GPRS.sendPeriod) + " secs");
       logln("[GPRS] -> Posting GPRS data...");
-      
+
       if (!GPRS.firstPost)
       {
         GPRS.firstPost = true;
