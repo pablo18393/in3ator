@@ -37,9 +37,8 @@ extern long lastDebugUpdate;
 extern long loopCounts;
 extern int page;
 extern int temperature_filter; // amount of temperature samples to filter
-extern long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
+extern long lastNTCmeasurement[numNTC], lastCurrentMeasurement, lastCurrentUpdate;
 
-extern int NTC_PIN[numNTC];
 extern double errorTemperature[numSensors], temperatureCalibrationPoint;
 extern double ReferenceTemperatureRange, ReferenceTemperatureLow;
 extern double provisionalReferenceTemperatureLow;
@@ -155,7 +154,7 @@ void autoCalibration()
   int historyLengthPosition = false;
   double referenceSensorHistory[SAMPLES_WITHIN_ERROR];
   double sensorToCalibrateHistory[SAMPLES_WITHIN_ERROR];
-  referenceSensorHistory[0] = in3.temperature[airSensor];
+  referenceSensorHistory[0] = in3.temperature[digitalTempHumSensor];
   sensorToCalibrateHistory[0] = in3.temperature[skinSensor];
   page = autoCalibrationPage;
   print_text = true;
@@ -186,7 +185,7 @@ void autoCalibration()
   drawHeading(page, in3.serialNumber);
   bar_pos = true;
   ypos = graphicHeight(bar_pos - 1);
-  while (!digitalRead(ENC_SWITCH))
+  while (!GPIORead(ENC_SWITCH))
   {
     updateData();
   }
@@ -204,12 +203,12 @@ void autoCalibration()
       turnFans(ON);
       break;
     case firstAutoCalibrationPoint:
-      if (!digitalRead(ENC_SWITCH) || checkStableTemperatures(referenceSensorHistory, sensorToCalibrateHistory, SAMPLES_WITHIN_ERROR, CALIBRATION_ERROR))
+      if (!GPIORead(ENC_SWITCH) || checkStableTemperatures(referenceSensorHistory, sensorToCalibrateHistory, SAMPLES_WITHIN_ERROR, CALIBRATION_ERROR))
       {
-        provisionalReferenceTemperatureLow = in3.temperature[airSensor];
+        provisionalReferenceTemperatureLow = in3.temperature[digitalTempHumSensor];
         provisionalRawTemperatureLow[skinSensor] = in3.temperature[skinSensor];
         vTaskDelay(debounceTime);
-        while (!digitalRead(ENC_SWITCH))
+        while (!GPIORead(ENC_SWITCH))
         {
           updateData();
           exitCalibrationMenu = back_mode();
@@ -226,12 +225,12 @@ void autoCalibration()
       break;
     case secondAutoCalibrationPoint:
       PIDHandler();
-      if (!digitalRead(ENC_SWITCH) || checkStableTemperatures(referenceSensorHistory, sensorToCalibrateHistory, SAMPLES_WITHIN_ERROR, CALIBRATION_ERROR))
+      if (!GPIORead(ENC_SWITCH) || checkStableTemperatures(referenceSensorHistory, sensorToCalibrateHistory, SAMPLES_WITHIN_ERROR, CALIBRATION_ERROR))
       {
         Serial.println("=================================================point 2");
         ReferenceTemperatureLow = provisionalReferenceTemperatureLow;
         RawTemperatureLow[skinSensor] = provisionalRawTemperatureLow[skinSensor];
-        ReferenceTemperatureRange = in3.temperature[airSensor] - ReferenceTemperatureLow;
+        ReferenceTemperatureRange = in3.temperature[digitalTempHumSensor] - ReferenceTemperatureLow;
         RawTemperatureRange[skinSensor] = (in3.temperature[skinSensor] - RawTemperatureLow[skinSensor]);
         logln("calibration factors: " + String(RawTemperatureLow[skinSensor]) + "," + String(RawTemperatureRange[skinSensor]) + "," + String(ReferenceTemperatureRange) + "," + String(ReferenceTemperatureLow));
         saveCalibrationToEEPROM();
@@ -249,7 +248,7 @@ void autoCalibration()
       {
         historyLengthPosition = false;
       }
-      referenceSensorHistory[historyLengthPosition] = in3.temperature[airSensor];
+      referenceSensorHistory[historyLengthPosition] = in3.temperature[digitalTempHumSensor];
       sensorToCalibrateHistory[historyLengthPosition] = in3.temperature[skinSensor];
       historyLengthPosition++;
 
@@ -285,7 +284,7 @@ void fineTuneCalibration()
   ypos = graphicHeight(bar_pos - 1);
   setTextColor(COLOR_MENU_TEXT);
   drawFloat(in3.temperature[skinSensor], 1, valuePosition, ypos, textFontSize);
-  while (!digitalRead(ENC_SWITCH))
+  while (!GPIORead(ENC_SWITCH))
   {
     updateData();
   }
@@ -330,7 +329,7 @@ void firstPointCalibration()
   ypos = graphicHeight(bar_pos - 1);
   setTextColor(COLOR_MENU_TEXT);
   drawFloat(in3.temperature[skinSensor], 1, valuePosition, ypos, textFontSize);
-  while (!digitalRead(ENC_SWITCH))
+  while (!GPIORead(ENC_SWITCH))
   {
     updateData();
   }
@@ -375,7 +374,7 @@ void secondPointCalibration()
   ypos = graphicHeight(bar_pos - 1);
   setTextColor(COLOR_MENU_TEXT);
   drawFloat(in3.temperature[skinSensor], 1, valuePosition, ypos, textFontSize);
-  while (!digitalRead(ENC_SWITCH))
+  while (!GPIORead(ENC_SWITCH))
   {
     updateData();
   }
@@ -414,8 +413,8 @@ void clearCalibrationValues()
 {
   RawTemperatureLow[skinSensor] = false;
   RawTemperatureRange[skinSensor] = false;
-  RawTemperatureLow[airSensor] = false;
-  RawTemperatureRange[airSensor] = false;
+  RawTemperatureLow[digitalTempHumSensor] = false;
+  RawTemperatureRange[digitalTempHumSensor] = false;
   ReferenceTemperatureRange = false;
   ReferenceTemperatureLow = false;
 }

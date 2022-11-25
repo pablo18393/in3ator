@@ -40,9 +40,13 @@ long lastDebugUpdate;
 long loopCounts;
 int page;
 int temperature_filter = analog_temperature_filter; // amount of temperature samples to filter
-long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
+long lastNTCmeasurement[numNTC], lastCurrentMeasurement, lastCurrentUpdate;
 
+#if (HW_NUM <= 6)
+int NTC_PIN[numNTC] = {BABY_NTC_PIN, AIR_NTC_PIN};
+#else
 int NTC_PIN[numNTC] = {BABY_NTC_PIN};
+#endif
 double errorTemperature[numSensors], temperatureCalibrationPoint;
 double ReferenceTemperatureRange, ReferenceTemperatureLow;
 double provisionalReferenceTemperatureLow;
@@ -69,8 +73,11 @@ volatile bool statusEncSwitch;
 bool roomSensorPresent = false;
 bool digitalCurrentSensorPresent = false;
 
-float instantTemperature[secondOrder_filter];
-float previousTemperature[secondOrder_filter];
+float instantTemperature[numNTC][secondOrder_filter];
+float previousTemperature[numNTC][secondOrder_filter];
+
+float instantCurrent[secondOrder_filter];
+float previousCurrent[secondOrder_filter];
 
 // room variables
 bool controlAlgorithm;

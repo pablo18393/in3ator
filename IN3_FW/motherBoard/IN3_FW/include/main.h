@@ -20,6 +20,7 @@
 #include <RotaryEncoder.h>        //
 #include <Beastdevices_INA3221.h> //
 #include "in3ator_humidifier.h"
+#include "TCA9555.h"
 
 #define WDT_TIMEOUT 45
 
@@ -86,12 +87,6 @@
 #define portuguese 3
 #define numLanguages 4
 #define defaultLanguage english // Preset number configuration when booting for first time
-
-// number assignment of each enviromental sensor for later call in variable
-#define skinSensor 0
-#define airSensor 1
-#define numNTC 1     // number of NTC
-#define numSensors 2 // number of total temperature sensors in system
 
 #define secondOrder_filter 3          // amount of temperature samples to filter
 #define analog_temperature_filter 500 // amount of temperature samples to filter
@@ -162,7 +157,6 @@
 #define time_back_wait 255
 
 #define DEFAULT_AUTOLOCK ON
-#define DEFAULT_WIFI_EN ON
 #define DEFAULT_CONTROL_ALGORITHM PID_CONTROL
 
 // security defs
@@ -298,7 +292,7 @@ void buzzerHandler();
 void buzzerTone(int beepTimes, int timevTaskDelay, int freq);
 
 void shutBuzzer();
-float measureMeanConsumption(int shunt);
+double measureMeanConsumption(int shunt);
 float measureMeanVoltage(int shunt);
 void watchdogReload();
 void OTAHandler(void);
@@ -392,9 +386,11 @@ void initAlarms();
 void IRAM_ATTR encSwitchHandler();
 void IRAM_ATTR encoderISR();
 
-bool measureNTCTemperature();
+bool measureNTCTemperature(uint8_t);
 void loadlogo();
 
 void initPin(uint8_t GPIO, uint8_t Mode);
+bool GPIORead(uint8_t GPIO);
+void GPIOWrite(uint8_t GPIO, uint8_t Mode);
 
 #endif

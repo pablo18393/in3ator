@@ -37,9 +37,8 @@ extern long lastDebugUpdate;
 extern long loopCounts;
 extern int page;
 extern int temperature_filter; // amount of temperature samples to filter
-extern long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
+extern long lastNTCmeasurement[numNTC], lastCurrentMeasurement, lastCurrentUpdate;
 
-extern int NTC_PIN[numNTC];
 extern double errorTemperature[numSensors], temperatureCalibrationPoint;
 extern double ReferenceTemperatureRange, ReferenceTemperatureLow;
 extern double provisionalReferenceTemperatureLow;
@@ -186,7 +185,7 @@ void UI_calibration()
   drawHeading(page, in3.serialNumber);
   bar_pos = true;
   ypos = graphicHeight(bar_pos - 1);
-  while (!digitalRead(ENC_SWITCH))
+  while (!GPIORead(ENC_SWITCH))
   {
     updateData();
   }

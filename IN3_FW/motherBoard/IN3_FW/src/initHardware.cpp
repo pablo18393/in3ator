@@ -37,9 +37,8 @@ extern long lastDebugUpdate;
 extern long loopCounts;
 extern int page;
 extern int temperature_filter; // amount of temperature samples to filter
-extern long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
+extern long lastNTCmeasurement[numNTC], lastCurrentMeasurement, lastCurrentUpdate;
 
-extern int NTC_PIN[numNTC];
 extern double errorTemperature[numSensors], temperatureCalibrationPoint;
 extern double ReferenceTemperatureRange, ReferenceTemperatureLow;
 extern double provisionalReferenceTemperatureLow;
@@ -206,6 +205,7 @@ long HW_error = false;
 long lastTFTCheck;
 
 extern in3ator_parameters in3;
+TCA9555 TCA(0x20);
 
 void initDebug()
 {
@@ -217,7 +217,7 @@ void initDebug()
 void initPWMGPIO()
 {
   ledcSetup(SCREENBACKLIGHT_PWM_CHANNEL, DEFAULT_PWM_FREQUENCY, DEFAULT_PWM_RESOLUTION);
-  ledcSetup(HEATER_PWM_CHANNEL, HEATER_PWM_FREQUENCY, DEFAULT_PWM_RESOLUTION);
+  ledcSetup(HEATER_PWM_CHANNEL, DEFAULT_PWM_FREQUENCY, DEFAULT_PWM_RESOLUTION);
   ledcSetup(BUZZER_PWM_CHANNEL, DEFAULT_PWM_FREQUENCY, DEFAULT_PWM_RESOLUTION);
   ledcAttachPin(SCREENBACKLIGHT, SCREENBACKLIGHT_PWM_CHANNEL);
   ledcAttachPin(HEATER, HEATER_PWM_CHANNEL);
@@ -229,19 +229,39 @@ void initPWMGPIO()
 
 void initGPIO()
 {
-  pinMode(PHOTOTHERAPY, OUTPUT);
-  pinMode(GPRS_PWRKEY, OUTPUT);
-  pinMode(encoderpinA, INPUT_PULLUP);
-  pinMode(encoderpinB, INPUT_PULLUP);
-  pinMode(ENC_SWITCH, INPUT_PULLUP);
-  pinMode(TFT_CS, OUTPUT);
-  pinMode(PHOTOTHERAPY, OUTPUT);
-  pinMode(FAN, OUTPUT);
-  pinMode(HEATER, OUTPUT);
-  pinMode(BUZZER, OUTPUT);
-  pinMode(SCREENBACKLIGHT, OUTPUT);
-  pinMode(ACTUATORS_EN, INPUT_PULLUP);
-  pinMode(ON_OFF_SWITCH, INPUT);
+#if (HW_NUM == 6)
+  TCA.begin();
+  for (int pin = 0; pin < 16; pin++)
+  {
+    TCA.setPolarity(pin, false);
+  }
+  initPin(UNUSED_GPIO_EXP0, OUTPUT);
+  initPin(UNUSED_GPIO_EXP1, OUTPUT);
+  initPin(UNUSED_GPIO_EXP2, OUTPUT);
+  initPin(UNUSED_GPIO_EXP3, OUTPUT);
+  GPIOWrite(UNUSED_GPIO_EXP0, HIGH);
+  GPIOWrite(UNUSED_GPIO_EXP1, HIGH);
+  GPIOWrite(UNUSED_GPIO_EXP2, HIGH);
+  GPIOWrite(UNUSED_GPIO_EXP3, HIGH);
+  initPin(GPRS_EN, OUTPUT);
+  GPIOWrite(GPRS_EN, HIGH);
+  initPin(HUMIDIFIER, OUTPUT);
+  GPIOWrite(HUMIDIFIER, LOW);
+#endif
+  initPin(PHOTOTHERAPY, OUTPUT);
+  initPin(GPRS_PWRKEY, OUTPUT);
+  initPin(encoderpinA, INPUT_PULLUP);
+  initPin(encoderpinB, INPUT_PULLUP);
+  initPin(ENC_SWITCH, INPUT_PULLUP);
+  initPin(TFT_CS, OUTPUT);
+  initPin(PHOTOTHERAPY, OUTPUT);
+  initPin(FAN, OUTPUT);
+  initPin(HEATER, OUTPUT);
+  initPin(BUZZER, OUTPUT);
+  initPin(SCREENBACKLIGHT, OUTPUT);
+  initPin(ACTUATORS_EN, OUTPUT);
+  GPIOWrite(ACTUATORS_EN, HIGH);
+  // initPin(ON_OFF_SWITCH, INPUT);
   initPWMGPIO();
 }
 
@@ -288,16 +308,20 @@ void initPowerAlarm()
 {
 }
 
+void initI2C()
+{
+  Wire.begin(I2C_SDA, I2C_SCL);
+  wire = &Wire;
+}
+
 void initSensors()
 {
   long error = HW_error;
   logln("[HW] -> Initialiting sensors");
-  Wire.begin(I2C_SDA, I2C_SCL);
-  wire = &Wire;
   initCurrentSensor();
   initRoomSensor();
   // sensors verification
-  while (!measureNTCTemperature())
+  while (!measureNTCTemperature(skinSensor))
     ;
   if (in3.temperature[skinSensor] < NTC_BABY_MIN)
   {
@@ -311,12 +335,12 @@ void initSensors()
   }
   if (updateRoomSensor())
   {
-    if (in3.temperature[airSensor] < DIG_TEMP_ROOM_MIN)
+    if (in3.temperature[digitalTempHumSensor] < DIG_TEMP_ROOM_MIN)
     {
       logln("[HW] -> Fail -> Room temperature is lower than expected");
       HW_error += DIG_TEMP_ROOM_MIN_ERROR;
     }
-    if (in3.temperature[airSensor] > DIG_TEMP_ROOM_MAX)
+    if (in3.temperature[digitalTempHumSensor] > DIG_TEMP_ROOM_MAX)
     {
       logln("[HW] -> Fail -> Room temperature is higher than expected");
       HW_error += DIG_TEMP_ROOM_MAX_ERROR;
@@ -378,7 +402,7 @@ void initSenseCircuit()
 
 void initializeTFT()
 {
-  tft.setController(ST7789V_CONTROLLER);
+  tft.setController(DISPLAY_CONTROLLER_IC);
   tft.begin(DISPLAY_SPI_CLK);
   tft.setRotation(DISPLAY_DEFAULT_ROTATION);
 }
@@ -389,7 +413,19 @@ void initTFT()
   float testCurrent, offsetCurrent;
   long processTime;
   offsetCurrent = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL);
-  digitalWrite(TFT_CS, LOW);
+#if (HW_NUM == 6)
+  initPin(TOUCH_CS, OUTPUT);
+  initPin(SD_CS, OUTPUT);
+  initPin(TFT_CS, OUTPUT);
+  initPin(TFT_RST, OUTPUT);
+  GPIOWrite(TOUCH_CS, HIGH);
+  GPIOWrite(SD_CS, HIGH);
+  GPIOWrite(TFT_CS, LOW);
+  GPIOWrite(TFT_RST, LOW); // alternating HIGH/LOW
+  delay(5);
+  GPIOWrite(TFT_RST, HIGH); // alternating HIGH/LOW
+  delay(5);
+#endif
   initializeTFT();
   loadlogo();
   processTime = millis();
@@ -430,7 +466,7 @@ void initTFT()
 void TFTRestore()
 {
   logln("[HW] -> restoring TFT previous status");
-  digitalWrite(TFT_CS, LOW);
+  GPIOWrite(TFT_CS, LOW);
   initializeTFT();
   switch (page)
   {
@@ -499,10 +535,10 @@ bool actuatorsTest()
   }
   vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT);
   offsetCurrent = measureMeanConsumption(PHOTOTHERAPY_SHUNT_CHANNEL);
-  digitalWrite(PHOTOTHERAPY, HIGH);
+  GPIOWrite(PHOTOTHERAPY, HIGH);
   vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT);
   testCurrent = measureMeanConsumption(PHOTOTHERAPY_SHUNT_CHANNEL) - offsetCurrent;
-  digitalWrite(PHOTOTHERAPY, LOW);
+  GPIOWrite(PHOTOTHERAPY, LOW);
   logln("[HW] -> Phototherapy current consumption: " + String(testCurrent) + " Amps");
   in3.phototherapy_current_test = testCurrent;
   if (testCurrent < PHOTOTHERAPY_CONSUMPTION_MIN)
@@ -537,12 +573,12 @@ bool actuatorsTest()
   }
   vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT);
   offsetCurrent = measureMeanConsumption(FAN_SHUNT_CHANNEL);
-  digitalWrite(FAN, HIGH);
+  GPIOWrite(FAN, HIGH);
   vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT);
   testCurrent = measureMeanConsumption(FAN_SHUNT_CHANNEL) - offsetCurrent;
   logln("[HW] -> FAN consumption: " + String(testCurrent) + " Amps");
   in3.fan_current_test = testCurrent;
-  digitalWrite(FAN, LOW);
+  GPIOWrite(FAN, LOW);
   if (testCurrent < FAN_CONSUMPTION_MIN)
   {
     HW_error += FAN_CONSUMPTION_MIN_ERROR;
@@ -568,26 +604,12 @@ bool actuatorsTest()
 
 bool initActuators()
 {
+#if (HW_NUM == 6)
+  in3_hum.begin(HUMIDIFIER_BINARY, HUMIDIFIER);
+#else
   in3_hum.begin();
-  return (actuatorsTest());
-}
-
-void checkTFTHealth()
-{
-  if (millis() - lastTFTCheck > TFTCheckPeriod)
-  {
-    uint8_t powerMode = tft.readcommand8(ILI9341_RDMODE);
-    uint8_t MADCTL = tft.readcommand8(ILI9341_RDMADCTL);
-    uint8_t pixelFormat = tft.readcommand8(ILI9341_RDPIXFMT);
-    uint8_t imageFormat = tft.readcommand8(ILI9341_RDIMGFMT);
-    uint8_t selfDiag = tft.readcommand8(ILI9341_RDSELFDIAG);
-    logln("[HW] -> TFT display status is: " + String(powerMode, HEX) + String(MADCTL, HEX) + String(pixelFormat, HEX) + String(imageFormat, HEX) + String(selfDiag, HEX));
-    if (!powerMode && !MADCTL && !pixelFormat && !imageFormat && !selfDiag)
-    {
-      TFTRestore();
-    }
-    lastTFTCheck = millis();
-  }
+#endif
+return (actuatorsTest());
 }
 
 void initHardware(bool printOutputTest)
@@ -595,9 +617,10 @@ void initHardware(bool printOutputTest)
   bool criticalError = false;
   initDebug();
   initEEPROM();
+  initI2C();
   initGPIO();
-  logln("[HW] -> Initialiting hardware");
   initSensors();
+  logln("[HW] -> Initialiting hardware");
   initSenseCircuit();
   initTFT();
   initPowerAlarm();
@@ -622,8 +645,9 @@ void initHardware(bool printOutputTest)
   in3.HW_test_error_code = HW_error;
   if (printOutputTest || criticalError)
   {
+    logln("[HW] -> PRINTING ERROR TO USER");
     drawHardwareErrorMessage(HW_error, criticalError);
-    while (digitalRead(ENC_SWITCH))
+    while (GPIORead(ENC_SWITCH))
     {
       updateData();
     }
@@ -632,4 +656,44 @@ void initHardware(bool printOutputTest)
   watchdogInit();
   initAlarms();
   // MQTT_init();
+}
+
+void initPin(uint8_t GPIO, uint8_t Mode)
+{
+  if (GPIO < GPIO_EXP_BASE)
+  {
+    pinMode(GPIO, Mode);
+  }
+  else
+  {
+    TCA.pinMode(GPIO - GPIO_EXP_BASE, Mode);
+  }
+}
+
+void GPIOWrite(uint8_t GPIO, uint8_t Mode)
+{
+  if (GPIO < GPIO_EXP_BASE)
+  {
+    GPIOWrite(GPIO, Mode);
+  }
+  else
+  {
+    logln("[HW] -> TCA9355 writing pin" + String(GPIO - GPIO_EXP_BASE) + " -> " + String(Mode));
+    if (!TCA.digitalWrite(GPIO - GPIO_EXP_BASE, Mode))
+    {
+      logln("[HW] -> TCA9355 WRITE ERROR");
+    }
+  }
+}
+
+bool GPIORead(uint8_t GPIO)
+{
+  if (GPIO < GPIO_EXP_BASE)
+  {
+    return (digitalRead(GPIO));
+  }
+  else
+  {
+    return (TCA.digitalRead(GPIO - GPIO_EXP_BASE));
+  }
 }

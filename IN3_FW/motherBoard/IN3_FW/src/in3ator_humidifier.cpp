@@ -27,48 +27,75 @@
 */
 
 #include "in3ator_humidifier.h"
+#include "main.h"
 
-void MAM_in3ator_Humidifier::_read(in3atorHum_param_t param, uint16_t *val) {
-    _i2c->beginTransmission(_i2c_addr);
-    _i2c->write(param); // parameter
-    _i2c->endTransmission();
+int activationMode;
+int controlPin;
 
-    _i2c->requestFrom(_i2c_addr, 2);
+void MAM_in3ator_Humidifier::_read(in3atorHum_param_t param, uint16_t *val)
+{
+	_i2c->beginTransmission(_i2c_addr);
+	_i2c->write(param); // parameter
+	_i2c->endTransmission();
 
-    if (_i2c->available())
-    {
-      *val = ((_i2c->read() << 8) | _i2c->read());
-    }
+	_i2c->requestFrom(_i2c_addr, 2);
+
+	if (_i2c->available())
+	{
+		*val = ((_i2c->read() << 8) | _i2c->read());
+	}
 }
 
-void MAM_in3ator_Humidifier::_write(in3atorHum_param_t param, uint16_t *val) {
-    _i2c->beginTransmission(_i2c_addr);
-    _i2c->write(param);                 // parameter
-    _i2c->write((*val >> 8) & 0xFF); // Upper 8-bits
-    _i2c->write(*val & 0xFF);        // Lower 8-bits
-    _i2c->endTransmission();
+void MAM_in3ator_Humidifier::_write(in3atorHum_param_t param, uint16_t *val)
+{
+	_i2c->beginTransmission(_i2c_addr);
+	_i2c->write(param);				 // parameter
+	_i2c->write((*val >> 8) & 0xFF); // Upper 8-bits
+	_i2c->write(*val & 0xFF);		 // Lower 8-bits
+	_i2c->endTransmission();
 }
 
-void MAM_in3ator_Humidifier::begin(TwoWire *theWire) {
-    _i2c = theWire;
-    _i2c->begin();
+void MAM_in3ator_Humidifier::begin(TwoWire *theWire)
+{
+	_i2c = theWire;
+	_i2c->begin();
 }
 
-uint16_t MAM_in3ator_Humidifier::getParam(in3atorHum_param_t param){
-    uint16_t val = 0;
-    _read(param, &val);
-    return val;
+void MAM_in3ator_Humidifier::begin(uint16_t mode, uint8_t pin)
+{
+	activationMode = mode;
+	controlPin = pin;
 }
 
-void MAM_in3ator_Humidifier::reset(){
 
+uint16_t MAM_in3ator_Humidifier::getParam(in3atorHum_param_t param)
+{
+	uint16_t val = 0;
+	_read(param, &val);
+	return val;
+}
+
+void MAM_in3ator_Humidifier::reset()
+{
 }
 
 void MAM_in3ator_Humidifier::turn(uint16_t mode)
 {
-int16_t val = false;
-if(mode){
-	val=true;
-}
-_write(IN3ATOR_HUM_ON, (uint16_t*)&val);
+	int16_t val = false;
+	switch (activationMode)
+	{
+	case HUMIDIFIER_BINARY:
+		GPIOWrite(controlPin, mode);
+		break;
+	case HUMIDIFIER_PWM:
+		break;
+	case HUMIDIFIER_I2C:
+	default:
+		if (mode)
+		{
+			val = true;
+		}
+		_write(IN3ATOR_HUM_ON, (uint16_t *)&val);
+		break;
+	}
 }

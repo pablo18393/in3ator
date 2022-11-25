@@ -36,9 +36,8 @@ extern bool WIFI_EN;
 extern long loopCounts;
 extern int page;
 extern int temperature_filter; // amount of temperature samples to filter
-extern long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
+extern long lastNTCmeasurement[numNTC], lastCurrentMeasurement, lastCurrentUpdate;
 
-extern int NTC_PIN[numNTC];
 extern double errorTemperature[numSensors], temperatureCalibrationPoint;
 extern double ReferenceTemperatureRange, ReferenceTemperatureLow;
 extern double provisionalReferenceTemperatureLow;
@@ -207,7 +206,7 @@ void stopActuation()
 
 void turnFans(bool mode)
 {
-  digitalWrite(FAN, mode * ongoingCriticalAlarm());
+  GPIOWrite(FAN, mode * ongoingCriticalAlarm());
 }
 
 void UI_actuatorsProgress()
@@ -320,7 +319,7 @@ void UI_actuatorsProgress()
   setTextColor(COLOR_WARNING_TEXT);
   drawStop();
   state_blink = true;
-  while (!digitalRead(ENC_SWITCH))
+  while (!GPIORead(ENC_SWITCH))
   {
     updateData();
   }
@@ -373,7 +372,7 @@ void UI_actuatorsProgress()
         PIDHandler();
       }
     }
-    while (!digitalRead(ENC_SWITCH))
+    while (!GPIORead(ENC_SWITCH))
     {
       updateData();
       exitActuation = back_mode();

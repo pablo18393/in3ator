@@ -36,9 +36,8 @@ extern long lastDebugUpdate;
 extern long loopCounts;
 extern int page;
 extern int temperature_filter; // amount of temperature samples to filter
-extern long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
+extern long lastNTCmeasurement[numNTC], lastCurrentMeasurement, lastCurrentUpdate;
 
-extern int NTC_PIN[numNTC];
 extern double errorTemperature[numSensors], temperatureCalibrationPoint;
 extern double ReferenceTemperatureRange, ReferenceTemperatureLow;
 extern double provisionalReferenceTemperatureLow;
@@ -269,12 +268,13 @@ void updateData()
     logln("[ALARM] -> maximum power exceeded");
     powerAlert = false;
   }
-  if (encPulseDetected && digitalRead(ENC_SWITCH))
+  if (encPulseDetected && GPIORead(ENC_SWITCH))
   {
     encPulseDetected = false;
   }
   if (millis() - lastDebugUpdate > debugUpdatePeriod)
   {
+
     if (airControlPID.GetMode() == AUTOMATIC)
     {
       logln("[PID] -> Heater PWM output is: " + String(100 * HeaterPIDOutput / BUZZER_MAX_PWR) + "%");
@@ -291,14 +291,20 @@ void updateData()
     {
       logln("[PID] -> Desired temp is: " + String(in3.desiredControlTemperature) + "ºC");
     }
-
-    logln("[SENSORS] -> System current consumption is: " + String(digitalCurrentSensor.getCurrent(INA3221_CH1), 4) + " Amps");
-    logln("[SENSORS] -> Phototherapy current consumption is: " + String(digitalCurrentSensor.getCurrent(INA3221_CH2), 4) + " Amps");
-    logln("[SENSORS] -> Fan current consumption is: " + String(digitalCurrentSensor.getCurrent(INA3221_CH3), 4) + " Amps");
+#if (HW_NUM == 6)
+    logln("[SENSORS] -> System current consumption is: " + String(in3.system_current) + " Amps");
+#else
+    if (digitalCurrentSensorPresent)
+    {
+      logln("[SENSORS] -> System current consumption is: " + String(digitalCurrentSensor.getCurrent(INA3221_CH1), 4) + " Amps");
+      logln("[SENSORS] -> Phototherapy current consumption is: " + String(digitalCurrentSensor.getCurrent(INA3221_CH2), 4) + " Amps");
+      logln("[SENSORS] -> Fan current consumption is: " + String(digitalCurrentSensor.getCurrent(INA3221_CH3), 4) + " Amps");
+    }
+#endif
     logln("[SENSORS] -> Baby temperature: " + String(in3.temperature[skinSensor]) + "ºC, correction error is " + String(errorTemperature[skinSensor]));
     logln("[SENSORS] -> Air temperature: " + String(in3.temperature[airSensor]) + "ºC, correction error is " + String(errorTemperature[airSensor]));
     logln("[SENSORS] -> Humidity: " + String(in3.humidity) + "%");
-    logln("[SENSORS] -> ON_OFF: " + String(digitalRead(ON_OFF_SWITCH)));
+    // logln("[SENSORS] -> ON_OFF: " + String(GPIORead(ON_OFF_SWITCH)));
     if (millis() - lastDebugUpdate)
     {
       logln("[LATENCY] -> Looped " + String(loopCounts * 1000 / (millis() - lastDebugUpdate)) + " Times per second");

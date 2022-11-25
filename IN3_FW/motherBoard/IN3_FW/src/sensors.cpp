@@ -37,7 +37,7 @@ extern long lastDebugUpdate;
 extern long loopCounts;
 extern int page;
 extern int temperature_filter; // amount of temperature samples to filter
-extern long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
+extern long lastNTCmeasurement[numNTC], lastCurrentMeasurement, lastCurrentUpdate;
 
 extern int NTC_PIN[numNTC];
 extern double errorTemperature[numSensors], temperatureCalibrationPoint;
@@ -69,8 +69,11 @@ extern bool WIFI_connection_status;
 extern bool roomSensorPresent;
 extern bool digitalCurrentSensorPresent;
 
-extern float instantTemperature[secondOrder_filter];
-extern float previousTemperature[secondOrder_filter];
+extern float instantTemperature[numNTC][secondOrder_filter];
+extern float previousTemperature[numNTC][secondOrder_filter];
+
+extern float instantCurrent[secondOrder_filter];
+extern float previousCurrent[secondOrder_filter];
 
 // room variables;
 extern boolean A_set;
@@ -144,18 +147,33 @@ extern in3ator_parameters in3;
 
 void sensorsHandler()
 {
-  measureNTCTemperature();
+  measureNTCTemperature(skinSensor);
+  #if (HW_NUM == 6)
+  measureNTCTemperature(airSensor);
+  #endif
   in3.system_current = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL);
   in3.system_voltage = measureMeanVoltage(SYSTEM_SHUNT_CHANNEL);
   // currentMonitor();
 }
 
-float measureMeanConsumption(int shunt)
+double measureMeanConsumption(int shunt)
 {
+#if (HW_NUM == 6)
+  previousCurrent[0] = analogRead(SYSTEM_CURRENT_SENSOR) * ANALOG_TO_AMP_FACTOR;
+  in3.system_current = butterworth2(instantCurrent[1], instantCurrent[2], previousCurrent[0], previousCurrent[1], previousCurrent[2]);
+  instantCurrent[0] = in3.system_current;
+  for (int i = 1; i >= 0; i--)
+  {
+    instantCurrent[i + 1] = instantCurrent[i];
+    previousCurrent[i + 1] = previousCurrent[i];
+  }
+  return (in3.system_current);
+#else
   if (digitalCurrentSensorPresent)
   {
     return (digitalCurrentSensor.getCurrent(ina3221_ch_t(shunt))); // Amperes
   }
+#endif
   return (false);
 }
 
@@ -192,43 +210,43 @@ float adcToCelsius(float adcReading, int maxAdcReading)
   return (beta / (log(rntc / r0) + (beta / temp0)) - 273); // Calcular la temperatura en Celsius
 }
 
-bool measureNTCTemperature()
+bool measureNTCTemperature(uint8_t NTC)
 {
   int NTCmeasurement;
-  if (micros() - lastNTCmeasurement > NTCMeasurementPeriod)
+  if (micros() - lastNTCmeasurement[NTC] > NTCMeasurementPeriod)
   {
-    NTCmeasurement = analogRead(NTC_PIN[skinSensor]);
+    NTCmeasurement = analogRead(NTC_PIN[NTC]);
     if (NTCmeasurement > minimumAllowedNTCMeasurement && NTCmeasurement < maximumAllowedNTCMeasurement)
     {
-      lastSuccesfullSensorUpdate[skinSensor] = millis();
-      previousTemperature[0] = adcToCelsius(NTCmeasurement, maxADCvalue);
-      in3.temperature[skinSensor] = butterworth2(instantTemperature[1], instantTemperature[2], previousTemperature[0], previousTemperature[1], previousTemperature[2]);
-      instantTemperature[0] = in3.temperature[skinSensor];
+      lastSuccesfullSensorUpdate[NTC] = millis();
+      previousTemperature[NTC][0] = adcToCelsius(NTCmeasurement, maxADCvalue);
+      in3.temperature[NTC] = butterworth2(instantTemperature[NTC][1], instantTemperature[NTC][2], previousTemperature[NTC][0], previousTemperature[NTC][1], previousTemperature[NTC][2]);
+      instantTemperature[NTC][0] = in3.temperature[NTC];
       for (int i = 1; i >= 0; i--)
       {
-        instantTemperature[i + 1] = instantTemperature[i];
-        previousTemperature[i + 1] = previousTemperature[i];
+        instantTemperature[NTC][i + 1] = instantTemperature[NTC][i];
+        previousTemperature[NTC][i + 1] = previousTemperature[NTC][i];
       }
-      errorTemperature[skinSensor] = in3.temperature[skinSensor];
-      if (RawTemperatureRange[skinSensor])
+      errorTemperature[NTC] = in3.temperature[NTC];
+      if (RawTemperatureRange[NTC])
       {
-        in3.temperature[skinSensor] = (((in3.temperature[skinSensor] - RawTemperatureLow[skinSensor]) * ReferenceTemperatureRange) / RawTemperatureRange[skinSensor]) + ReferenceTemperatureLow;
-        in3.temperature[skinSensor] += fineTuneSkinTemperature;
+        in3.temperature[NTC] = (((in3.temperature[NTC] - RawTemperatureLow[NTC]) * ReferenceTemperatureRange) / RawTemperatureRange[NTC]) + ReferenceTemperatureLow;
+        in3.temperature[NTC] += fineTuneSkinTemperature;
       }
-      errorTemperature[skinSensor] -= in3.temperature[skinSensor];
-      if (in3.temperature[skinSensor] < 0)
+      errorTemperature[NTC] -= in3.temperature[NTC];
+      if (in3.temperature[NTC] < 0)
       {
-        in3.temperature[skinSensor] = 0;
+        in3.temperature[NTC] = 0;
       }
-      if (in3.temperature[skinSensor] > temperatureMax[skinSensor])
+      if (in3.temperature[NTC] > temperatureMax[NTC])
       {
-        temperatureMax[skinSensor] = in3.temperature[skinSensor];
+        temperatureMax[NTC] = in3.temperature[NTC];
       }
-      if (in3.temperature[skinSensor] < temperatureMin[skinSensor])
+      if (in3.temperature[NTC] < temperatureMin[NTC])
       {
-        temperatureMin[skinSensor] = in3.temperature[skinSensor];
+        temperatureMin[NTC] = in3.temperature[NTC];
       }
-      lastNTCmeasurement = micros();
+      lastNTCmeasurement[NTC] = micros();
     }
     return true;
   }
@@ -248,16 +266,16 @@ bool updateRoomSensor()
       sensedTemperature = mySHTC3.toDegC();
       if (sensedTemperature > minTempToDiscard && sensedTemperature < maxTempToDiscard)
       {
-        lastSuccesfullSensorUpdate[airSensor] = millis();
-        in3.temperature[airSensor] = sensedTemperature; // Add here measurement to temp array
+        lastSuccesfullSensorUpdate[digitalTempHumSensor] = millis();
+        in3.temperature[digitalTempHumSensor] = sensedTemperature; // Add here measurement to temp array
         in3.humidity = mySHTC3.toPercent();
-        if (in3.temperature[airSensor] > temperatureMax[airSensor])
+        if (in3.temperature[digitalTempHumSensor] > temperatureMax[digitalTempHumSensor])
         {
-          temperatureMax[airSensor] = in3.temperature[airSensor];
+          temperatureMax[digitalTempHumSensor] = in3.temperature[digitalTempHumSensor];
         }
-        if (in3.temperature[airSensor] < temperatureMin[airSensor])
+        if (in3.temperature[digitalTempHumSensor] < temperatureMin[digitalTempHumSensor])
         {
-          temperatureMin[airSensor] = in3.temperature[airSensor];
+          temperatureMin[digitalTempHumSensor] = in3.temperature[digitalTempHumSensor];
         }
         return true;
       }

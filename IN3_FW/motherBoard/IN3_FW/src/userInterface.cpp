@@ -37,9 +37,8 @@ extern long lastDebugUpdate;
 extern long loopCounts;
 extern int page;
 extern int temperature_filter; // amount of temperature samples to filter
-extern long lastNTCmeasurement, lastCurrentMeasurement, lastCurrentUpdate;
+extern long lastNTCmeasurement[numNTC], lastCurrentMeasurement, lastCurrentUpdate;
 
-extern int NTC_PIN[numNTC];
 extern double errorTemperature[numSensors], temperatureCalibrationPoint;
 extern double ReferenceTemperatureRange, ReferenceTemperatureLow;
 extern double provisionalReferenceTemperatureLow;
@@ -184,7 +183,7 @@ void userInterfaceHandler(int UI_page)
       ypos = graphicHeight(bar_pos - 1);
     }
   }
-  if (!digitalRead(ENC_SWITCH))
+  if (!GPIORead(ENC_SWITCH))
   {
     selected = !selected;
     if (menu_rows)
@@ -216,7 +215,7 @@ void userInterfaceHandler(int UI_page)
           UI_mainMenu();
           break;
         case temperatureGraphicPosition:
-          while (digitalRead(ENC_SWITCH))
+          while (GPIORead(ENC_SWITCH))
           {
             updateData();
             if (EncMove)
@@ -258,7 +257,7 @@ void userInterfaceHandler(int UI_page)
           drawStartMessage(enableSet, menu_rows, helpMessage);
           break;
         case humidityGraphicPosition:
-          while (digitalRead(ENC_SWITCH))
+          while (GPIORead(ENC_SWITCH))
           {
             updateData();
             if (EncMove)
@@ -319,7 +318,7 @@ void userInterfaceHandler(int UI_page)
           {
             drawRightString(convertStringToChar(cstring, "OFF"), unitPosition, ypos, textFontSize);
           }
-          digitalWrite(PHOTOTHERAPY, in3.phototherapy);
+          GPIOWrite(PHOTOTHERAPY, in3.phototherapy);
           break;
         case settingsGraphicPosition:
           UI_settings();
@@ -333,7 +332,7 @@ void userInterfaceHandler(int UI_page)
         switch (bar_pos - graphicTextOffset)
         {
         case languageGraphicPosition:
-          while (digitalRead(ENC_SWITCH))
+          while (GPIORead(ENC_SWITCH))
           {
             updateData();
             if (EncMove)
@@ -389,7 +388,7 @@ void userInterfaceHandler(int UI_page)
           UI_settings();
           break;
         case serialNumberGraphicPosition:
-          while (digitalRead(ENC_SWITCH))
+          while (GPIORead(ENC_SWITCH))
           {
             updateData();
             if (EncMove)
@@ -482,7 +481,7 @@ void userInterfaceHandler(int UI_page)
         case temperatureCalibrationGraphicPosition:
           errorTemperature[skinSensor] = false;
           diffTemperature = in3.temperature[skinSensor];
-          while (digitalRead(ENC_SWITCH))
+          while (GPIORead(ENC_SWITCH))
           {
             updateData();
             if (EncMove)
@@ -512,7 +511,7 @@ void userInterfaceHandler(int UI_page)
         case temperatureCalibrationGraphicPosition:
           errorTemperature[skinSensor] = false;
           diffTemperature = in3.temperature[skinSensor];
-          while (digitalRead(ENC_SWITCH))
+          while (GPIORead(ENC_SWITCH))
           {
             updateData();
             if (EncMove)
@@ -539,7 +538,7 @@ void userInterfaceHandler(int UI_page)
         {
         case temperatureCalibrationGraphicPosition:
           diffTemperature = in3.temperature[skinSensor];
-          while (digitalRead(ENC_SWITCH))
+          while (GPIORead(ENC_SWITCH))
           {
             updateData();
             if (EncMove)
@@ -592,7 +591,7 @@ bool encoderContinuousPress(int UI_page)
   if (UI_page == mainMenuPage)
   {
     long timePressed = millis();
-    while (!digitalRead(ENC_SWITCH))
+    while (!GPIORead(ENC_SWITCH))
     {
       updateData();
       if (millis() - timePressed > timePressToSettings)
@@ -655,7 +654,7 @@ bool back_mode()
   vTaskDelay(debounceTime);
   last_encPulsed = millis();
   byte back_bar = false;
-  while (!digitalRead(ENC_SWITCH))
+  while (!GPIORead(ENC_SWITCH))
   {
     updateData();
     if (millis() - last_encPulsed > time_back_wait)

@@ -85,7 +85,7 @@ void initGPRS()
 {
   Serial2.begin(115200);
   GPRS.powerUp = true;
-  digitalWrite(GPRS_PWRKEY, HIGH);
+  GPIOWrite(GPRS_PWRKEY, HIGH);
 }
 
 void GPRS_get_triangulation_location()
@@ -158,7 +158,7 @@ void GPRSPowerUp()
   {
   case 0:
     GPRS.processTime = millis();
-    digitalWrite(GPRS_PWRKEY, LOW);
+    GPIOWrite(GPRS_PWRKEY, LOW);
     GPRS.process++;
     GPRS.packetSentenceTime = millis();
     logln("[GPRS] -> powering up GPRS");
@@ -166,7 +166,7 @@ void GPRSPowerUp()
   case 1:
     if (millis() - GPRS.packetSentenceTime > 500)
     {
-      digitalWrite(GPRS_PWRKEY, HIGH);
+      GPIOWrite(GPRS_PWRKEY, HIGH);
       GPRS.packetSentenceTime = millis();
       GPRS.process++;
       logln("[GPRS] -> GPRS powered");

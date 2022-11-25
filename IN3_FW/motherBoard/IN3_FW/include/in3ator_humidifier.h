@@ -30,45 +30,55 @@
 #include "Arduino.h"
 #include "Wire.h"
 
-typedef enum {
-	    DEFAULT_ADDRESS = 0x2,
+#define HUMIDIFIER_BINARY 0
+#define HUMIDIFIER_PWM 1
+#define HUMIDIFIER_I2C 2
+
+typedef enum
+{
+	DEFAULT_ADDRESS = 0x2,
 } in3atorHum_addr_t;
 
 // parameters
-typedef enum {
-    IN3ATOR_HUM_ON = 0,
+typedef enum
+{
+	IN3ATOR_HUM_ON = 0,
 } in3atorHum_param_t;
 
-class MAM_in3ator_Humidifier {
+class MAM_in3ator_Humidifier
+{
 
-    // Arduino's I2C library
-    TwoWire *_i2c;
+	// Arduino's I2C library
+	TwoWire *_i2c;
 
-    // I2C address
-    in3atorHum_addr_t _i2c_addr;
+	// I2C address
+	in3atorHum_addr_t _i2c_addr;
 
-    // Reads 16 bytes from a parameter.
-    void _read(in3atorHum_param_t param, uint16_t *val);
+	// Reads 16 bytes from a parameter.
+	void _read(in3atorHum_param_t param, uint16_t *val);
 
-    // Writes 16 bytes to a parameter.
-    void _write(in3atorHum_param_t param, uint16_t *val);
+	// Writes 16 bytes to a parameter.
+	void _write(in3atorHum_param_t param, uint16_t *val);
 
 public:
-
-    MAM_in3ator_Humidifier(in3atorHum_addr_t addr) : _i2c_addr(addr) {};
+	MAM_in3ator_Humidifier(in3atorHum_addr_t addr) : _i2c_addr(addr){};
 	//    MAM_in3ator_Humidifier();
 
-    // Initializes INA3221
-    void begin(TwoWire *theWire = &Wire);
+	// Initializes i2c humidifier
+	void begin(TwoWire *theWire = &Wire);
 
-    // Gets a parameter value.
-    uint16_t getParam(in3atorHum_param_t param);
+	// Initializes i2c humidifier
+	void begin(uint16_t mode, uint8_t pin);
 
-    // Resets Humidifier
-    void reset();
-	
+	// Gets a parameter value.
+	uint16_t getParam(in3atorHum_param_t param);
+
+	// Resets Humidifier
+	void reset();
+
 	// Sets humidifier ON
 	void turn(uint16_t mode);
+
 };
 
 #endif
