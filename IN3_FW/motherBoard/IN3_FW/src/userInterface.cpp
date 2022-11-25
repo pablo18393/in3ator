@@ -42,13 +42,13 @@ extern long lastNTCmeasurement[numNTC], lastCurrentMeasurement, lastCurrentUpdat
 extern double errorTemperature[numSensors], temperatureCalibrationPoint;
 extern double ReferenceTemperatureRange, ReferenceTemperatureLow;
 extern double provisionalReferenceTemperatureLow;
-extern double fineTuneSkinTemperature;
+extern double fineTuneSkinTemperature, fineTuneAirTemperature;
 extern double RawTemperatureLow[numSensors], RawTemperatureRange[numSensors];
 extern double provisionalRawTemperatureLow[numSensors];
 extern double temperatureMax[numSensors], temperatureMin[numSensors];
 extern int temperatureArray[numNTC][analog_temperature_filter]; // variable to handle each NTC with the array of last samples (only for NTC)
 extern int temperature_array_pos;                               // temperature sensor number turn to measure
-extern float diffTemperature;                                   // difference between measured temperature and user input real temperature
+extern float diffSkinTemperature, diffAirTemperature;                                   // difference between measured temperature and user input real temperature
 extern bool humidifierState, humidifierStateChange;
 extern int previousHumidity; // previous sampled humidity
 extern float diffHumidity;   // difference between measured humidity and user input real humidity
@@ -480,25 +480,30 @@ void userInterfaceHandler(int UI_page)
         {
         case temperatureCalibrationGraphicPosition:
           errorTemperature[skinSensor] = false;
-          diffTemperature = in3.temperature[skinSensor];
+          diffSkinTemperature = in3.temperature[skinSensor];
+          diffAirTemperature = in3.temperature[airSensor];
           while (GPIORead(ENC_SWITCH))
           {
             updateData();
             if (EncMove)
             {
               setTextColor(COLOR_MENU);
-              drawFloat(diffTemperature, 1, valuePosition, ypos, textFontSize);
+              drawFloat(diffSkinTemperature, 1, valuePosition, ypos, textFontSize);
               setTextColor(COLOR_MENU_TEXT);
-              diffTemperature += EncMove * (0.1);
-              drawFloat(diffTemperature, 1, valuePosition, ypos, textFontSize);
+              diffSkinTemperature += EncMove * (0.1);
+              diffAirTemperature += EncMove * (0.1);
+              drawFloat(diffSkinTemperature, 1, valuePosition, ypos, textFontSize);
               EncMove = false;
             }
           }
           break;
         case setCalibrationGraphicPosition:
-          fineTuneSkinTemperature = diffTemperature - in3.temperature[skinSensor];
-          logln("[CALIBRATION] -> Fine tune value is " + String(fineTuneSkinTemperature));
+          fineTuneSkinTemperature = diffSkinTemperature - in3.temperature[skinSensor];
+          fineTuneAirTemperature = diffAirTemperature - in3.temperature[airSensor];
+          logln("[CALIBRATION] -> Fine tune Skin value is " + String(fineTuneSkinTemperature));
+          logln("[CALIBRATION] -> Fine tune Air value is " + String(fineTuneAirTemperature));
           EEPROM.writeFloat(EEPROM_FineTuneSkinTemperature, fineTuneSkinTemperature);
+          EEPROM.writeFloat(EEPROM_FineTuneAirTemperature, fineTuneAirTemperature);
           EEPROM.commit();
           UI_mainMenu();
           break;
@@ -510,23 +515,25 @@ void userInterfaceHandler(int UI_page)
         {
         case temperatureCalibrationGraphicPosition:
           errorTemperature[skinSensor] = false;
-          diffTemperature = in3.temperature[skinSensor];
+          diffSkinTemperature = in3.temperature[skinSensor];
+          diffAirTemperature = in3.temperature[airSensor];
           while (GPIORead(ENC_SWITCH))
           {
             updateData();
             if (EncMove)
             {
               setTextColor(COLOR_MENU);
-              drawFloat(diffTemperature, 1, valuePosition, ypos, textFontSize);
+              drawFloat(diffSkinTemperature, 1, valuePosition, ypos, textFontSize);
               setTextColor(COLOR_MENU_TEXT);
-              diffTemperature += EncMove * (0.1);
-              drawFloat(diffTemperature, 1, valuePosition, ypos, textFontSize);
+              diffSkinTemperature += EncMove * (0.1);
+              diffAirTemperature += EncMove * (0.1);
+              drawFloat(diffSkinTemperature, 1, valuePosition, ypos, textFontSize);
               EncMove = false;
             }
           }
           break;
         case setCalibrationGraphicPosition:
-          provisionalReferenceTemperatureLow = diffTemperature;
+          provisionalReferenceTemperatureLow = diffSkinTemperature;
           provisionalRawTemperatureLow[skinSensor] = in3.temperature[skinSensor];
           logln("[CALIBRATION] -> Low reference point is " + String(provisionalReferenceTemperatureLow) + ", low raw skin point is " + String(provisionalRawTemperatureLow[skinSensor]));
           secondPointCalibration();
@@ -537,26 +544,26 @@ void userInterfaceHandler(int UI_page)
         switch (bar_pos - graphicTextOffset)
         {
         case temperatureCalibrationGraphicPosition:
-          diffTemperature = in3.temperature[skinSensor];
+          diffSkinTemperature = in3.temperature[skinSensor];
           while (GPIORead(ENC_SWITCH))
           {
             updateData();
             if (EncMove)
             {
               setTextColor(COLOR_MENU);
-              drawFloat(diffTemperature, 1, valuePosition, ypos, textFontSize);
+              drawFloat(diffSkinTemperature, 1, valuePosition, ypos, textFontSize);
               setTextColor(COLOR_MENU_TEXT);
-              diffTemperature += EncMove * (0.1);
-              drawFloat(diffTemperature, 1, valuePosition, ypos, textFontSize);
+              diffSkinTemperature += EncMove * (0.1);
+              drawFloat(diffSkinTemperature, 1, valuePosition, ypos, textFontSize);
               EncMove = false;
-              logln("difTemp: " + String(diffTemperature));
+              logln("difTemp: " + String(diffSkinTemperature));
             }
           }
           break;
         case setCalibrationGraphicPosition:
           ReferenceTemperatureLow = provisionalReferenceTemperatureLow;
           RawTemperatureLow[skinSensor] = provisionalRawTemperatureLow[skinSensor];
-          ReferenceTemperatureRange = diffTemperature - ReferenceTemperatureLow;
+          ReferenceTemperatureRange = diffSkinTemperature - ReferenceTemperatureLow;
           if (RawTemperatureRange[skinSensor])
           {
             RawTemperatureRange[skinSensor] = (in3.temperature[skinSensor] - RawTemperatureLow[skinSensor]);

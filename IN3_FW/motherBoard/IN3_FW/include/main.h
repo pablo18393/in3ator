@@ -62,6 +62,7 @@
 #define EEPROM_ReferenceTemperatureRange 170
 #define EEPROM_ReferenceTemperatureLow 180
 #define EEPROM_FineTuneSkinTemperature 190
+#define EEPROM_FineTuneAirTemperature 194
 #define EEPROM_THINGSBOARD_PROVISIONED 200
 #define EEPROM_THINGSBOARD_TOKEN 205
 

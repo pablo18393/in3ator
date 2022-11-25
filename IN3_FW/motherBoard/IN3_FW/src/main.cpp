@@ -50,13 +50,13 @@ int NTC_PIN[numNTC] = {BABY_NTC_PIN};
 double errorTemperature[numSensors], temperatureCalibrationPoint;
 double ReferenceTemperatureRange, ReferenceTemperatureLow;
 double provisionalReferenceTemperatureLow;
-double fineTuneSkinTemperature;
+double fineTuneSkinTemperature, fineTuneAirTemperature;
+float diffSkinTemperature, diffAirTemperature;                                   // difference between measured temperature and user input real temperature
 double RawTemperatureLow[numSensors], RawTemperatureRange[numSensors];
 double provisionalRawTemperatureLow[numSensors];
 double temperatureMax[numSensors], temperatureMin[numSensors];
 int temperatureArray[numNTC][analog_temperature_filter]; // variable to handle each NTC with the array of last samples (only for NTC)
 int temperature_array_pos;                               // temperature sensor number turn to measure
-float diffTemperature;                                   // difference between measured temperature and user input real temperature
 bool humidifierState, humidifierStateChange;
 int previousHumidity; // previous sampled humidity
 float diffHumidity;   // difference between measured humidity and user input real humidity

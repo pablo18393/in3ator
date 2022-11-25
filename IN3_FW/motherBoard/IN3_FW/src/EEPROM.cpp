@@ -33,7 +33,7 @@ extern bool controlAlgorithm;
 extern int presetTemp[2]; // preset baby skin temperature
 extern double RawTemperatureLow[numSensors], RawTemperatureRange[numSensors];
 extern double ReferenceTemperatureRange, ReferenceTemperatureLow;
-extern double fineTuneSkinTemperature;
+extern double fineTuneSkinTemperature, fineTuneAirTemperature;
 
 extern in3ator_parameters in3;
 extern struct GPRSstruct GPRS;
@@ -124,6 +124,7 @@ void recapVariables()
   ReferenceTemperatureRange = EEPROM.readFloat(EEPROM_ReferenceTemperatureRange);
   ReferenceTemperatureLow = EEPROM.readFloat(EEPROM_ReferenceTemperatureLow);
   fineTuneSkinTemperature = EEPROM.readFloat(EEPROM_FineTuneSkinTemperature);
+  fineTuneAirTemperature = EEPROM.readFloat(EEPROM_FineTuneAirTemperature);
   for (int i = 0; i < numSensors; i++)
   {
     logln("calibration factors: " + String(RawTemperatureLow[i]) + "," + String(RawTemperatureRange[i]) + "," + String(ReferenceTemperatureRange) + "," + String(ReferenceTemperatureLow));
@@ -158,5 +159,6 @@ void saveCalibrationToEEPROM()
   EEPROM.writeFloat(EEPROM_ReferenceTemperatureRange, ReferenceTemperatureRange);
   EEPROM.writeFloat(EEPROM_ReferenceTemperatureLow, ReferenceTemperatureLow);
   EEPROM.writeFloat(EEPROM_FineTuneSkinTemperature, fineTuneSkinTemperature);
+  EEPROM.writeFloat(EEPROM_FineTuneAirTemperature, fineTuneAirTemperature);
   EEPROM.commit();
 }

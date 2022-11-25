@@ -43,13 +43,13 @@ extern int NTC_PIN[numNTC];
 extern double errorTemperature[numSensors], temperatureCalibrationPoint;
 extern double ReferenceTemperatureRange, ReferenceTemperatureLow;
 extern double provisionalReferenceTemperatureLow;
-extern double fineTuneSkinTemperature;
+extern double fineTuneSkinTemperature, fineTuneAirTemperature;
 extern double RawTemperatureLow[numSensors], RawTemperatureRange[numSensors];
 extern double provisionalRawTemperatureLow[numSensors];
 extern double temperatureMax[numSensors], temperatureMin[numSensors];
 extern int temperatureArray[numNTC][analog_temperature_filter]; // variable to handle each NTC with the array of last samples (only for NTC)
 extern int temperature_array_pos;                               // temperature sensor number turn to measure
-extern float diffTemperature;                                   // difference between measured temperature and user input real temperature
+extern float diffSkinTemperature, diffAirTemperature;           // difference between measured temperature and user input real temperature
 extern bool humidifierState, humidifierStateChange;
 extern int previousHumidity; // previous sampled humidity
 extern float diffHumidity;   // difference between measured humidity and user input real humidity
@@ -148,9 +148,9 @@ extern in3ator_parameters in3;
 void sensorsHandler()
 {
   measureNTCTemperature(skinSensor);
-  #if (HW_NUM == 6)
+#if (HW_NUM == 6)
   measureNTCTemperature(airSensor);
-  #endif
+#endif
   in3.system_current = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL);
   in3.system_voltage = measureMeanVoltage(SYSTEM_SHUNT_CHANNEL);
   // currentMonitor();
@@ -159,13 +159,16 @@ void sensorsHandler()
 double measureMeanConsumption(int shunt)
 {
 #if (HW_NUM == 6)
-  previousCurrent[0] = analogRead(SYSTEM_CURRENT_SENSOR) * ANALOG_TO_AMP_FACTOR;
-  in3.system_current = butterworth2(instantCurrent[1], instantCurrent[2], previousCurrent[0], previousCurrent[1], previousCurrent[2]);
-  instantCurrent[0] = in3.system_current;
-  for (int i = 1; i >= 0; i--)
+  for (int i = 0; i < CURRENT_MEASURES_AMOUNT; i++)
   {
-    instantCurrent[i + 1] = instantCurrent[i];
-    previousCurrent[i + 1] = previousCurrent[i];
+    previousCurrent[0] = analogRead(SYSTEM_CURRENT_SENSOR) * ANALOG_TO_AMP_FACTOR;
+    in3.system_current = butterworth2(instantCurrent[1], instantCurrent[2], previousCurrent[0], previousCurrent[1], previousCurrent[2]);
+    instantCurrent[0] = in3.system_current;
+    for (int i = 1; i >= 0; i--)
+    {
+      instantCurrent[i + 1] = instantCurrent[i];
+      previousCurrent[i + 1] = previousCurrent[i];
+    }
   }
   return (in3.system_current);
 #else
@@ -231,7 +234,14 @@ bool measureNTCTemperature(uint8_t NTC)
       if (RawTemperatureRange[NTC])
       {
         in3.temperature[NTC] = (((in3.temperature[NTC] - RawTemperatureLow[NTC]) * ReferenceTemperatureRange) / RawTemperatureRange[NTC]) + ReferenceTemperatureLow;
+      }
+      if (NTC == skinSensor)
+      {
         in3.temperature[NTC] += fineTuneSkinTemperature;
+      }
+      else
+      {
+        in3.temperature[NTC] += fineTuneAirTemperature;
       }
       errorTemperature[NTC] -= in3.temperature[NTC];
       if (in3.temperature[NTC] < 0)
