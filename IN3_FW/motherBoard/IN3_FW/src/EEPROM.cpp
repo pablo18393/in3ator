@@ -77,6 +77,7 @@ void initEEPROM()
     logln("[FLASH] -> Loading variables stored in flash");
     recapVariables();
   }
+  logln("[FLASH] -> Variables loaded");
 }
 
 void loaddefaultValues()

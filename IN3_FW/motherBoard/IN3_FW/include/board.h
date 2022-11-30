@@ -23,10 +23,10 @@
 
 */
 
-#define HW_NUM 6
-#define HW_REVISION 'B'
+#define HW_NUM 9
+#define HW_REVISION 'A'
 #define HWversion String(HW_NUM) + "." + String(HW_REVISION)
-#define FWversion "10.5"
+#define FWversion "10.6"
 #define WIFI_NAME "In3_v" + String(FWversion) + "/" + String(HWversion)
 #define headingTitle "in3ator"
 
@@ -48,7 +48,7 @@
 
 #define GPIO_EXP_BASE 100 // To differentiate with ESP32 GPIO
 
-#if (HW_NUM == 9)
+#if (HW_NUM >= 9)
 // PINOUT
 #define TFT_DC 0
 #define ENC_SWITCH 4

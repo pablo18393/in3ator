@@ -341,7 +341,7 @@ void drawBack();
 void drawActuatorsSeparators();
 void drawStop();
 void drawHelpMessage(byte UI_language);
-void printLoadingTemperatureBar(int UI_desiredControlTemperature);
+void printLoadingTemperatureBar(double UI_desiredControlTemperature);
 void printLoadingHumidityBar(int UI_desiredControlHumidity);
 void blinkGoBackMessage();
 bool ongoingAlarms();

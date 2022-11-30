@@ -48,7 +48,7 @@ extern double provisionalRawTemperatureLow[numSensors];
 extern double temperatureMax[numSensors], temperatureMin[numSensors];
 extern int temperatureArray[numNTC][analog_temperature_filter]; // variable to handle each NTC with the array of last samples (only for NTC)
 extern int temperature_array_pos;                               // temperature sensor number turn to measure
-extern float diffSkinTemperature, diffAirTemperature;                                   // difference between measured temperature and user input real temperature
+extern float diffSkinTemperature, diffAirTemperature;           // difference between measured temperature and user input real temperature
 extern bool humidifierState, humidifierStateChange;
 extern int previousHumidity; // previous sampled humidity
 extern float diffHumidity;   // difference between measured humidity and user input real humidity
@@ -220,6 +220,13 @@ void userInterfaceHandler(int UI_page)
             updateData();
             if (EncMove)
             {
+              if (!in3.temperatureControl)
+              {
+                in3.temperatureControl = true;
+                drawRightString(convertStringToChar(cstring, initialSensorsValue), initialSensorPosition, temperatureY, textFontSize);
+                setTextColor(COLOR_MENU_TEXT);
+                drawFloat(in3.desiredControlTemperature, 1, temperatureX - 65, temperatureY, textFontSize);
+              }
               if (EncMove > 0)
               {
                 if (in3.desiredControlTemperature > minDesiredTemp[in3.controlMode])
@@ -237,11 +244,6 @@ void userInterfaceHandler(int UI_page)
               if (updateUIData)
               {
                 setTextColor(COLOR_MENU);
-                if (!in3.temperatureControl)
-                {
-                  in3.temperatureControl = true;
-                  drawRightString(convertStringToChar(cstring, initialSensorsValue), initialSensorPosition, temperatureY, textFontSize);
-                }
                 drawFloat(in3.desiredControlTemperature, 1, temperatureX - 65, temperatureY, textFontSize);
                 in3.desiredControlTemperature -= float(EncMove) * stepTemperatureIncrement;
                 setTextColor(COLOR_MENU_TEXT);
@@ -262,6 +264,14 @@ void userInterfaceHandler(int UI_page)
             updateData();
             if (EncMove)
             {
+              if (!in3.humidityControl)
+              {
+                in3.humidityControl = true;
+                setTextColor(COLOR_MENU);
+                drawRightString(convertStringToChar(cstring, initialSensorsValue), initialSensorPosition, humidityY, textFontSize);
+                setTextColor(COLOR_MENU_TEXT);
+                drawCentreNumber(in3.desiredControlHumidity, humidityX - 65, humidityY);
+              }
               if (EncMove > 0)
               {
                 if (in3.desiredControlHumidity > minHum)
@@ -279,11 +289,6 @@ void userInterfaceHandler(int UI_page)
               if (updateUIData)
               {
                 setTextColor(COLOR_MENU);
-                if (!in3.humidityControl)
-                {
-                  in3.humidityControl = true;
-                  drawRightString(convertStringToChar(cstring, initialSensorsValue), initialSensorPosition, humidityY, textFontSize);
-                }
                 drawCentreNumber(in3.desiredControlHumidity, humidityX - 65, humidityY);
                 in3.desiredControlHumidity -= (EncMove)*stepHumidityIncrement;
                 setTextColor(COLOR_MENU_TEXT);

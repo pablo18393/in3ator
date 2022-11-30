@@ -420,7 +420,7 @@ void drawActuatorsSeparators()
   tft.fillRect(0, separatorBotYPos, tft.width(), barThickness, COLOR_FRAME_BAR);
 }
 
-void printLoadingTemperatureBar(int UI_desiredControlTemperature)
+void printLoadingTemperatureBar(double UI_desiredControlTemperature)
 {
   drawFloat(UI_desiredControlTemperature, 1, tft.width() - 5 * letter_width, temperatureY, textFontSize);
   for (int i = true; i <= barThickness; i++)

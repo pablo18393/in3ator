@@ -48,7 +48,7 @@ extern double provisionalRawTemperatureLow[numSensors];
 extern double temperatureMax[numSensors], temperatureMin[numSensors];
 extern int temperatureArray[numNTC][analog_temperature_filter]; // variable to handle each NTC with the array of last samples (only for NTC)
 extern int temperature_array_pos;                               // temperature sensor number turn to measure
-extern float diffSkinTemperature, diffAirTemperature;                                   // difference between measured temperature and user input real temperature
+extern float diffSkinTemperature, diffAirTemperature;           // difference between measured temperature and user input real temperature
 extern bool humidifierState, humidifierStateChange;
 extern int previousHumidity; // previous sampled humidity
 extern float diffHumidity;   // difference between measured humidity and user input real humidity
@@ -216,6 +216,7 @@ void initDebug()
 
 void initPWMGPIO()
 {
+  logln("[HW] -> Initialiting PWM GPIOs");
   ledcSetup(SCREENBACKLIGHT_PWM_CHANNEL, DEFAULT_PWM_FREQUENCY, DEFAULT_PWM_RESOLUTION);
   ledcSetup(HEATER_PWM_CHANNEL, DEFAULT_PWM_FREQUENCY, DEFAULT_PWM_RESOLUTION);
   ledcSetup(BUZZER_PWM_CHANNEL, DEFAULT_PWM_FREQUENCY, DEFAULT_PWM_RESOLUTION);
@@ -225,10 +226,12 @@ void initPWMGPIO()
   ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, false);
   ledcWrite(HEATER_PWM_CHANNEL, false);
   ledcWrite(BUZZER_PWM_CHANNEL, false);
+  logln("[HW] -> PWM GPIOs initialized");
 }
 
 void initGPIO()
 {
+  logln("[HW] -> Initializing GPIOs");
 #if (HW_NUM == 6)
   TCA.begin();
   for (int pin = 0; pin < 16; pin++)
@@ -262,8 +265,10 @@ void initGPIO()
   initPin(SCREENBACKLIGHT, OUTPUT);
   initPin(ACTUATORS_EN, OUTPUT);
   GPIOWrite(ACTUATORS_EN, HIGH);
+  GPIOWrite(PHOTOTHERAPY, LOW);
   // initPin(ON_OFF_SWITCH, INPUT);
   initPWMGPIO();
+  logln("[HW] -> GPIOs initilialized");
 }
 
 void initInterrupts()
@@ -287,6 +292,7 @@ void initRoomSensor()
 
 void initCurrentSensor()
 {
+  logln("[HW] -> Initialiting current sensor");
   wire->beginTransmission(digitalCurrentSensor_i2c_address);
   digitalCurrentSensorPresent = !(wire->endTransmission());
   if (digitalCurrentSensorPresent)
@@ -311,8 +317,10 @@ void initPowerAlarm()
 
 void initI2C()
 {
+  logln("[HW] -> Initializing i2c port");
   Wire.begin(I2C_SDA, I2C_SCL);
   wire = &Wire;
+  logln("[HW] -> I2c port initialized");
 }
 
 void initSensors()
@@ -610,7 +618,7 @@ bool initActuators()
 #else
   in3_hum.begin();
 #endif
-return (actuatorsTest());
+  return (actuatorsTest());
 }
 
 void initHardware(bool printOutputTest)
@@ -628,11 +636,11 @@ void initHardware(bool printOutputTest)
   initBuzzer();
   initInterrupts();
   PIDInit();
-  #if (HW_NUM == 6)
+#if (HW_NUM == 6)
   initActuators();
-  #else
+#else
   criticalError = initActuators();
-  #endif
+#endif
   initGPRS();
   if (WIFI_EN)
   {
@@ -678,7 +686,7 @@ void GPIOWrite(uint8_t GPIO, uint8_t Mode)
 {
   if (GPIO < GPIO_EXP_BASE)
   {
-    GPIOWrite(GPIO, Mode);
+    digitalWrite(GPIO, Mode);
   }
   else
   {
