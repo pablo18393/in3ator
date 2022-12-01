@@ -246,7 +246,11 @@
 
 #define BACKLIGHT_NO_INTERACTION_TIME 12000 // time to decrease backlight display if no user actions
 
-#define GPRS_TASK_PERIOD 500
+#define GPRS_TASK_PERIOD 100
+#define OTA_TASK_PERIOD 100
+#define SENSORS_TASK_PERIOD 1
+#define BUZZER_TASK_PERIOD 10
+#define BACKLIGHT_TASK_PERIOD 10
 #define BACKLIGHT_DELAY 1
 #define INIT_TFT_DELAY 300
 
@@ -387,6 +391,7 @@ void watchdogInit();
 void initAlarms();
 void IRAM_ATTR encSwitchHandler();
 void IRAM_ATTR encoderISR();
+void backlightHandler();
 
 bool measureNTCTemperature(uint8_t);
 void loadlogo();

@@ -51,7 +51,7 @@ double errorTemperature[numSensors], temperatureCalibrationPoint;
 double ReferenceTemperatureRange, ReferenceTemperatureLow;
 double provisionalReferenceTemperatureLow;
 double fineTuneSkinTemperature, fineTuneAirTemperature;
-float diffSkinTemperature, diffAirTemperature;                                   // difference between measured temperature and user input real temperature
+float diffSkinTemperature, diffAirTemperature; // difference between measured temperature and user input real temperature
 double RawTemperatureLow[numSensors], RawTemperatureRange[numSensors];
 double provisionalRawTemperatureLow[numSensors];
 double temperatureMax[numSensors], temperatureMin[numSensors];
@@ -165,6 +165,42 @@ void GPRS_Task(void *pvParameters)
   }
 }
 
+void Backlight_Task(void *pvParameters)
+{
+  for (;;)
+  {
+    backlightHandler();
+    vTaskDelay(BACKLIGHT_TASK_PERIOD / portTICK_PERIOD_MS);
+  }
+}
+
+void sensors_Task(void *pvParameters)
+{
+  for (;;)
+  {
+    sensorsHandler();
+    vTaskDelay(SENSORS_TASK_PERIOD / portTICK_PERIOD_MS);
+  }
+}
+
+void OTA_Task(void *pvParameters)
+{
+  for (;;)
+  {
+    OTAHandler();
+    vTaskDelay(OTA_TASK_PERIOD / portTICK_PERIOD_MS);
+  }
+}
+
+void buzzer_Task(void *pvParameters)
+{
+  for (;;)
+  {
+    buzzerHandler();
+    vTaskDelay(BUZZER_TASK_PERIOD / portTICK_PERIOD_MS);
+  }
+}
+
 void setup()
 {
   initHardware(false);
@@ -176,6 +212,31 @@ void setup()
     ;
   ;
   logln("GPRS task successfully created!\n");
+/*
+  logln("Creating Backlight task ...\n");
+  while (xTaskCreatePinnedToCore(Backlight_Task, (const char *)"BACKLIGHT", 4096, NULL, 1, NULL, 1) != pdPASS)
+    ;
+  ;
+  logln("Backlight task successfully created!\n");
+
+  logln("Creating sensors task ...\n");
+  while (xTaskCreatePinnedToCore(sensors_Task, (const char *)"SENSORS", 4096, NULL, 1, NULL, 1) != pdPASS)
+    ;
+  ;
+  logln("sensors task successfully created!\n");
+
+  logln("Creating OTA task ...\n");
+  while (xTaskCreatePinnedToCore(OTA_Task, (const char *)"OTA", 4096, NULL, 1, NULL, 1) != pdPASS)
+    ;
+  ;
+  logln("OTA task successfully created!\n");
+
+  logln("Creating buzzer task ...\n");
+  while (xTaskCreatePinnedToCore(buzzer_Task, (const char *)"BUZZER", 4096, NULL, 1, NULL, 1) != pdPASS)
+    ;
+  ;
+  logln("Buzzer task successfully created!\n");
+  */
 }
 
 void loop()
