@@ -48,7 +48,7 @@ extern double provisionalRawTemperatureLow[numSensors];
 extern double temperatureMax[numSensors], temperatureMin[numSensors];
 extern int temperatureArray[numNTC][analog_temperature_filter]; // variable to handle each NTC with the array of last samples (only for NTC)
 extern int temperature_array_pos;                               // temperature sensor number turn to measure
-extern float diffSkinTemperature, diffAirTemperature;                                   // difference between measured temperature and user input real temperature
+extern float diffSkinTemperature, diffAirTemperature;           // difference between measured temperature and user input real temperature
 extern bool humidifierState, humidifierStateChange;
 extern int previousHumidity; // previous sampled humidity
 extern float diffHumidity;   // difference between measured humidity and user input real humidity
@@ -92,8 +92,7 @@ extern int humidityX;
 extern int humidityY;
 extern int temperatureX;
 extern int temperatureY;
-extern int separatorTopYPos;
-extern int separatorBotYPos;
+extern int separatorTopYPos, separatorMidYPos, separatorBotYPos;
 extern int ypos;
 extern bool print_text;
 extern int initialSensorPosition;
@@ -159,13 +158,13 @@ void setSensorsGraphicPosition(int UI_page)
     tempBarPosX = tft.width() / 2;
     tempBarPosY = tft.height() / 3 - 11;
     humBarPosX = tempBarPosX;
-    humBarPosY = 3 * tft.height() / 4 + 35;
+    humBarPosY = tft.height() * 3 / 4 + 15;
     temperatureX = letter_width;
     temperatureY = tempBarPosY - barHeight / 2;
-    humidityX = 2 * letter_width;
+    humidityX = 4 * letter_width;
     humidityY = humBarPosY - barHeight / 2;
     separatorTopYPos = tft.height() / 3 + 5;
-    separatorBotYPos = tft.height() * 2 / 3 + 10;
+    separatorMidYPos = tft.height() * 2 / 3 - 10;
     break;
   }
 }
@@ -417,7 +416,7 @@ void drawStartMessage(bool UI_enableSet, int UI_menu_rows, char *UI_helpMessage)
 void drawActuatorsSeparators()
 {
   tft.fillRect(0, separatorTopYPos, tft.width(), barThickness, COLOR_FRAME_BAR);
-  tft.fillRect(0, separatorBotYPos, tft.width(), barThickness, COLOR_FRAME_BAR);
+  tft.fillRect(0, separatorMidYPos, tft.width(), barThickness, COLOR_FRAME_BAR);
 }
 
 void printLoadingTemperatureBar(double UI_desiredControlTemperature)

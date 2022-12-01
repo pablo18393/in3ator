@@ -47,7 +47,7 @@ extern double provisionalRawTemperatureLow[numSensors];
 extern double temperatureMax[numSensors], temperatureMin[numSensors];
 extern int temperatureArray[numNTC][analog_temperature_filter]; // variable to handle each NTC with the array of last samples (only for NTC)
 extern int temperature_array_pos;                               // temperature sensor number turn to measure
-extern float diffSkinTemperature, diffAirTemperature;                                   // difference between measured temperature and user input real temperature
+extern float diffSkinTemperature, diffAirTemperature;           // difference between measured temperature and user input real temperature
 extern bool humidifierState, humidifierStateChange;
 extern int previousHumidity; // previous sampled humidity
 extern float diffHumidity;   // difference between measured humidity and user input real humidity
@@ -94,8 +94,6 @@ extern int humidityX;
 extern int humidityY;
 extern int temperatureX;
 extern int temperatureY;
-extern int separatorTopYPos;
-extern int separatorBotYPos;
 extern int ypos;
 extern bool print_text;
 extern int initialSensorPosition;
@@ -274,22 +272,21 @@ void updateData()
   }
   if (millis() - lastDebugUpdate > debugUpdatePeriod)
   {
-
+    Serial.println(ongoingCriticalAlarm());
     if (airControlPID.GetMode() == AUTOMATIC)
     {
-      logln("[PID] -> Heater PWM output is: " + String(100 * HeaterPIDOutput / BUZZER_MAX_PWR) + "%");
+      logln("[PID] -> Heater PWM output is: " + String(100 * HeaterPIDOutput / HEATER_MAX_PWM) + "%");
+      logln("[PID] -> Desired air temp is: " + String(in3.desiredControlTemperature) + "ºC");
     }
     if (skinControlPID.GetMode() == AUTOMATIC)
     {
-      logln("[PID] -> Heater PWM output is: " + String(100 * HeaterPIDOutput / BUZZER_MAX_PWR) + "%");
+      logln("[PID] -> Heater PWM output is: " + String(100 * HeaterPIDOutput / HEATER_MAX_PWM) + "%");
+      logln("[PID] -> Desired skin temp is: " + String(in3.desiredControlTemperature) + "ºC");
     }
     if (humidityControlPID.GetMode() == AUTOMATIC)
     {
       logln("[PID] -> Humidifier output is: " + String(100 * humidityControlPIDOutput / humidifierTimeCycle) + "%");
-    }
-    if (airControlPID.GetMode() == AUTOMATIC || skinControlPID.GetMode() == AUTOMATIC || humidityControlPID.GetMode() == AUTOMATIC)
-    {
-      logln("[PID] -> Desired temp is: " + String(in3.desiredControlTemperature) + "ºC");
+      logln("[PID] -> Desired humditity is: " + String(in3.desiredControlHumidity) + "%");
     }
 #if (HW_NUM == 6)
     logln("[SENSORS] -> System current consumption is: " + String(in3.system_current) + " Amps");

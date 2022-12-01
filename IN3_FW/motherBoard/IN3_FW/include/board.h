@@ -164,6 +164,7 @@
 
 #define maxADCvalue 4095
 #define maxDACvalue 4095
+//#define PWM_MAX_VALUE maxADCvalue
 #define PWM_MAX_VALUE (pow(2, DEFAULT_PWM_RESOLUTION) - 1)
 
 #define minimumAllowedNTCMeasurement maxADCvalue / 5
@@ -175,10 +176,11 @@
 #define maxTempToDiscard 60
 #define minTempToDiscard 5
 
-#define BUZZER_MAX_PWR PWM_MAX_VALUE
+#define HEATER_MAX_PWM PWM_MAX_VALUE
 #define HEATER_HALF_PWR PWM_MAX_VALUE / 2
 
 #define BUZZER_MAX_PWM PWM_MAX_VALUE
+#define BUZZER_HALF_PWM PWM_MAX_VALUE / 2
 
 #define DIRECT true
 #define INVERTED false

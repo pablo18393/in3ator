@@ -93,7 +93,8 @@
 #define analog_temperature_filter 500 // amount of temperature samples to filter
 #define digital_temperature_filter 10 // amount of temperature samples to filter
 
-#define NTCMeasurementPeriod 10    // in millis
+#define NTC_MEASUREMENT_PERIOD 1    // in millis
+#define NTC_SAMPLES_TEST 1000
 #define CURRENT_UPDATE_PERIOD 500    // in millis
 
 #define setupAutoCalibrationPoint 0

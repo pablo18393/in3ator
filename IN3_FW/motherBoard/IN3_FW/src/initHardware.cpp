@@ -92,8 +92,6 @@ extern int humidityX;
 extern int humidityY;
 extern int temperatureX;
 extern int temperatureY;
-extern int separatorTopYPos;
-extern int separatorBotYPos;
 extern int ypos;
 extern bool print_text;
 extern int initialSensorPosition;
@@ -330,8 +328,11 @@ void initSensors()
   initCurrentSensor();
   initRoomSensor();
   // sensors verification
-  while (!measureNTCTemperature(skinSensor))
-    ;
+  for (int i = 0; i <= NTC_SAMPLES_TEST; i++)
+  {
+    while (!measureNTCTemperature(skinSensor))
+      ;
+  }
   if (in3.temperature[skinSensor] < NTC_BABY_MIN)
   {
     logln("[HW] -> Fail -> NTC temperature is lower than expected");
@@ -449,7 +450,7 @@ void initTFT()
     backlight_end_value = false;
   }
 
-  for (int i = backlight_start_value; i < backlight_end_value ; i++)
+  for (int i = backlight_start_value; i < backlight_end_value; i++)
   {
     ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, i);
     vTaskDelay(BACKLIGHT_DELAY / portTICK_PERIOD_MS);
@@ -485,7 +486,7 @@ void initBuzzer()
   float testCurrent, offsetCurrent;
 
   offsetCurrent = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL);
-  ledcWrite(BUZZER_PWM_CHANNEL, BUZZER_MAX_PWM / 2);
+  ledcWrite(BUZZER_PWM_CHANNEL, BUZZER_HALF_PWM);
   vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT / portTICK_PERIOD_MS);
   testCurrent = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL) - offsetCurrent;
   ledcWrite(BUZZER_PWM_CHANNEL, false);

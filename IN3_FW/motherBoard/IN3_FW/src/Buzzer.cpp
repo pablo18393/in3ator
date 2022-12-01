@@ -37,7 +37,7 @@ void buzzerHandler() {
   if (millis() - buzzerTime > buzzerToneTime && buzzerBeeps) {
     buzzerBeeps -= buzzerBuzzing;
     buzzerBuzzing = !buzzerBuzzing;
-    ledcWrite(BUZZER_PWM_CHANNEL, BUZZER_MAX_PWM / 2 * buzzerBuzzing);
+    ledcWrite(BUZZER_PWM_CHANNEL, BUZZER_HALF_PWM * buzzerBuzzing);
     buzzerTime = millis();
 
     if (buzzerBeeps) {
@@ -52,7 +52,7 @@ void buzzerHandler() {
 void buzzerConstantTone (int freq) {
   logln("[BUZZER] -> BUZZER activated in constant Mode");
   if (buzzerState == BUZZER_DISABLED) {
-    ledcWrite(BUZZER_PWM_CHANNEL, BUZZER_MAX_PWM / 2);
+    ledcWrite(BUZZER_PWM_CHANNEL, BUZZER_HALF_PWM);
     buzzerState = BUZZER_ENABLED;
   }
 }

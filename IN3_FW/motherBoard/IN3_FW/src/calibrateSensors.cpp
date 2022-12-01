@@ -90,8 +90,6 @@ extern int humidityX;
 extern int humidityY;
 extern int temperatureX;
 extern int temperatureY;
-extern int separatorTopYPos;
-extern int separatorBotYPos;
 extern int ypos;
 extern bool print_text;
 extern int initialSensorPosition;

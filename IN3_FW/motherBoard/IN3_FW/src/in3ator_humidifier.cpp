@@ -59,6 +59,7 @@ void MAM_in3ator_Humidifier::begin(TwoWire *theWire)
 {
 	_i2c = theWire;
 	_i2c->begin();
+	activationMode = HUMIDIFIER_I2C;
 }
 
 void MAM_in3ator_Humidifier::begin(uint16_t mode, uint8_t pin)
@@ -96,6 +97,7 @@ void MAM_in3ator_Humidifier::turn(uint16_t mode)
 			val = true;
 		}
 		_write(IN3ATOR_HUM_ON, (uint16_t *)&val);
+		Serial.println("HUMIDIFIER I2C: " + String(mode));
 		break;
 	}
 }

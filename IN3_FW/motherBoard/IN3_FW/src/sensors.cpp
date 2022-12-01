@@ -94,8 +94,6 @@ extern int humidityX;
 extern int humidityY;
 extern int temperatureX;
 extern int temperatureY;
-extern int separatorTopYPos;
-extern int separatorBotYPos;
 extern int ypos;
 extern bool print_text;
 extern int initialSensorPosition;
@@ -228,7 +226,7 @@ float adcToCelsius(float adcReading, int maxAdcReading)
 bool measureNTCTemperature(uint8_t NTC)
 {
   int NTCmeasurement;
-  if (millis() - lastNTCmeasurement[NTC] > NTCMeasurementPeriod)
+  if (millis() - lastNTCmeasurement[NTC] > NTC_MEASUREMENT_PERIOD)
   {
     NTCmeasurement = analogRead(NTC_PIN[NTC]);
     if (NTCmeasurement > minimumAllowedNTCMeasurement && NTCmeasurement < maximumAllowedNTCMeasurement)

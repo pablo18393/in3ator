@@ -90,8 +90,6 @@ extern int humidityX;
 extern int humidityY;
 extern int temperatureX;
 extern int temperatureY;
-extern int separatorTopYPos;
-extern int separatorBotYPos;
 extern int ypos;
 extern bool print_text;
 extern int initialSensorPosition;
@@ -143,7 +141,7 @@ extern in3ator_parameters in3;
 
 void heatUp()
 {
-  ledcWrite(HEATER_PWM_CHANNEL, BUZZER_MAX_PWR * ongoingCriticalAlarm());
+  ledcWrite(HEATER_PWM_CHANNEL, HEATER_MAX_PWM * ongoingCriticalAlarm());
 }
 
 void basictemperatureControl()
@@ -184,7 +182,7 @@ void basicHumidityControl()
 
 void turnActuators(bool mode)
 {
-  ledcWrite(HEATER_PWM_CHANNEL, mode * BUZZER_MAX_PWR * ongoingCriticalAlarm());
+  ledcWrite(HEATER_PWM_CHANNEL, mode * HEATER_MAX_PWM * ongoingCriticalAlarm());
   if (mode * ongoingCriticalAlarm())
   {
     in3_hum.turn(ON);

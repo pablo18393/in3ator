@@ -90,8 +90,6 @@ extern int humidityX;
 extern int humidityY;
 extern int temperatureX;
 extern int temperatureY;
-extern int separatorTopYPos;
-extern int separatorBotYPos;
 extern int ypos;
 extern bool print_text;
 extern int initialSensorPosition;
@@ -195,13 +193,13 @@ void startPID(byte var)
   switch (var)
   {
   case airPID:
-    airControlPID.SetOutputLimits(false, BUZZER_MAX_PWR);
+    airControlPID.SetOutputLimits(false, HEATER_MAX_PWM);
     airControlPID.SetTunings(Kp[airPID], Ki[airPID], Kd[airPID]);
     airControlPID.SetControllerDirection(DIRECT);
     airControlPID.SetMode(AUTOMATIC);
     break;
   case skinPID:
-    skinControlPID.SetOutputLimits(false, BUZZER_MAX_PWR);
+    skinControlPID.SetOutputLimits(false, HEATER_MAX_PWM);
     skinControlPID.SetTunings(Kp[skinPID], Ki[skinPID], Kd[skinPID]);
     skinControlPID.SetControllerDirection(DIRECT);
     skinControlPID.SetMode(AUTOMATIC);
@@ -209,6 +207,7 @@ void startPID(byte var)
   case humidityPID:
     humidifierStateChange = true;
     windowStartTime = millis();
+    skinControlPID.SetTunings(Kp[humidityPID], Ki[humidityPID], Kd[humidityPID]);
     humidityControlPID.SetOutputLimits(humidifierTimeCycle * humidifierDutyCycleMin / 100, humidifierTimeCycle * humidifierDutyCycleMax / 100);
     humidityControlPID.SetMode(AUTOMATIC);
     break;

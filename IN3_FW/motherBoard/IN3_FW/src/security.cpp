@@ -94,8 +94,6 @@ extern int humidityX;
 extern int humidityY;
 extern int temperatureX;
 extern int temperatureY;
-extern int separatorTopYPos;
-extern int separatorBotYPos;
 extern int ypos;
 extern bool print_text;
 extern int initialSensorPosition;
@@ -294,7 +292,7 @@ bool ongoingAlarms()
 }
 
 bool ongoingCriticalAlarm()
-{
+{ 
   return (!(alarmOnGoing[AIR_THERMAL_CUTOUT_ALARM] || alarmOnGoing[SKIN_THERMAL_CUTOUT_ALARM] || alarmOnGoing[AIR_SENSOR_ISSUE_ALARM] || alarmOnGoing[SKIN_SENSOR_ISSUE_ALARM] || alarmOnGoing[HEATER_ISSUE_ALARM]));
   //return (true);
 }

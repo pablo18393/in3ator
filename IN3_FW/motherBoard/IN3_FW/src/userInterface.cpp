@@ -95,8 +95,6 @@ extern int humidityX;
 extern int humidityY;
 extern int temperatureX;
 extern int temperatureY;
-extern int separatorTopYPos;
-extern int separatorBotYPos;
 extern int ypos;
 extern bool print_text;
 extern int initialSensorPosition;
@@ -226,6 +224,7 @@ void userInterfaceHandler(int UI_page)
                 drawRightString(convertStringToChar(cstring, initialSensorsValue), initialSensorPosition, temperatureY, textFontSize);
                 setTextColor(COLOR_MENU_TEXT);
                 drawFloat(in3.desiredControlTemperature, 1, temperatureX - 65, temperatureY, textFontSize);
+                enableSet = true;
               }
               if (EncMove > 0)
               {
@@ -248,7 +247,6 @@ void userInterfaceHandler(int UI_page)
                 in3.desiredControlTemperature -= float(EncMove) * stepTemperatureIncrement;
                 setTextColor(COLOR_MENU_TEXT);
                 drawFloat(in3.desiredControlTemperature, 1, temperatureX - 65, temperatureY, textFontSize);
-                enableSet = true;
               }
               EncMove = false;
               updateUIData = false;
@@ -271,6 +269,7 @@ void userInterfaceHandler(int UI_page)
                 drawRightString(convertStringToChar(cstring, initialSensorsValue), initialSensorPosition, humidityY, textFontSize);
                 setTextColor(COLOR_MENU_TEXT);
                 drawCentreNumber(in3.desiredControlHumidity, humidityX - 65, humidityY);
+                enableSet = true;
               }
               if (EncMove > 0)
               {
@@ -293,7 +292,6 @@ void userInterfaceHandler(int UI_page)
                 in3.desiredControlHumidity -= (EncMove)*stepHumidityIncrement;
                 setTextColor(COLOR_MENU_TEXT);
                 drawCentreNumber(in3.desiredControlHumidity, humidityX - 65, humidityY);
-                enableSet = true;
               }
             }
             EncMove = false;
