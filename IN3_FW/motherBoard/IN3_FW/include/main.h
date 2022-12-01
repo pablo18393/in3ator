@@ -93,9 +93,8 @@
 #define analog_temperature_filter 500 // amount of temperature samples to filter
 #define digital_temperature_filter 10 // amount of temperature samples to filter
 
-#define NTCMeasurementPeriod 1000    // in millis
-#define CurrentMeasurementPeriod 500 // in micros
-#define CurrentUpdatePeriod 1000     // in millis
+#define NTCMeasurementPeriod 10    // in millis
+#define CURRENT_UPDATE_PERIOD 500    // in millis
 
 #define setupAutoCalibrationPoint 0
 #define firstAutoCalibrationPoint 1
@@ -248,6 +247,8 @@
 #define BACKLIGHT_NO_INTERACTION_TIME 12000 // time to decrease backlight display if no user actions
 
 #define GPRS_TASK_PERIOD 500
+#define BACKLIGHT_DELAY 1
+#define INIT_TFT_DELAY 300
 
 typedef struct
 {

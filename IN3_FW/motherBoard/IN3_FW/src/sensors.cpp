@@ -37,7 +37,7 @@ extern long lastDebugUpdate;
 extern long loopCounts;
 extern int page;
 extern int temperature_filter; // amount of temperature samples to filter
-extern long lastNTCmeasurement[numNTC], lastCurrentMeasurement, lastCurrentUpdate;
+extern long lastNTCmeasurement[numNTC];
 
 extern int NTC_PIN[numNTC];
 extern double errorTemperature[numSensors], temperatureCalibrationPoint;
@@ -145,15 +145,27 @@ extern PID humidityControlPID;
 
 extern in3ator_parameters in3;
 
+long lastCurrentMeasurement;
+
+void currentMonitor()
+{
+  if (millis() - lastCurrentMeasurement > CURRENT_UPDATE_PERIOD)
+  {
+    in3.system_current = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL);
+    in3.system_voltage = measureMeanVoltage(SYSTEM_SHUNT_CHANNEL);
+    in3.fan_current = measureMeanConsumption(FAN_SHUNT_CHANNEL);
+    in3.phototherapy_current = measureMeanConsumption(PHOTOTHERAPY_SHUNT_CHANNEL);
+    lastCurrentMeasurement = millis();
+  }
+}
+
 void sensorsHandler()
 {
   measureNTCTemperature(skinSensor);
 #if (HW_NUM == 6)
   measureNTCTemperature(airSensor);
 #endif
-  in3.system_current = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL);
-  in3.system_voltage = measureMeanVoltage(SYSTEM_SHUNT_CHANNEL);
-  // currentMonitor();
+  currentMonitor();
 }
 
 double measureMeanConsumption(int shunt)
@@ -216,7 +228,7 @@ float adcToCelsius(float adcReading, int maxAdcReading)
 bool measureNTCTemperature(uint8_t NTC)
 {
   int NTCmeasurement;
-  if (micros() - lastNTCmeasurement[NTC] > NTCMeasurementPeriod)
+  if (millis() - lastNTCmeasurement[NTC] > NTCMeasurementPeriod)
   {
     NTCmeasurement = analogRead(NTC_PIN[NTC]);
     if (NTCmeasurement > minimumAllowedNTCMeasurement && NTCmeasurement < maximumAllowedNTCMeasurement)

@@ -40,7 +40,7 @@ long lastDebugUpdate;
 long loopCounts;
 int page;
 int temperature_filter = analog_temperature_filter; // amount of temperature samples to filter
-long lastNTCmeasurement[numNTC], lastCurrentMeasurement, lastCurrentUpdate;
+long lastNTCmeasurement[numNTC];
 
 #if (HW_NUM <= 6)
 int NTC_PIN[numNTC] = {BABY_NTC_PIN, AIR_NTC_PIN};

@@ -37,7 +37,7 @@ extern long lastDebugUpdate;
 extern long loopCounts;
 extern int page;
 extern int temperature_filter; // amount of temperature samples to filter
-extern long lastNTCmeasurement[numNTC], lastCurrentMeasurement, lastCurrentUpdate;
+extern long lastNTCmeasurement[numNTC];
 
 extern double errorTemperature[numSensors], temperatureCalibrationPoint;
 extern double ReferenceTemperatureRange, ReferenceTemperatureLow;
@@ -189,7 +189,7 @@ void autoCalibration()
   {
     updateData();
   }
-  vTaskDelay(debounceTime);
+  vTaskDelay(debounceTime / portTICK_PERIOD_MS);
   autoCalibrationProcess = setupAutoCalibrationPoint;
   while (!exitCalibrationMenu)
   {
@@ -207,13 +207,13 @@ void autoCalibration()
       {
         provisionalReferenceTemperatureLow = in3.temperature[digitalTempHumSensor];
         provisionalRawTemperatureLow[skinSensor] = in3.temperature[skinSensor];
-        vTaskDelay(debounceTime);
+        vTaskDelay(debounceTime / portTICK_PERIOD_MS);
         while (!GPIORead(ENC_SWITCH))
         {
           updateData();
           exitCalibrationMenu = back_mode();
         }
-        vTaskDelay(debounceTime);
+        vTaskDelay(debounceTime / portTICK_PERIOD_MS);
         in3.desiredControlTemperature = DEFAULT_CALIBRATION_TEMPERATURE;
         startPID(airPID);
         // ledcWrite(HEATER_PWM_CHANNEL, HEATER_HALF_PWR * ongoingCriticalAlarm());
@@ -289,7 +289,7 @@ void fineTuneCalibration()
   {
     updateData();
   }
-  vTaskDelay(debounceTime);
+  vTaskDelay(debounceTime / portTICK_PERIOD_MS);
 }
 
 void firstPointCalibration()
@@ -334,7 +334,7 @@ void firstPointCalibration()
   {
     updateData();
   }
-  vTaskDelay(debounceTime);
+  vTaskDelay(debounceTime / portTICK_PERIOD_MS);
 }
 
 void secondPointCalibration()
@@ -379,7 +379,7 @@ void secondPointCalibration()
   {
     updateData();
   }
-  vTaskDelay(debounceTime);
+  vTaskDelay(debounceTime / portTICK_PERIOD_MS);
 }
 
 bool checkStableTemperatures(double *referenceSensorHistory, double *sensorToCalibrateHistory, int historyLength, double stabilityError)

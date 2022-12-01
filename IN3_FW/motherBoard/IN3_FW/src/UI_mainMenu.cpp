@@ -37,7 +37,7 @@ extern long lastDebugUpdate;
 extern long loopCounts;
 extern int page;
 extern int temperature_filter; // amount of temperature samples to filter
-extern long lastNTCmeasurement[numNTC], lastCurrentMeasurement, lastCurrentUpdate;
+extern long lastNTCmeasurement[numNTC];
 
 extern double errorTemperature[numSensors], temperatureCalibrationPoint;
 extern double ReferenceTemperatureRange, ReferenceTemperatureLow;
@@ -232,5 +232,5 @@ void UI_mainMenu()
   {
     updateData();
   }
-  vTaskDelay(debounceTime);
+  vTaskDelay(debounceTime / portTICK_PERIOD_MS);
 }

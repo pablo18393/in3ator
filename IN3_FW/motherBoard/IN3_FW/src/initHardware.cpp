@@ -37,7 +37,7 @@ extern long lastDebugUpdate;
 extern long loopCounts;
 extern int page;
 extern int temperature_filter; // amount of temperature samples to filter
-extern long lastNTCmeasurement[numNTC], lastCurrentMeasurement, lastCurrentUpdate;
+extern long lastNTCmeasurement[numNTC];
 
 extern double errorTemperature[numSensors], temperatureCalibrationPoint;
 extern double ReferenceTemperatureRange, ReferenceTemperatureLow;
@@ -210,7 +210,7 @@ TCA9555 TCA(0x20);
 void initDebug()
 {
   Serial.begin(115200);
-  vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT);
+  vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT / portTICK_PERIOD_MS);
   logln("in3ator debug uart, version v" + String(FWversion) + "/" + String(HWversion) + ", SN: " + String(in3.serialNumber));
 }
 
@@ -421,6 +421,7 @@ void initTFT()
   long error = HW_error;
   float testCurrent, offsetCurrent;
   long processTime;
+  int backlight_start_value, backlight_end_value;
   offsetCurrent = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL);
 #if (HW_NUM == 6)
   initPin(TOUCH_CS, OUTPUT);
@@ -437,19 +438,25 @@ void initTFT()
 #endif
   initializeTFT();
   loadlogo();
-  processTime = millis();
-  for (int i = 0; i < BACKLIGHT_POWER_DEFAULT; i++)
+  if (BACKLIGHT_CONTROL == DIRECT)
+  {
+    backlight_start_value = false;
+    backlight_end_value = BACKLIGHT_POWER_DEFAULT;
+  }
+  else
+  {
+    backlight_start_value = BACKLIGHT_POWER_DEFAULT;
+    backlight_end_value = false;
+  }
+
+  for (int i = backlight_start_value; i < backlight_end_value ; i++)
   {
     ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, i);
-    if (brightenRate)
-    {
-      while (millis() - processTime < i / brightenRate)
-      {
-        sensorsHandler();
-      }
-    }
-    processTime = millis();
+    vTaskDelay(BACKLIGHT_DELAY / portTICK_PERIOD_MS);
+    if (BACKLIGHT_CONTROL == DIRECT)
+      i -= 2;
   }
+  vTaskDelay(INIT_TFT_DELAY / portTICK_PERIOD_MS);
   testCurrent = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL) - offsetCurrent;
   if (testCurrent < SCREEN_CONSUMPTION_MIN)
   {
@@ -472,23 +479,6 @@ void initTFT()
   in3.display_current_test = testCurrent;
 }
 
-void TFTRestore()
-{
-  logln("[HW] -> restoring TFT previous status");
-  GPIOWrite(TFT_CS, LOW);
-  initializeTFT();
-  switch (page)
-  {
-  case actuatorsProgressPage:
-    UI_actuatorsProgress();
-    break;
-  case mainMenuPage:
-  default:
-    UI_mainMenu();
-    break;
-  }
-}
-
 void initBuzzer()
 {
   long error = HW_error;
@@ -496,10 +486,10 @@ void initBuzzer()
 
   offsetCurrent = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL);
   ledcWrite(BUZZER_PWM_CHANNEL, BUZZER_MAX_PWM / 2);
-  vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT);
+  vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT / portTICK_PERIOD_MS);
   testCurrent = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL) - offsetCurrent;
   ledcWrite(BUZZER_PWM_CHANNEL, false);
-  vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT);
+  vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT / portTICK_PERIOD_MS);
   if (testCurrent < BUZZER_CONSUMPTION_MIN)
   {
     HW_error += DEFECTIVE_BUZZER;
@@ -523,7 +513,7 @@ bool actuatorsTest()
   float testCurrent, offsetCurrent;
   offsetCurrent = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL);
   ledcWrite(HEATER_PWM_CHANNEL, PWM_MAX_VALUE);
-  vTaskDelay(CURRENT_STABILIZE_TIME_HEATER);
+  vTaskDelay(CURRENT_STABILIZE_TIME_HEATER / portTICK_PERIOD_MS);
   testCurrent = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL) - offsetCurrent;
   logln("[HW] -> Heater current consumption: " + String(testCurrent) + " Amps");
   in3.heater_current_test = testCurrent;
@@ -542,10 +532,10 @@ bool actuatorsTest()
     setAlarm(HEATER_ISSUE_ALARM);
     return (true);
   }
-  vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT);
+  vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT / portTICK_PERIOD_MS);
   offsetCurrent = measureMeanConsumption(PHOTOTHERAPY_SHUNT_CHANNEL);
   GPIOWrite(PHOTOTHERAPY, HIGH);
-  vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT);
+  vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT / portTICK_PERIOD_MS);
   testCurrent = measureMeanConsumption(PHOTOTHERAPY_SHUNT_CHANNEL) - offsetCurrent;
   GPIOWrite(PHOTOTHERAPY, LOW);
   logln("[HW] -> Phototherapy current consumption: " + String(testCurrent) + " Amps");
@@ -561,10 +551,10 @@ bool actuatorsTest()
     logln("[HW] -> Fail -> PHOTOTHERAPY current consumption is too high");
     return (true);
   }
-  vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT);
+  vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT / portTICK_PERIOD_MS);
   offsetCurrent = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL); // <- UPDATE THIS CODE TO ASK I2C DATA
   in3_hum.turn(ON);
-  vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT);
+  vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT / portTICK_PERIOD_MS);
   testCurrent = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL) - offsetCurrent; // <- UPDATE THIS CODE TO ASK I2C DATA
   logln("[HW] -> Humidifier current consumption: " + String(testCurrent) + " Amps");
   in3.humidifier_current_test = testCurrent;
@@ -580,10 +570,10 @@ bool actuatorsTest()
     logln("[HW] -> Fail -> HUMIDIFIER current consumption is too high");
     return (true);
   }
-  vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT);
+  vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT / portTICK_PERIOD_MS);
   offsetCurrent = measureMeanConsumption(FAN_SHUNT_CHANNEL);
   GPIOWrite(FAN, HIGH);
-  vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT);
+  vTaskDelay(CURRENT_STABILIZE_TIME_DEFAULT / portTICK_PERIOD_MS);
   testCurrent = measureMeanConsumption(FAN_SHUNT_CHANNEL) - offsetCurrent;
   logln("[HW] -> FAN consumption: " + String(testCurrent) + " Amps");
   in3.fan_current_test = testCurrent;

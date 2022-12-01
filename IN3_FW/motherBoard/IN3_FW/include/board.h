@@ -180,12 +180,17 @@
 
 #define BUZZER_MAX_PWM PWM_MAX_VALUE
 
+#define DIRECT true
+#define INVERTED false
+
 #if (HW_NUM <= 8 || (HW_NUM == 9 && HW_REVISION == 'A'))
 #define SCREEN_BRIGHTNESS_FACTOR 0.1 // Max brightness will be multiplied by this constant
 #define BACKLIGHT_POWER_SAFE_PERCENTAGE 0.6
+#define BACKLIGHT_CONTROL INVERTED
 #else
 #define SCREEN_BRIGHTNESS_FACTOR 0.6 // Max brightness will be multiplied by this constant
 #define BACKLIGHT_POWER_SAFE_PERCENTAGE 0.1
+#define BACKLIGHT_CONTROL DIRECT
 #endif
 
 #define BACKLIGHT_POWER_SAFE PWM_MAX_VALUE *BACKLIGHT_POWER_SAFE_PERCENTAGE

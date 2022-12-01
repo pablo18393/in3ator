@@ -37,7 +37,7 @@ extern long lastDebugUpdate;
 extern long loopCounts;
 extern int page;
 extern int temperature_filter; // amount of temperature samples to filter
-extern long lastNTCmeasurement[numNTC], lastCurrentMeasurement, lastCurrentUpdate;
+extern long lastNTCmeasurement[numNTC];
 
 extern double errorTemperature[numSensors], temperatureCalibrationPoint;
 extern double ReferenceTemperatureRange, ReferenceTemperatureLow;
@@ -592,7 +592,7 @@ void userInterfaceHandler(int UI_page)
         tft.fillRect(0, (tft.height() - height_heading) * (bar_pos - 1) / menu_rows + height_heading, width_select, (tft.height() - height_heading) / menu_rows, WHITE);
       }
       encoderContinuousPress(UI_page);
-      vTaskDelay(debounceTime);
+      vTaskDelay(debounceTime / portTICK_PERIOD_MS);
     }
   }
 }
@@ -663,7 +663,7 @@ void checkSetMessage(int UI_page)
 
 bool back_mode()
 {
-  vTaskDelay(debounceTime);
+  vTaskDelay(debounceTime / portTICK_PERIOD_MS);
   last_encPulsed = millis();
   byte back_bar = false;
   while (!GPIORead(ENC_SWITCH))
@@ -679,12 +679,12 @@ bool back_mode()
       UI_mainMenu();
       return true;
     }
-    vTaskDelay((time_back_draw + time_back_wait) / width_back);
+    vTaskDelay(((time_back_draw + time_back_wait) / width_back) / portTICK_PERIOD_MS);
   }
   if (millis() - last_encPulsed > time_back_wait)
   {
     drawBack();
   }
-  vTaskDelay(10);
+  vTaskDelay(debounceTime / portTICK_PERIOD_MS);
   return (false);
 }
