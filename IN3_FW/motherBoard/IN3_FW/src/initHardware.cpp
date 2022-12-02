@@ -439,7 +439,7 @@ void initTFT()
 #endif
   initializeTFT();
   loadlogo();
-  if (BACKLIGHT_CONTROL == DIRECT)
+  if (BACKLIGHT_CONTROL == DIRECT_BACKLIGHT_CONTROL)
   {
     backlight_start_value = false;
     backlight_end_value = BACKLIGHT_POWER_DEFAULT;
@@ -454,7 +454,7 @@ void initTFT()
   {
     ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, i);
     vTaskDelay(BACKLIGHT_DELAY / portTICK_PERIOD_MS);
-    if (BACKLIGHT_CONTROL == DIRECT)
+    if (BACKLIGHT_CONTROL == DIRECT_BACKLIGHT_CONTROL)
       i -= 2;
   }
   vTaskDelay(INIT_TFT_DELAY / portTICK_PERIOD_MS);

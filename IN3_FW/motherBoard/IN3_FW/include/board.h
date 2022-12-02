@@ -26,7 +26,7 @@
 #define HW_NUM 9
 #define HW_REVISION 'A'
 #define HWversion String(HW_NUM) + "." + String(HW_REVISION)
-#define FWversion "10.6"
+#define FWversion "10.7"
 #define WIFI_NAME "In3_v" + String(FWversion) + "/" + String(HWversion)
 #define headingTitle "in3ator"
 
@@ -182,17 +182,17 @@
 #define BUZZER_MAX_PWM PWM_MAX_VALUE
 #define BUZZER_HALF_PWM PWM_MAX_VALUE / 2
 
-#define DIRECT true
-#define INVERTED false
+#define DIRECT_BACKLIGHT_CONTROL true
+#define INVERTED_BACKLIGHT_CONTROL false
 
 #if (HW_NUM <= 8 || (HW_NUM == 9 && HW_REVISION == 'A'))
 #define SCREEN_BRIGHTNESS_FACTOR 0.1 // Max brightness will be multiplied by this constant
 #define BACKLIGHT_POWER_SAFE_PERCENTAGE 0.6
-#define BACKLIGHT_CONTROL INVERTED
+#define BACKLIGHT_CONTROL INVERTED_BACKLIGHT_CONTROL
 #else
 #define SCREEN_BRIGHTNESS_FACTOR 0.6 // Max brightness will be multiplied by this constant
 #define BACKLIGHT_POWER_SAFE_PERCENTAGE 0.1
-#define BACKLIGHT_CONTROL DIRECT
+#define BACKLIGHT_CONTROL DIRECT_BACKLIGHT_CONTROL
 #endif
 
 #define BACKLIGHT_POWER_SAFE PWM_MAX_VALUE *BACKLIGHT_POWER_SAFE_PERCENTAGE

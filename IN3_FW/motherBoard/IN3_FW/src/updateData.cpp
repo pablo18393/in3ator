@@ -272,7 +272,6 @@ void updateData()
   }
   if (millis() - lastDebugUpdate > debugUpdatePeriod)
   {
-    Serial.println(ongoingCriticalAlarm());
     if (airControlPID.GetMode() == AUTOMATIC)
     {
       logln("[PID] -> Heater PWM output is: " + String(100 * HeaterPIDOutput / HEATER_MAX_PWM) + "%");
@@ -293,9 +292,9 @@ void updateData()
 #else
     if (digitalCurrentSensorPresent)
     {
-      logln("[SENSORS] -> System current consumption is: " + String(digitalCurrentSensor.getCurrent(INA3221_CH1), 4) + " Amps");
-      logln("[SENSORS] -> Phototherapy current consumption is: " + String(digitalCurrentSensor.getCurrent(INA3221_CH2), 4) + " Amps");
-      logln("[SENSORS] -> Fan current consumption is: " + String(digitalCurrentSensor.getCurrent(INA3221_CH3), 4) + " Amps");
+      logln("[SENSORS] -> System current consumption is: " + String(in3.system_current, 4) + " Amps");
+      logln("[SENSORS] -> Phototherapy current consumption is: " + String(in3.phototherapy_current, 4) + " Amps");
+      logln("[SENSORS] -> Fan current consumption is: " + String(in3.fan_current, 4) + " Amps");
     }
 #endif
     logln("[SENSORS] -> Baby temperature: " + String(in3.temperature[skinSensor]) + "ºC, correction error is " + String(errorTemperature[skinSensor]));

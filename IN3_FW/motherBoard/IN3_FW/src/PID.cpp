@@ -207,7 +207,8 @@ void startPID(byte var)
   case humidityPID:
     humidifierStateChange = true;
     windowStartTime = millis();
-    skinControlPID.SetTunings(Kp[humidityPID], Ki[humidityPID], Kd[humidityPID]);
+    humidityControlPID.SetTunings(Kp[humidityPID], Ki[humidityPID], Kd[humidityPID]);
+    humidityControlPID.SetControllerDirection(DIRECT);
     humidityControlPID.SetOutputLimits(humidifierTimeCycle * humidifierDutyCycleMin / 100, humidifierTimeCycle * humidifierDutyCycleMax / 100);
     humidityControlPID.SetMode(AUTOMATIC);
     break;
