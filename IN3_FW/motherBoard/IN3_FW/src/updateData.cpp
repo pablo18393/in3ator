@@ -126,8 +126,6 @@ extern bool state_blink;
 extern bool blinkSetMessageState;
 extern long lastBlinkSetMessage;
 
-extern bool powerAlert;
-extern long lastSuccesfullSensorUpdate[numSensors];
 
 extern double HeaterPIDOutput;
 extern double skinControlPIDInput;
@@ -261,17 +259,14 @@ void updateData()
   {
     securityCheck();
   }
-  if (powerAlert)
-  {
-    logln("[ALARM] -> maximum power exceeded");
-    powerAlert = false;
-  }
   if (encPulseDetected && GPIORead(ENC_SWITCH))
   {
     encPulseDetected = false;
   }
   if (millis() - lastDebugUpdate > debugUpdatePeriod)
   {
+      Serial.println(digitalRead(ON_OFF_SWITCH));
+
     if (airControlPID.GetMode() == AUTOMATIC)
     {
       logln("[PID] -> Heater PWM output is: " + String(100 * HeaterPIDOutput / HEATER_MAX_PWM) + "%");

@@ -32,9 +32,10 @@
 
 #if (HW_NUM <= 8)
 #define DISPLAY_SPI_CLK SPI_CLOCK_DIV128
-#else
-// Hardware
+#elif (HW_NUM == 9 && HW_REVISION == 'A')
 #define DISPLAY_SPI_CLK SPI_CLOCK_DIV16
+#else 
+#define DISPLAY_SPI_CLK SPI_CLOCK_DIV128
 #endif
 
 #if (HW_NUM <= 6)
@@ -66,8 +67,7 @@
 #define SCREENBACKLIGHT 33
 #define BABY_NTC_PIN 39
 #define DISPLAY_CONTROLLER_IC ST7789V_CONTROLLER
-
-// #define ON_OFF_SWITCH 34
+#define ON_OFF_SWITCH 34
 #else
 // Hardware
 // PINOUT
@@ -185,13 +185,15 @@
 #define DIRECT_BACKLIGHT_CONTROL true
 #define INVERTED_BACKLIGHT_CONTROL false
 
+#define MINIMUM_SYSTEM_VALUE 9
+
 #if (HW_NUM <= 8 || (HW_NUM == 9 && HW_REVISION == 'A'))
 #define SCREEN_BRIGHTNESS_FACTOR 0.1 // Max brightness will be multiplied by this constant
 #define BACKLIGHT_POWER_SAFE_PERCENTAGE 0.6
 #define BACKLIGHT_CONTROL INVERTED_BACKLIGHT_CONTROL
 #else
-#define SCREEN_BRIGHTNESS_FACTOR 0.6 // Max brightness will be multiplied by this constant
-#define BACKLIGHT_POWER_SAFE_PERCENTAGE 0.1
+#define SCREEN_BRIGHTNESS_FACTOR 0.7 // Max brightness will be multiplied by this constant
+#define BACKLIGHT_POWER_SAFE_PERCENTAGE 0.3
 #define BACKLIGHT_CONTROL DIRECT_BACKLIGHT_CONTROL
 #endif
 

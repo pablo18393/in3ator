@@ -126,8 +126,6 @@ extern bool state_blink;
 extern bool blinkSetMessageState;
 extern long lastBlinkSetMessage;
 
-extern bool powerAlert;
-extern long lastSuccesfullSensorUpdate[numSensors];
 
 extern double HeaterPIDOutput;
 extern double skinControlPIDInput;

@@ -136,7 +136,6 @@ bool state_blink;
 bool blinkSetMessageState;
 long lastBlinkSetMessage;
 
-bool powerAlert;
 long lastSuccesfullSensorUpdate[numSensors];
 
 double Kp[numPID] = {200, 200, 200}, Ki[numPID] = {1, 1, 2}, Kd[numPID] = {500, 500, 20};

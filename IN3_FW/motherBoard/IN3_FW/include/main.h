@@ -21,6 +21,8 @@
 #include <Beastdevices_INA3221.h> //
 #include "in3ator_humidifier.h"
 #include "TCA9555.h"
+#include "esp32/ulp.h"
+#include "driver/rtc_io.h"
 
 #define WDT_TIMEOUT 45
 
@@ -93,9 +95,10 @@
 #define analog_temperature_filter 500 // amount of temperature samples to filter
 #define digital_temperature_filter 10 // amount of temperature samples to filter
 
-#define NTC_MEASUREMENT_PERIOD 1    // in millis
+#define NTC_MEASUREMENT_PERIOD 1 // in millis
 #define NTC_SAMPLES_TEST 1000
-#define CURRENT_UPDATE_PERIOD 500    // in millis
+#define CURRENT_UPDATE_PERIOD 500 // in millis
+#define VOLTAGE_UPDATE_PERIOD 50  // in millis
 
 #define setupAutoCalibrationPoint 0
 #define firstAutoCalibrationPoint 1
@@ -160,16 +163,18 @@
 #define DEFAULT_AUTOLOCK ON
 #define DEFAULT_CONTROL_ALGORITHM PID_CONTROL
 
-// security defs
-#define HUMIDITY_ALARM 0
-#define TEMPERATURE_ALARM 1
-#define AIR_THERMAL_CUTOUT_ALARM 2
-#define SKIN_THERMAL_CUTOUT_ALARM 3
-#define AIR_SENSOR_ISSUE_ALARM 4
-#define SKIN_SENSOR_ISSUE_ALARM 5
-#define FAN_ISSUE_ALARM 6
-#define HEATER_ISSUE_ALARM 7
-#define NUM_ALARMS 8
+typedef enum
+{
+    HUMIDITY_ALARM = 0,
+    TEMPERATURE_ALARM,
+    AIR_THERMAL_CUTOUT_ALARM,
+    SKIN_THERMAL_CUTOUT_ALARM,
+    AIR_SENSOR_ISSUE_ALARM,
+    SKIN_SENSOR_ISSUE_ALARM,
+    FAN_ISSUE_ALARM,
+    HEATER_ISSUE_ALARM,
+    NUM_ALARMS,
+} ALARMS_ID;
 
 // Graphic variables
 #define ERASE false
@@ -252,7 +257,7 @@
 #define SENSORS_TASK_PERIOD 1
 #define BUZZER_TASK_PERIOD 10
 #define BACKLIGHT_TASK_PERIOD 10
-#define BACKLIGHT_DELAY 1
+#define BACKLIGHT_DELAY 2
 #define INIT_TFT_DELAY 300
 
 typedef struct
@@ -382,9 +387,12 @@ void setSensorsGraphicPosition(int UI_page);
 void basicHumidityControl();
 bool checkStableTemperatures(double *referenceSensorHistory, double *sensorToCalibrateHistory, int historyLength, double stabilityError);
 void initRoomSensor();
+void currentMonitor();
+void voltageMonitor();
 
 double butterworth2(double y1, double y2, double x0, double x1, double x2);
 
+void initGPIO();
 void initEEPROM();
 void initGPRS();
 void drawHardwareErrorMessage(long error, bool criticalError);
@@ -392,6 +400,7 @@ void watchdogInit();
 void initAlarms();
 void IRAM_ATTR encSwitchHandler();
 void IRAM_ATTR encoderISR();
+void IRAM_ATTR ON_OFF_Switch_ISR();
 void backlightHandler();
 
 bool measureNTCTemperature(uint8_t);

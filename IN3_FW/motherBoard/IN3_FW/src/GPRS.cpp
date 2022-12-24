@@ -115,6 +115,11 @@ void GPRS_get_SIM_info()
   GPRS.IP = modem.localIP();
 
   GPRS_get_triangulation_location();
+
+  logln("[GPRS] -> CCID is: " + GPRS.CCID);
+  logln("[GPRS] -> IMEI is: " + GPRS.IMEI);
+  logln("[GPRS] -> IMSI is: " + GPRS.IMSI);
+  logln("[GPRS] -> COP is: " + GPRS.COP);
 }
 
 void GPRSUpdateCSQ()
@@ -369,7 +374,6 @@ void GPRSPost()
       if (!GPRS.firstPost)
       {
         GPRS.firstPost = true;
-        GPRS_get_SIM_info();
         tb.sendAttributeInt("SN", in3.serialNumber);
         tb.sendAttributeInt("HW_num", HW_NUM);
         tb.sendAttributeString("HW_revision", String(HW_REVISION).c_str());

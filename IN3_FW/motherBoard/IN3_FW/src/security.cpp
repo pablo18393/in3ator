@@ -126,7 +126,6 @@ extern bool state_blink;
 extern bool blinkSetMessageState;
 extern long lastBlinkSetMessage;
 
-extern bool powerAlert;
 extern long lastSuccesfullSensorUpdate[numSensors];
 
 extern double HeaterPIDOutput;
@@ -149,11 +148,6 @@ extern PID humidityControlPID;
 
 #define FAN_TEST_CURRENTDIF_MIN 0.2 // when the fan is spinning, heater cools down and consume less current
 #define FAN_TEST_PREHEAT_TIME 30000 // when the fan is spinning, heater cools down and consume less current
-
-// Alarm variables
-#define powerAlertNotificationPeriod 1000
-
-long lastPowerAlertNotification;
 
 #define ALARM_TIME_DELAY 30 // in mins, time to check alarm
 // security config
@@ -258,10 +252,25 @@ void checkStatusOfSensor(byte sensor)
   }
 }
 
+void powerFailureAlarm()
+{
+
+}
+
 void checkSensors()
 {
   checkStatusOfSensor(airSensor);
   checkStatusOfSensor(skinSensor);
+#if (HW_NUM <= 9)
+  currentMonitor();
+#elif (HW_NUM >= 10)
+  currentMonitor();
+  voltageMonitor();
+  if (digitalCurrentSensorPresent && in3.system_voltage < MINIMUM_SYSTEM_VALUE && GPIORead(ON_OFF_SWITCH) == OFF)
+  {
+    powerFailureAlarm();
+  }
+#endif
 }
 
 void alarmTimerStart()
@@ -292,9 +301,9 @@ bool ongoingAlarms()
 }
 
 bool ongoingCriticalAlarm()
-{ 
+{
   return (!(alarmOnGoing[AIR_THERMAL_CUTOUT_ALARM] || alarmOnGoing[SKIN_THERMAL_CUTOUT_ALARM] || alarmOnGoing[AIR_SENSOR_ISSUE_ALARM] || alarmOnGoing[SKIN_SENSOR_ISSUE_ALARM] || alarmOnGoing[HEATER_ISSUE_ALARM]));
-  //return (true);
+  // return (true);
 }
 
 char *alarmIDtoString(byte alarmID)

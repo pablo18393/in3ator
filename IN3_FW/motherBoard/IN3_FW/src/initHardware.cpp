@@ -124,8 +124,6 @@ extern bool state_blink;
 extern bool blinkSetMessageState;
 extern long lastBlinkSetMessage;
 
-extern bool powerAlert;
-extern long lastSuccesfullSensorUpdate[numSensors];
 
 extern double HeaterPIDOutput;
 extern double skinControlPIDInput;
@@ -249,6 +247,9 @@ void initGPIO()
   initPin(HUMIDIFIER, OUTPUT);
   GPIOWrite(HUMIDIFIER, LOW);
 #endif
+#if (HW_NUM >= 10)
+  initPin(ON_OFF_SWITCH, INPUT);
+#endif
   initPin(PHOTOTHERAPY, OUTPUT);
   initPin(GPRS_PWRKEY, OUTPUT);
   initPin(encoderpinA, INPUT_PULLUP);
@@ -274,6 +275,9 @@ void initInterrupts()
   attachInterrupt(ENC_SWITCH, encSwitchHandler, CHANGE);
   attachInterrupt(ENC_A, encoderISR, CHANGE);
   attachInterrupt(ENC_B, encoderISR, CHANGE);
+#if (HW_NUM >= 10)
+  attachInterrupt(ON_OFF_SWITCH, ON_OFF_Switch_ISR, CHANGE);
+#endif
 }
 
 void initRoomSensor()
@@ -449,13 +453,14 @@ void initTFT()
     backlight_start_value = BACKLIGHT_POWER_DEFAULT;
     backlight_end_value = false;
   }
-
   for (int i = backlight_start_value; i < backlight_end_value; i++)
   {
     ledcWrite(SCREENBACKLIGHT_PWM_CHANNEL, i);
     vTaskDelay(BACKLIGHT_DELAY / portTICK_PERIOD_MS);
-    if (BACKLIGHT_CONTROL == DIRECT_BACKLIGHT_CONTROL)
+    if (BACKLIGHT_CONTROL == INVERTED_BACKLIGHT_CONTROL)
+    {
       i -= 2;
+    }
   }
   vTaskDelay(INIT_TFT_DELAY / portTICK_PERIOD_MS);
   testCurrent = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL) - offsetCurrent;

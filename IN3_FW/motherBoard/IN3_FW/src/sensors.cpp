@@ -126,7 +126,6 @@ extern bool state_blink;
 extern bool blinkSetMessageState;
 extern long lastBlinkSetMessage;
 
-extern bool powerAlert;
 extern long lastSuccesfullSensorUpdate[numSensors];
 
 extern double HeaterPIDOutput;
@@ -143,17 +142,25 @@ extern PID humidityControlPID;
 
 extern in3ator_parameters in3;
 
-long lastCurrentMeasurement;
+long lastCurrentMeasurement, lastVoltageMeasurement;
 
 void currentMonitor()
 {
-  if (millis() - lastCurrentMeasurement > CURRENT_UPDATE_PERIOD)
+  if (digitalCurrentSensorPresent && millis() - lastCurrentMeasurement > CURRENT_UPDATE_PERIOD)
   {
     in3.system_current = measureMeanConsumption(SYSTEM_SHUNT_CHANNEL);
-    in3.system_voltage = measureMeanVoltage(SYSTEM_SHUNT_CHANNEL);
     in3.fan_current = measureMeanConsumption(FAN_SHUNT_CHANNEL);
     in3.phototherapy_current = measureMeanConsumption(PHOTOTHERAPY_SHUNT_CHANNEL);
     lastCurrentMeasurement = millis();
+  }
+}
+
+void voltageMonitor()
+{
+  if (digitalCurrentSensorPresent && millis() - lastVoltageMeasurement > VOLTAGE_UPDATE_PERIOD)
+  {
+    in3.system_voltage = measureMeanVoltage(SYSTEM_SHUNT_CHANNEL);
+    lastVoltageMeasurement = millis();
   }
 }
 
@@ -163,7 +170,6 @@ void sensorsHandler()
 #if (HW_NUM == 6)
   measureNTCTemperature(airSensor);
 #endif
-  currentMonitor();
 }
 
 double measureMeanConsumption(int shunt)
