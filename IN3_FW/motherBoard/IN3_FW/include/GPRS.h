@@ -1,4 +1,4 @@
-//#define TOKEN "tOUZTeBHHycW5BGntTuO"
+#include <Arduino.h>
 #define THINGSBOARD_SERVER "mon.medicalopenworld.org"
 #define THINGSBOARD_PORT 1883
 
@@ -21,8 +21,8 @@
 #define GPRS_USER ""
 #define GPRS_PASS ""
 
-#define PROVISION_DEVICE_KEY "8f9yvlkqxirz2pq9n5co"
-#define PROVISION_DEVICE_SECRET "bz9fwzi8t3pnqxdlipqz"
+#define PROVISION_DEVICE_KEY "bztump0738iuc2ggreix"
+#define PROVISION_DEVICE_SECRET "0znp47gkyh9hbljq1opm"
 
 #define SIMCOM800_AT "AT\n"
 #define SIMCOM800_AT_CFUN "AT+CFUN=1\n"

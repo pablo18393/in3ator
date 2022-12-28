@@ -44,8 +44,7 @@ ThingsBoard tb(client);
 // ThingsBoard tb(espClient);
 
 // Initialize ThingsBoard client provision instance
-ThingsBoard tb_provision(client);
-// ThingsBoard tb_provision(espClient);
+ThingsBoardSized<4096> tb_provision(client); // increase buffer size
 
 unsigned long previous_processing_time;
 
