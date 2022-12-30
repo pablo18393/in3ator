@@ -156,6 +156,7 @@ PID humidityControlPID(&in3.humidity, &humidityControlPIDOutput, &in3.desiredCon
 
 void GPRS_Task(void *pvParameters)
 {
+  GPRS_TB_Init();
   for (;;)
   {
     GPRS_Handler();
@@ -183,9 +184,10 @@ void sensors_Task(void *pvParameters)
 
 void OTA_Task(void *pvParameters)
 {
+  WIFI_TB_Init();
   for (;;)
   {
-    OTAHandler();
+    WifiOTAHandler();
     vTaskDelay(OTA_TASK_PERIOD / portTICK_PERIOD_MS);
   }
 }
@@ -210,6 +212,12 @@ void setup()
     ;
   ;
   logln("GPRS task successfully created!\n");
+
+  logln("Creating OTA task ...\n");
+  while (xTaskCreatePinnedToCore(OTA_Task, (const char *)"OTA", 4096, NULL, 1, NULL, 1) != pdPASS)
+    ;
+  ;
+  logln("OTA task successfully created!\n");
   /*
     logln("Creating Backlight task ...\n");
     while (xTaskCreatePinnedToCore(Backlight_Task, (const char *)"BACKLIGHT", 4096, NULL, 1, NULL, 1) != pdPASS)
@@ -223,11 +231,7 @@ void setup()
     ;
     logln("sensors task successfully created!\n");
 
-    logln("Creating OTA task ...\n");
-    while (xTaskCreatePinnedToCore(OTA_Task, (const char *)"OTA", 4096, NULL, 1, NULL, 1) != pdPASS)
-      ;
-    ;
-    logln("OTA task successfully created!\n");
+
 
     logln("Creating buzzer task ...\n");
     while (xTaskCreatePinnedToCore(buzzer_Task, (const char *)"BUZZER", 4096, NULL, 1, NULL, 1) != pdPASS)

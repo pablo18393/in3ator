@@ -257,6 +257,7 @@ typedef enum
 #define SENSORS_TASK_PERIOD 1
 #define BUZZER_TASK_PERIOD 10
 #define BACKLIGHT_TASK_PERIOD 10
+
 #define BACKLIGHT_DELAY 2
 #define INIT_TFT_DELAY 300
 
@@ -307,9 +308,11 @@ void shutBuzzer();
 double measureMeanConsumption(int shunt);
 float measureMeanVoltage(int shunt);
 void watchdogReload();
-void OTAHandler(void);
+void WIFI_TB_Init();
+void WifiOTAHandler(void);
 void sensorsHandler();
 void GPRS_Handler();
+void GPRS_TB_Init();
 void securityCheck();
 void buzzerConstantTone(int freq);
 void drawAlarmMessage(char *alertMessage);

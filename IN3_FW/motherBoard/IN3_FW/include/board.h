@@ -24,18 +24,17 @@
 */
 
 #define HW_NUM 9
-#define HW_REVISION 'A'
+#define HW_REVISION 'B'
 #define HWversion String(HW_NUM) + "." + String(HW_REVISION)
 #define FWversion "10.7"
 #define WIFI_NAME "In3_v" + String(FWversion) + "/" + String(HWversion)
-#define headingTitle "in3ator"
+#define CURRENT_FIRMWARE_TITLE "in3ator"
 
-#if (HW_NUM <= 8)
+
+#if (HW_NUM <= 8 || HW_NUM >= 10)
 #define DISPLAY_SPI_CLK SPI_CLOCK_DIV128
-#elif (HW_NUM == 9 && HW_REVISION == 'A')
+#elif (HW_NUM == 9)
 #define DISPLAY_SPI_CLK SPI_CLOCK_DIV16
-#else 
-#define DISPLAY_SPI_CLK SPI_CLOCK_DIV128
 #endif
 
 #if (HW_NUM <= 6)
@@ -53,7 +52,7 @@
 // PINOUT
 #define TFT_DC 0
 #define ENC_SWITCH 4
-#define BUZZER 5
+#define BUZZER 35
 #define FAN 12
 #define PHOTOTHERAPY 13
 #define ACTUATORS_EN 14

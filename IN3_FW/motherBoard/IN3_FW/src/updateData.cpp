@@ -252,7 +252,6 @@ void updateData()
   loopCounts++;
   buzzerHandler();
   watchdogReload();
-  OTAHandler();
   sensorsHandler();
   backlightHandler();
   if (page != autoCalibrationPage)

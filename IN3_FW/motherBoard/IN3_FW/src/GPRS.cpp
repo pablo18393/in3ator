@@ -23,38 +23,14 @@
 
 */
 
-#define TINY_GSM_MODEM_SIM800
-
 #include <Arduino.h>
 #include "GPRS.h"
-#include "main.h"
-#include <TinyGsmClient.h>
-#include "ThingsBoard.h"
-#include <WiFi.h>
-
-// Initialize GSM modem
-TinyGsm modem(modemSerial);
-
-// Initialize GSM client
-TinyGsmClient client(modem);
-WiFiClient espClient;
-
-// Initialize ThingsBoard instance
-ThingsBoard tb(client);
-// ThingsBoard tb(espClient);
-
-// Initialize ThingsBoard client provision instance
-ThingsBoardSized<4096> tb_provision(client); // increase buffer size
 
 unsigned long previous_processing_time;
 
 extern in3ator_parameters in3;
 GPRSstruct GPRS;
 Credentials credentials;
-
-const char *provisionDeviceKey = "3ze2np7my4acf643r0jz";
-const char *provisionDeviceSecret = "nruedye0eiz1dkm8mo96";
-const char *deviceName = "test_autoprovisioning_11";
 
 void clearGPRSBuffer()
 {
@@ -124,13 +100,14 @@ void GPRS_get_SIM_info()
 void GPRSUpdateCSQ()
 {
   GPRS.CSQ = modem.getSignalQuality();
+  logln("[GPRS] -> CSQ is: " + String(GPRS.CSQ));
 }
 
 void GPRSStatusHandler()
 {
   if (GPRS.process)
   {
-    if (GPRS.powerUp || GPRS.connect || GPRS.post)
+    if (GPRS.powerUp || GPRS.connect)
     {
       if (millis() - GPRS.processTime > GPRS_TIMEOUT)
       {
@@ -149,10 +126,7 @@ void GPRSStatusHandler()
   }
   if (!GPRS.powerUp && !GPRS.connect && !GPRS.post)
   {
-    if (!GPRS.connectionStatus)
-    {
-      GPRS.powerUp = true;
-    }
+    GPRS.powerUp = true;
   }
 }
 
@@ -168,10 +142,9 @@ void GPRSPowerUp()
     logln("[GPRS] -> powering up GPRS");
     break;
   case 1:
-    if (millis() - GPRS.packetSentenceTime > 500)
+    if (millis() - GPRS.packetSentenceTime > 1000)
     {
       GPIOWrite(GPRS_PWRKEY, HIGH);
-      GPRS.packetSentenceTime = millis();
       GPRS.process++;
       logln("[GPRS] -> GPRS powered");
     }
@@ -230,7 +203,6 @@ void GPRSStablishConnection()
     break;
   case 2:
     GPRS_get_SIM_info();
-    GPRS.connectionStatus = true;
     GPRS.connect = false;
     GPRS.process = false;
     GPRS.post = true;
@@ -341,6 +313,25 @@ void TBProvision()
   }
 }
 
+void UpdatedCallback(const bool &success)
+{
+  if (success)
+  {
+    logln("[GPRS] -> Done, Reboot now");
+    esp_restart();
+  }
+  else
+  {
+    logln("[GPRS] -> No new firmware");
+  }
+}
+
+void GPRSCheckOTA()
+{
+  Serial.println("Checking GPRS firwmare Update...");
+  tb.Start_Firmware_Update(CURRENT_FIRMWARE_TITLE, FWversion, UpdatedCallback);
+}
+
 void GPRSPost()
 {
   if (!GPRS.provisioned)
@@ -349,13 +340,14 @@ void GPRSPost()
     {
       TBProvision();
     }
+    tb_provision.loop();
   }
   else
   {
     if (!tb.connected())
     {
       // Connect to the ThingsBoard
-      Serial.print("Connecting to: ");
+      Serial.print("Connecting over GPRS to: ");
       Serial.print(THINGSBOARD_SERVER);
       Serial.print(" with token ");
       Serial.println(GPRS.device_token);
@@ -364,6 +356,7 @@ void GPRSPost()
         Serial.println("Failed to connect");
         return;
       }
+      GPRSCheckOTA();
     }
     if (tb.connected() && millis() - GPRS.lastSent > secsToMillis(GPRS.sendPeriod))
     {
@@ -449,8 +442,18 @@ void GPRSPost()
   }
 }
 
+void GPRS_TB_Init()
+{
+  GPRS.provisioned = EEPROM.read(EEPROM_THINGSBOARD_PROVISIONED);
+  if (GPRS.provisioned)
+  {
+    GPRS.device_token = EEPROM.readString(EEPROM_THINGSBOARD_TOKEN);
+  }
+}
+
 void GPRS_Handler()
 {
+  GPRSStatusHandler();
   if (GPRS.powerUp)
   {
     GPRSPowerUp();
@@ -463,14 +466,7 @@ void GPRS_Handler()
   {
     GPRSSetPostPeriod();
     GPRSPost();
-    if (!GPRS.provision_request_processed)
-    {
-      tb_provision.loop();
-    }
-    else
-    {
-      tb.loop();
-    }
+    tb.loop();
   }
   readGPRSData();
 }

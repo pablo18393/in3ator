@@ -24,6 +24,7 @@
 */
 #include <Arduino.h>
 #include "main.h"
+#include "Wifi_OTA.h"
 
 const char *wifiHost = "in3ator";
 
@@ -36,6 +37,7 @@ WebServer wifiServer(80);
 bool WIFI_connection_status = false;
 
 extern in3ator_parameters in3;
+WIFIstruct Wifi_TB;
 
 /*
    Login page
@@ -202,7 +204,39 @@ void configWifiServer()
   wifiServer.begin();
 }
 
-void OTAHandler(void)
+void WIFI_UpdatedCallback(const bool &success)
+{
+  if (success)
+  {
+    logln("[WIFI] -> Done, Reboot now");
+#if defined(ESP8266)
+    ESP.restart();
+#elif defined(ESP32)
+    esp_restart();
+#endif
+  }
+  else
+  {
+    logln("[WIFI] -> No new firmware");
+  }
+}
+
+void WIFICheckOTA()
+{
+  logln("[WIFI] -> Checking WIFI firwmare Update...");
+  tb_wifi.Start_Firmware_Update(CURRENT_FIRMWARE_TITLE, FWversion, WIFI_UpdatedCallback);
+}
+
+void WIFI_TB_Init()
+{
+  Wifi_TB.provisioned = EEPROM.read(EEPROM_THINGSBOARD_PROVISIONED);
+  if (Wifi_TB.provisioned)
+  {
+    Wifi_TB.device_token = EEPROM.readString(EEPROM_THINGSBOARD_TOKEN);
+  }
+}
+
+void WifiOTAHandler(void)
 {
   if (WiFi.status() == WL_CONNECTED)
   {
@@ -213,6 +247,27 @@ void OTAHandler(void)
     else
     {
       wifiServer.handleClient();
+    }
+    if (!tb_wifi.connected())
+    {
+      // Connect to the ThingsBoard
+      Serial.print("Connecting over WIFI to: ");
+      Serial.print(THINGSBOARD_SERVER);
+      Serial.print(" with token ");
+      Serial.println(Wifi_TB.device_token);
+      if (!tb_wifi.connect(THINGSBOARD_SERVER, Wifi_TB.device_token.c_str()))
+      {
+        Serial.println("Failed to connect");
+        return;
+      }
+      else
+      {
+        WIFICheckOTA();
+      }
+    }
+    else
+    {
+      tb_wifi.loop();
     }
     WIFI_connection_status = true;
   }

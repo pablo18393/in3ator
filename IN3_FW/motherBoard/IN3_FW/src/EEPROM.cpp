@@ -24,7 +24,6 @@
 */
 #include <Arduino.h>
 #include "main.h"
-#include "GPRS.h"
 
 extern bool autoLock;
 extern bool WIFI_EN;
@@ -144,11 +143,6 @@ void recapVariables()
   in3.controlMode = EEPROM.read(EEPROM_controlMode);
   in3.desiredControlTemperature = EEPROM.read(EEPROM_desiredControlMode);
   in3.desiredControlHumidity = EEPROM.read(EEPROM_desiredControlHumidity);
-  GPRS.provisioned = EEPROM.read(EEPROM_THINGSBOARD_PROVISIONED);
-  if (GPRS.provisioned)
-  {
-    GPRS.device_token = EEPROM.readString(EEPROM_THINGSBOARD_TOKEN);
-  }
 }
 
 void saveCalibrationToEEPROM()
