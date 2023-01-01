@@ -440,14 +440,8 @@ void initTFT()
   GPIOWrite(TFT_RST, HIGH); // alternating HIGH/LOW
   delay(5);
 #endif
-  Serial.println("code 0");
-  delay(100);
   initializeTFT();
-  Serial.println("code 1");
-  delay(100);
   loadlogo();
-  Serial.println("code 2");
-  delay(100);
   if (BACKLIGHT_CONTROL == DIRECT_BACKLIGHT_CONTROL)
   {
     backlight_start_value = false;
@@ -488,7 +482,6 @@ void initTFT()
     logln("[HW] -> Fail -> test current is " + String(testCurrent) + " Amps");
   }
   in3.display_current_test = testCurrent;
-  Serial.println("code 3");
 }
 
 void initBuzzer()
