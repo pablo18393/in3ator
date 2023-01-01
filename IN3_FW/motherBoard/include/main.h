@@ -246,6 +246,8 @@ typedef enum
 #define GPRS_TASK_PERIOD 1
 #define OTA_TASK_PERIOD 1
 #define SENSORS_TASK_PERIOD 1
+#define ROOM_SENSOR_UPDATE_PERIOD 500
+#define DIGITAL_CURRENT_SENSOR_PERIOD 5
 #define BUZZER_TASK_PERIOD 1
 #define BACKLIGHT_TASK_PERIOD 100
 
@@ -301,7 +303,6 @@ float measureMeanVoltage(int shunt);
 void watchdogReload();
 void WIFI_TB_Init();
 void WifiOTAHandler(void);
-void sensorsHandler();
 void GPRS_Handler();
 void GPRS_TB_Init();
 void securityCheck();
@@ -381,6 +382,7 @@ void setSensorsGraphicPosition(int UI_page);
 void basicHumidityControl();
 bool checkStableTemperatures(double *referenceSensorHistory, double *sensorToCalibrateHistory, int historyLength, double stabilityError);
 void initRoomSensor();
+void powerMonitor();
 void currentMonitor();
 void voltageMonitor();
 

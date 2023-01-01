@@ -164,14 +164,6 @@ void voltageMonitor()
   }
 }
 
-void sensorsHandler()
-{
-  measureNTCTemperature(skinSensor);
-#if (HW_NUM == 6)
-  measureNTCTemperature(airSensor);
-#endif
-}
-
 double measureMeanConsumption(int shunt)
 {
 #if (HW_NUM == 6)

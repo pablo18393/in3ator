@@ -138,6 +138,7 @@ long lastBlinkSetMessage;
 long lastSuccesfullSensorUpdate[numSensors];
 
 int ScreenBacklightMode;
+long lastRoomSensorUpdate, lastCurrentSensorUpdate;
 
 in3ator_parameters in3;
 
@@ -164,7 +165,21 @@ void sensors_Task(void *pvParameters)
 {
   for (;;)
   {
-    sensorsHandler();
+    measureNTCTemperature(skinSensor);
+#if (HW_NUM == 6)
+    measureNTCTemperature(airSensor);
+#endif
+    if (millis() - lastRoomSensorUpdate > ROOM_SENSOR_UPDATE_PERIOD)
+    {
+      updateRoomSensor();
+      lastRoomSensorUpdate=millis();
+    }
+    if (millis() - lastCurrentSensorUpdate > DIGITAL_CURRENT_SENSOR_PERIOD)
+    {
+      powerMonitor();
+      lastCurrentSensorUpdate=millis();
+    }
+    securityCheck();
     vTaskDelay(SENSORS_TASK_PERIOD / portTICK_PERIOD_MS);
   }
 }

@@ -253,13 +253,16 @@ void checkStatusOfSensor(byte sensor)
 
 void powerFailureAlarm()
 {
-
 }
 
-void checkSensors()
+void sensorHealthMonitor()
 {
   checkStatusOfSensor(airSensor);
   checkStatusOfSensor(skinSensor);
+}
+
+void powerMonitor()
+{
 #if (HW_NUM <= 9)
   currentMonitor();
 #elif (HW_NUM >= 10)
@@ -439,5 +442,5 @@ void securityCheck()
 {
   checkThermalCutOuts();
   checkAlarms();
-  checkSensors();
+  sensorHealthMonitor();
 }

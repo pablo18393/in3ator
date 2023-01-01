@@ -125,7 +125,6 @@ extern bool state_blink;
 extern bool blinkSetMessageState;
 extern long lastBlinkSetMessage;
 
-
 extern double HeaterPIDOutput;
 extern double skinControlPIDInput;
 extern double airControlPIDInput;
@@ -249,10 +248,6 @@ void updateData()
 {
   loopCounts++;
   watchdogReload();
-  if (page != autoCalibrationPage)
-  {
-    securityCheck();
-  }
   if (encPulseDetected && GPIORead(ENC_SWITCH))
   {
     encPulseDetected = false;
@@ -297,7 +292,6 @@ void updateData()
   }
   if (millis() - lastGraphicSensorsUpdate > sensorsUpdatePeriod)
   {
-    updateRoomSensor();
     if (page == mainMenuPage || page == actuatorsProgressPage)
     {
       updateDisplaySensors();
