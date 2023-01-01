@@ -205,14 +205,15 @@ float adcToCelsius(float adcReading, int maxAdcReading)
   float beta = 3950.0;
   float temp0 = 298.0;
   float r0 = 10000.0;
+  float adcReadingCorrection = 215;
   // Bloque de cálculo
   // Variables used in calculus
   float vm = 0.0;
   float rntc = 0.0;
-  if (maxAdcReading && adcReading && (adcReading != maxAdcReading))
+  if (maxAdcReading && adcReading && (adcReading != maxAdcReading) && (adcReading + adcReadingCorrection < maxAdcReading))
   {
-    vm = (vcc) * (adcReading / maxAdcReading); // Calcular tensión en la entrada
-    rntc = rAux / ((vcc / vm) - 1);            // Calcular la resistencia de la NTC
+    vm = (vcc) * ((adcReading + adcReadingCorrection) / maxAdcReading); // Calcular tensión en la entrada
+    rntc = rAux / ((vcc / vm) - 1);                                     // Calcular la resistencia de la NTC
   }
   else
   {

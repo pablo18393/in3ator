@@ -172,12 +172,12 @@ void sensors_Task(void *pvParameters)
     if (millis() - lastRoomSensorUpdate > ROOM_SENSOR_UPDATE_PERIOD)
     {
       updateRoomSensor();
-      lastRoomSensorUpdate=millis();
+      lastRoomSensorUpdate = millis();
     }
     if (millis() - lastCurrentSensorUpdate > DIGITAL_CURRENT_SENSOR_PERIOD)
     {
       powerMonitor();
-      lastCurrentSensorUpdate=millis();
+      lastCurrentSensorUpdate = millis();
     }
     securityCheck();
     vTaskDelay(SENSORS_TASK_PERIOD / portTICK_PERIOD_MS);
@@ -240,6 +240,7 @@ void setup()
 
 void loop()
 {
+  watchdogReload();
   userInterfaceHandler(page);
   updateData();
 }
