@@ -7,7 +7,7 @@
 #include "ThingsBoard.h"
 #include "Credentials.h"
 
-#define THINGSBOARD_BUFFER_SIZE 512 
+#define THINGSBOARD_BUFFER_SIZE 512
 
 // Initialize GSM modem
 TinyGsm modem(modemSerial);
@@ -46,43 +46,45 @@ ThingsBoardSized<THINGSBOARD_BUFFER_SIZE> tb_provision(client); // increase buff
 
 struct GPRSstruct
 {
-    int provisioned = false;
-    bool provision_request_sent = false;
-    bool provision_request_processed = false;
+  int provisioned = false;
+  bool OTA_requested = false;
+  bool provision_request_sent = false;
+  bool provision_request_processed = false;
 
-    bool enable;
-    long sendPeriod;
-    long lastSent;
-    char buffer[RX_BUFFER_LENGTH];
-    int charToRead;
-    int bufferWritePos;
-    bool powerUp;
-    bool connect;
-    bool connectionStatus;
-    bool timeOut;
-    byte process;
-    long processTime;
-    long packetSentenceTime;
-    bool post;
-    bool firstPost = false;
-    bool firstConfigPost;
+  bool enable;
+  long sendPeriod;
+  long lastSent;
+  char buffer[RX_BUFFER_LENGTH];
+  int charToRead;
+  int bufferWritePos;
+  bool powerUp;
+  bool connect;
+  bool connectionStatus;
+  bool timeOut;
+  byte process;
+  long processTime;
+  long packetSentenceTime;
+  bool post;
+  bool firstPost = false;
+  bool firstConfigPost;
 
-    String CCID;
-    String IMEI;
-    String IMSI;
-    String COP;
-    int CSQ;
-    String APN;
-    IPAddress IP;
-    String device_token;
+  String CCID;
+  String IMEI;
+  String IMSI;
+  String COP;
+  int CSQ;
+  String APN;
+  IPAddress IP;
+  String device_token;
 
-    float longitud;
-    float latitud;
-    float accuracy;
+  float longitud;
+  float latitud;
+  float accuracy;
 };
 
 // Struct for client connecting after provisioning
-struct Credentials {
+struct Credentials
+{
   String client_id;
   String username;
   String password;

@@ -259,9 +259,10 @@ void WifiOTAHandler(void)
       }
       else
       {
-        if (ENABLE_OTA)
+        if (ENABLE_WIFI_OTA && !Wifi_TB.OTA_requested)
         {
           WIFICheckOTA();
+          Wifi_TB.OTA_requested = true;
         }
       }
     }

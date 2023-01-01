@@ -25,7 +25,8 @@
 #include "PID.h"
 
 #define WDT_TIMEOUT 45
-#define ENABLE_OTA false
+#define ENABLE_WIFI_OTA true // enable wifi OTA
+#define ENABLE_GPRS_OTA false // enable GPRS OTA
 
 #define ON true
 #define OFF false

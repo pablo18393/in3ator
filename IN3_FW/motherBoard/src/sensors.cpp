@@ -283,7 +283,7 @@ bool updateRoomSensor()
 {
   if (roomSensorPresent)
   {
-    bool sensorState = mySHTC3.update();
+    SHTC3_Status_TypeDef sensorState = mySHTC3.update();
     float sensedTemperature;
     logln("[SENSORS] -> Updating room humidity: state is " + String(sensorState));
     if (!sensorState)

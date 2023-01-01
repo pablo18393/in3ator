@@ -352,9 +352,10 @@ void GPRSPost()
         logln("[GPRS] -> Failed to connect");
         return;
       }
-      if (ENABLE_OTA)
+      if (ENABLE_GPRS_OTA && !GPRS.OTA_requested)
       {
         GPRSCheckOTA();
+        GPRS.OTA_requested = true;
       }
     }
     if (tb.connected() && millis() - GPRS.lastSent > secsToMillis(GPRS.sendPeriod))

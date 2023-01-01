@@ -7,7 +7,7 @@
 #define humidityPID 2
 #define numPID 3
 
-#define PID_TEMPERATURE_SAMPLE_TIME 1000
+#define PID_TEMPERATURE_SAMPLE_TIME 4000
 #define PID_HUMIDITY_SAMPLE_TIME 200
 
 #define KP_AIR 200
