@@ -47,7 +47,7 @@ extern double provisionalRawTemperatureLow[numSensors];
 extern double temperatureMax[numSensors], temperatureMin[numSensors];
 extern int temperatureArray[numNTC][analog_temperature_filter]; // variable to handle each NTC with the array of last samples (only for NTC)
 extern int temperature_array_pos;                               // temperature sensor number turn to measure
-extern float diffSkinTemperature, diffAirTemperature;                                   // difference between measured temperature and user input real temperature
+extern float diffSkinTemperature, diffAirTemperature;           // difference between measured temperature and user input real temperature
 extern bool humidifierState, humidifierStateChange;
 extern int previousHumidity; // previous sampled humidity
 extern float diffHumidity;   // difference between measured humidity and user input real humidity
@@ -71,7 +71,6 @@ extern float instantTemperature[secondOrder_filter];
 extern float previousTemperature[secondOrder_filter];
 
 // room variables
-extern bool controlAlgorithm;
 extern boolean A_set;
 extern boolean B_set;
 extern int encoderpinA;                 // pin  encoder A
@@ -122,7 +121,6 @@ extern bool state_blink;
 extern bool blinkSetMessageState;
 extern long lastBlinkSetMessage;
 
-
 extern double HeaterPIDOutput;
 extern double skinControlPIDInput;
 extern double airControlPIDInput;
@@ -130,7 +128,6 @@ extern double humidityControlPIDOutput;
 extern int humidifierTimeCycle;
 extern unsigned long windowStartTime;
 
-extern double Kp[numPID], Ki[numPID], Kd[numPID];
 extern PID airControlPID;
 extern PID skinControlPID;
 extern PID humidityControlPID;
@@ -319,16 +316,13 @@ void UI_actuatorsProgress()
   {
     updateData();
   }
-  if (controlAlgorithm == PID_CONTROL)
+  if (in3.temperatureControl)
   {
-    if (in3.temperatureControl)
-    {
-      startPID(in3.controlMode);
-    }
-    if (in3.humidityControl)
-    {
-      startPID(humidityPID);
-    }
+    startPID(in3.controlMode);
+  }
+  if (in3.humidityControl)
+  {
+    startPID(humidityPID);
   }
   updateDisplaySensors();
   if (in3.temperatureControl)
@@ -348,25 +342,11 @@ void UI_actuatorsProgress()
     updateData();
     if (in3.temperatureControl)
     {
-      if (controlAlgorithm == BASIC_CONTROL)
-      {
-        basictemperatureControl();
-      }
-      else
-      {
-        PIDHandler();
-      }
+      PIDHandler();
     }
     if (in3.humidityControl)
     {
-      if (controlAlgorithm == BASIC_CONTROL)
-      {
-        basicHumidityControl();
-      }
-      else
-      {
-        PIDHandler();
-      }
+      PIDHandler();
     }
     while (!GPIORead(ENC_SWITCH))
     {

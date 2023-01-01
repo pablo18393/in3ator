@@ -28,7 +28,6 @@
 extern bool autoLock;
 extern bool WIFI_EN;
 bool firstTurnOn;
-extern bool controlAlgorithm;
 extern int presetTemp[2]; // preset baby skin temperature
 extern double RawTemperatureLow[numSensors], RawTemperatureRange[numSensors];
 extern double ReferenceTemperatureRange, ReferenceTemperatureLow;
@@ -84,14 +83,12 @@ void loaddefaultValues()
   autoLock = DEFAULT_AUTOLOCK;
   WIFI_EN = DEFAULT_WIFI_EN;
   in3.language = defaultLanguage;
-  controlAlgorithm = DEFAULT_CONTROL_ALGORITHM;
   in3.controlMode = AIR_CONTROL;
   in3.desiredControlTemperature = presetTemp[in3.controlMode];
   in3.desiredControlHumidity = presetHumidity;
   EEPROM.write(EEPROM_autoLock, autoLock);
   EEPROM.write(EEPROM_WIFI_EN, WIFI_EN);
   EEPROM.write(EEPROM_language, in3.language);
-  EEPROM.write(EEPROM_controlAlgorithm, controlAlgorithm);
   EEPROM.write(EEPROM_controlMode, in3.controlMode);
   EEPROM.write(EEPROM_desiredControlMode, in3.desiredControlTemperature);
   EEPROM.commit();
@@ -139,7 +136,6 @@ void recapVariables()
   }
   in3.serialNumber = EEPROM.read(EEPROM_SerialNumber);
   WIFI_EN = EEPROM.read(EEPROM_WIFI_EN);
-  controlAlgorithm = EEPROM.read(EEPROM_controlAlgorithm);
   in3.controlMode = EEPROM.read(EEPROM_controlMode);
   in3.desiredControlTemperature = EEPROM.read(EEPROM_desiredControlMode);
   in3.desiredControlHumidity = EEPROM.read(EEPROM_desiredControlHumidity);

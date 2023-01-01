@@ -73,7 +73,6 @@ extern float instantTemperature[secondOrder_filter];
 extern float previousTemperature[secondOrder_filter];
 
 // room variables
-extern bool controlAlgorithm;
 extern double desiredControlTemperature; // preset baby skin temperature
 extern double desiredControlHumidity;    // preset enviromental humidity
 
@@ -135,7 +134,6 @@ extern double humidityControlPIDOutput;
 extern int humidifierTimeCycle;
 extern unsigned long windowStartTime;
 
-extern double Kp[numPID], Ki[numPID], Kd[numPID];
 extern PID airControlPID;
 extern PID skinControlPID;
 extern PID humidityControlPID;

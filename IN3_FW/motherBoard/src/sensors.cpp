@@ -283,7 +283,6 @@ bool updateRoomSensor()
 {
   if (roomSensorPresent)
   {
-    noInterrupts();
     bool sensorState = mySHTC3.update();
     float sensedTemperature;
     logln("[SENSORS] -> Updating room humidity: state is " + String(sensorState));
@@ -310,7 +309,6 @@ bool updateRoomSensor()
     {
       initRoomSensor();
     }
-    interrupts();
   }
   else
   {

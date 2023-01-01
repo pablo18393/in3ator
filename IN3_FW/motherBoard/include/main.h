@@ -13,16 +13,16 @@
 #include "Adafruit_ILI9341.h"
 #include <EEPROM.h>
 #include <SPI.h>
-#include <PID_v1.h> //
 #include "board.h"
 #include <Wire.h>
-#include "SparkFun_SHTC3.h"       // Click here to get the library: http://librarymanager/All#SparkFun_SHTC3
-#include <RotaryEncoder.h>        //
-#include <Beastdevices_INA3221.h> //
+#include "SparkFun_SHTC3.h"
+#include <RotaryEncoder.h>
+#include <Beastdevices_INA3221.h>
 #include "in3ator_humidifier.h"
 #include "TCA9555.h"
 #include "esp32/ulp.h"
 #include "driver/rtc_io.h"
+#include "PID.h"
 
 #define WDT_TIMEOUT 45
 #define ENABLE_OTA false
@@ -61,7 +61,6 @@
 #define EEPROM_RawAirTemperatureRangeCorrection 130
 #define EEPROM_RawDigitalTemperatureLowCorrection 140
 #define EEPROM_RawDigitalTemperatureRangeCorrection 150
-#define EEPROM_controlAlgorithm 160
 #define EEPROM_ReferenceTemperatureRange 170
 #define EEPROM_ReferenceTemperatureLow 180
 #define EEPROM_FineTuneSkinTemperature 190
@@ -162,7 +161,6 @@
 #define time_back_wait 255
 
 #define DEFAULT_AUTOLOCK ON
-#define DEFAULT_CONTROL_ALGORITHM PID_CONTROL
 
 typedef enum
 {
@@ -241,15 +239,6 @@ typedef enum
 #define introBackColor WHITE
 #define introTextColor BLACK
 #define transitionEffect BLACK
-
-#define PIDISRPeriod 1000           // in msecs
-#define peripheralsISRPeriod 100000 // in milliseconds
-
-// PID VARIABLES
-#define skinPID 0
-#define airPID 1
-#define humidityPID 2
-#define numPID 3
 
 #define BACKLIGHT_NO_INTERACTION_TIME 12000 // time to decrease backlight display if no user actions
 

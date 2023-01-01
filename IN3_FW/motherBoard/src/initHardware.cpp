@@ -488,7 +488,7 @@ void initTFT()
     logln("[HW] -> Fail -> test current is " + String(testCurrent) + " Amps");
   }
   in3.display_current_test = testCurrent;
-    Serial.println("code 3");
+  Serial.println("code 3");
 }
 
 void initBuzzer()

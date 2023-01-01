@@ -135,7 +135,6 @@ extern double humidityControlPIDOutput;
 extern int humidifierTimeCycle;
 extern unsigned long windowStartTime;
 
-extern double Kp[numPID], Ki[numPID], Kd[numPID];
 extern PID airControlPID;
 extern PID skinControlPID;
 extern PID humidityControlPID;

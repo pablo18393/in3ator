@@ -24,118 +24,26 @@
 */
 #include <Arduino.h>
 #include "main.h"
+#include "PID.h"
 
-extern TwoWire *wire;
-extern MAM_in3ator_Humidifier in3_hum;
-extern Adafruit_ILI9341 tft;
-extern SHTC3 mySHTC3; // Declare an instance of the SHTC3 class
-extern RotaryEncoder encoder;
-extern Beastdevices_INA3221 digitalCurrentSensor;
-
-extern bool WIFI_EN;
-extern long lastDebugUpdate;
-extern long loopCounts;
-extern int page;
-extern int temperature_filter; // amount of temperature samples to filter
-extern long lastNTCmeasurement[numNTC];
-
-extern double errorTemperature[numSensors], temperatureCalibrationPoint;
-extern double ReferenceTemperatureRange, ReferenceTemperatureLow;
-extern double provisionalReferenceTemperatureLow;
-extern double fineTuneSkinTemperature;
-extern double RawTemperatureLow[numSensors], RawTemperatureRange[numSensors];
-extern double provisionalRawTemperatureLow[numSensors];
-extern double temperatureMax[numSensors], temperatureMin[numSensors];
-extern int temperatureArray[numNTC][analog_temperature_filter]; // variable to handle each NTC with the array of last samples (only for NTC)
-extern int temperature_array_pos;                               // temperature sensor number turn to measure
-extern float diffTemperature;                                   // difference between measured temperature and user input real temperature
-extern bool humidifierState, humidifierStateChange;
-extern int previousHumidity; // previous sampled humidity
-extern float diffHumidity;   // difference between measured humidity and user input real humidity
-
-extern byte autoCalibrationProcess;
-
-// Sensor check rate (in ms). Both sensors are checked in same interrupt and they have different check rates
-extern byte encoderRate;
-extern byte encoderCount;
-extern bool encPulseDetected;
-extern volatile long lastEncPulse;
-extern volatile bool statusEncSwitch;
-
-// WIFI
-extern bool WIFI_connection_status;
-
-extern bool roomSensorPresent;
-extern bool digitalCurrentSensorPresent;
-
-extern float instantTemperature[secondOrder_filter];
-extern float previousTemperature[secondOrder_filter];
-
-// room variables;
-extern boolean A_set;
-extern boolean B_set;
-extern int encoderpinA;                 // pin  encoder A
-extern int encoderpinB;                 // pin  encoder B
-extern bool encPulsed, encPulsedBefore; // encoder switch status
-extern bool updateUIData;
-extern volatile int EncMove;            // moved encoder
-extern volatile int lastEncMove;        // moved last encoder
-extern volatile int EncMoveOrientation; // set to -1 to increase values clockwise
-extern int last_encoder_move;           // moved encoder
-extern long encoder_debounce_time;      // in milliseconds, debounce time in encoder to filter signal bounces
-extern long last_encPulsed;             // last time encoder was pulsed
-
-// Text Graphic position variables
-extern int humidityX;
-extern int humidityY;
-extern int temperatureX;
-extern int temperatureY;
-extern int ypos;
-extern bool print_text;
-extern int initialSensorPosition;
-extern bool pos_text[8];
-
-extern bool enableSet;
-extern float temperaturePercentage, temperatureAtStart;
-extern float humidityPercentage, humidityAtStart;
-extern int barWidth, barHeight, tempBarPosX, tempBarPosY, humBarPosX, humBarPosY;
-extern int screenTextColor, screenTextBackgroundColor;
-
-// User Interface display variables
-extern bool autoLock;             // setting that enables backlight switch OFF after a given time of no user actions
-extern long lastbacklightHandler; // last time there was a encoder movement or pulse
-extern long sensorsUpdatePeriod;
-
-extern bool selected;
-extern char cstring[128];
-extern char *textToWrite;
-extern char *words[12];
-extern char *helpMessage;
-extern byte bar_pos;
-extern byte menu_rows;
-extern byte length;
-extern long lastGraphicSensorsUpdate;
-extern long lastSensorsUpdate;
-extern bool enableSetProcess;
-extern long blinking;
-extern bool state_blink;
-extern bool blinkSetMessageState;
-extern long lastBlinkSetMessage;
-
-
-extern double HeaterPIDOutput;
-extern double skinControlPIDInput;
-extern double airControlPIDInput;
-extern double humidityControlPIDOutput;
-extern int humidifierTimeCycle;
-extern unsigned long windowStartTime;
-
-extern double Kp[numPID], Ki[numPID], Kd[numPID];
-extern PID airControlPID;
-extern PID skinControlPID;
-extern PID humidityControlPID;
+double HeaterPIDOutput;
+double skinControlPIDInput;
+double airControlPIDInput;
+double humidityControlPIDOutput;
+int humidifierTimeCycle = 5000;
+unsigned long windowStartTime;
 
 extern in3ator_parameters in3;
+extern MAM_in3ator_Humidifier in3_hum;
+extern bool humidifierState, humidifierStateChange;
+
+double Kp[numPID] = {KP_SKIN, KP_AIR, KP_HUMIDITY};
+double Ki[numPID] = {KI_SKIN, KI_AIR, KI_HUMIDITY};
+double Kd[numPID] = {KD_SKIN, KD_AIR, KD_HUMIDITY};
+
+PID airControlPID(&airControlPIDInput, &HeaterPIDOutput, &in3.desiredControlTemperature, Kp[airPID], Ki[airPID], Kd[airPID], P_ON_E, DIRECT);
+PID skinControlPID(&skinControlPIDInput, &HeaterPIDOutput, &in3.desiredControlTemperature, Kp[skinPID], Ki[skinPID], Kd[skinPID], P_ON_E, DIRECT);
+PID humidityControlPID(&in3.humidity, &humidityControlPIDOutput, &in3.desiredControlHumidity, Kp[humidityPID], Ki[humidityPID], Kd[humidityPID], P_ON_E, DIRECT);
 
 void PIDInit()
 {
@@ -194,12 +102,14 @@ void startPID(byte var)
     airControlPID.SetOutputLimits(false, HEATER_MAX_PWM);
     airControlPID.SetTunings(Kp[airPID], Ki[airPID], Kd[airPID]);
     airControlPID.SetControllerDirection(DIRECT);
+    airControlPID.SetSampleTime(PID_TEMPERATURE_SAMPLE_TIME);
     airControlPID.SetMode(AUTOMATIC);
     break;
   case skinPID:
     skinControlPID.SetOutputLimits(false, HEATER_MAX_PWM);
     skinControlPID.SetTunings(Kp[skinPID], Ki[skinPID], Kd[skinPID]);
     skinControlPID.SetControllerDirection(DIRECT);
+    airControlPID.SetSampleTime(PID_TEMPERATURE_SAMPLE_TIME);
     skinControlPID.SetMode(AUTOMATIC);
     break;
   case humidityPID:
@@ -208,6 +118,7 @@ void startPID(byte var)
     humidityControlPID.SetTunings(Kp[humidityPID], Ki[humidityPID], Kd[humidityPID]);
     humidityControlPID.SetControllerDirection(DIRECT);
     humidityControlPID.SetOutputLimits(humidifierTimeCycle * humidifierDutyCycleMin / 100, humidifierTimeCycle * humidifierDutyCycleMax / 100);
+    airControlPID.SetSampleTime(PID_HUMIDITY_SAMPLE_TIME);
     humidityControlPID.SetMode(AUTOMATIC);
     break;
   }

@@ -23,7 +23,7 @@
 
 */
 
-#define HW_NUM 6
+#define HW_NUM 9
 #define HW_REVISION 'B'
 #define HWversion String(HW_NUM) + "." + String(HW_REVISION)
 #define FWversion "10.7"

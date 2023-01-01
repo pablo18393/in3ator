@@ -72,7 +72,6 @@ extern float instantTemperature[secondOrder_filter];
 extern float previousTemperature[secondOrder_filter];
 
 // room variables
-extern bool controlAlgorithm;
 extern boolean B_set;
 extern int encoderpinA;                 // pin  encoder A
 extern int encoderpinB;                 // pin  encoder B
@@ -131,7 +130,6 @@ extern double humidityControlPIDOutput;
 extern int humidifierTimeCycle;
 extern unsigned long windowStartTime;
 
-extern double Kp[numPID], Ki[numPID], Kd[numPID];
 extern PID airControlPID;
 extern PID skinControlPID;
 extern PID humidityControlPID;

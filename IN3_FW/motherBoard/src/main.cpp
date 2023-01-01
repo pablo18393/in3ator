@@ -80,7 +80,6 @@ float instantCurrent[secondOrder_filter];
 float previousCurrent[secondOrder_filter];
 
 // room variables
-bool controlAlgorithm;
 float minDesiredTemp[2] = {35, 30};   // minimum allowed temperature to be set
 float maxDesiredTemp[2] = {37.5, 37}; // maximum allowed temperature to be set
 int presetTemp[2] = {36, 32};         // preset baby skin temperature
@@ -138,21 +137,9 @@ long lastBlinkSetMessage;
 
 long lastSuccesfullSensorUpdate[numSensors];
 
-double Kp[numPID] = {200, 200, 200}, Ki[numPID] = {1, 1, 2}, Kd[numPID] = {500, 500, 20};
-double HeaterPIDOutput;
-double skinControlPIDInput;
-double airControlPIDInput;
-double humidityControlPIDOutput;
-int humidifierTimeCycle = 5000;
-unsigned long windowStartTime;
-
 int ScreenBacklightMode;
 
 in3ator_parameters in3;
-
-PID airControlPID(&airControlPIDInput, &HeaterPIDOutput, &in3.desiredControlTemperature, Kp[airPID], Ki[airPID], Kd[airPID], P_ON_E, DIRECT);
-PID skinControlPID(&skinControlPIDInput, &HeaterPIDOutput, &in3.desiredControlTemperature, Kp[skinPID], Ki[skinPID], Kd[skinPID], P_ON_E, DIRECT);
-PID humidityControlPID(&in3.humidity, &humidityControlPIDOutput, &in3.desiredControlHumidity, Kp[humidityPID], Ki[humidityPID], Kd[humidityPID], P_ON_E, DIRECT);
 
 void GPRS_Task(void *pvParameters)
 {
