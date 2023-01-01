@@ -205,27 +205,22 @@ void setup()
     ;
   ;
   logln("OTA task successfully created!\n");
-  /*
-    logln("Creating Backlight task ...\n");
-    while (xTaskCreatePinnedToCore(Backlight_Task, (const char *)"BACKLIGHT", 4096, NULL, 1, NULL, 1) != pdPASS)
-      ;
+  logln("Creating Backlight task ...\n");
+  while (xTaskCreatePinnedToCore(Backlight_Task, (const char *)"BACKLIGHT", 4096, NULL, 1, NULL, 1) != pdPASS)
     ;
-    logln("Backlight task successfully created!\n");
+  ;
+  logln("Backlight task successfully created!\n");
 
-    logln("Creating sensors task ...\n");
-    while (xTaskCreatePinnedToCore(sensors_Task, (const char *)"SENSORS", 4096, NULL, 1, NULL, 1) != pdPASS)
-      ;
+  logln("Creating buzzer task ...\n");
+  while (xTaskCreatePinnedToCore(buzzer_Task, (const char *)"BUZZER", 4096, NULL, 1, NULL, 1) != pdPASS)
     ;
-    logln("sensors task successfully created!\n");
-
-
-
-    logln("Creating buzzer task ...\n");
-    while (xTaskCreatePinnedToCore(buzzer_Task, (const char *)"BUZZER", 4096, NULL, 1, NULL, 1) != pdPASS)
-      ;
+  ;
+  logln("Buzzer task successfully created!\n");
+  logln("Creating sensors task ...\n");
+  while (xTaskCreatePinnedToCore(sensors_Task, (const char *)"SENSORS", 4096, NULL, 1, NULL, 1) != pdPASS)
     ;
-    logln("Buzzer task successfully created!\n");
-    */
+  ;
+  logln("sensors task successfully created!\n");
 }
 
 void loop()

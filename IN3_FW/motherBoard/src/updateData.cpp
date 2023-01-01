@@ -248,10 +248,7 @@ void backlightHandler()
 void updateData()
 {
   loopCounts++;
-  buzzerHandler();
   watchdogReload();
-  sensorsHandler();
-  backlightHandler();
   if (page != autoCalibrationPage)
   {
     securityCheck();
