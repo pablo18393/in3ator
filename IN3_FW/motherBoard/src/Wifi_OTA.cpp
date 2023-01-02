@@ -213,11 +213,7 @@ void WIFI_UpdatedCallback(const bool &success)
   if (success)
   {
     logln("[WIFI] -> Done, Reboot now");
-#if defined(ESP8266)
-    ESP.restart();
-#elif defined(ESP32)
     esp_restart();
-#endif
   }
   else
   {
@@ -229,28 +225,31 @@ bool WIFICheckNewEvent()
 {
   bool retVal = false;
   bool WifiStatus = (WiFi.status() == WL_CONNECTED);
-  bool serverConnectionStatus = false;
-  if (WifiStatus)
-  {
-    serverConnectionStatus = tb_wifi.connected();
-  }
-  if (serverConnectionStatus != Wifi_TB.lastServerConnectionStatus || WifiStatus != Wifi_TB.lastWIFIConnectionStatus)
+  bool serverConnectionStatus = WIFIIsConnectedToServer();
+  bool OTAInProgress = WIFIOTAIsOngoing();
+  if (serverConnectionStatus != Wifi_TB.lastServerConnectionStatus || WifiStatus != Wifi_TB.lastWIFIConnectionStatus || OTAInProgress != Wifi_TB.lastOTAInProgress)
   {
     retVal = true;
   }
+  Wifi_TB.lastOTAInProgress = OTAInProgress;
   Wifi_TB.lastWIFIConnectionStatus = WifiStatus;
   Wifi_TB.lastServerConnectionStatus = serverConnectionStatus;
   return (retVal);
 }
 
-bool WIFIAttached()
+bool WIFIIsConnected()
 {
   return (WiFi.status() == WL_CONNECTED);
 }
 
-bool WIFIConnectedToServer()
+bool WIFIIsConnectedToServer()
 {
-  return (Wifi_TB.serverConnectionStatus);
+  return (Wifi_TB.serverConnectionStatus && WIFIIsConnected());
+}
+
+bool WIFIOTAIsOngoing()
+{
+  return (tb_wifi.Firmware_is_updating() && WIFIIsConnectedToServer());
 }
 
 void WIFICheckOTA()
@@ -308,6 +307,6 @@ void WifiOTAHandler(void)
   else
   {
     WIFI_connection_status = false;
-    Wifi_TB.serverConnectionStatus = true;
+    Wifi_TB.serverConnectionStatus = false;
   }
 }

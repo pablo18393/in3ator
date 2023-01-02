@@ -183,6 +183,7 @@ typedef enum
     EVENT_2G = 0,
     EVENT_WIFI,
     EVENT_SERVER_CONNECTION,
+    EVENT_OTA_ONGOING,
 } UI_EVENTS_ID;
 
 typedef enum
@@ -190,6 +191,7 @@ typedef enum
     EVENT_2G_UI_POS = 5,
     EVENT_SERVER_CONNECTION_UI_POS = EVENT_2G_UI_POS + 2 * letter_width,
     EVENT_WIFI_UI_POS = EVENT_SERVER_CONNECTION_UI_POS + letter_width,
+    EVENT_OTA_ONGOING_UI_POS = EVENT_WIFI_UI_POS + letter_width,
 } UI_EVENTS_ID_POS;
 
 // Graphic variables
@@ -328,6 +330,7 @@ char *convertStringToChar(String input);
 char *convertStringToChar(char *arrayInput, String input);
 int16_t drawCentreString(char *string, int16_t dX, int16_t poY, int16_t size);
 void eraseBar(int UI_menu_rows, int bar_pos);
+void UI_updateConnectivityEvents();
 void updateBar(int UI_menu_rows, int bar_pos);
 void graphics(uint8_t UI_page, uint8_t UI_language, uint8_t UI_print_text, uint8_t UI_menu_rows, uint8_t UI_var_0, uint8_t UI_var_1);
 int graphicHeight(int position);

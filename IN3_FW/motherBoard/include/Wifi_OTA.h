@@ -18,11 +18,13 @@ struct WIFIstruct
     bool serverConnectionStatus = false;
     bool lastServerConnectionStatus = false;
     bool lastWIFIConnectionStatus = false;
+    bool lastOTAInProgress = false;
     String device_token;
 };
 
-bool WIFIConnectedToServer();
-bool WIFIAttached();
+bool WIFIIsConnectedToServer();
+bool WIFIIsConnected();
 bool WIFICheckNewEvent();
+bool WIFIOTAIsOngoing();
 
 #endif // _WIFI_OTA_H_

@@ -996,6 +996,15 @@ public:
       m_fwUpdatedCallback(success);
     }
   }
+
+  inline const bool Firmware_is_updating()
+  {
+    if (m_fwState != nullptr)
+    {
+      return (strncmp_P(FW_STATE_DOWNLOADING, m_fwState, strlen(FW_STATE_DOWNLOADING)) == 0);
+    }
+    return false;
+  }
 #endif
 
   //----------------------------------------------------------------------------

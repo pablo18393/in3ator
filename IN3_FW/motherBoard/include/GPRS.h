@@ -42,6 +42,8 @@ struct GPRSstruct
   bool lastGPRSConnectionStatus = false;
   bool serverConnectionStatus = false;
   bool lastServerConnectionStatus = false;
+  bool OTAInProgress = false;
+  bool lastOTAInProgress = false;
   bool enable;
   long sendPeriod;
   long lastSent;
@@ -82,8 +84,9 @@ struct Credentials
 };
 
 bool GPRSCheckNewEvent();
-bool GPRSAttached();
-bool GPRSConnectedToServer();
+bool GPRSIsAttached();
+bool GPRSIsConnectedToServer();
+bool GPRSOTAIsOngoing();
 void GPRS_Handler();
 void GPRS_TB_Init();
 void initGPRS();

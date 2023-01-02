@@ -148,7 +148,10 @@ void GPRS_Task(void *pvParameters)
   GPRS_TB_Init();
   for (;;)
   {
-    GPRS_Handler();
+    if (!WIFIIsConnected())
+    {
+      GPRS_Handler();
+    }
     vTaskDelay(GPRS_TASK_PERIOD / portTICK_PERIOD_MS);
   }
 }
@@ -241,7 +244,6 @@ void setup()
 
 void loop()
 {
-  watchdogReload();
   userInterfaceHandler(page);
   updateData();
 }

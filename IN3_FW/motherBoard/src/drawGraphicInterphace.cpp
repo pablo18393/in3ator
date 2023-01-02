@@ -204,16 +204,6 @@ void drawHeading(int UI_page, int UI_serialNumber)
   drawCentreString(convertStringToChar(cstring, "in3_"), tft.width() / 2 - 2 * letter_width - 10, headint_text_height, textFontSize);
   drawCentreNumber(UI_serialNumber, tft.width() / 2, headint_text_height);
   drawCentreString(convertStringToChar(cstring, String(FWversion) + "/" + HWversion), tft.width() - 4 * letter_width, headint_text_height, textFontSize);
-  updateHeadingEvent(EVENT_2G, GPRSAttached());
-  updateHeadingEvent(EVENT_WIFI, WIFIAttached());
-  if (GPRSAttached())
-  {
-    updateHeadingEvent(EVENT_SERVER_CONNECTION, GPRSConnectedToServer());
-  }
-  if (WIFIAttached())
-  {
-    updateHeadingEvent(EVENT_SERVER_CONNECTION, WIFIConnectedToServer());
-  }
 }
 
 void updateHeadingEvent(byte Event, bool event_status)
@@ -239,8 +229,21 @@ void updateHeadingEvent(byte Event, bool event_status)
   case EVENT_SERVER_CONNECTION:
     drawCentreString(convertStringToChar(cstring, "S"), EVENT_SERVER_CONNECTION_UI_POS, headint_text_height, textFontSize);
     break;
+  case EVENT_OTA_ONGOING:
+    drawCentreString(convertStringToChar(cstring, "O"), EVENT_OTA_ONGOING_UI_POS, headint_text_height, textFontSize);
+    break;
+  default:
+    break;
   }
   setBackgroundColor(currentBackgroundColor);
+}
+
+void UI_updateConnectivityEvents()
+{
+  updateHeadingEvent(EVENT_2G, GPRSIsAttached());
+  updateHeadingEvent(EVENT_WIFI, WIFIIsConnected());
+  updateHeadingEvent(EVENT_SERVER_CONNECTION, GPRSIsConnectedToServer() || WIFIIsConnectedToServer());
+  updateHeadingEvent(EVENT_OTA_ONGOING, WIFIOTAIsOngoing() || GPRSOTAIsOngoing());
 }
 
 void eraseBar(int UI_menu_rows, int bar_pos)

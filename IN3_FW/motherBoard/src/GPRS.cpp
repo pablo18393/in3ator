@@ -95,14 +95,19 @@ bool GPRSCheckNewEvent()
   return (retVal);
 }
 
-bool GPRSAttached()
+bool GPRSIsAttached()
 {
   return (GPRS.post);
 }
 
-bool GPRSConnectedToServer()
+bool GPRSIsConnectedToServer()
 {
   return (GPRS.serverConnectionStatus);
+}
+
+bool GPRSOTAIsOngoing()
+{
+  return (tb.Firmware_is_updating() && GPRSIsConnectedToServer());
 }
 
 void GPRS_get_triangulation_location()
@@ -481,7 +486,15 @@ void GPRSPost()
       {
         tb.sendTelemetryFloat("Phototherapy_current", in3.phototherapy_current);
       }
+      /*
+      // Send our firmware title and version
+      StaticJsonDocument<JSON_OBJECT_SIZE(2)> currentFirmwareInfo;
+      JsonObject currentFirmwareInfoObject = currentFirmwareInfo.to<JsonObject>();
 
+      currentFirmwareInfoObject[CURR_FW_TITLE_KEY] = currFwTitle;
+      currentFirmwareInfoObject[CURR_FW_VER_KEY] = currFwVersion;
+      return sendTelemetryJson(currentFirmwareInfoObject, JSON_STRING_SIZE(measureJson(currentFirmwareInfoObject)));
+      */
       GPRS.process = false;
       GPRS.lastSent = millis();
       logln("[GPRS] -> GPRS POST SUCCESS");
