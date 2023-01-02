@@ -1,25 +1,14 @@
+#ifndef _GPRS_H_
+#define _GPRS_H_
+
 #define TINY_GSM_MODEM_SIM800
 #define modemSerial Serial2
 
 #include <Arduino.h>
-#include "main.h"
 #include <TinyGsmClient.h>
 #include "ThingsBoard.h"
-#include "Credentials.h"
 
 #define THINGSBOARD_BUFFER_SIZE 512
-
-// Initialize GSM modem
-TinyGsm modem(modemSerial);
-
-// Initialize GSM client
-TinyGsmClient client(modem);
-
-// Initialize ThingsBoard instance
-ThingsBoardSized<THINGSBOARD_BUFFER_SIZE> tb(client);
-
-// Initialize ThingsBoard client provision instance
-ThingsBoardSized<THINGSBOARD_BUFFER_SIZE> tb_provision(client); // increase buffer size
 
 #define APN_TM "TM"
 #define APN_TRUPHONE "iot.truphone.com"
@@ -50,7 +39,8 @@ struct GPRSstruct
   bool OTA_requested = false;
   bool provision_request_sent = false;
   bool provision_request_processed = false;
-
+  bool lastGPRSConnectionStatus = false;
+  bool lastServerConnectionStatus = false;
   bool enable;
   long sendPeriod;
   long lastSent;
@@ -89,3 +79,13 @@ struct Credentials
   String username;
   String password;
 };
+
+bool GPRSCheckNewEvent();
+bool GPRSAttached();
+bool GPRSConnectedToServer();
+void GPRS_Handler();
+void GPRS_TB_Init();
+void initGPRS();
+void GPRSSetPostPeriod();
+
+#endif // _GPRS_123H_

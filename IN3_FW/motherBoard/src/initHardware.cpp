@@ -636,7 +636,6 @@ void initHardware(bool printOutputTest)
 #else
   criticalError = initActuators();
 #endif
-  initGPRS();
   if (WIFI_EN)
   {
     wifiInit();

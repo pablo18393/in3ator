@@ -247,7 +247,6 @@ void backlightHandler()
 void updateData()
 {
   loopCounts++;
-  watchdogReload();
   if (encPulseDetected && GPIORead(ENC_SWITCH))
   {
     encPulseDetected = false;
@@ -297,6 +296,16 @@ void updateData()
       updateDisplaySensors();
     }
     lastGraphicSensorsUpdate = millis();
+    if (GPRSCheckNewEvent())
+    {
+      updateHeadingEvent(EVENT_2G, GPRSAttached());
+      updateHeadingEvent(EVENT_SERVER_CONNECTION, GPRSConnectedToServer() || WIFIConnectedToServer());
+    }
+    if (WIFICheckNewEvent())
+    {
+      updateHeadingEvent(EVENT_WIFI, WIFIAttached());
+      updateHeadingEvent(EVENT_SERVER_CONNECTION, GPRSConnectedToServer() || WIFIConnectedToServer());
+    }
   }
   if ((page == mainMenuPage) && !enableSet)
   {

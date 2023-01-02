@@ -24,7 +24,6 @@
 */
 #include <Arduino.h>
 #include "main.h"
-#include "Wifi_OTA.h"
 
 const char *wifiHost = "in3ator";
 
@@ -32,6 +31,11 @@ const char *ssid = "in3wifi";
 const char *wifiPassword = "12345678";
 
 WebServer wifiServer(80);
+
+WiFiClient espClient;
+
+// Initialize ThingsBoard instance
+ThingsBoardSized<THINGSBOARD_BUFFER_SIZE> tb_wifi(espClient);
 
 // WIFI
 bool WIFI_connection_status = false;
@@ -219,6 +223,34 @@ void WIFI_UpdatedCallback(const bool &success)
   {
     logln("[WIFI] -> No new firmware");
   }
+}
+
+bool WIFICheckNewEvent()
+{
+  bool retVal = false;
+  bool WifiStatus = (WiFi.status() == WL_CONNECTED);
+  bool serverConnectionStatus = false;
+  if (WifiStatus)
+  {
+    serverConnectionStatus = tb_wifi.connected();
+  }
+  if (serverConnectionStatus != Wifi_TB.lastServerConnectionStatus || WifiStatus != Wifi_TB.lastWIFIConnectionStatus)
+  {
+    retVal = true;
+  }
+  Wifi_TB.lastWIFIConnectionStatus = WifiStatus;
+  Wifi_TB.lastServerConnectionStatus = serverConnectionStatus;
+  return (retVal);
+}
+
+bool WIFIAttached()
+{
+  return (WiFi.status() == WL_CONNECTED);
+}
+
+bool WIFIConnectedToServer()
+{
+  return (tb_wifi.connected());
 }
 
 void WIFICheckOTA()

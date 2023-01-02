@@ -144,6 +144,7 @@ in3ator_parameters in3;
 
 void GPRS_Task(void *pvParameters)
 {
+  initGPRS();
   GPRS_TB_Init();
   for (;;)
   {

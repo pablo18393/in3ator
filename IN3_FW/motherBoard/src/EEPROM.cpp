@@ -34,7 +34,6 @@ extern double ReferenceTemperatureRange, ReferenceTemperatureLow;
 extern double fineTuneSkinTemperature, fineTuneAirTemperature;
 
 extern in3ator_parameters in3;
-extern struct GPRSstruct GPRS;
 
 void initEEPROM()
 {

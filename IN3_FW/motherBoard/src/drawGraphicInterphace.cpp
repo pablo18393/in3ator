@@ -124,7 +124,6 @@ extern bool state_blink;
 extern bool blinkSetMessageState;
 extern long lastBlinkSetMessage;
 
-
 extern double HeaterPIDOutput;
 extern double skinControlPIDInput;
 extern double airControlPIDInput;
@@ -137,6 +136,21 @@ extern PID skinControlPID;
 extern PID humidityControlPID;
 
 extern in3ator_parameters in3;
+
+void setTextColor(int16_t color)
+{
+  screenTextColor = color;
+}
+
+void setBackgroundColor(int16_t color)
+{
+  screenTextBackgroundColor = color;
+}
+
+int16_t getBackgroundColor()
+{
+  return screenTextBackgroundColor;
+}
 
 void setSensorsGraphicPosition(int UI_page)
 {
@@ -190,6 +204,36 @@ void drawHeading(int UI_page, int UI_serialNumber)
   drawCentreString(convertStringToChar(cstring, "in3_"), tft.width() / 2 - 2 * letter_width - 10, headint_text_height, textFontSize);
   drawCentreNumber(UI_serialNumber, tft.width() / 2, headint_text_height);
   drawCentreString(convertStringToChar(cstring, String(FWversion) + "/" + HWversion), tft.width() - 4 * letter_width, headint_text_height, textFontSize);
+  updateHeadingEvent(EVENT_2G, GPRSAttached());
+  updateHeadingEvent(EVENT_WIFI, WIFIAttached());
+  updateHeadingEvent(EVENT_SERVER_CONNECTION, GPRSConnectedToServer() || WIFIConnectedToServer());
+}
+
+void updateHeadingEvent(byte Event, bool event_status)
+{
+  uint16_t currentBackgroundColor = getBackgroundColor();
+  setBackgroundColor(COLOR_HEADING);
+  if (event_status)
+  {
+    setTextColor(COLOR_MENU);
+  }
+  else
+  {
+    setTextColor(COLOR_HEADING);
+  }
+  switch (Event)
+  {
+  case EVENT_2G:
+    drawCentreString(convertStringToChar(cstring, "2G"), EVENT_2G_UI_POS, headint_text_height, textFontSize);
+    break;
+  case EVENT_WIFI:
+    drawCentreString(convertStringToChar(cstring, "W"), EVENT_WIFI_UI_POS, headint_text_height, textFontSize);
+    break;
+  case EVENT_SERVER_CONNECTION:
+    drawCentreString(convertStringToChar(cstring, "S"), EVENT_SERVER_CONNECTION_UI_POS, headint_text_height, textFontSize);
+    break;
+  }
+  setBackgroundColor(currentBackgroundColor);
 }
 
 void eraseBar(int UI_menu_rows, int bar_pos)
@@ -555,16 +599,6 @@ int16_t drawRightString(char *string, int16_t dX, int16_t poY, int16_t size)
   }
 
   return sumX;
-}
-
-void setTextColor(int16_t color)
-{
-  screenTextColor = color;
-}
-
-void setBackgroundColor(int16_t color)
-{
-  screenTextBackgroundColor = color;
 }
 
 int16_t drawFloat(float floatNumber, int16_t decimal, int16_t poX, int16_t poY, int16_t size)

@@ -23,9 +23,11 @@
 #include "esp32/ulp.h"
 #include "driver/rtc_io.h"
 #include "PID.h"
+#include "GPRS.h"
+#include "Wifi_OTA.h"
 
 #define WDT_TIMEOUT 45
-#define ENABLE_WIFI_OTA true // enable wifi OTA
+#define ENABLE_WIFI_OTA true  // enable wifi OTA
 #define ENABLE_GPRS_OTA false // enable GPRS OTA
 
 #define ON true
@@ -176,6 +178,20 @@ typedef enum
     NUM_ALARMS,
 } ALARMS_ID;
 
+typedef enum
+{
+    EVENT_2G = 0,
+    EVENT_WIFI,
+    EVENT_SERVER_CONNECTION,
+} UI_EVENTS_ID;
+
+typedef enum
+{
+    EVENT_2G_UI_POS = 5,
+    EVENT_SERVER_CONNECTION_UI_POS = EVENT_2G_UI_POS + 2 * letter_width,
+    EVENT_WIFI_UI_POS = EVENT_SERVER_CONNECTION_UI_POS + letter_width,
+} UI_EVENTS_ID_POS;
+
 // Graphic variables
 #define ERASE false
 #define DRAW true
@@ -303,12 +319,11 @@ float measureMeanVoltage(int shunt);
 void watchdogReload();
 void WIFI_TB_Init();
 void WifiOTAHandler(void);
-void GPRS_Handler();
-void GPRS_TB_Init();
 void securityCheck();
 void buzzerConstantTone(int freq);
 void drawAlarmMessage(char *alertMessage);
 void drawHeading(int UI_page, int UI_serialNumber);
+void updateHeadingEvent(byte Event, bool event_status);
 char *convertStringToChar(String input);
 char *convertStringToChar(char *arrayInput, String input);
 int16_t drawCentreString(char *string, int16_t dX, int16_t poY, int16_t size);
@@ -318,10 +333,10 @@ void graphics(uint8_t UI_page, uint8_t UI_language, uint8_t UI_print_text, uint8
 int graphicHeight(int position);
 int16_t drawFloat(float floatNumber, int16_t decimal, int16_t poX, int16_t poY, int16_t size);
 void setTextColor(int16_t color);
+int16_t getBackgroundColor();
 
 void turnFans(bool mode);
 void alarmTimerStart();
-void setGPRSPostPeriod(long seconds);
 
 bool ongoingCriticalAlarm();
 void setAlarm(byte alarmID);
@@ -390,7 +405,6 @@ double butterworth2(double y1, double y2, double x0, double x1, double x2);
 
 void initGPIO();
 void initEEPROM();
-void initGPRS();
 void drawHardwareErrorMessage(long error, bool criticalError);
 void watchdogInit();
 void initAlarms();

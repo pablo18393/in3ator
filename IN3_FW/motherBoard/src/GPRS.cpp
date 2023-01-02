@@ -24,7 +24,21 @@
 */
 
 #include <Arduino.h>
+#include "Credentials.h"
+#include "main.h"
 #include "GPRS.h"
+
+// Initialize GSM modem
+TinyGsm modem(modemSerial);
+
+// Initialize GSM client
+TinyGsmClient client(modem);
+
+// Initialize ThingsBoard instance
+ThingsBoardSized<THINGSBOARD_BUFFER_SIZE> tb(client);
+
+// Initialize ThingsBoard client provision instance
+ThingsBoardSized<THINGSBOARD_BUFFER_SIZE> tb_provision(client); // increase buffer size
 
 unsigned long previous_processing_time;
 
@@ -58,9 +72,37 @@ int checkSerial(const char *success, const char *error)
 
 void initGPRS()
 {
-  Serial2.begin(115200);
+  Serial2.begin(MODEM_BAUD);
   GPRS.powerUp = true;
   GPIOWrite(GPRS_PWRKEY, HIGH);
+}
+
+bool GPRSCheckNewEvent()
+{
+  bool retVal = false;
+  bool isGPRSConnected = GPRS.post;
+  bool serverConnectionStatus = false;
+  if(isGPRSConnected)
+  {
+    serverConnectionStatus = tb.connected();
+  }
+  if (serverConnectionStatus != GPRS.lastServerConnectionStatus || isGPRSConnected != GPRS.lastGPRSConnectionStatus)
+  {
+    retVal = true;
+  }
+  GPRS.lastGPRSConnectionStatus = isGPRSConnected;
+  GPRS.lastServerConnectionStatus = serverConnectionStatus;
+  return (retVal);
+}
+
+bool GPRSAttached()
+{
+  return (GPRS.post);
+}
+
+bool GPRSConnectedToServer()
+{
+  return (tb.connected());
 }
 
 void GPRS_get_triangulation_location()
