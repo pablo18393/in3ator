@@ -82,9 +82,9 @@ bool GPRSCheckNewEvent()
   bool retVal = false;
   bool isGPRSConnected = GPRS.post;
   bool serverConnectionStatus = false;
-  if(isGPRSConnected)
+  if (isGPRSConnected)
   {
-    serverConnectionStatus = tb.connected();
+    serverConnectionStatus = GPRS.serverConnectionStatus;
   }
   if (serverConnectionStatus != GPRS.lastServerConnectionStatus || isGPRSConnected != GPRS.lastGPRSConnectionStatus)
   {
@@ -102,7 +102,7 @@ bool GPRSAttached()
 
 bool GPRSConnectedToServer()
 {
-  return (tb.connected());
+  return (GPRS.serverConnectionStatus);
 }
 
 void GPRS_get_triangulation_location()
@@ -159,6 +159,7 @@ void GPRSStatusHandler()
         GPRS.post = false;
         GPRS.connect = false;
         GPRS.powerUp = true;
+        GPRS.serverConnectionStatus = false;
         logln("[GPRS] -> powering module down...");
         Serial2.print("AT+CPOWD=1\n");
         GPRS.packetSentenceTime = millis();
@@ -394,10 +395,14 @@ void GPRSPost()
         logln("[GPRS] -> Failed to connect");
         return;
       }
-      if (ENABLE_GPRS_OTA && !GPRS.OTA_requested)
+      else
       {
-        GPRSCheckOTA();
-        GPRS.OTA_requested = true;
+        GPRS.serverConnectionStatus = true;
+        if (ENABLE_GPRS_OTA && !GPRS.OTA_requested)
+        {
+          GPRSCheckOTA();
+          GPRS.OTA_requested = true;
+        }
       }
     }
     if (tb.connected() && millis() - GPRS.lastSent > secsToMillis(GPRS.sendPeriod))

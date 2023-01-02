@@ -206,7 +206,14 @@ void drawHeading(int UI_page, int UI_serialNumber)
   drawCentreString(convertStringToChar(cstring, String(FWversion) + "/" + HWversion), tft.width() - 4 * letter_width, headint_text_height, textFontSize);
   updateHeadingEvent(EVENT_2G, GPRSAttached());
   updateHeadingEvent(EVENT_WIFI, WIFIAttached());
-  updateHeadingEvent(EVENT_SERVER_CONNECTION, GPRSConnectedToServer() || WIFIConnectedToServer());
+  if (GPRSAttached())
+  {
+    updateHeadingEvent(EVENT_SERVER_CONNECTION, GPRSConnectedToServer());
+  }
+  if (WIFIAttached())
+  {
+    updateHeadingEvent(EVENT_SERVER_CONNECTION, WIFIConnectedToServer());
+  }
 }
 
 void updateHeadingEvent(byte Event, bool event_status)

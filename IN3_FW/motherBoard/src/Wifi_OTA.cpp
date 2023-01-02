@@ -250,7 +250,7 @@ bool WIFIAttached()
 
 bool WIFIConnectedToServer()
 {
-  return (tb_wifi.connected());
+  return (Wifi_TB.serverConnectionStatus);
 }
 
 void WIFICheckOTA()
@@ -291,6 +291,7 @@ void WifiOTAHandler(void)
       }
       else
       {
+        Wifi_TB.serverConnectionStatus = true;
         if (ENABLE_WIFI_OTA && !Wifi_TB.OTA_requested)
         {
           WIFICheckOTA();
@@ -307,5 +308,6 @@ void WifiOTAHandler(void)
   else
   {
     WIFI_connection_status = false;
+    Wifi_TB.serverConnectionStatus = true;
   }
 }

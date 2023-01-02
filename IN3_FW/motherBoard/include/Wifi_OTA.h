@@ -15,6 +15,7 @@ struct WIFIstruct
     bool OTA_requested = false;
     bool provision_request_sent = false;
     bool provision_request_processed = false;
+    bool serverConnectionStatus = false;
     bool lastServerConnectionStatus = false;
     bool lastWIFIConnectionStatus = false;
     String device_token;

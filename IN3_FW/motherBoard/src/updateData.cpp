@@ -296,15 +296,18 @@ void updateData()
       updateDisplaySensors();
     }
     lastGraphicSensorsUpdate = millis();
-    if (GPRSCheckNewEvent())
+    if (GPRSCheckNewEvent() || WIFICheckNewEvent())
     {
       updateHeadingEvent(EVENT_2G, GPRSAttached());
-      updateHeadingEvent(EVENT_SERVER_CONNECTION, GPRSConnectedToServer() || WIFIConnectedToServer());
-    }
-    if (WIFICheckNewEvent())
-    {
       updateHeadingEvent(EVENT_WIFI, WIFIAttached());
-      updateHeadingEvent(EVENT_SERVER_CONNECTION, GPRSConnectedToServer() || WIFIConnectedToServer());
+      if (GPRSAttached())
+      {
+        updateHeadingEvent(EVENT_SERVER_CONNECTION, GPRSConnectedToServer());
+      }
+      if(WIFIAttached())
+      {
+        updateHeadingEvent(EVENT_SERVER_CONNECTION, WIFIConnectedToServer());
+      }
     }
   }
   if ((page == mainMenuPage) && !enableSet)

@@ -40,6 +40,7 @@ struct GPRSstruct
   bool provision_request_sent = false;
   bool provision_request_processed = false;
   bool lastGPRSConnectionStatus = false;
+  bool serverConnectionStatus = false;
   bool lastServerConnectionStatus = false;
   bool enable;
   long sendPeriod;
