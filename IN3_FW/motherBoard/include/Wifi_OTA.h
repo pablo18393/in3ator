@@ -8,6 +8,7 @@
 #include "Credentials.h"
 
 #define THINGSBOARD_BUFFER_SIZE 512
+#define THINGSBOARD_FIELDS_AMOUNT 64
 
 struct WIFIstruct
 {

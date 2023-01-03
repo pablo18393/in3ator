@@ -35,7 +35,7 @@ WebServer wifiServer(80);
 WiFiClient espClient;
 
 // Initialize ThingsBoard instance
-ThingsBoardSized<THINGSBOARD_BUFFER_SIZE> tb_wifi(espClient);
+ThingsBoardSized<THINGSBOARD_BUFFER_SIZE, THINGSBOARD_FIELDS_AMOUNT> tb_wifi(espClient);
 
 // WIFI
 bool WIFI_connection_status = false;

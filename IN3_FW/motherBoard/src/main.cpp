@@ -246,4 +246,5 @@ void loop()
 {
   userInterfaceHandler(page);
   updateData();
+  vTaskDelay(LOOP_TASK_PERIOD / portTICK_PERIOD_MS);
 }

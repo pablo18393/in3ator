@@ -263,11 +263,9 @@ void sensorHealthMonitor()
 
 void powerMonitor()
 {
-#if (HW_NUM <= 9)
-  currentMonitor();
-#elif (HW_NUM >= 10)
   currentMonitor();
   voltageMonitor();
+#if(HW_NUM >= 10)
   if (digitalCurrentSensorPresent && in3.system_voltage < MINIMUM_SYSTEM_VALUE && GPIORead(ON_OFF_SWITCH) == OFF)
   {
     powerFailureAlarm();

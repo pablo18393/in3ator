@@ -30,6 +30,40 @@
 #define ENABLE_WIFI_OTA true  // enable wifi OTA
 #define ENABLE_GPRS_OTA false // enable GPRS OTA
 
+#define SN_KEY "SN"
+#define HW_NUM_KEY "HW_num"
+#define HW_REV_KEY "HW_revision"
+#define FW_VERSION_KEY "FW_version"
+#define CCID_KEY "CCID"
+#define IMEI_KEY "IMEI"
+#define APN_KEY "APN"
+#define COP_KEY "COP"
+#define SYS_CURR_STANDBY_TEST_KEY "SYS_current_stanby_test"
+#define HEATER_CURR_TEST_KEY "Heater_current_test"
+#define FAN_CURR_TEST_KEY "Fan_current_test"
+#define PHOTOTHERAPY_CURR_KEY "Phototherapy_current_test"
+#define HUMIDIFIER_CURR_KEY "Humidifier_current_test"
+#define DISPLAY_CURR_TEST_KEY "Display_current_test"
+#define BUZZER_CURR_TEST_KEY "Buzzer_current_test"
+#define HW_TEST_KEY "HW_Test"
+#define LOCATION_LONGTITUD_KEY "tri_longitud"
+#define LOCATION_LATITUD_KEY "tri_latitud"
+#define TRI_ACCURACY_KEY "tri_accuracy"
+#define UI_LANGUAGE_KEY "UI_language"
+#define AIR_TEMPERATURE_KEY "Air_temp"
+#define SKIN_TEMPERATURE_KEY "Skin_temp"
+#define HUMIDITY_KEY "Humidity"
+#define SYSTEM_CURRENT_KEY "SYS_current"
+#define SYSTEM_VOLTAGE_KEY "SYS_voltage"
+#define CELL_SIGNAL_QUALITY_KEY "CSQ"
+#define FAN_CURRENT_KEY "Fan_current"
+#define CONTROL_MODE_KEY "Control_mode"
+#define DESIRED_TEMPERATURE_KEY "Temp_desired"
+#define DESIRED_HUMIDITY_KEY "Hum_desired"
+#define HUMIDIFIER_CURRENT_KEY "Humidifier_current"
+#define HUMIDIFIER_VOLTAGE_KEY "Humidifier_voltage"
+#define PHOTOTHERAPY_CURRENT_KEY "Phototherapy_current"
+
 #define ON true
 #define OFF false
 #define BASIC_CONTROL false
@@ -268,6 +302,7 @@ typedef enum
 #define DIGITAL_CURRENT_SENSOR_PERIOD 5
 #define BUZZER_TASK_PERIOD 1
 #define BACKLIGHT_TASK_PERIOD 100
+#define LOOP_TASK_PERIOD 1 
 
 #define BACKLIGHT_DELAY 2
 #define INIT_TFT_DELAY 300
@@ -405,6 +440,7 @@ void currentMonitor();
 void voltageMonitor();
 
 double butterworth2(double y1, double y2, double x0, double x1, double x2);
+double roundSignificantDigits(double value, int numberOfDecimals);
 
 void initGPIO();
 void initEEPROM();

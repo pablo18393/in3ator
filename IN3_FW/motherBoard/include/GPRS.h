@@ -9,6 +9,8 @@
 #include "ThingsBoard.h"
 
 #define THINGSBOARD_BUFFER_SIZE 512
+#define THINGSBOARD_FIELDS_AMOUNT 64
+#define TELEMETRIES_DECIMALS 2
 
 #define APN_TM "TM"
 #define APN_TRUPHONE "iot.truphone.com"
