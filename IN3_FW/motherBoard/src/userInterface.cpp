@@ -469,7 +469,6 @@ void userInterfaceHandler(int UI_page)
           autoCalibration();
           break;
         case restartCalibrationGraphicPosition:
-          loadDefaultCalibration();
           recapVariables();
           UI_calibration();
           break;

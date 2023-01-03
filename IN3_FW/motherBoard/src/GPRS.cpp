@@ -456,6 +456,7 @@ void GPRSPost()
         addVariableToTelemetryJSON[LOCATION_LATITUD_KEY] = GPRS.latitud;
         addVariableToTelemetryJSON[TRI_ACCURACY_KEY] = GPRS.accuracy;
         addVariableToTelemetryJSON[UI_LANGUAGE_KEY] = in3.language;
+        addVariableToTelemetryJSON[CALIBRATED_SENSOR_KEY] = in3.calibrationError;
         if (tb.sendTelemetryJson(addVariableToTelemetryJSON, JSON_STRING_SIZE(measureJson(addVariableToTelemetryJSON))))
         {
           logln("[GPRS] -> GPRS POST CONFIG SUCCESS");

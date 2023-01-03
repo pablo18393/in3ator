@@ -703,7 +703,7 @@ void loadlogo()
 /*
    Function pending to complete
 */
-void drawHardwareErrorMessage(long error, bool criticalError)
+void drawHardwareErrorMessage(long error, bool criticalError, bool calibrationError)
 {
   tft.fillScreen(introBackColor);
   tft.setTextColor(introTextColor); // use tft. because tft.print is configured by it
@@ -733,11 +733,21 @@ void drawHardwareErrorMessage(long error, bool criticalError)
     tft.println(textToWrite);
     tft.setTextSize(2);
     tft.println("  medicalopenworld.org");
-    if (criticalError)
+    if (criticalError || calibrationError)
     {
       tft.setTextSize(3);
       tft.println("CRITICAL ERROR");
-      tft.println("CHECK WIRING");
+      if (error)
+      {
+      }
+      if (criticalError)
+      {
+        tft.println("CHECK WIRING");
+      }
+      if (calibrationError)
+      {
+        tft.println("CALIBRATION ERROR");
+      }
     }
   }
   else

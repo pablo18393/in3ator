@@ -93,22 +93,6 @@ void loaddefaultValues()
   EEPROM.commit();
 }
 
-void loadDefaultCalibration()
-{
-  /*
-  EEPROM.writeFloat(EEPROM_RawSkinTemperatureLowCorrection, 25.54);
-  EEPROM.writeFloat(EEPROM_RawSkinTemperatureRangeCorrection, 14.28);
-  EEPROM.writeFloat(EEPROM_RawAirTemperatureLowCorrection, 0);
-  EEPROM.writeFloat(EEPROM_RawAirTemperatureRangeCorrection, 0);
-  EEPROM.writeFloat(EEPROM_RawDigitalTemperatureLowCorrection, 0);
-  EEPROM.writeFloat(EEPROM_RawDigitalTemperatureRangeCorrection, 0);
-  EEPROM.writeFloat(EEPROM_ReferenceTemperatureRange, 14.03);
-  EEPROM.writeFloat(EEPROM_ReferenceTemperatureLow, 21.15);
-  EEPROM.writeFloat(EEPROM_FineTuneSkinTemperature, 0);
-  EEPROM.commit();
-  */
-}
-
 void recapVariables()
 {
   autoLock = EEPROM.read(EEPROM_autoLock);
@@ -121,9 +105,11 @@ void recapVariables()
   ReferenceTemperatureLow = EEPROM.readFloat(EEPROM_ReferenceTemperatureLow);
   fineTuneSkinTemperature = EEPROM.readFloat(EEPROM_FineTuneSkinTemperature);
   fineTuneAirTemperature = EEPROM.readFloat(EEPROM_FineTuneAirTemperature);
-  for (int i = 0; i < numSensors; i++)
+
+  if (!ReferenceTemperatureRange)
   {
-    logln("calibration factors: " + String(RawTemperatureLow[i]) + "," + String(RawTemperatureRange[i]) + "," + String(ReferenceTemperatureRange) + "," + String(ReferenceTemperatureLow));
+    in3.calibrationError = true;
+    logln("[HW] -> Fail -> temperature sensor is not calibrated");
   }
 
   for (int i = 0; i < numSensors; i++)

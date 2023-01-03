@@ -29,6 +29,7 @@
 #define WDT_TIMEOUT 45
 #define ENABLE_WIFI_OTA true  // enable wifi OTA
 #define ENABLE_GPRS_OTA false // enable GPRS OTA
+#define DEFAULT_CONTROL_MODE AIR_CONTROL 
 
 #define SN_KEY "SN"
 #define HW_NUM_KEY "HW_num"
@@ -63,6 +64,7 @@
 #define HUMIDIFIER_CURRENT_KEY "Humidifier_current"
 #define HUMIDIFIER_VOLTAGE_KEY "Humidifier_voltage"
 #define PHOTOTHERAPY_CURRENT_KEY "Phototherapy_current"
+#define CALIBRATED_SENSOR_KEY "Calibrated_sensor"
 
 #define ON true
 #define OFF false
@@ -201,6 +203,30 @@
 
 typedef enum
 {
+    NTC_BABY_MIN_ERROR = 0,
+    NTC_BABY_MAX_ERROR,
+    DIG_TEMP_ROOM_MIN_ERROR,
+    DIG_TEMP_ROOM_MAX_ERROR,
+    DIG_HUM_ROOM_MIN_ERROR,
+    DIG_HUM_ROOM_MAX_ERROR,
+    DIGITAL_SENSOR_NOTFOUND,
+    HEATER_CONSUMPTION_MIN_ERROR,
+    FAN_CONSUMPTION_MIN_ERROR,
+    PHOTOTHERAPY_CONSUMPTION_MIN_ERROR,
+    HUMIDIFIER_CONSUMPTION_MIN_ERROR,
+    HEATER_CONSUMPTION_MAX_ERROR,
+    FAN_CONSUMPTION_MAX_ERROR,
+    PHOTOTHERAPY_CONSUMPTION_MAX_ERROR,
+    HUMIDIFIER_CONSUMPTION_MAX_ERROR,
+    STANDBY_CONSUMPTION_MAX_ERROR,
+    DEFECTIVE_SCREEN,
+    DEFECTIVE_BUZZER,
+    DEFECTIVE_CURRENT_SENSOR,
+    UNCALIBRATED_SENSOR,
+} HW_ERROR_ID;
+
+typedef enum
+{
     HUMIDITY_ALARM = 0,
     TEMPERATURE_ALARM,
     AIR_THERMAL_CUTOUT_ALARM,
@@ -310,31 +336,34 @@ typedef enum
 typedef struct
 {
     double temperature[numSensors];
-    double humidity;
-    double desiredControlTemperature;
-    double desiredControlHumidity;
+    double humidity = false;
+    double desiredControlTemperature = false;
+    double desiredControlHumidity = false;
 
-    double system_current_standby_test;
-    double heater_current_test;
-    double fan_current_test;
-    double phototherapy_current_test;
-    double humidifier_current_test;
-    double display_current_test;
-    double buzzer_current_test;
-    double HW_test_error_code;
+    double system_current_standby_test = false;
+    double heater_current_test = false;
+    double fan_current_test = false;
+    double phototherapy_current_test = false;
+    double humidifier_current_test = false;
+    double display_current_test = false;
+    double buzzer_current_test = false;
+    bool HW_critical_error = false;
+    double HW_test_error_code = false;
 
-    double system_current;
-    double system_voltage;
-    double fan_current;
-    double humidifier_current;
-    double humidifier_voltage;
-    double phototherapy_current;
+    double system_current = false;
+    double system_voltage = false;
+    double fan_current = false;
+    double humidifier_current = false;
+    double humidifier_voltage = false;
+    double phototherapy_current = false;
     int serialNumber = false;
 
-    bool controlMode = AIR_CONTROL;
+    bool controlMode = DEFAULT_CONTROL_MODE;
     bool temperatureControl = false;
     bool humidityControl = false;
     bool phototherapy = false;
+
+    bool calibrationError = false;
 
     byte language;
 
@@ -423,7 +452,6 @@ void UI_calibration();
 void firstPointCalibration();
 void fineTuneCalibration();
 void autoCalibration();
-void loadDefaultCalibration();
 void recapVariables();
 void clearCalibrationValues();
 void secondPointCalibration();
@@ -444,7 +472,7 @@ double roundSignificantDigits(double value, int numberOfDecimals);
 
 void initGPIO();
 void initEEPROM();
-void drawHardwareErrorMessage(long error, bool criticalError);
+void drawHardwareErrorMessage(long error, bool criticalError, bool calibrationError);
 void watchdogInit();
 void initAlarms();
 void IRAM_ATTR encSwitchHandler();
