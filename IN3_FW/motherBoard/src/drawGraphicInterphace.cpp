@@ -707,14 +707,26 @@ void drawHardwareErrorMessage(long error, bool criticalError, bool calibrationEr
 {
   tft.fillScreen(introBackColor);
   tft.setTextColor(introTextColor); // use tft. because tft.print is configured by it
-  tft.setCursor(tft.width() / 4 - hexDigits(error) * 16, tft.height() / 5);
+  tft.setCursor(tft.width() / 4 - hexDigits(error) * 16, tft.height() / 10);
   tft.setTextSize(3);
   if (error)
   {
     tft.print("HW error:");
     tft.println(error, HEX);
     tft.println();
-    tft.print(" ");
+    if (criticalError || calibrationError)
+    {
+      tft.setTextSize(3);
+      if (criticalError)
+      {
+        tft.println("WIRING ERROR");
+      }
+      if (calibrationError)
+      {
+        tft.println("CALIBRATION ERROR");
+      }
+      tft.println();
+    }
     switch (in3.language)
     {
     case spanish:
@@ -733,22 +745,6 @@ void drawHardwareErrorMessage(long error, bool criticalError, bool calibrationEr
     tft.println(textToWrite);
     tft.setTextSize(2);
     tft.println("  medicalopenworld.org");
-    if (criticalError || calibrationError)
-    {
-      tft.setTextSize(3);
-      tft.println("CRITICAL ERROR");
-      if (error)
-      {
-      }
-      if (criticalError)
-      {
-        tft.println("CHECK WIRING");
-      }
-      if (calibrationError)
-      {
-        tft.println("CALIBRATION ERROR");
-      }
-    }
   }
   else
   {
