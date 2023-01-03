@@ -395,6 +395,7 @@ void WifiOTAHandler(void)
           logln("[WIFI] -> WIFI MQTT PUBLISH TELEMETRIES FAIL");
         }
         WIFI_JSON.clear();
+        Wifi_TB.lastMQTTPublish = millis();
       }
       tb_wifi.loop();
     }
