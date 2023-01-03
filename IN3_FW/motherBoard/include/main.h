@@ -27,7 +27,7 @@
 #include "Wifi_OTA.h"
 
 #define WDT_TIMEOUT 45
-#define ENABLE_WIFI_OTA true  // enable wifi OTA
+#define ENABLE_WIFI_OTA false  // enable wifi OTA
 #define ENABLE_GPRS_OTA false // enable GPRS OTA
 #define DEFAULT_CONTROL_MODE AIR_CONTROL 
 

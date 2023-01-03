@@ -37,6 +37,9 @@ WiFiClient espClient;
 // Initialize ThingsBoard instance
 ThingsBoardSized<THINGSBOARD_BUFFER_SIZE, THINGSBOARD_FIELDS_AMOUNT> tb_wifi(espClient);
 
+StaticJsonDocument<JSON_OBJECT_SIZE(THINGSBOARD_FIELDS_AMOUNT)> WIFI_JSON;
+JsonObject addVariableToTelemetryWIFIJSON = WIFI_JSON.to<JsonObject>();
+
 // WIFI
 bool WIFI_connection_status = false;
 
@@ -267,6 +270,73 @@ void WIFI_TB_Init()
   }
 }
 
+void addConfigTelemetriesToWIFIJSON()
+{
+  addVariableToTelemetryWIFIJSON[SN_KEY] = in3.serialNumber;
+  addVariableToTelemetryWIFIJSON[HW_NUM_KEY] = HW_NUM;
+  addVariableToTelemetryWIFIJSON[HW_REV_KEY] = String(HW_REVISION);
+  addVariableToTelemetryWIFIJSON[FW_VERSION_KEY] = FWversion;
+
+  addVariableToTelemetryWIFIJSON[SYS_CURR_STANDBY_TEST_KEY] = roundSignificantDigits(in3.system_current_standby_test, TELEMETRIES_DECIMALS);
+  addVariableToTelemetryWIFIJSON[HEATER_CURR_TEST_KEY] = roundSignificantDigits(in3.heater_current_test, TELEMETRIES_DECIMALS);
+  addVariableToTelemetryWIFIJSON[FAN_CURR_TEST_KEY] = roundSignificantDigits(in3.fan_current_test, TELEMETRIES_DECIMALS);
+  addVariableToTelemetryWIFIJSON[PHOTOTHERAPY_CURR_KEY] = roundSignificantDigits(in3.phototherapy_current_test, TELEMETRIES_DECIMALS);
+  addVariableToTelemetryWIFIJSON[HUMIDIFIER_CURR_KEY] = roundSignificantDigits(in3.humidifier_current_test, TELEMETRIES_DECIMALS);
+  addVariableToTelemetryWIFIJSON[DISPLAY_CURR_TEST_KEY] = roundSignificantDigits(in3.display_current_test, TELEMETRIES_DECIMALS);
+  addVariableToTelemetryWIFIJSON[BUZZER_CURR_TEST_KEY] = roundSignificantDigits(in3.buzzer_current_test, TELEMETRIES_DECIMALS);
+  addVariableToTelemetryWIFIJSON[HW_TEST_KEY] = in3.HW_test_error_code;
+
+  addVariableToTelemetryWIFIJSON[UI_LANGUAGE_KEY] = in3.language;
+  addVariableToTelemetryWIFIJSON[CALIBRATED_SENSOR_KEY] = !in3.calibrationError;
+}
+
+void addTelemetriesToWIFIJSON()
+{
+  addVariableToTelemetryWIFIJSON[AIR_TEMPERATURE_KEY] = roundSignificantDigits(in3.temperature[airSensor], TELEMETRIES_DECIMALS);
+  addVariableToTelemetryWIFIJSON[SKIN_TEMPERATURE_KEY] = roundSignificantDigits(in3.temperature[skinSensor], TELEMETRIES_DECIMALS);
+  addVariableToTelemetryWIFIJSON[HUMIDITY_KEY] = roundSignificantDigits(in3.humidity, TELEMETRIES_DECIMALS);
+  addVariableToTelemetryWIFIJSON[SYSTEM_CURRENT_KEY] = roundSignificantDigits(in3.system_current, TELEMETRIES_DECIMALS);
+  addVariableToTelemetryWIFIJSON[SYSTEM_VOLTAGE_KEY] = roundSignificantDigits(in3.system_voltage, TELEMETRIES_DECIMALS);
+
+  if (in3.temperatureControl || in3.humidityControl)
+  {
+    addVariableToTelemetryWIFIJSON[FAN_CURRENT_KEY] = roundSignificantDigits(in3.fan_current, TELEMETRIES_DECIMALS);
+    if (!Wifi_TB.firstConfigPost)
+    {
+      Wifi_TB.firstConfigPost = true;
+      if (in3.temperatureControl)
+      {
+        if (in3.controlMode == AIR_CONTROL)
+        {
+          addVariableToTelemetryWIFIJSON[CONTROL_MODE_KEY] = "AIR";
+        }
+        else
+        {
+          addVariableToTelemetryWIFIJSON[CONTROL_MODE_KEY] = "SKIN";
+        }
+        addVariableToTelemetryWIFIJSON[DESIRED_TEMPERATURE_KEY] = in3.desiredControlTemperature;
+      }
+      if (in3.humidityControl)
+      {
+        addVariableToTelemetryWIFIJSON[DESIRED_HUMIDITY_KEY] = in3.desiredControlHumidity;
+      }
+    }
+  }
+  else
+  {
+    Wifi_TB.firstConfigPost = false;
+  }
+  if (in3.humidityControl)
+  {
+    addVariableToTelemetryWIFIJSON[HUMIDIFIER_CURRENT_KEY] = roundSignificantDigits(in3.humidifier_current, TELEMETRIES_DECIMALS);
+    addVariableToTelemetryWIFIJSON[HUMIDIFIER_VOLTAGE_KEY] = roundSignificantDigits(in3.humidifier_voltage, TELEMETRIES_DECIMALS);
+  }
+  if (in3.phototherapy)
+  {
+    addVariableToTelemetryWIFIJSON[PHOTOTHERAPY_CURRENT_KEY] = roundSignificantDigits(in3.phototherapy_current, TELEMETRIES_DECIMALS);
+  }
+}
+
 void WifiOTAHandler(void)
 {
   if (WiFi.status() == WL_CONNECTED)
@@ -290,6 +360,19 @@ void WifiOTAHandler(void)
       }
       else
       {
+        if (!Wifi_TB.firstPublish)
+        {
+          addConfigTelemetriesToWIFIJSON();
+          if (tb_wifi.sendTelemetryJson(addVariableToTelemetryWIFIJSON, JSON_STRING_SIZE(measureJson(addVariableToTelemetryWIFIJSON))))
+          {
+            logln("[WIFI] -> WIFI MQTT PUBLISH CONFIG SUCCESS");
+          }
+          else
+          {
+            logln("[WIFI] -> WIFI MQTT PUBLISH CONFIG FAIL");
+          }
+          WIFI_JSON.clear();
+        }
         Wifi_TB.serverConnectionStatus = true;
         if (ENABLE_WIFI_OTA && !Wifi_TB.OTA_requested)
         {
@@ -300,6 +383,19 @@ void WifiOTAHandler(void)
     }
     else
     {
+      if (millis() - Wifi_TB.lastMQTTPublish > WIFI_PUBLISH_INTERVAL)
+      {
+        addTelemetriesToWIFIJSON();
+        if (tb_wifi.sendTelemetryJson(addVariableToTelemetryWIFIJSON, JSON_STRING_SIZE(measureJson(addVariableToTelemetryWIFIJSON))))
+        {
+          logln("[WIFI] -> WIFI MQTT PUBLISH TELEMETRIES SUCCESS");
+        }
+        else
+        {
+          logln("[WIFI] -> WIFI MQTT PUBLISH TELEMETRIES FAIL");
+        }
+        WIFI_JSON.clear();
+      }
       tb_wifi.loop();
     }
     WIFI_connection_status = true;

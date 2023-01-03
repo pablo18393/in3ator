@@ -730,16 +730,16 @@ void drawHardwareErrorMessage(long error, bool criticalError, bool calibrationEr
     switch (in3.language)
     {
     case spanish:
-      textToWrite = convertStringToChar(cstring, "Por favor contacta");
+      textToWrite = convertStringToChar(cstring, " Por favor contacta");
       break;
     case portuguese:
-      textToWrite = convertStringToChar(cstring, "Por favor entre em contato");
+      textToWrite = convertStringToChar(cstring, " Por favor entre em contato");
       break;
     case english:
-      textToWrite = convertStringToChar(cstring, "Please contact");
+      textToWrite = convertStringToChar(cstring, " Please contact");
       break;
     case french:
-      textToWrite = convertStringToChar(cstring, "S'il vous plait contactez");
+      textToWrite = convertStringToChar(cstring, " S'il vous plait contactez");
       break;
     }
     tft.println(textToWrite);
