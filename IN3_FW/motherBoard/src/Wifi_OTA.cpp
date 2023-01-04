@@ -301,6 +301,11 @@ void addTelemetriesToWIFIJSON()
   if (in3.temperatureControl || in3.humidityControl)
   {
     addVariableToTelemetryWIFIJSON[FAN_CURRENT_KEY] = roundSignificantDigits(in3.fan_current, TELEMETRIES_DECIMALS);
+    addVariableToTelemetryWIFIJSON[DESIRED_TEMPERATURE_KEY] = in3.desiredControlTemperature;
+    if (in3.humidityControl)
+    {
+      addVariableToTelemetryWIFIJSON[DESIRED_HUMIDITY_KEY] = in3.desiredControlHumidity;
+    }
     if (!Wifi_TB.firstConfigPost)
     {
       Wifi_TB.firstConfigPost = true;
@@ -314,11 +319,6 @@ void addTelemetriesToWIFIJSON()
         {
           addVariableToTelemetryWIFIJSON[CONTROL_MODE_KEY] = "SKIN";
         }
-        addVariableToTelemetryWIFIJSON[DESIRED_TEMPERATURE_KEY] = in3.desiredControlTemperature;
-      }
-      if (in3.humidityControl)
-      {
-        addVariableToTelemetryWIFIJSON[DESIRED_HUMIDITY_KEY] = in3.desiredControlHumidity;
       }
     }
   }
@@ -337,7 +337,7 @@ void addTelemetriesToWIFIJSON()
   }
 }
 
-void WifiOTAHandler(void)
+void WEB_OTA()
 {
   if (WiFi.status() == WL_CONNECTED)
   {
@@ -349,6 +349,17 @@ void WifiOTAHandler(void)
     {
       wifiServer.handleClient();
     }
+  }
+  else
+  {
+    WIFI_connection_status = false;
+  }
+}
+
+void WIFI_TB_OTA()
+{
+  if (WiFi.status() == WL_CONNECTED)
+  {
     if (!tb_wifi.connected())
     {
       // Connect to the ThingsBoard
@@ -397,13 +408,18 @@ void WifiOTAHandler(void)
         WIFI_JSON.clear();
         Wifi_TB.lastMQTTPublish = millis();
       }
-      tb_wifi.loop();
     }
     WIFI_connection_status = true;
   }
   else
   {
-    WIFI_connection_status = false;
     Wifi_TB.serverConnectionStatus = false;
   }
+  tb_wifi.loop();
+}
+
+void WifiOTAHandler(void)
+{
+  WIFI_TB_OTA();
+  WEB_OTA();
 }

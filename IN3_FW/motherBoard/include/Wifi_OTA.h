@@ -7,7 +7,7 @@
 #include "ThingsBoard.h"
 #include "Credentials.h"
 
-#define THINGSBOARD_BUFFER_SIZE 512
+#define THINGSBOARD_BUFFER_SIZE 4096
 #define THINGSBOARD_FIELDS_AMOUNT 64
 
 #define WIFI_PUBLISH_INTERVAL 5000 // milliseconds

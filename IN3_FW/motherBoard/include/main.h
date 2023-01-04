@@ -27,7 +27,7 @@
 #include "Wifi_OTA.h"
 
 #define WDT_TIMEOUT 45
-#define ENABLE_WIFI_OTA false  // enable wifi OTA
+#define ENABLE_WIFI_OTA true  // enable wifi OTA
 #define ENABLE_GPRS_OTA false // enable GPRS OTA
 #define DEFAULT_CONTROL_MODE AIR_CONTROL 
 
@@ -322,7 +322,7 @@ typedef enum
 #define BACKLIGHT_NO_INTERACTION_TIME 12000 // time to decrease backlight display if no user actions
 
 #define GPRS_TASK_PERIOD 1
-#define OTA_TASK_PERIOD 1
+#define OTA_TASK_PERIOD 0
 #define SENSORS_TASK_PERIOD 1
 #define ROOM_SENSOR_UPDATE_PERIOD 500
 #define DIGITAL_CURRENT_SENSOR_PERIOD 5
