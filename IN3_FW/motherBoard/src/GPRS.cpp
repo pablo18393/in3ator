@@ -433,6 +433,7 @@ void addTelemetriesToGPRSJSON()
     if (!GPRS.firstConfigPost)
     {
       GPRS.firstConfigPost = true;
+      addVariableToTelemetryGPRSJSON[CONTROL_ACTIVE_KEY] = true;
       if (in3.temperatureControl)
       {
         if (in3.controlMode == AIR_CONTROL)
@@ -454,6 +455,7 @@ void addTelemetriesToGPRSJSON()
   else
   {
     GPRS.firstConfigPost = false;
+    addVariableToTelemetryGPRSJSON[CONTROL_ACTIVE_KEY] = false;
   }
   if (in3.humidityControl)
   {

@@ -29,7 +29,7 @@
 #define WDT_TIMEOUT 45
 #define ENABLE_WIFI_OTA true  // enable wifi OTA
 #define ENABLE_GPRS_OTA false // enable GPRS OTA
-#define DEFAULT_CONTROL_MODE AIR_CONTROL 
+#define DEFAULT_CONTROL_MODE AIR_CONTROL
 
 #define SN_KEY "SN"
 #define HW_NUM_KEY "HW_num"
@@ -58,6 +58,7 @@
 #define SYSTEM_VOLTAGE_KEY "SYS_voltage"
 #define CELL_SIGNAL_QUALITY_KEY "CSQ"
 #define FAN_CURRENT_KEY "Fan_current"
+#define CONTROL_ACTIVE_KEY "Control_active"
 #define CONTROL_MODE_KEY "Control_mode"
 #define DESIRED_TEMPERATURE_KEY "Temp_desired"
 #define DESIRED_HUMIDITY_KEY "Hum_desired"
@@ -328,7 +329,7 @@ typedef enum
 #define DIGITAL_CURRENT_SENSOR_PERIOD 5
 #define BUZZER_TASK_PERIOD 1
 #define BACKLIGHT_TASK_PERIOD 100
-#define LOOP_TASK_PERIOD 1 
+#define LOOP_TASK_PERIOD 1
 
 #define BACKLIGHT_DELAY 2
 #define INIT_TFT_DELAY 300

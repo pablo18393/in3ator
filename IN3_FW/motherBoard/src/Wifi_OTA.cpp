@@ -309,6 +309,7 @@ void addTelemetriesToWIFIJSON()
     if (!Wifi_TB.firstConfigPost)
     {
       Wifi_TB.firstConfigPost = true;
+      addVariableToTelemetryWIFIJSON[CONTROL_ACTIVE_KEY] = true;
       if (in3.temperatureControl)
       {
         if (in3.controlMode == AIR_CONTROL)
@@ -325,6 +326,7 @@ void addTelemetriesToWIFIJSON()
   else
   {
     Wifi_TB.firstConfigPost = false;
+    addVariableToTelemetryWIFIJSON[CONTROL_ACTIVE_KEY] = false;
   }
   if (in3.humidityControl)
   {
