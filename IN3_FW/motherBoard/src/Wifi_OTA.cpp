@@ -288,6 +288,8 @@ void addConfigTelemetriesToWIFIJSON()
 
   addVariableToTelemetryWIFIJSON[UI_LANGUAGE_KEY] = in3.language;
   addVariableToTelemetryWIFIJSON[CALIBRATED_SENSOR_KEY] = !in3.calibrationError;
+  addVariableToTelemetryWIFIJSON[GPRS_CONNECTIVITY_KEY] = false;
+  addVariableToTelemetryWIFIJSON[WIFI_CONNECTIVITY_KEY] = true;
 }
 
 void addTelemetriesToWIFIJSON()

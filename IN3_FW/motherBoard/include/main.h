@@ -73,6 +73,8 @@
 #define FAN_ACTIVE_TIME_KEY "Fan_active_time"
 #define PHOTHERAPY_ACTIVE_TIME_KEY "Phototherapy_active_time"
 #define HUMIDIFIER_ACTIVE_TIME_KEY "Humidifier_active_time"
+#define GPRS_CONNECTIVITY_KEY "GPRS_connection"
+#define WIFI_CONNECTIVITY_KEY "WIFI_connection"
 
 #define ON true
 #define OFF false

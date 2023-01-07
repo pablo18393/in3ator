@@ -416,6 +416,8 @@ void addConfigTelemetriesToGPRSJSON()
   addVariableToTelemetryGPRSJSON[TRI_ACCURACY_KEY] = GPRS.accuracy;
   addVariableToTelemetryGPRSJSON[UI_LANGUAGE_KEY] = in3.language;
   addVariableToTelemetryGPRSJSON[CALIBRATED_SENSOR_KEY] = !in3.calibrationError;
+  addVariableToTelemetryGPRSJSON[GPRS_CONNECTIVITY_KEY] = true;
+  addVariableToTelemetryGPRSJSON[WIFI_CONNECTIVITY_KEY] = false;
 }
 
 void addTelemetriesToGPRSJSON()
