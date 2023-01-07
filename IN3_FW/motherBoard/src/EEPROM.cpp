@@ -41,25 +41,25 @@ void initEEPROM()
   {
     logln("failed to initialise EEPROM");
   }
-  if (EEPROM.read(EEPROM_checkStatus))
+  if (EEPROM.read(EEPROM_CHECK_STATUS))
   {
-    EEPROM.write(EEPROM_checkStatus, 0);
+    EEPROM.write(EEPROM_CHECK_STATUS, 0);
     EEPROM.commit();
     vTaskDelay(30);
-    if (EEPROM.read(EEPROM_checkStatus) != 0)
+    if (EEPROM.read(EEPROM_CHECK_STATUS) != 0)
     {
     }
   }
   else
   {
-    EEPROM.write(EEPROM_checkStatus, 1);
+    EEPROM.write(EEPROM_CHECK_STATUS, 1);
     EEPROM.commit();
     vTaskDelay(30);
-    if (EEPROM.read(EEPROM_checkStatus) != 1)
+    if (EEPROM.read(EEPROM_CHECK_STATUS) != 1)
     {
     }
   }
-  firstTurnOn = EEPROM.read(EEPROM_firstTurnOn);
+  firstTurnOn = EEPROM.read(EEPROM_FIRST_TURN_ON);
   if (firstTurnOn)
   { // firstTimePowerOn
     for (int i = false; i < EEPROM_SIZE; i++)
@@ -85,26 +85,31 @@ void loaddefaultValues()
   in3.controlMode = AIR_CONTROL;
   in3.desiredControlTemperature = presetTemp[in3.controlMode];
   in3.desiredControlHumidity = presetHumidity;
-  EEPROM.write(EEPROM_autoLock, autoLock);
+  EEPROM.write(EEPROM_AUTO_LOCK, autoLock);
   EEPROM.write(EEPROM_WIFI_EN, WIFI_EN);
-  EEPROM.write(EEPROM_language, in3.language);
-  EEPROM.write(EEPROM_controlMode, in3.controlMode);
-  EEPROM.write(EEPROM_desiredControlMode, in3.desiredControlTemperature);
+  EEPROM.write(EEPROM_LANGUAGE, in3.language);
+  EEPROM.write(EEPROM_CONTROL_MODE, in3.controlMode);
+  EEPROM.write(EEPROM_DESIRED_CONTROL_MODE, in3.desiredControlTemperature);
   EEPROM.commit();
 }
 
 void recapVariables()
 {
-  autoLock = EEPROM.read(EEPROM_autoLock);
-  in3.language = EEPROM.read(EEPROM_language);
-  RawTemperatureLow[skinSensor] = EEPROM.readFloat(EEPROM_RawSkinTemperatureLowCorrection);
-  RawTemperatureRange[skinSensor] = EEPROM.readFloat(EEPROM_RawSkinTemperatureRangeCorrection);
-  RawTemperatureLow[digitalTempHumSensor] = EEPROM.readFloat(EEPROM_RawDigitalTemperatureLowCorrection);
-  RawTemperatureRange[digitalTempHumSensor] = EEPROM.readFloat(EEPROM_RawDigitalTemperatureRangeCorrection);
-  ReferenceTemperatureRange = EEPROM.readFloat(EEPROM_ReferenceTemperatureRange);
-  ReferenceTemperatureLow = EEPROM.readFloat(EEPROM_ReferenceTemperatureLow);
-  fineTuneSkinTemperature = EEPROM.readFloat(EEPROM_FineTuneSkinTemperature);
-  fineTuneAirTemperature = EEPROM.readFloat(EEPROM_FineTuneAirTemperature);
+  autoLock = EEPROM.read(EEPROM_AUTO_LOCK);
+  in3.language = EEPROM.read(EEPROM_LANGUAGE);
+  RawTemperatureLow[skinSensor] = EEPROM.readFloat(EEPROM_RAW_SKIN_TEMP_LOW_CORRECTION);
+  RawTemperatureRange[skinSensor] = EEPROM.readFloat(EEPROM_RAW_SKIN_TEMP_RANGE_CORRECTION);
+  ReferenceTemperatureRange = EEPROM.readFloat(EEPROM_REFERENCE_TEMP_RANGE);
+  ReferenceTemperatureLow = EEPROM.readFloat(EEPROM_REFERENCE_TEMP_LOW);
+  fineTuneSkinTemperature = EEPROM.readFloat(EEPROM_FINE_TUNE_TEMP_SKIN);
+  fineTuneAirTemperature = EEPROM.readFloat(EEPROM_FINE_TUNE_TEMP_AIR);
+
+  in3.standby_time = EEPROM.readFloat(EEPROM_STANDBY_TIME);
+  in3.control_active_time = EEPROM.readFloat(EEPROM_CONTROL_ACTIVE_TIME);
+  in3.heater_active_time = EEPROM.readFloat(EEPROM_HEATER_ACTIVE_TIME);
+  in3.fan_active_time = EEPROM.readFloat(EEPROM_FAN_ACTIVE_TIME);
+  in3.humidifier_active_time = EEPROM.readFloat(EEPROM_HUMIDIFIER_ACTIVE_TIME);
+  in3.phototherapy_active_time = EEPROM.readFloat(EEPROM_PHOTOTHERAPY_ACTIVE_TIME);
 
   if (!ReferenceTemperatureRange)
   {
@@ -119,22 +124,20 @@ void recapVariables()
       // critical error
     }
   }
-  in3.serialNumber = EEPROM.read(EEPROM_SerialNumber);
+  in3.serialNumber = EEPROM.read(EEPROM_SERIAL_NUMBER);
   WIFI_EN = EEPROM.read(EEPROM_WIFI_EN);
-  in3.controlMode = EEPROM.read(EEPROM_controlMode);
-  in3.desiredControlTemperature = EEPROM.read(EEPROM_desiredControlMode);
-  in3.desiredControlHumidity = EEPROM.read(EEPROM_desiredControlHumidity);
+  in3.controlMode = EEPROM.read(EEPROM_CONTROL_MODE);
+  in3.desiredControlTemperature = EEPROM.read(EEPROM_DESIRED_CONTROL_MODE);
+  in3.desiredControlHumidity = EEPROM.read(EEPROM_DESIRED_CONTROL_HUMIDITY);
 }
 
 void saveCalibrationToEEPROM()
 {
-  EEPROM.writeFloat(EEPROM_RawSkinTemperatureLowCorrection, RawTemperatureLow[skinSensor]);
-  EEPROM.writeFloat(EEPROM_RawSkinTemperatureRangeCorrection, RawTemperatureRange[skinSensor]);
-  EEPROM.writeFloat(EEPROM_RawDigitalTemperatureLowCorrection, RawTemperatureLow[digitalTempHumSensor]);
-  EEPROM.writeFloat(EEPROM_RawDigitalTemperatureRangeCorrection, RawTemperatureRange[digitalTempHumSensor]);
-  EEPROM.writeFloat(EEPROM_ReferenceTemperatureRange, ReferenceTemperatureRange);
-  EEPROM.writeFloat(EEPROM_ReferenceTemperatureLow, ReferenceTemperatureLow);
-  EEPROM.writeFloat(EEPROM_FineTuneSkinTemperature, fineTuneSkinTemperature);
-  EEPROM.writeFloat(EEPROM_FineTuneAirTemperature, fineTuneAirTemperature);
+  EEPROM.writeFloat(EEPROM_RAW_SKIN_TEMP_LOW_CORRECTION, RawTemperatureLow[skinSensor]);
+  EEPROM.writeFloat(EEPROM_RAW_SKIN_TEMP_RANGE_CORRECTION, RawTemperatureRange[skinSensor]);
+  EEPROM.writeFloat(EEPROM_REFERENCE_TEMP_RANGE, ReferenceTemperatureRange);
+  EEPROM.writeFloat(EEPROM_REFERENCE_TEMP_LOW, ReferenceTemperatureLow);
+  EEPROM.writeFloat(EEPROM_FINE_TUNE_TEMP_SKIN, fineTuneSkinTemperature);
+  EEPROM.writeFloat(EEPROM_FINE_TUNE_TEMP_AIR, fineTuneAirTemperature);
   EEPROM.commit();
 }

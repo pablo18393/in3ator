@@ -294,6 +294,7 @@ void addTelemetriesToWIFIJSON()
 {
   addVariableToTelemetryWIFIJSON[AIR_TEMPERATURE_KEY] = roundSignificantDigits(in3.temperature[airSensor], TELEMETRIES_DECIMALS);
   addVariableToTelemetryWIFIJSON[SKIN_TEMPERATURE_KEY] = roundSignificantDigits(in3.temperature[skinSensor], TELEMETRIES_DECIMALS);
+  addVariableToTelemetryWIFIJSON[PHOTOTHERAPY_ACTIVE_KEY] = in3.phototherapy;
   addVariableToTelemetryWIFIJSON[HUMIDITY_KEY] = roundSignificantDigits(in3.humidity, TELEMETRIES_DECIMALS);
   addVariableToTelemetryWIFIJSON[SYSTEM_CURRENT_KEY] = roundSignificantDigits(in3.system_current, TELEMETRIES_DECIMALS);
   addVariableToTelemetryWIFIJSON[SYSTEM_VOLTAGE_KEY] = roundSignificantDigits(in3.system_voltage, TELEMETRIES_DECIMALS);
@@ -301,11 +302,9 @@ void addTelemetriesToWIFIJSON()
   if (in3.temperatureControl || in3.humidityControl)
   {
     addVariableToTelemetryWIFIJSON[FAN_CURRENT_KEY] = roundSignificantDigits(in3.fan_current, TELEMETRIES_DECIMALS);
-    addVariableToTelemetryWIFIJSON[DESIRED_TEMPERATURE_KEY] = in3.desiredControlTemperature;
-    if (in3.humidityControl)
-    {
-      addVariableToTelemetryWIFIJSON[DESIRED_HUMIDITY_KEY] = in3.desiredControlHumidity;
-    }
+    addVariableToTelemetryWIFIJSON[CONTROL_ACTIVE_TIME_KEY] = roundSignificantDigits(in3.control_active_time, TELEMETRIES_DECIMALS);
+    addVariableToTelemetryWIFIJSON[HEATER_ACTIVE_TIME_KEY] = roundSignificantDigits(in3.heater_active_time, TELEMETRIES_DECIMALS);
+    addVariableToTelemetryWIFIJSON[FAN_ACTIVE_TIME_KEY] = roundSignificantDigits(in3.fan_active_time, TELEMETRIES_DECIMALS);
     if (!Wifi_TB.firstConfigPost)
     {
       Wifi_TB.firstConfigPost = true;
@@ -320,6 +319,11 @@ void addTelemetriesToWIFIJSON()
         {
           addVariableToTelemetryWIFIJSON[CONTROL_MODE_KEY] = "SKIN";
         }
+        addVariableToTelemetryWIFIJSON[DESIRED_TEMPERATURE_KEY] = in3.desiredControlTemperature;
+      }
+      if (in3.humidityControl)
+      {
+        addVariableToTelemetryWIFIJSON[DESIRED_HUMIDITY_KEY] = in3.desiredControlHumidity;
       }
     }
   }
@@ -327,15 +331,18 @@ void addTelemetriesToWIFIJSON()
   {
     Wifi_TB.firstConfigPost = false;
     addVariableToTelemetryWIFIJSON[CONTROL_ACTIVE_KEY] = false;
+    addVariableToTelemetryWIFIJSON[STANBY_TIME_KEY] = roundSignificantDigits(in3.standby_time, TELEMETRIES_DECIMALS);
   }
   if (in3.humidityControl)
   {
     addVariableToTelemetryWIFIJSON[HUMIDIFIER_CURRENT_KEY] = roundSignificantDigits(in3.humidifier_current, TELEMETRIES_DECIMALS);
     addVariableToTelemetryWIFIJSON[HUMIDIFIER_VOLTAGE_KEY] = roundSignificantDigits(in3.humidifier_voltage, TELEMETRIES_DECIMALS);
+    addVariableToTelemetryWIFIJSON[HUMIDIFIER_ACTIVE_TIME_KEY] = roundSignificantDigits(in3.humidifier_active_time, TELEMETRIES_DECIMALS);
   }
   if (in3.phototherapy)
   {
     addVariableToTelemetryWIFIJSON[PHOTOTHERAPY_CURRENT_KEY] = roundSignificantDigits(in3.phototherapy_current, TELEMETRIES_DECIMALS);
+    addVariableToTelemetryWIFIJSON[PHOTHERAPY_ACTIVE_TIME_KEY] = roundSignificantDigits(in3.phototherapy_active_time, TELEMETRIES_DECIMALS);
   }
 }
 

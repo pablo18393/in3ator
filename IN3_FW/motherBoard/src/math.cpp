@@ -44,6 +44,11 @@ long secsToMillis(long timeInMillis)
   return (timeInMillis * 1000);
 }
 
+float millisToHours(long timeInMillis)
+{
+  return (timeInMillis / 1000.0 / 60.0 / 60.0);
+}
+
 double roundSignificantDigits(double value, int numberOfDecimals)
 {
   double exponent;

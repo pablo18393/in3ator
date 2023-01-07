@@ -27,8 +27,8 @@
 #include "Wifi_OTA.h"
 
 #define WDT_TIMEOUT 45
-#define ENABLE_WIFI_OTA true  // enable wifi OTA
-#define ENABLE_GPRS_OTA false // enable GPRS OTA
+#define ENABLE_WIFI_OTA false  // enable wifi OTA
+#define ENABLE_GPRS_OTA true // enable GPRS OTA
 #define DEFAULT_CONTROL_MODE AIR_CONTROL
 
 #define SN_KEY "SN"
@@ -65,7 +65,14 @@
 #define HUMIDIFIER_CURRENT_KEY "Humidifier_current"
 #define HUMIDIFIER_VOLTAGE_KEY "Humidifier_voltage"
 #define PHOTOTHERAPY_CURRENT_KEY "Phototherapy_current"
+#define PHOTOTHERAPY_ACTIVE_KEY "Phototherapy_active"
 #define CALIBRATED_SENSOR_KEY "Calibrated_sensor"
+#define STANBY_TIME_KEY "Standby_time"
+#define CONTROL_ACTIVE_TIME_KEY "Control_active_time"
+#define HEATER_ACTIVE_TIME_KEY "Heater_active_time"
+#define FAN_ACTIVE_TIME_KEY "Fan_active_time"
+#define PHOTHERAPY_ACTIVE_TIME_KEY "Phototherapy_active_time"
+#define HUMIDIFIER_ACTIVE_TIME_KEY "Humidifier_active_time"
 
 #define ON true
 #define OFF false
@@ -85,28 +92,29 @@
 
 // EEPROM variables
 #define EEPROM_SIZE 256
-#define EEPROM_checkStatus 0
-#define EEPROM_firstTurnOn 10
-#define EEPROM_autoLock 20
-#define EEPROM_language 30
-#define EEPROM_SerialNumber 40
+#define EEPROM_CHECK_STATUS 0
+#define EEPROM_FIRST_TURN_ON 10
+#define EEPROM_AUTO_LOCK 20
+#define EEPROM_LANGUAGE 30
+#define EEPROM_SERIAL_NUMBER 40
 #define EEPROM_WIFI_EN 50
-#define EEPROM_usedGenericMosfet 60
-#define EEPROM_controlMode 70
-#define EEPROM_desiredControlMode 80
-#define EEPROM_desiredControlHumidity 90
-#define EEPROM_RawSkinTemperatureLowCorrection 100
-#define EEPROM_RawSkinTemperatureRangeCorrection 110
-#define EEPROM_RawAirTemperatureLowCorrection 120
-#define EEPROM_RawAirTemperatureRangeCorrection 130
-#define EEPROM_RawDigitalTemperatureLowCorrection 140
-#define EEPROM_RawDigitalTemperatureRangeCorrection 150
-#define EEPROM_ReferenceTemperatureRange 170
-#define EEPROM_ReferenceTemperatureLow 180
-#define EEPROM_FineTuneSkinTemperature 190
-#define EEPROM_FineTuneAirTemperature 194
+#define EEPROM_CONTROL_MODE 70
+#define EEPROM_DESIRED_CONTROL_MODE 80
+#define EEPROM_DESIRED_CONTROL_HUMIDITY 90
+#define EEPROM_RAW_SKIN_TEMP_LOW_CORRECTION 100
+#define EEPROM_RAW_SKIN_TEMP_RANGE_CORRECTION 110
+#define EEPROM_REFERENCE_TEMP_RANGE 170
+#define EEPROM_REFERENCE_TEMP_LOW 180
+#define EEPROM_FINE_TUNE_TEMP_SKIN 190
+#define EEPROM_FINE_TUNE_TEMP_AIR 194
 #define EEPROM_THINGSBOARD_PROVISIONED 200
 #define EEPROM_THINGSBOARD_TOKEN 205
+#define EEPROM_STANDBY_TIME 226
+#define EEPROM_CONTROL_ACTIVE_TIME 230
+#define EEPROM_HEATER_ACTIVE_TIME 234
+#define EEPROM_FAN_ACTIVE_TIME 238
+#define EEPROM_PHOTOTHERAPY_ACTIVE_TIME 242
+#define EEPROM_HUMIDIFIER_ACTIVE_TIME 246
 
 // configuration variables
 #define debounceTime 30          // encoder debouncing time
@@ -324,7 +332,7 @@ typedef enum
 
 #define GPRS_TASK_PERIOD 1
 #define OTA_TASK_PERIOD 0
-#define SENSORS_TASK_PERIOD 1
+#define SENSORS_TASK_PERIOD 1 
 #define ROOM_SENSOR_UPDATE_PERIOD 500
 #define DIGITAL_CURRENT_SENSOR_PERIOD 5
 #define BUZZER_TASK_PERIOD 1
@@ -333,6 +341,8 @@ typedef enum
 
 #define BACKLIGHT_DELAY 2
 #define INIT_TFT_DELAY 300
+
+#define TIME_TRACK_UPDATE_PERIOD 900000 // 15 minutes
 
 typedef struct
 {
@@ -366,6 +376,14 @@ typedef struct
 
     bool calibrationError = false;
 
+    long last_check_time = false;
+    float standby_time = false;
+    float control_active_time = false;
+    float heater_active_time = false;
+    float fan_active_time = false;
+    float phototherapy_active_time = false;
+    float humidifier_active_time = false;
+
     byte language;
 
 } in3ator_parameters;
@@ -373,6 +391,7 @@ typedef struct
 void logln(String dataString);
 long secsToMillis(long timeInMillis);
 long minsToMillis(long timeInMillis);
+float millisToHours(long timeInMillis);
 void initHardware(bool printOutputTest);
 void UI_mainMenu();
 void userInterfaceHandler(int UI_page);

@@ -205,7 +205,7 @@ void userInterfaceHandler(int UI_page)
         {
         case controlModeGraphicPosition:
           in3.controlMode = !in3.controlMode;
-          EEPROM.write(EEPROM_controlMode, in3.controlMode);
+          EEPROM.write(EEPROM_CONTROL_MODE, in3.controlMode);
           EEPROM.commit();
           UI_mainMenu();
           break;
@@ -249,7 +249,7 @@ void userInterfaceHandler(int UI_page)
               updateUIData = false;
             }
           }
-          EEPROM.write(EEPROM_desiredControlMode, in3.desiredControlTemperature);
+          EEPROM.write(EEPROM_DESIRED_CONTROL_MODE, in3.desiredControlTemperature);
           EEPROM.commit();
           drawStartMessage(enableSet, menu_rows, helpMessage);
           break;
@@ -294,7 +294,7 @@ void userInterfaceHandler(int UI_page)
             EncMove = false;
             updateUIData = false;
           }
-          EEPROM.write(EEPROM_desiredControlHumidity, in3.desiredControlHumidity);
+          EEPROM.write(EEPROM_DESIRED_CONTROL_HUMIDITY, in3.desiredControlHumidity);
           EEPROM.commit();
           drawStartMessage(enableSet, menu_rows, helpMessage);
           break;
@@ -383,7 +383,7 @@ void userInterfaceHandler(int UI_page)
               EncMove = false;
             }
           }
-          EEPROM.write(EEPROM_language, in3.language);
+          EEPROM.write(EEPROM_LANGUAGE, in3.language);
           EEPROM.commit();
           UI_settings();
           break;
@@ -396,7 +396,7 @@ void userInterfaceHandler(int UI_page)
               setTextColor(COLOR_MENU);
               drawRightNumber(in3.serialNumber, unitPosition, ypos);
               in3.serialNumber -= EncMove;
-              EEPROM.write(EEPROM_SerialNumber, in3.serialNumber);
+              EEPROM.write(EEPROM_SERIAL_NUMBER, in3.serialNumber);
               setTextColor(COLOR_MENU_TEXT);
               drawRightNumber(in3.serialNumber, unitPosition, ypos);
             }
@@ -501,8 +501,8 @@ void userInterfaceHandler(int UI_page)
           fineTuneAirTemperature = diffAirTemperature - in3.temperature[airSensor];
           logln("[CALIBRATION] -> Fine tune Skin value is " + String(fineTuneSkinTemperature));
           logln("[CALIBRATION] -> Fine tune Air value is " + String(fineTuneAirTemperature));
-          EEPROM.writeFloat(EEPROM_FineTuneSkinTemperature, fineTuneSkinTemperature);
-          EEPROM.writeFloat(EEPROM_FineTuneAirTemperature, fineTuneAirTemperature);
+          EEPROM.writeFloat(EEPROM_FINE_TUNE_TEMP_SKIN, fineTuneSkinTemperature);
+          EEPROM.writeFloat(EEPROM_FINE_TUNE_TEMP_AIR, fineTuneAirTemperature);
           EEPROM.commit();
           UI_mainMenu();
           break;

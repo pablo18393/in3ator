@@ -240,6 +240,13 @@ void setup()
     ;
   ;
   logln("sensors task successfully created!\n");
+  /*
+  logln("Creating time track task ...\n");
+  while (xTaskCreatePinnedToCore(time_track_Task, (const char *)"SENSORS", 4096, NULL, 1, NULL, 1) != pdPASS)
+    ;
+  ;
+  logln("Time track task successfully created!\n");
+  */
 }
 
 void loop()
