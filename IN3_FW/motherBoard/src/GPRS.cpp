@@ -368,8 +368,8 @@ void UpdatedCallback(const bool &success)
 {
   if (success)
   {
-    logln("[GPRS] -> Done, Reboot now");
-    esp_restart();
+    logln("[WIFI] -> Done, OTA will be implemented on next boot");
+    //esp_restart();
   }
   else
   {

@@ -215,8 +215,8 @@ void WIFI_UpdatedCallback(const bool &success)
 {
   if (success)
   {
-    logln("[WIFI] -> Done, Reboot now");
-    esp_restart();
+    logln("[WIFI] -> Done, OTA will be implemented on next boot");
+    // esp_restart();
   }
   else
   {
@@ -307,25 +307,25 @@ void addTelemetriesToWIFIJSON()
     addVariableToTelemetryWIFIJSON[CONTROL_ACTIVE_TIME_KEY] = roundSignificantDigits(in3.control_active_time, TELEMETRIES_DECIMALS);
     addVariableToTelemetryWIFIJSON[HEATER_ACTIVE_TIME_KEY] = roundSignificantDigits(in3.heater_active_time, TELEMETRIES_DECIMALS);
     addVariableToTelemetryWIFIJSON[FAN_ACTIVE_TIME_KEY] = roundSignificantDigits(in3.fan_active_time, TELEMETRIES_DECIMALS);
-    if (!Wifi_TB.firstConfigPost)
+    addVariableToTelemetryWIFIJSON[DESIRED_TEMPERATURE_KEY] = in3.desiredControlTemperature;
+  }
+  if (in3.humidityControl)
+  {
+    addVariableToTelemetryWIFIJSON[DESIRED_HUMIDITY_KEY] = in3.desiredControlHumidity;
+  }
+  if (!Wifi_TB.firstConfigPost)
+  {
+    Wifi_TB.firstConfigPost = true;
+    addVariableToTelemetryWIFIJSON[CONTROL_ACTIVE_KEY] = true;
+    if (in3.temperatureControl)
     {
-      Wifi_TB.firstConfigPost = true;
-      addVariableToTelemetryWIFIJSON[CONTROL_ACTIVE_KEY] = true;
-      if (in3.temperatureControl)
+      if (in3.controlMode == AIR_CONTROL)
       {
-        if (in3.controlMode == AIR_CONTROL)
-        {
-          addVariableToTelemetryWIFIJSON[CONTROL_MODE_KEY] = "AIR";
-        }
-        else
-        {
-          addVariableToTelemetryWIFIJSON[CONTROL_MODE_KEY] = "SKIN";
-        }
-        addVariableToTelemetryWIFIJSON[DESIRED_TEMPERATURE_KEY] = in3.desiredControlTemperature;
+        addVariableToTelemetryWIFIJSON[CONTROL_MODE_KEY] = "AIR";
       }
-      if (in3.humidityControl)
+      else
       {
-        addVariableToTelemetryWIFIJSON[DESIRED_HUMIDITY_KEY] = in3.desiredControlHumidity;
+        addVariableToTelemetryWIFIJSON[CONTROL_MODE_KEY] = "SKIN";
       }
     }
   }

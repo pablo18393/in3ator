@@ -903,6 +903,8 @@ public:
     const uint16_t previousBufferSize = m_client.getBufferSize();
     const bool changeBufferSize = previousBufferSize < (chunkSize + 50U);
 
+    Serial.println("Previous buffer size: " + String(previousBufferSize));
+    Serial.println("New buffer size: " + String(chunkSize + 50U));
     // Increase size of receive buffer
     if (changeBufferSize && !m_client.setBufferSize(chunkSize + 50U))
     {
@@ -918,12 +920,13 @@ public:
     // Download the firmware
     do
     {
+      Serial.println("Requesting chunk" + String(currChunk) + " of " + String(numberOfChunk));
       char topic[detect_size(FIRMWARE_REQUEST_TOPIC, currChunk)]; // Size adjuts dynamically to the current length of the currChunk number to ensure we don't cut it out of the topic string.
       snprintf_P(topic, sizeof(topic), FIRMWARE_REQUEST_TOPIC, currChunk);
       snprintf_P(size, sizeof(size), NUMBER_PRINTF, chunkSize);
       m_client.publish(topic, size, m_qos);
 
-      const uint64_t timeout = millis() + 3000U; // Amount of time we wait until we declare the download as failed in milliseconds.
+      const uint64_t timeout = millis() + 30000U; // Amount of time we wait until we declare the download as failed in milliseconds.
       do
       {
         delay(5);
@@ -939,11 +942,13 @@ public:
           if (strncmp_P(FW_STATE_DOWNLOADING, m_fwState, strlen(FW_STATE_DOWNLOADING)) == 0)
           {
             currChunk++;
+            Logger::log("Packet received OK");
             nbRetry = 3U; // added line
           }
           else
           {
             nbRetry--;
+            Logger::log("Failed OTA packet, retrying...");
             if (nbRetry == 0)
             {
               Logger::log(UNABLE_TO_WRITE);
@@ -955,12 +960,21 @@ public:
         else
         {
           currChunk++;
+          Logger::log("Packet received OK");
         }
       }
       // Timeout
       else
       {
         nbRetry--;
+        if (timeout >= millis())
+        {
+          Serial.println("Timeout while waiting for OTA packet" + String(m_fwChunkReceive) + ", expected " + String(currChunk) + ", retrying...");
+        }
+        else
+        {
+          Serial.println("Received wrong OTA packet" + String(m_fwChunkReceive) + ", expected " + String(currChunk) + ", retrying...");
+        }
         if (nbRetry == 0)
         {
           Logger::log(UNABLE_TO_DOWNLOAD);
