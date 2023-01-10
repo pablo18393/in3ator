@@ -23,8 +23,8 @@
 
 */
 
-#define HW_NUM 9
-#define HW_REVISION 'B'
+#define HW_NUM 11
+#define HW_REVISION 'A'
 #define HWversion String(HW_NUM) + "." + String(HW_REVISION)
 #define FWversion "10.9"
 #define WIFI_NAME "In3_v" + String(FWversion) + "/" + String(HWversion)
@@ -72,6 +72,7 @@
 // PINOUT
 #define TFT_DC 4
 #define BUZZER 5
+#define TFT_CS 15 //fake GPIO
 #define I2C_SDA 21
 #define I2C_SCL 22
 #define ENC_A 25
@@ -113,7 +114,7 @@
 #define HUMIDIFIER GPIO_EXP_6
 #define PHOTOTHERAPY GPIO_EXP_7
 #define GPRS_PWRKEY GPIO_EXP_8
-#define TFT_CS GPIO_EXP_9
+#define TFT_CS_EXP GPIO_EXP_9
 #define TOUCH_IRQ GPIO_EXP_10
 #define TOUCH_CS GPIO_EXP_11
 #define TFT_RST GPIO_EXP_13

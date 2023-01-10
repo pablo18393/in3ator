@@ -206,6 +206,7 @@ void initGPIO()
   {
     TCA.setPolarity(pin, false);
   }
+  initPin(TFT_CS_EXP, OUTPUT);
   initPin(UNUSED_GPIO_EXP0, OUTPUT);
   initPin(UNUSED_GPIO_EXP1, OUTPUT);
   initPin(UNUSED_GPIO_EXP2, OUTPUT);
@@ -408,11 +409,10 @@ void initTFT()
 #if (HW_NUM == 6)
   initPin(TOUCH_CS, OUTPUT);
   initPin(SD_CS, OUTPUT);
-  initPin(TFT_CS, OUTPUT);
   initPin(TFT_RST, OUTPUT);
   GPIOWrite(TOUCH_CS, HIGH);
   GPIOWrite(SD_CS, HIGH);
-  GPIOWrite(TFT_CS, LOW);
+  GPIOWrite(TFT_CS_EXP, LOW);
   GPIOWrite(TFT_RST, LOW); // alternating HIGH/LOW
   delay(5);
   GPIOWrite(TFT_RST, HIGH); // alternating HIGH/LOW
