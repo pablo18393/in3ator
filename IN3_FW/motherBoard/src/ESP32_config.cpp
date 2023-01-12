@@ -22,13 +22,11 @@
   SOFTWARE.
 
 */
-#include <Arduino.h>
-#include "main.h"
 
-void watchdogInit()
+#include "ESP32_config.h"
+void watchdogInit(uint32_t wdt_timeout)
 {
-  logln("[HW] -> Watchdog enabled with " + String(WDT_TIMEOUT) + " seconds timeout");
-  esp_task_wdt_init(WDT_TIMEOUT, true); // enable panic so ESP32 restarts
+  esp_task_wdt_init(wdt_timeout, true); // enable panic so ESP32 restarts
   esp_task_wdt_add(NULL);               // add current thread to WDT watch
 }
 
@@ -36,3 +34,9 @@ void watchdogReload()
 {
   esp_task_wdt_reset();
 }
+
+void brownOutConfig(uint32_t val)
+{
+  WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, val);
+}
+

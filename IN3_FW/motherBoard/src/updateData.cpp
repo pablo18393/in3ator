@@ -331,7 +331,8 @@ void updateData()
 #else
     if (digitalCurrentSensorPresent)
     {
-      logln("[SENSORS] -> System current consumption is: " + String(in3.system_current, 4) + " Amps");
+      logln("[SENSORS] -> System voltage is: " + String(in3.system_voltage, 2) + " Amps");
+      logln("[SENSORS] -> System current consumption is: " + String(in3.system_current, 2) + " Amps");
       logln("[SENSORS] -> Phototherapy current consumption is: " + String(in3.phototherapy_current, 4) + " Amps");
       logln("[SENSORS] -> Fan current consumption is: " + String(in3.fan_current, 4) + " Amps");
     }

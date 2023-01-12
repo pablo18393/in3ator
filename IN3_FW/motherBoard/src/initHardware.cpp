@@ -638,6 +638,7 @@ bool GPIORead(uint8_t GPIO)
 void initHardware(bool printOutputTest)
 {
   initDebug();
+  //brownOutConfig(false);
   initEEPROM();
   initI2C();
   initGPIO();
@@ -678,6 +679,6 @@ void initHardware(bool printOutputTest)
     }
   }
   buzzerTone(2, buzzerStandbyToneDuration, buzzerStandbyTone);
-  watchdogInit();
+  watchdogInit(WDT_TIMEOUT);
   initAlarms();
 }

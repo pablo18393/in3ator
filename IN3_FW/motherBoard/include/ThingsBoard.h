@@ -903,8 +903,6 @@ public:
     const uint16_t previousBufferSize = m_client.getBufferSize();
     const bool changeBufferSize = previousBufferSize < (chunkSize + 50U);
 
-    Serial.println("Previous buffer size: " + String(previousBufferSize));
-    Serial.println("New buffer size: " + String(chunkSize + 50U));
     // Increase size of receive buffer
     if (changeBufferSize && !m_client.setBufferSize(chunkSize + 50U))
     {
@@ -926,7 +924,7 @@ public:
       snprintf_P(size, sizeof(size), NUMBER_PRINTF, chunkSize);
       m_client.publish(topic, size, m_qos);
 
-      const uint64_t timeout = millis() + 30000U; // Amount of time we wait until we declare the download as failed in milliseconds.
+      const uint64_t timeout = millis() + 10000U; // Amount of time we wait until we declare the download as failed in milliseconds.
       do
       {
         delay(5);
@@ -967,7 +965,7 @@ public:
       else
       {
         nbRetry--;
-        if (timeout >= millis())
+        if (timeout <= millis())
         {
           Serial.println("Timeout while waiting for OTA packet" + String(m_fwChunkReceive) + ", expected " + String(currChunk) + ", retrying...");
         }

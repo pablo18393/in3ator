@@ -155,6 +155,7 @@ void basictemperatureControl()
 
 void basicHumidityControl()
 {
+  /*
   if (in3.humidity < in3.desiredControlHumidity)
   {
     if (!humidifierState || humidifierStateChange)
@@ -173,6 +174,7 @@ void basicHumidityControl()
     }
     humidifierState = false;
   }
+  */
 }
 
 void turnActuators(bool mode)

@@ -1,7 +1,6 @@
 #ifndef _MAIN_H
 #define _MAIN_H
 
-#include <esp_task_wdt.h>
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include <WebServer.h>
@@ -25,11 +24,20 @@
 #include "PID.h"
 #include "GPRS.h"
 #include "Wifi_OTA.h"
+#include "ESP32_config.h"
 
 #define WDT_TIMEOUT 45
+#define BROWN_OUT_BATTERY_MODE 0 
+#define BROWN_OUT_NORMAL_MODE 0 
 #define ENABLE_WIFI_OTA true  // enable wifi OTA
 #define ENABLE_GPRS_OTA true // enable GPRS OTA
 #define DEFAULT_CONTROL_MODE AIR_CONTROL
+
+#define CORE_ID_FREERTOS 1
+
+#define THINGSBOARD_BUFFER_SIZE 8192
+#define THINGSBOARD_FIELDS_AMOUNT 64
+#define TELEMETRIES_DECIMALS 2
 
 #define SN_KEY "SN"
 #define HW_NUM_KEY "HW_num"
@@ -404,7 +412,6 @@ void buzzerTone(int beepTimes, int timevTaskDelay, int freq);
 void shutBuzzer();
 double measureMeanConsumption(int shunt);
 float measureMeanVoltage(int shunt);
-void watchdogReload();
 void WIFI_TB_Init();
 void WifiOTAHandler(void);
 void securityCheck();
@@ -495,7 +502,6 @@ double roundSignificantDigits(double value, int numberOfDecimals);
 void initGPIO();
 void initEEPROM();
 void drawHardwareErrorMessage(long error, bool criticalError, bool calibrationError);
-void watchdogInit();
 void initAlarms();
 void IRAM_ATTR encSwitchHandler();
 void IRAM_ATTR encoderISR();

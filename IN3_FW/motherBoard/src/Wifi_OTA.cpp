@@ -27,7 +27,9 @@
 
 const char *wifiHost = "in3ator";
 
-const char *ssid = "in3wifi";
+#define ssid "in3wifi"
+
+// const char *ssid = "in3wifi";
 const char *wifiPassword = "12345678";
 
 WebServer wifiServer(80);
@@ -221,6 +223,7 @@ void WIFI_UpdatedCallback(const bool &success)
   else
   {
     logln("[WIFI] -> No new firmware");
+    Update.abort();
   }
 }
 
@@ -355,6 +358,7 @@ void WEB_OTA()
     if (!WIFI_connection_status)
     {
       configWifiServer();
+      WIFI_connection_status = true;
     }
     else
     {
@@ -398,9 +402,9 @@ void WIFI_TB_OTA()
         Wifi_TB.serverConnectionStatus = true;
         if (ENABLE_WIFI_OTA && !Wifi_TB.OTA_requested)
         {
-          WIFICheckOTA();
           Wifi_TB.OTA_requested = true;
         }
+        WIFICheckOTA();
       }
     }
     else
@@ -420,7 +424,6 @@ void WIFI_TB_OTA()
         Wifi_TB.lastMQTTPublish = millis();
       }
     }
-    WIFI_connection_status = true;
   }
   else
   {

@@ -214,35 +214,35 @@ void setup()
   // Task generation
   /* Task n#1 - GPRS Handler */
   logln("Creating GPRS task ...\n");
-  while (xTaskCreatePinnedToCore(GPRS_Task, (const char *)"GPRS", 8192, NULL, 1, NULL, 1) != pdPASS)
+  while (xTaskCreatePinnedToCore(GPRS_Task, (const char *)"GPRS", 8192, NULL, 1, NULL, CORE_ID_FREERTOS) != pdPASS)
     ;
   ;
   logln("GPRS task successfully created!\n");
 
   logln("Creating OTA task ...\n");
-  while (xTaskCreatePinnedToCore(OTA_Task, (const char *)"OTA", 8192, NULL, 1, NULL, 1) != pdPASS)
+  while (xTaskCreatePinnedToCore(OTA_Task, (const char *)"OTA", 8192, NULL, 1, NULL, CORE_ID_FREERTOS) != pdPASS)
     ;
   ;
   logln("OTA task successfully created!\n");
   logln("Creating Backlight task ...\n");
-  while (xTaskCreatePinnedToCore(Backlight_Task, (const char *)"BACKLIGHT", 4096, NULL, 1, NULL, 1) != pdPASS)
+  while (xTaskCreatePinnedToCore(Backlight_Task, (const char *)"BACKLIGHT", 4096, NULL, 1, NULL, CORE_ID_FREERTOS) != pdPASS)
     ;
   ;
   logln("Backlight task successfully created!\n");
 
   logln("Creating buzzer task ...\n");
-  while (xTaskCreatePinnedToCore(buzzer_Task, (const char *)"BUZZER", 4096, NULL, 1, NULL, 1) != pdPASS)
+  while (xTaskCreatePinnedToCore(buzzer_Task, (const char *)"BUZZER", 4096, NULL, 1, NULL, CORE_ID_FREERTOS) != pdPASS)
     ;
   ;
   logln("Buzzer task successfully created!\n");
   logln("Creating sensors task ...\n");
-  while (xTaskCreatePinnedToCore(sensors_Task, (const char *)"SENSORS", 4096, NULL, 1, NULL, 1) != pdPASS)
+  while (xTaskCreatePinnedToCore(sensors_Task, (const char *)"SENSORS", 4096, NULL, 1, NULL, CORE_ID_FREERTOS) != pdPASS)
     ;
   ;
   logln("sensors task successfully created!\n");
   /*
   logln("Creating time track task ...\n");
-  while (xTaskCreatePinnedToCore(time_track_Task, (const char *)"SENSORS", 4096, NULL, 1, NULL, 1) != pdPASS)
+  while (xTaskCreatePinnedToCore(time_track_Task, (const char *)"SENSORS", 4096, NULL, 1, NULL, CORE_ID_FREERTOS) != pdPASS)
     ;
   ;
   logln("Time track task successfully created!\n");
