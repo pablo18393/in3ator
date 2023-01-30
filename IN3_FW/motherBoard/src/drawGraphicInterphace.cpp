@@ -709,7 +709,7 @@ void drawHardwareErrorMessage(long error, bool criticalError, bool calibrationEr
   tft.setTextColor(introTextColor); // use tft. because tft.print is configured by it
   tft.setCursor(tft.width() / 4 - hexDigits(error) * 16, tft.height() / 10);
   tft.setTextSize(3);
-  if (error)
+  if (error || criticalError || calibrationError)
   {
     tft.print("HW error:");
     tft.println(error, HEX);

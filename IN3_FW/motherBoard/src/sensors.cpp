@@ -205,7 +205,8 @@ float adcToCelsius(float adcReading, int maxAdcReading)
   float beta = 3950.0;
   float temp0 = 298.0;
   float r0 = 10000.0;
-  float adcReadingCorrection = 215;
+  //float adcReadingCorrection = 215;
+  float adcReadingCorrection = 0;
   // Bloque de cálculo
   // Variables used in calculus
   float vm = 0.0;
@@ -278,7 +279,7 @@ bool updateRoomSensor()
   {
     SHTC3_Status_TypeDef sensorState = mySHTC3.update();
     float sensedTemperature;
-    //logln("[SENSORS] -> Updating room humidity: state is " + String(sensorState));
+    //log("[SENSORS] -> Updating room humidity: state is " + String(sensorState));
     if (!sensorState)
     {
       sensedTemperature = mySHTC3.toDegC();

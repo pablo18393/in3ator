@@ -27,15 +27,18 @@
 #include "ESP32_config.h"
 
 #define WDT_TIMEOUT 45
-#define BROWN_OUT_BATTERY_MODE 0 
-#define BROWN_OUT_NORMAL_MODE 0 
-#define ENABLE_WIFI_OTA true  // enable wifi OTA
-#define ENABLE_GPRS_OTA true // enable GPRS OTA
+
+#define ENABLE_WIFI_OTA false // enable wifi OTA
+#define ENABLE_GPRS_OTA false // enable GPRS OTA
 #define DEFAULT_CONTROL_MODE AIR_CONTROL
+#define ALARM_SYSTEM_ENABLED false
 
 #define CORE_ID_FREERTOS 1
 
-#define THINGSBOARD_BUFFER_SIZE 8192
+#define BROWN_OUT_BATTERY_MODE 0
+#define BROWN_OUT_NORMAL_MODE 0
+
+#define THINGSBOARD_BUFFER_SIZE 4096
 #define THINGSBOARD_FIELDS_AMOUNT 64
 #define TELEMETRIES_DECIMALS 2
 
@@ -200,7 +203,7 @@
 #define separatorPosition 240
 #define unitPosition 315
 #define textFontSize 2 // text default size
-#define width_select 7
+#define width_select 20
 #define height_heading 34
 #define width_indentation 4
 #define width_back 50
@@ -342,7 +345,7 @@ typedef enum
 
 #define GPRS_TASK_PERIOD 1
 #define OTA_TASK_PERIOD 0
-#define SENSORS_TASK_PERIOD 1 
+#define SENSORS_TASK_PERIOD 1
 #define ROOM_SENSOR_UPDATE_PERIOD 500
 #define DIGITAL_CURRENT_SENSOR_PERIOD 5
 #define BUZZER_TASK_PERIOD 1
@@ -398,7 +401,7 @@ typedef struct
 
 } in3ator_parameters;
 
-void logln(String dataString);
+void log(String dataString);
 long secsToMillis(long timeInMillis);
 long minsToMillis(long timeInMillis);
 float millisToHours(long timeInMillis);

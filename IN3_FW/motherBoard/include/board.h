@@ -23,13 +23,12 @@
 
 */
 
-#define HW_NUM 9
-#define HW_REVISION 'B'
+#define HW_NUM 10
+#define HW_REVISION 'A'
 #define HWversion String(HW_NUM) + "." + String(HW_REVISION)
-#define FWversion "11.0"
+#define FWversion "11.1"
 #define WIFI_NAME "In3_v" + String(FWversion) + "/" + String(HWversion)
 #define CURRENT_FIRMWARE_TITLE "in3ator"
-
 
 #if (HW_NUM <= 8)
 #define DISPLAY_SPI_CLK SPI_CLOCK_DIV128
@@ -74,7 +73,7 @@
 // PINOUT
 #define TFT_DC 4
 #define BUZZER 5
-#define TFT_CS 15 //fake GPIO
+#define TFT_CS 15 // fake GPIO
 #define I2C_SDA 21
 #define I2C_SCL 22
 #define ENC_A 25
@@ -126,19 +125,19 @@
 #endif
 
 #if (HW_NUM >= 8)
-// number assignment of each enviromental sensor for later call in variable
+// number assignment of each environmental sensor for later call in variable
 #define skinSensor 0
 #define airSensor 1
-#define numNTC 1     // number of NTC
+#define numNTC 1 // number of NTC
 #define digitalTempHumSensor 1
 #define numSensors 2 // number of total temperature sensors in system
 
 #define DEFAULT_WIFI_EN ON
 #else
-// number assignment of each enviromental sensor for later call in variable
+// number assignment of each environmental sensor for later call in variable
 #define skinSensor 0
 #define airSensor 1
-#define numNTC 2     // number of NTC
+#define numNTC 2 // number of NTC
 #define digitalTempHumSensor 2
 #define numSensors 3 // number of total temperature sensors in system
 
@@ -166,7 +165,7 @@
 
 #define maxADCvalue 4095
 #define maxDACvalue 4095
-//#define PWM_MAX_VALUE maxADCvalue
+// #define PWM_MAX_VALUE maxADCvalue
 #define PWM_MAX_VALUE (pow(2, DEFAULT_PWM_RESOLUTION) - 1)
 
 #define minimumAllowedNTCMeasurement maxADCvalue / 5

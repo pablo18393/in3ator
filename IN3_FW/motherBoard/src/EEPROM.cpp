@@ -39,7 +39,7 @@ void initEEPROM()
 {
   if (!EEPROM.begin(EEPROM_SIZE))
   {
-    logln("failed to initialise EEPROM");
+    log("failed to initialise EEPROM");
   }
   if (EEPROM.read(EEPROM_CHECK_STATUS))
   {
@@ -67,14 +67,14 @@ void initEEPROM()
       EEPROM.write(i, 0);
     }
     loaddefaultValues();
-    logln("[FLASH] -> First turn on, loading default values");
+    log("[FLASH] -> First turn on, loading default values");
   }
   else
   {
-    logln("[FLASH] -> Loading variables stored in flash");
+    log("[FLASH] -> Loading variables stored in flash");
     recapVariables();
   }
-  logln("[FLASH] -> Variables loaded");
+  log("[FLASH] -> Variables loaded");
 }
 
 void loaddefaultValues()
@@ -111,10 +111,15 @@ void recapVariables()
   in3.humidifier_active_time = EEPROM.readFloat(EEPROM_HUMIDIFIER_ACTIVE_TIME);
   in3.phototherapy_active_time = EEPROM.readFloat(EEPROM_PHOTOTHERAPY_ACTIVE_TIME);
 
+  for (int i = 0; i < numSensors; i++)
+  {
+    log("calibration factors: " + String(RawTemperatureLow[i]) + "," + String(RawTemperatureRange[i]) + "," + String(ReferenceTemperatureRange) + "," + String(ReferenceTemperatureLow));
+  }
+
   if (!ReferenceTemperatureRange)
   {
     in3.calibrationError = true;
-    logln("[HW] -> Fail -> temperature sensor is not calibrated");
+    log("[HW] -> Fail -> temperature sensor is not calibrated");
   }
 
   for (int i = 0; i < numSensors; i++)

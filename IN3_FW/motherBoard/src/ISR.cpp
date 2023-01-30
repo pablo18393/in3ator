@@ -166,7 +166,7 @@ void IRAM_ATTR encSwitchHandler()
         disableAllAlarms();
       }
       encPulseDetected = true;
-      // logln("[ENCODER] -> Pushed");
+      // log("[ENCODER] -> Pushed");
     }
     lastEncPulse = millis();
     lastbacklightHandler = millis();

@@ -340,7 +340,7 @@ char *alarmIDtoString(byte alarmID)
 
 void setAlarm(byte alarmID)
 {
-  logln("[ALARM] ->" + String(alarmIDtoString(alarmID)) + " has been triggered");
+  log("[ALARM] ->" + String(alarmIDtoString(alarmID)) + " has been triggered");
   alarmOnGoing[alarmID] = true;
   buzzerConstantTone(buzzerAlarmTone);
   drawAlarmMessage(alarmIDtoString(alarmID));
@@ -348,7 +348,7 @@ void setAlarm(byte alarmID)
 
 void resetAlarm(byte alarmID)
 {
-  logln("[ALARM] ->" + String(alarmIDtoString(alarmID)) + " has been disable");
+  log("[ALARM] ->" + String(alarmIDtoString(alarmID)) + " has been disable");
   alarmOnGoing[alarmID] = false;
   drawHeading(page, in3.serialNumber);
   if (!ongoingAlarms())

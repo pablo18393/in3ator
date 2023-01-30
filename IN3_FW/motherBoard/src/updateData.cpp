@@ -205,14 +205,9 @@ void updateDisplaySensors()
   }
 }
 
-void logln(String dataString)
-{
-  Serial.println(String(millis() / 1000) + ": " + dataString);
-}
-
 void log(String dataString)
 {
-  Serial.print(dataString);
+  Serial.println(String(millis() / 1000) + ": " + dataString);
 }
 
 void backlightHandler()
@@ -313,37 +308,37 @@ void updateData()
   {
     if (airControlPID.GetMode() == AUTOMATIC)
     {
-      logln("[PID] -> Heater PWM output is: " + String(100 * HeaterPIDOutput / HEATER_MAX_PWM) + "%");
-      logln("[PID] -> Desired air temp is: " + String(in3.desiredControlTemperature) + "ºC");
+      log("[PID] -> Heater PWM output is: " + String(100 * HeaterPIDOutput / HEATER_MAX_PWM) + "%");
+      log("[PID] -> Desired air temp is: " + String(in3.desiredControlTemperature) + "ºC");
     }
     if (skinControlPID.GetMode() == AUTOMATIC)
     {
-      logln("[PID] -> Heater PWM output is: " + String(100 * HeaterPIDOutput / HEATER_MAX_PWM) + "%");
-      logln("[PID] -> Desired skin temp is: " + String(in3.desiredControlTemperature) + "ºC");
+      log("[PID] -> Heater PWM output is: " + String(100 * HeaterPIDOutput / HEATER_MAX_PWM) + "%");
+      log("[PID] -> Desired skin temp is: " + String(in3.desiredControlTemperature) + "ºC");
     }
     if (humidityControlPID.GetMode() == AUTOMATIC)
     {
-      logln("[PID] -> Humidifier output is: " + String(100 * humidityControlPIDOutput / humidifierTimeCycle) + "%");
-      logln("[PID] -> Desired humditity is: " + String(in3.desiredControlHumidity) + "%");
+      log("[PID] -> Humidifier output is: " + String(100 * humidityControlPIDOutput / humidifierTimeCycle) + "%");
+      log("[PID] -> Desired humditity is: " + String(in3.desiredControlHumidity) + "%");
     }
 #if (HW_NUM == 6)
-    logln("[SENSORS] -> System current consumption is: " + String(in3.system_current) + " Amps");
+    log("[SENSORS] -> System current consumption is: " + String(in3.system_current) + " Amps");
 #else
     if (digitalCurrentSensorPresent)
     {
-      logln("[SENSORS] -> System voltage is: " + String(in3.system_voltage, 2) + " Amps");
-      logln("[SENSORS] -> System current consumption is: " + String(in3.system_current, 2) + " Amps");
-      logln("[SENSORS] -> Phototherapy current consumption is: " + String(in3.phototherapy_current, 4) + " Amps");
-      logln("[SENSORS] -> Fan current consumption is: " + String(in3.fan_current, 4) + " Amps");
+      log("[SENSORS] -> System voltage is: " + String(in3.system_voltage, 2) + " Amps");
+      log("[SENSORS] -> System current consumption is: " + String(in3.system_current, 2) + " Amps");
+      log("[SENSORS] -> Phototherapy current consumption is: " + String(in3.phototherapy_current, 4) + " Amps");
+      log("[SENSORS] -> Fan current consumption is: " + String(in3.fan_current, 4) + " Amps");
     }
 #endif
-    logln("[SENSORS] -> Baby temperature: " + String(in3.temperature[skinSensor]) + "ºC, correction error is " + String(errorTemperature[skinSensor]));
-    logln("[SENSORS] -> Air temperature: " + String(in3.temperature[airSensor]) + "ºC, correction error is " + String(errorTemperature[airSensor]));
-    logln("[SENSORS] -> Humidity: " + String(in3.humidity) + "%");
-    // logln("[SENSORS] -> ON_OFF: " + String(GPIORead(ON_OFF_SWITCH)));
+    log("[SENSORS] -> Baby temperature: " + String(in3.temperature[skinSensor]) + "ºC, correction error is " + String(errorTemperature[skinSensor]));
+    log("[SENSORS] -> Air temperature: " + String(in3.temperature[airSensor]) + "ºC, correction error is " + String(errorTemperature[airSensor]));
+    log("[SENSORS] -> Humidity: " + String(in3.humidity) + "%");
+    // log("[SENSORS] -> ON_OFF: " + String(GPIORead(ON_OFF_SWITCH)));
     if (millis() - lastDebugUpdate)
     {
-      logln("[LATENCY] -> Looped " + String(loopCounts * 1000 / (millis() - lastDebugUpdate)) + " Times per second");
+      log("[LATENCY] -> Looped " + String(loopCounts * 1000 / (millis() - lastDebugUpdate)) + " Times per second");
     }
     loopCounts = 0;
     lastDebugUpdate = millis();

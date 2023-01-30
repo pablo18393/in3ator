@@ -227,7 +227,7 @@ void autoCalibration()
         RawTemperatureLow[skinSensor] = provisionalRawTemperatureLow[skinSensor];
         ReferenceTemperatureRange = in3.temperature[digitalTempHumSensor] - ReferenceTemperatureLow;
         RawTemperatureRange[skinSensor] = (in3.temperature[skinSensor] - RawTemperatureLow[skinSensor]);
-        logln("calibration factors: " + String(RawTemperatureLow[skinSensor]) + "," + String(RawTemperatureRange[skinSensor]) + "," + String(ReferenceTemperatureRange) + "," + String(ReferenceTemperatureLow));
+        log("calibration factors: " + String(RawTemperatureLow[skinSensor]) + "," + String(RawTemperatureRange[skinSensor]) + "," + String(ReferenceTemperatureRange) + "," + String(ReferenceTemperatureLow));
         saveCalibrationToEEPROM();
         ledcWrite(HEATER_PWM_CHANNEL, false);
         turnFans(OFF);

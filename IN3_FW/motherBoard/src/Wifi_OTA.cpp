@@ -155,14 +155,14 @@ void wifiDisable()
 void configWifiServer()
 {
   // Wait for connection
-  logln("Connected to " + String(ssid) + "IP address" + WiFi.localIP());
+  log("Connected to " + String(ssid) + "IP address" + WiFi.localIP());
 
   /*use mdns for wifiHost name resolution*/
   if (!MDNS.begin(wifiHost))
   { // http://esp32.local
-    logln("Error setting up MDNS responder!");
+    log("Error setting up MDNS responder!");
   }
-  logln("mDNS responder started");
+  log("mDNS responder started");
   /*return index page which is stored in ServerIndex */
   wifiServer.on("/", HTTP_GET, []()
                 {
@@ -217,12 +217,12 @@ void WIFI_UpdatedCallback(const bool &success)
 {
   if (success)
   {
-    logln("[WIFI] -> Done, OTA will be implemented on next boot");
+    log("[WIFI] -> Done, OTA will be implemented on next boot");
     // esp_restart();
   }
   else
   {
-    logln("[WIFI] -> No new firmware");
+    log("[WIFI] -> No new firmware");
     Update.abort();
   }
 }
@@ -260,7 +260,7 @@ bool WIFIOTAIsOngoing()
 
 void WIFICheckOTA()
 {
-  logln("[WIFI] -> Checking WIFI firwmare Update...");
+  log("[WIFI] -> Checking WIFI firwmare Update...");
   tb_wifi.Start_Firmware_Update(CURRENT_FIRMWARE_TITLE, FWversion, WIFI_UpdatedCallback);
 }
 
@@ -308,27 +308,30 @@ void addTelemetriesToWIFIJSON()
   {
     addVariableToTelemetryWIFIJSON[FAN_CURRENT_KEY] = roundSignificantDigits(in3.fan_current, TELEMETRIES_DECIMALS);
     addVariableToTelemetryWIFIJSON[CONTROL_ACTIVE_TIME_KEY] = roundSignificantDigits(in3.control_active_time, TELEMETRIES_DECIMALS);
-    addVariableToTelemetryWIFIJSON[HEATER_ACTIVE_TIME_KEY] = roundSignificantDigits(in3.heater_active_time, TELEMETRIES_DECIMALS);
     addVariableToTelemetryWIFIJSON[FAN_ACTIVE_TIME_KEY] = roundSignificantDigits(in3.fan_active_time, TELEMETRIES_DECIMALS);
-    addVariableToTelemetryWIFIJSON[DESIRED_TEMPERATURE_KEY] = in3.desiredControlTemperature;
-  }
-  if (in3.humidityControl)
-  {
-    addVariableToTelemetryWIFIJSON[DESIRED_HUMIDITY_KEY] = in3.desiredControlHumidity;
-  }
-  if (!Wifi_TB.firstConfigPost)
-  {
-    Wifi_TB.firstConfigPost = true;
-    addVariableToTelemetryWIFIJSON[CONTROL_ACTIVE_KEY] = true;
     if (in3.temperatureControl)
     {
-      if (in3.controlMode == AIR_CONTROL)
+      addVariableToTelemetryWIFIJSON[DESIRED_TEMPERATURE_KEY] = in3.desiredControlTemperature;
+      addVariableToTelemetryWIFIJSON[HEATER_ACTIVE_TIME_KEY] = roundSignificantDigits(in3.heater_active_time, TELEMETRIES_DECIMALS);
+    }
+    if (in3.humidityControl)
+    {
+      addVariableToTelemetryWIFIJSON[DESIRED_HUMIDITY_KEY] = in3.desiredControlHumidity;
+    }
+    if (!Wifi_TB.firstConfigPost)
+    {
+      Wifi_TB.firstConfigPost = true;
+      addVariableToTelemetryWIFIJSON[CONTROL_ACTIVE_KEY] = true;
+      if (in3.temperatureControl)
       {
-        addVariableToTelemetryWIFIJSON[CONTROL_MODE_KEY] = "AIR";
-      }
-      else
-      {
-        addVariableToTelemetryWIFIJSON[CONTROL_MODE_KEY] = "SKIN";
+        if (in3.controlMode == AIR_CONTROL)
+        {
+          addVariableToTelemetryWIFIJSON[CONTROL_MODE_KEY] = "AIR";
+        }
+        else
+        {
+          addVariableToTelemetryWIFIJSON[CONTROL_MODE_KEY] = "SKIN";
+        }
       }
     }
   }
@@ -378,10 +381,10 @@ void WIFI_TB_OTA()
     if (!tb_wifi.connected())
     {
       // Connect to the ThingsBoard
-      logln("[WIFI] -> Connecting over WIFI to: " + String(THINGSBOARD_SERVER) + " with token " + String(Wifi_TB.device_token));
+      log("[WIFI] -> Connecting over WIFI to: " + String(THINGSBOARD_SERVER) + " with token " + String(Wifi_TB.device_token));
       if (!tb_wifi.connect(THINGSBOARD_SERVER, Wifi_TB.device_token.c_str()))
       {
-        logln("[WIFI] ->Failed to connect");
+        log("[WIFI] ->Failed to connect");
         return;
       }
       else
@@ -391,11 +394,11 @@ void WIFI_TB_OTA()
           addConfigTelemetriesToWIFIJSON();
           if (tb_wifi.sendTelemetryJson(addVariableToTelemetryWIFIJSON, JSON_STRING_SIZE(measureJson(addVariableToTelemetryWIFIJSON))))
           {
-            logln("[WIFI] -> WIFI MQTT PUBLISH CONFIG SUCCESS");
+            log("[WIFI] -> WIFI MQTT PUBLISH CONFIG SUCCESS");
           }
           else
           {
-            logln("[WIFI] -> WIFI MQTT PUBLISH CONFIG FAIL");
+            log("[WIFI] -> WIFI MQTT PUBLISH CONFIG FAIL");
           }
           WIFI_JSON.clear();
         }
@@ -414,11 +417,11 @@ void WIFI_TB_OTA()
         addTelemetriesToWIFIJSON();
         if (tb_wifi.sendTelemetryJson(addVariableToTelemetryWIFIJSON, JSON_STRING_SIZE(measureJson(addVariableToTelemetryWIFIJSON))))
         {
-          logln("[WIFI] -> WIFI MQTT PUBLISH TELEMETRIES SUCCESS");
+          log("[WIFI] -> WIFI MQTT PUBLISH TELEMETRIES SUCCESS");
         }
         else
         {
-          logln("[WIFI] -> WIFI MQTT PUBLISH TELEMETRIES FAIL");
+          log("[WIFI] -> WIFI MQTT PUBLISH TELEMETRIES FAIL");
         }
         WIFI_JSON.clear();
         Wifi_TB.lastMQTTPublish = millis();

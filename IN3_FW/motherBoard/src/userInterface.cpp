@@ -499,8 +499,8 @@ void userInterfaceHandler(int UI_page)
         case setCalibrationGraphicPosition:
           fineTuneSkinTemperature = diffSkinTemperature - in3.temperature[skinSensor];
           fineTuneAirTemperature = diffAirTemperature - in3.temperature[airSensor];
-          logln("[CALIBRATION] -> Fine tune Skin value is " + String(fineTuneSkinTemperature));
-          logln("[CALIBRATION] -> Fine tune Air value is " + String(fineTuneAirTemperature));
+          log("[CALIBRATION] -> Fine tune Skin value is " + String(fineTuneSkinTemperature));
+          log("[CALIBRATION] -> Fine tune Air value is " + String(fineTuneAirTemperature));
           EEPROM.writeFloat(EEPROM_FINE_TUNE_TEMP_SKIN, fineTuneSkinTemperature);
           EEPROM.writeFloat(EEPROM_FINE_TUNE_TEMP_AIR, fineTuneAirTemperature);
           EEPROM.commit();
@@ -534,7 +534,7 @@ void userInterfaceHandler(int UI_page)
         case setCalibrationGraphicPosition:
           provisionalReferenceTemperatureLow = diffSkinTemperature;
           provisionalRawTemperatureLow[skinSensor] = in3.temperature[skinSensor];
-          logln("[CALIBRATION] -> Low reference point is " + String(provisionalReferenceTemperatureLow) + ", low raw skin point is " + String(provisionalRawTemperatureLow[skinSensor]));
+          log("[CALIBRATION] -> Low reference point is " + String(provisionalReferenceTemperatureLow) + ", low raw skin point is " + String(provisionalRawTemperatureLow[skinSensor]));
           secondPointCalibration();
           break;
         }
@@ -555,7 +555,7 @@ void userInterfaceHandler(int UI_page)
               diffSkinTemperature += EncMove * (0.1);
               drawFloat(diffSkinTemperature, 1, valuePosition, ypos, textFontSize);
               EncMove = false;
-              logln("difTemp: " + String(diffSkinTemperature));
+              log("difTemp: " + String(diffSkinTemperature));
             }
           }
           break;
@@ -566,12 +566,12 @@ void userInterfaceHandler(int UI_page)
           if (RawTemperatureRange[skinSensor])
           {
             RawTemperatureRange[skinSensor] = (in3.temperature[skinSensor] - RawTemperatureLow[skinSensor]);
-            logln("calibration factors: " + String(RawTemperatureLow[skinSensor]) + "," + String(RawTemperatureRange[skinSensor]) + "," + String(ReferenceTemperatureRange) + "," + String(ReferenceTemperatureLow));
+            log("calibration factors: " + String(RawTemperatureLow[skinSensor]) + "," + String(RawTemperatureRange[skinSensor]) + "," + String(ReferenceTemperatureRange) + "," + String(ReferenceTemperatureLow));
             saveCalibrationToEEPROM();
           }
           else
           {
-            logln("[CALIBRATION] -> ERROR -> DIVIDE BY ZERO");
+            log("[CALIBRATION] -> ERROR -> DIVIDE BY ZERO");
           }
           UI_settings();
           break;
