@@ -28,10 +28,9 @@
 
 #define WDT_TIMEOUT 45
 
-#define ENABLE_WIFI_OTA false // enable wifi OTA
-#define ENABLE_GPRS_OTA false // enable GPRS OTA
-#define DEFAULT_CONTROL_MODE AIR_CONTROL
-#define ALARM_SYSTEM_ENABLED false
+#define ENABLE_WIFI_OTA true // enable wifi OTA
+#define ENABLE_GPRS_OTA true // enable GPRS OTA
+#define ALARM_SYSTEM_ENABLED true
 
 #define CORE_ID_FREERTOS 1
 
@@ -151,6 +150,7 @@
 #define portuguese 3
 #define numLanguages 4
 #define defaultLanguage english // Preset number configuration when booting for first time
+#define DEFAULT_CONTROL_MODE AIR_CONTROL
 
 #define secondOrder_filter 3          // amount of temperature samples to filter
 #define analog_temperature_filter 500 // amount of temperature samples to filter
