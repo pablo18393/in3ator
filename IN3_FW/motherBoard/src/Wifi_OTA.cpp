@@ -27,11 +27,6 @@
 
 const char *wifiHost = "in3ator";
 
-#define ssid "in3wifi"
-
-// const char *ssid = "in3wifi";
-const char *wifiPassword = "12345678";
-
 WebServer wifiServer(80);
 
 WiFiClient espClient;

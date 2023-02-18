@@ -23,7 +23,7 @@
 
 */
 
-#define HW_NUM 10
+#define HW_NUM 11
 #define HW_REVISION 'A'
 #define HWversion String(HW_NUM) + "." + String(HW_REVISION)
 #define FWversion "11.1"
@@ -47,7 +47,7 @@
 #define HUMIDIFIER_INTERFACE HUMIDIFIER_I2C
 #endif
 
-#define GPIO_EXP_BASE 100 // To differentiate with ESP32 GPIO
+#define GPIO_EXP_BASE 100  // To differentiate with ESP32 GPIO
 
 #if (HW_NUM >= 9)
 // PINOUT
@@ -73,7 +73,7 @@
 // PINOUT
 #define TFT_DC 4
 #define BUZZER 5
-#define TFT_CS 15 // fake GPIO
+#define TFT_CS 15  // fake GPIO
 #define I2C_SDA 21
 #define I2C_SCL 22
 #define ENC_A 25
@@ -128,18 +128,18 @@
 // number assignment of each environmental sensor for later call in variable
 #define skinSensor 0
 #define airSensor 1
-#define numNTC 1 // number of NTC
+#define numNTC 1  // number of NTC
 #define digitalTempHumSensor 1
-#define numSensors 2 // number of total temperature sensors in system
+#define numSensors 2  // number of total temperature sensors in system
 
 #define DEFAULT_WIFI_EN ON
 #else
 // number assignment of each environmental sensor for later call in variable
 #define skinSensor 0
 #define airSensor 1
-#define numNTC 2 // number of NTC
+#define numNTC 2  // number of NTC
 #define digitalTempHumSensor 2
-#define numSensors 3 // number of total temperature sensors in system
+#define numSensors 3  // number of total temperature sensors in system
 
 #define DEFAULT_WIFI_EN OFF
 #endif
@@ -151,9 +151,9 @@
 #define HUMIDIFIER_SHUNT 1
 
 #define SDCard false
-#define SYSTEM_SHUNT 2        // miliohms
-#define PHOTOTHERAPY_SHUNT 20 // miliohms
-#define FAN_SHUNT 100         // miliohms
+#define SYSTEM_SHUNT 2         // miliohms
+#define PHOTOTHERAPY_SHUNT 20  // miliohms
+#define FAN_SHUNT 100          // miliohms
 
 #define DISPLAY_DEFAULT_ROTATION 3
 
@@ -189,11 +189,11 @@
 #define MINIMUM_SYSTEM_VALUE 9
 
 #if (HW_NUM <= 8 || (HW_NUM == 9 && HW_REVISION == 'A'))
-#define SCREEN_BRIGHTNESS_FACTOR 0.1 // Max brightness will be multiplied by this constant
+#define SCREEN_BRIGHTNESS_FACTOR 0.1  // Max brightness will be multiplied by this constant
 #define BACKLIGHT_POWER_SAFE_PERCENTAGE 0.6
 #define BACKLIGHT_CONTROL INVERTED_BACKLIGHT_CONTROL
 #else
-#define SCREEN_BRIGHTNESS_FACTOR 0.7 // Max brightness will be multiplied by this constant
+#define SCREEN_BRIGHTNESS_FACTOR 0.7  // Max brightness will be multiplied by this constant
 #define BACKLIGHT_POWER_SAFE_PERCENTAGE 0.3
 #define BACKLIGHT_CONTROL DIRECT_BACKLIGHT_CONTROL
 #endif

@@ -25,13 +25,14 @@
 
 // Firmware version and head title of UI screen
 
-#include <Arduino.h>
 #include "main.h"
+
+#include <Arduino.h>
 
 TwoWire *wire;
 MAM_in3ator_Humidifier in3_hum(DEFAULT_ADDRESS);
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
-SHTC3 mySHTC3; // Declare an instance of the SHTC3 class
+SHTC3 mySHTC3;  // Declare an instance of the SHTC3 class
 RotaryEncoder encoder(ENC_A, ENC_B, RotaryEncoder::LatchMode::TWO03);
 Beastdevices_INA3221 digitalCurrentSensor(INA3221_ADDR41_VCC);
 
@@ -39,7 +40,7 @@ bool WIFI_EN = true;
 long lastDebugUpdate;
 long loopCounts;
 int page;
-int temperature_filter = analog_temperature_filter; // amount of temperature samples to filter
+int temperature_filter = analog_temperature_filter;  // amount of temperature samples to filter
 long lastNTCmeasurement[numNTC];
 
 #if (HW_NUM <= 6)
@@ -51,15 +52,15 @@ double errorTemperature[numSensors], temperatureCalibrationPoint;
 double ReferenceTemperatureRange, ReferenceTemperatureLow;
 double provisionalReferenceTemperatureLow;
 double fineTuneSkinTemperature, fineTuneAirTemperature;
-float diffSkinTemperature, diffAirTemperature; // difference between measured temperature and user input real temperature
+float diffSkinTemperature, diffAirTemperature;  // difference between measured temperature and user input real temperature
 double RawTemperatureLow[numSensors], RawTemperatureRange[numSensors];
 double provisionalRawTemperatureLow[numSensors];
 double temperatureMax[numSensors], temperatureMin[numSensors];
-int temperatureArray[numNTC][analog_temperature_filter]; // variable to handle each NTC with the array of last samples (only for NTC)
-int temperature_array_pos;                               // temperature sensor number turn to measure
+int temperatureArray[numNTC][analog_temperature_filter];  // variable to handle each NTC with the array of last samples (only for NTC)
+int temperature_array_pos;                                // temperature sensor number turn to measure
 bool humidifierState, humidifierStateChange;
-int previousHumidity; // previous sampled humidity
-float diffHumidity;   // difference between measured humidity and user input real humidity
+int previousHumidity;  // previous sampled humidity
+float diffHumidity;    // difference between measured humidity and user input real humidity
 
 byte autoCalibrationProcess;
 
@@ -80,22 +81,22 @@ float instantCurrent[secondOrder_filter];
 float previousCurrent[secondOrder_filter];
 
 // room variables
-float minDesiredTemp[2] = {35, 30};   // minimum allowed temperature to be set
-float maxDesiredTemp[2] = {37.5, 37}; // maximum allowed temperature to be set
-int presetTemp[2] = {36, 32};         // preset baby skin temperature
+float minDesiredTemp[2] = {35, 30};    // minimum allowed temperature to be set
+float maxDesiredTemp[2] = {37.5, 37};  // maximum allowed temperature to be set
+int presetTemp[2] = {36, 32};          // preset baby skin temperature
 
 boolean A_set;
 boolean B_set;
-int encoderpinA = ENC_A;         // pin  encoder A
-int encoderpinB = ENC_B;         // pin  encoder B
-bool encPulsed, encPulsedBefore; // encoder switch status
+int encoderpinA = ENC_A;          // pin  encoder A
+int encoderpinB = ENC_B;          // pin  encoder B
+bool encPulsed, encPulsedBefore;  // encoder switch status
 bool updateUIData;
-volatile int EncMove;                 // moved encoder
-volatile int lastEncMove;             // moved last encoder
-volatile int EncMoveOrientation = -1; // set to -1 to increase values clockwise
-volatile int last_encoder_move;       // moved encoder
-long encoder_debounce_time = true;    // in milliseconds, debounce time in encoder to filter signal bounces
-long last_encPulsed;                  // last time encoder was pulsed
+volatile int EncMove;                  // moved encoder
+volatile int lastEncMove;              // moved last encoder
+volatile int EncMoveOrientation = -1;  // set to -1 to increase values clockwise
+volatile int last_encoder_move;        // moved encoder
+long encoder_debounce_time = true;     // in milliseconds, debounce time in encoder to filter signal bounces
+long last_encPulsed;                   // last time encoder was pulsed
 
 // Text Graphic position variables
 int humidityX;
@@ -115,8 +116,8 @@ int barWidth, barHeight, tempBarPosX, tempBarPosY, humBarPosX, humBarPosY;
 int screenTextColor, screenTextBackgroundColor;
 
 // User Interface display variables
-bool autoLock;             // setting that enables backlight switch OFF after a given time of no user actions
-long lastbacklightHandler; // last time there was a encoder movement or pulse
+bool autoLock;              // setting that enables backlight switch OFF after a given time of no user actions
+long lastbacklightHandler;  // last time there was a encoder movement or pulse
 long sensorsUpdatePeriod = 1000;
 
 bool selected;
@@ -142,76 +143,68 @@ long lastRoomSensorUpdate, lastCurrentSensorUpdate;
 
 in3ator_parameters in3;
 
-void GPRS_Task(void *pvParameters)
-{
+void GPRS_Task(void *pvParameters) {
   initGPRS();
   GPRS_TB_Init();
-  for (;;)
-  {
-    if (!WIFIIsConnected())
-    {
+  for (;;) {
+    if (!WIFIIsConnected()) {
       GPRS_Handler();
     }
     vTaskDelay(GPRS_TASK_PERIOD / portTICK_PERIOD_MS);
   }
 }
 
-void Backlight_Task(void *pvParameters)
-{
-  for (;;)
-  {
+void GPRS_Task_check(void *pvParameters) {
+  for (;;) {
+    log("[GPRS] -> Connection is " + String(GPRS_CheckConnection()));
+    vTaskDelay(10000 / portTICK_PERIOD_MS);
+  }
+}
+
+void Backlight_Task(void *pvParameters) {
+  for (;;) {
     backlightHandler();
     vTaskDelay(BACKLIGHT_TASK_PERIOD / portTICK_PERIOD_MS);
   }
 }
 
-void sensors_Task(void *pvParameters)
-{
-  for (;;)
-  {
+void sensors_Task(void *pvParameters) {
+  for (;;) {
     measureNTCTemperature(skinSensor);
 #if (HW_NUM == 6)
     measureNTCTemperature(airSensor);
 #endif
-    if (millis() - lastRoomSensorUpdate > ROOM_SENSOR_UPDATE_PERIOD)
-    {
+    if (millis() - lastRoomSensorUpdate > ROOM_SENSOR_UPDATE_PERIOD) {
       updateRoomSensor();
       lastRoomSensorUpdate = millis();
     }
-    if (millis() - lastCurrentSensorUpdate > DIGITAL_CURRENT_SENSOR_PERIOD)
-    {
+    if (millis() - lastCurrentSensorUpdate > DIGITAL_CURRENT_SENSOR_PERIOD) {
       powerMonitor();
       lastCurrentSensorUpdate = millis();
     }
-    if (ALARM_SYSTEM_ENABLED)
-    {
+    if (ALARM_SYSTEM_ENABLED) {
       securityCheck();
     }
     vTaskDelay(SENSORS_TASK_PERIOD / portTICK_PERIOD_MS);
   }
 }
 
-void OTA_Task(void *pvParameters)
-{
+void OTA_Task(void *pvParameters) {
   WIFI_TB_Init();
-  for (;;)
-  {
+  for (;;) {
     WifiOTAHandler();
     vTaskDelay(OTA_TASK_PERIOD / portTICK_PERIOD_MS);
   }
 }
 
-void buzzer_Task(void *pvParameters)
-{
-  for (;;)
-  {
+void buzzer_Task(void *pvParameters) {
+  for (;;) {
     buzzerHandler();
     vTaskDelay(BUZZER_TASK_PERIOD / portTICK_PERIOD_MS);
   }
 }
 
-void setup()
-{
+void setup() {
   initHardware(false);
   UI_mainMenu();
   // Task generation
@@ -219,7 +212,7 @@ void setup()
   log("Creating GPRS task ...\n");
   while (xTaskCreatePinnedToCore(GPRS_Task, (const char *)"GPRS", 8192, NULL, 1, NULL, CORE_ID_FREERTOS) != pdPASS)
     ;
-  ;
+  //while (xTaskCreatePinnedToCore(GPRS_Task_check, (const char *)"GPRS_check", 8192, NULL, 1, NULL, CORE_ID_FREERTOS) != pdPASS);
   log("GPRS task successfully created!\n");
 
   log("Creating OTA task ...\n");
@@ -252,8 +245,7 @@ void setup()
   */
 }
 
-void loop()
-{
+void loop() {
   userInterfaceHandler(page);
   updateData();
   vTaskDelay(LOOP_TASK_PERIOD / portTICK_PERIOD_MS);

@@ -5,7 +5,6 @@
 #include <Arduino.h>
 #include "main.h"
 #include "ThingsBoard.h"
-#include "Credentials.h"
 
 
 

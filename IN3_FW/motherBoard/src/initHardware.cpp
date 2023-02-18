@@ -156,7 +156,7 @@ extern int ScreenBacklightMode;
 #define PHOTOTHERAPY_CONSUMPTION_MIN 0.3
 #define HUMIDIFIER_CONSUMPTION_MIN 0.07
 
-#define HEATER_CONSUMPTION_MAX 10
+#define HEATER_CONSUMPTION_MAX 15
 #define FAN_CONSUMPTION_MAX 1
 #define PHOTOTHERAPY_CONSUMPTION_MAX 3
 #define HUMIDIFIER_CONSUMPTION_MAX 0.8
@@ -638,7 +638,7 @@ bool GPIORead(uint8_t GPIO)
 void initHardware(bool printOutputTest)
 {
   initDebug();
-  //brownOutConfig(false);
+  // brownOutConfig(false);
   initEEPROM();
   initI2C();
   initGPIO();

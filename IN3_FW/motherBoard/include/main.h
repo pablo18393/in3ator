@@ -1,36 +1,39 @@
 #ifndef _MAIN_H
 #define _MAIN_H
 
-#include <WiFi.h>
-#include <WiFiClient.h>
-#include <WebServer.h>
 #include <ESPmDNS.h>
 #include <Update.h>
+#include <WebServer.h>
+#include <WiFi.h>
+#include <WiFiClient.h>
 // include libraries
-#include "SPI.h"
+#include <Beastdevices_INA3221.h>
+#include <EEPROM.h>
+#include <RotaryEncoder.h>
+#include <SPI.h>
+#include <Wire.h>
+
 #include "Adafruit_GFX.h"
 #include "Adafruit_ILI9341.h"
-#include <EEPROM.h>
-#include <SPI.h>
-#include "board.h"
-#include <Wire.h>
-#include "SparkFun_SHTC3.h"
-#include <RotaryEncoder.h>
-#include <Beastdevices_INA3221.h>
-#include "in3ator_humidifier.h"
-#include "TCA9555.h"
-#include "esp32/ulp.h"
-#include "driver/rtc_io.h"
-#include "PID.h"
-#include "GPRS.h"
-#include "Wifi_OTA.h"
 #include "ESP32_config.h"
+#include "GPRS.h"
+#include "PID.h"
+#include "SPI.h"
+#include "SparkFun_SHTC3.h"
+#include "TCA9555.h"
+#include "Wifi_OTA.h"
+#include "board.h"
+#include "driver/rtc_io.h"
+#include "esp32/ulp.h"
+#include "in3ator_humidifier.h"
+
+#include "Credentials.h"
 
 #define WDT_TIMEOUT 45
 
-#define ENABLE_WIFI_OTA true // enable wifi OTA
-#define ENABLE_GPRS_OTA true // enable GPRS OTA
-#define ALARM_SYSTEM_ENABLED true
+#define ENABLE_WIFI_OTA true  // enable wifi OTA
+#define ENABLE_GPRS_OTA true  // enable GPRS OTA
+#define ALARM_SYSTEM_ENABLED false
 
 #define CORE_ID_FREERTOS 1
 
@@ -94,13 +97,13 @@
 #define AIR_CONTROL true
 
 // buzzer variables
-#define buzzerStandbyPeriod 10000    // in millis, there will be a periodic tone when regulating baby's constants
-#define buzzerStandbyTone 500        // in micros, tone freq
-#define buzzerAlarmTone 500          // in micros, tone freq
-#define buzzerRotaryEncoderTone 2200 // in micros, tone freq
-#define buzzerStandbyToneDuration 50 // in micros, tone freq
-#define buzzerSwitchDuration 10      // in micros, tone freq
-#define buzzerStandbyToneTimes 1     // in micros, tone freq
+#define buzzerStandbyPeriod 10000     // in millis, there will be a periodic tone when regulating baby's constants
+#define buzzerStandbyTone 500         // in micros, tone freq
+#define buzzerAlarmTone 500           // in micros, tone freq
+#define buzzerRotaryEncoderTone 2200  // in micros, tone freq
+#define buzzerStandbyToneDuration 50  // in micros, tone freq
+#define buzzerSwitchDuration 10       // in micros, tone freq
+#define buzzerStandbyToneTimes 1      // in micros, tone freq
 
 // EEPROM variables
 #define EEPROM_SIZE 256
@@ -129,9 +132,9 @@
 #define EEPROM_HUMIDIFIER_ACTIVE_TIME 246
 
 // configuration variables
-#define debounceTime 30          // encoder debouncing time
-#define timePressToSettings 3000 // in millis, time to press to go to settings window in UI
-#define debugUpdatePeriod 1000   // in millis,
+#define debounceTime 30           // encoder debouncing time
+#define timePressToSettings 3000  // in millis, time to press to go to settings window in UI
+#define debugUpdatePeriod 1000    // in millis,
 
 // pages number in UI. Configuration and information will be displayed depending on the page number
 
@@ -149,26 +152,26 @@
 #define french 2
 #define portuguese 3
 #define numLanguages 4
-#define defaultLanguage english // Preset number configuration when booting for first time
+#define defaultLanguage english  // Preset number configuration when booting for first time
 #define DEFAULT_CONTROL_MODE AIR_CONTROL
 
-#define secondOrder_filter 3          // amount of temperature samples to filter
-#define analog_temperature_filter 500 // amount of temperature samples to filter
-#define digital_temperature_filter 10 // amount of temperature samples to filter
+#define secondOrder_filter 3           // amount of temperature samples to filter
+#define analog_temperature_filter 500  // amount of temperature samples to filter
+#define digital_temperature_filter 10  // amount of temperature samples to filter
 
-#define NTC_MEASUREMENT_PERIOD 1 // in millis
+#define NTC_MEASUREMENT_PERIOD 1  // in millis
 #define NTC_SAMPLES_TEST 1000
-#define CURRENT_UPDATE_PERIOD 500 // in millis
-#define VOLTAGE_UPDATE_PERIOD 50  // in millis
+#define CURRENT_UPDATE_PERIOD 500  // in millis
+#define VOLTAGE_UPDATE_PERIOD 50   // in millis
 
 #define setupAutoCalibrationPoint 0
 #define firstAutoCalibrationPoint 1
 #define secondAutoCalibrationPoint 2
 
 // GPRS variables to transmit
-#define turnedOn 0     // transmit first turned ON with hardware verification
-#define room 1         // transmit room variables
-#define aliveRefresh 2 // message to let know that incubator is still ON
+#define turnedOn 0      // transmit first turned ON with hardware verification
+#define room 1          // transmit room variables
+#define aliveRefresh 2  // message to let know that incubator is still ON
 
 #define digitalCurrentSensorReadPeriod 500
 #define externalADCReadPeriod 30
@@ -176,33 +179,33 @@
 // sensor variables
 #define defaultCurrentSamples 30
 #define defaultTestingSamples 8000
-#define Rsense 3000 // 3 microohm as shunt resistor
+#define Rsense 3000  // 3 microohm as shunt resistor
 #define digitalCurrentSensor_i2c_address 65
 #define roomSensorAddress 112
 
 // #define system constants
-#define humidifierDutyCycleMax 100 // maximum humidity cycle in heater to be set
-#define humidifierDutyCycleMin 0   // minimum humidity cycle in heater to be set
+#define humidifierDutyCycleMax 100  // maximum humidity cycle in heater to be set
+#define humidifierDutyCycleMin 0    // minimum humidity cycle in heater to be set
 
-#define stepTemperatureIncrement 0.1 // maximum allowed temperature to be set
-#define stepHumidityIncrement 5      // maximum allowed temperature to be set
-#define presetHumidity 60            // preset humidity
-#define maxHum 90                    // maximum allowed humidity to be set
-#define minHum 20                    // minimum allowed humidity to be set
-#define LEDMaxIntensity 100          // max LED intensity to be set
-#define fanMaxSpeed 100              // max fan speed (percentage) to be set
+#define stepTemperatureIncrement 0.1  // maximum allowed temperature to be set
+#define stepHumidityIncrement 5       // maximum allowed temperature to be set
+#define presetHumidity 60             // preset humidity
+#define maxHum 90                     // maximum allowed humidity to be set
+#define minHum 20                     // minimum allowed humidity to be set
+#define LEDMaxIntensity 100           // max LED intensity to be set
+#define fanMaxSpeed 100               // max fan speed (percentage) to be set
 
 // Encoder variables
-#define NUMENCODERS 1 // number of encoders in circuit
+#define NUMENCODERS 1  // number of encoders in circuit
 #define ENCODER_TICKS_DIV 0
 #define encPulseDebounce 50
 
 // User Interface display constants
-#define brightenRate 10 // intro brighten speed (Higher value, faster)
+#define brightenRate 10  // intro brighten speed (Higher value, faster)
 #define valuePosition 245
 #define separatorPosition 240
 #define unitPosition 315
-#define textFontSize 2 // text default size
+#define textFontSize 2  // text default size
 #define width_select 20
 #define height_heading 34
 #define width_indentation 4
@@ -216,64 +219,60 @@
 #define headint_text_height height_heading / 5
 #define initialSensorsValue "XX"
 #define barThickness 3
-#define blinkTimeON 1000 // displayed text ON time
-#define blinkTimeOFF 100 // displayed text OFF time
+#define blinkTimeON 1000  // displayed text ON time
+#define blinkTimeOFF 100  // displayed text OFF time
 #define time_back_draw 255
 #define time_back_wait 255
 
 #define DEFAULT_AUTOLOCK ON
 
-typedef enum
-{
-    NTC_BABY_MIN_ERROR = 0,
-    NTC_BABY_MAX_ERROR,
-    DIG_TEMP_ROOM_MIN_ERROR,
-    DIG_TEMP_ROOM_MAX_ERROR,
-    DIG_HUM_ROOM_MIN_ERROR,
-    DIG_HUM_ROOM_MAX_ERROR,
-    DIGITAL_SENSOR_NOTFOUND,
-    HEATER_CONSUMPTION_MIN_ERROR,
-    FAN_CONSUMPTION_MIN_ERROR,
-    PHOTOTHERAPY_CONSUMPTION_MIN_ERROR,
-    HUMIDIFIER_CONSUMPTION_MIN_ERROR,
-    HEATER_CONSUMPTION_MAX_ERROR,
-    FAN_CONSUMPTION_MAX_ERROR,
-    PHOTOTHERAPY_CONSUMPTION_MAX_ERROR,
-    HUMIDIFIER_CONSUMPTION_MAX_ERROR,
-    STANDBY_CONSUMPTION_MAX_ERROR,
-    DEFECTIVE_SCREEN,
-    DEFECTIVE_BUZZER,
-    DEFECTIVE_CURRENT_SENSOR,
-    UNCALIBRATED_SENSOR,
+typedef enum {
+  NTC_BABY_MIN_ERROR = 0,
+  NTC_BABY_MAX_ERROR,
+  DIG_TEMP_ROOM_MIN_ERROR,
+  DIG_TEMP_ROOM_MAX_ERROR,
+  DIG_HUM_ROOM_MIN_ERROR,
+  DIG_HUM_ROOM_MAX_ERROR,
+  DIGITAL_SENSOR_NOTFOUND,
+  HEATER_CONSUMPTION_MIN_ERROR,
+  FAN_CONSUMPTION_MIN_ERROR,
+  PHOTOTHERAPY_CONSUMPTION_MIN_ERROR,
+  HUMIDIFIER_CONSUMPTION_MIN_ERROR,
+  HEATER_CONSUMPTION_MAX_ERROR,
+  FAN_CONSUMPTION_MAX_ERROR,
+  PHOTOTHERAPY_CONSUMPTION_MAX_ERROR,
+  HUMIDIFIER_CONSUMPTION_MAX_ERROR,
+  STANDBY_CONSUMPTION_MAX_ERROR,
+  DEFECTIVE_SCREEN,
+  DEFECTIVE_BUZZER,
+  DEFECTIVE_CURRENT_SENSOR,
+  UNCALIBRATED_SENSOR,
 } HW_ERROR_ID;
 
-typedef enum
-{
-    HUMIDITY_ALARM = 0,
-    TEMPERATURE_ALARM,
-    AIR_THERMAL_CUTOUT_ALARM,
-    SKIN_THERMAL_CUTOUT_ALARM,
-    AIR_SENSOR_ISSUE_ALARM,
-    SKIN_SENSOR_ISSUE_ALARM,
-    FAN_ISSUE_ALARM,
-    HEATER_ISSUE_ALARM,
-    NUM_ALARMS,
+typedef enum {
+  HUMIDITY_ALARM = 0,
+  TEMPERATURE_ALARM,
+  AIR_THERMAL_CUTOUT_ALARM,
+  SKIN_THERMAL_CUTOUT_ALARM,
+  AIR_SENSOR_ISSUE_ALARM,
+  SKIN_SENSOR_ISSUE_ALARM,
+  FAN_ISSUE_ALARM,
+  HEATER_ISSUE_ALARM,
+  NUM_ALARMS,
 } ALARMS_ID;
 
-typedef enum
-{
-    EVENT_2G = 0,
-    EVENT_WIFI,
-    EVENT_SERVER_CONNECTION,
-    EVENT_OTA_ONGOING,
+typedef enum {
+  EVENT_2G = 0,
+  EVENT_WIFI,
+  EVENT_SERVER_CONNECTION,
+  EVENT_OTA_ONGOING,
 } UI_EVENTS_ID;
 
-typedef enum
-{
-    EVENT_2G_UI_POS = 5,
-    EVENT_SERVER_CONNECTION_UI_POS = EVENT_2G_UI_POS + 2 * letter_width,
-    EVENT_WIFI_UI_POS = EVENT_SERVER_CONNECTION_UI_POS + letter_width,
-    EVENT_OTA_ONGOING_UI_POS = EVENT_WIFI_UI_POS + letter_width,
+typedef enum {
+  EVENT_2G_UI_POS = 5,
+  EVENT_SERVER_CONNECTION_UI_POS = EVENT_2G_UI_POS + 2 * letter_width,
+  EVENT_WIFI_UI_POS = EVENT_SERVER_CONNECTION_UI_POS + letter_width,
+  EVENT_OTA_ONGOING_UI_POS = EVENT_WIFI_UI_POS + letter_width,
 } UI_EVENTS_ID_POS;
 
 // Graphic variables
@@ -281,7 +280,7 @@ typedef enum
 #define DRAW true
 
 // graphic text configurations
-#define graphicTextOffset 1 // bar pos is counted from 1, but text from 0
+#define graphicTextOffset 1  // bar pos is counted from 1, but text from 0
 #define CENTER true
 #define LEFT_MARGIN false
 
@@ -341,7 +340,7 @@ typedef enum
 #define introTextColor BLACK
 #define transitionEffect BLACK
 
-#define BACKLIGHT_NO_INTERACTION_TIME 12000 // time to decrease backlight display if no user actions
+#define BACKLIGHT_NO_INTERACTION_TIME 12000  // time to decrease backlight display if no user actions
 
 #define GPRS_TASK_PERIOD 1
 #define OTA_TASK_PERIOD 0
@@ -355,49 +354,49 @@ typedef enum
 #define BACKLIGHT_DELAY 2
 #define INIT_TFT_DELAY 300
 
-#define TIME_TRACK_UPDATE_PERIOD 900000 // 15 minutes
+#define TIME_TRACK_UPDATE_PERIOD 900000  // 15 minutes
 
 typedef struct
 {
-    double temperature[numSensors];
-    double humidity = false;
-    double desiredControlTemperature = false;
-    double desiredControlHumidity = false;
+  double temperature[numSensors];
+  double humidity = false;
+  double desiredControlTemperature = false;
+  double desiredControlHumidity = false;
 
-    double system_current_standby_test = false;
-    double heater_current_test = false;
-    double fan_current_test = false;
-    double phototherapy_current_test = false;
-    double humidifier_current_test = false;
-    double display_current_test = false;
-    double buzzer_current_test = false;
-    bool HW_critical_error = false;
-    double HW_test_error_code = false;
+  double system_current_standby_test = false;
+  double heater_current_test = false;
+  double fan_current_test = false;
+  double phototherapy_current_test = false;
+  double humidifier_current_test = false;
+  double display_current_test = false;
+  double buzzer_current_test = false;
+  bool HW_critical_error = false;
+  double HW_test_error_code = false;
 
-    double system_current = false;
-    double system_voltage = false;
-    double fan_current = false;
-    double humidifier_current = false;
-    double humidifier_voltage = false;
-    double phototherapy_current = false;
-    int serialNumber = false;
+  double system_current = false;
+  double system_voltage = false;
+  double fan_current = false;
+  double humidifier_current = false;
+  double humidifier_voltage = false;
+  double phototherapy_current = false;
+  int serialNumber = false;
 
-    bool controlMode = DEFAULT_CONTROL_MODE;
-    bool temperatureControl = false;
-    bool humidityControl = false;
-    bool phototherapy = false;
+  bool controlMode = DEFAULT_CONTROL_MODE;
+  bool temperatureControl = false;
+  bool humidityControl = false;
+  bool phototherapy = false;
 
-    bool calibrationError = false;
+  bool calibrationError = false;
 
-    long last_check_time = false;
-    float standby_time = false;
-    float control_active_time = false;
-    float heater_active_time = false;
-    float fan_active_time = false;
-    float phototherapy_active_time = false;
-    float humidifier_active_time = false;
+  long last_check_time = false;
+  float standby_time = false;
+  float control_active_time = false;
+  float heater_active_time = false;
+  float fan_active_time = false;
+  float phototherapy_active_time = false;
+  float humidifier_active_time = false;
 
-    byte language;
+  byte language;
 
 } in3ator_parameters;
 
@@ -478,6 +477,7 @@ void UI_actuatorsProgress();
 
 void wifiInit(void);
 void wifiDisable();
+bool GPRS_CheckConnection();
 
 void loaddefaultValues();
 void UI_calibration();
