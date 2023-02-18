@@ -33,7 +33,7 @@
 
 #define ENABLE_WIFI_OTA true  // enable wifi OTA
 #define ENABLE_GPRS_OTA true  // enable GPRS OTA
-#define ALARM_SYSTEM_ENABLED false
+#define ALARM_SYSTEM_ENABLED true
 
 #define CORE_ID_FREERTOS 1
 
